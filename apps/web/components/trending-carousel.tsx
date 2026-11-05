@@ -17,6 +17,7 @@ interface TrendingCarouselProps {
     title: string;
     originalTitle?: string;
     posterUrl: string;
+    thumbUrl?: string;
     slug: string;
     year?: string | number;
     quality?: string;
@@ -36,9 +37,9 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
 
   return (
     <section className="py-4 md:py-6 w-full relative overflow-hidden">
-      <div className="container mx-auto px-3 md:px-8">
+      <div className="container mx-auto px-3 md:px-6">
         <div className="flex min-w-0 items-center justify-between gap-3 mb-3 md:mb-5">
-          <h2 className="min-w-0 text-base md:text-xl font-bold text-white leading-tight">
+          <h2 className="min-w-0 text-lg md:text-xl font-bold text-white leading-tight">
             {title}
           </h2>
         </div>
@@ -88,12 +89,11 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
                 className="h-auto group/slide select-none"
               >
                 <div className="relative flex flex-col gap-1.5 w-full">
-                  {/* Ranking number behind poster - RoPhim style */}
-                  <div className="absolute -left-1 bottom-8 z-0 pointer-events-none select-none">
+                  <div className="absolute -left-1 bottom-10 z-0 pointer-events-none select-none">
                     <span
-                      className="ranking-number-hollow text-[72px] md:text-[96px] leading-none font-black italic"
+                      className="text-[72px] md:text-[96px] leading-none font-black italic"
                       style={{
-                        WebkitTextStroke: "2px rgba(255,255,255,0.25)",
+                        WebkitTextStroke: "2px rgba(255,255,255,0.22)",
                         color: "transparent",
                       }}
                     >
@@ -103,7 +103,7 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
 
                   <div className="relative z-10 ml-4 md:ml-6">
                     <div className="relative aspect-[2/3] w-full rounded-md overflow-hidden shadow-xl transition-transform duration-300 group-hover/slide:-translate-y-1">
-                      <MovieCard {...movie} hideInfo />
+                      <MovieCard {...movie} hideInfo variant="vertical" />
                     </div>
 
                     <div className="mt-2 px-0.5">
