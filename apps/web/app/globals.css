@@ -546,15 +546,15 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 24px;
   background:
-    radial-gradient(ellipse at 16% 0%, rgba(255, 255, 255, 0.2), transparent 42%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.045) 48%, rgba(255, 216, 117, 0.055));
+    radial-gradient(ellipse at 16% 0%, rgba(190, 205, 230, 0.075), transparent 42%),
+    linear-gradient(135deg, rgba(24, 29, 43, 0.76), rgba(13, 16, 27, 0.68) 48%, rgba(54, 44, 25, 0.24));
   -webkit-backdrop-filter: blur(30px) saturate(190%);
   backdrop-filter: blur(30px) saturate(190%);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.28),
     0 2px 8px rgba(0, 0, 0, 0.16),
-    inset 0 1px 1px rgba(255, 255, 255, 0.34),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    inset 0 1px 1px rgba(255, 255, 255, 0.13),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.045);
   transition:
     background 320ms ease,
     border-color 320ms ease,
@@ -570,8 +570,8 @@ body {
   border-radius: inherit;
   pointer-events: none;
   background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.12), transparent 28%, transparent 72%, rgba(255, 255, 255, 0.045)),
-    radial-gradient(ellipse at 50% -35%, rgba(255, 255, 255, 0.16), transparent 68%);
+    linear-gradient(115deg, rgba(255, 255, 255, 0.055), transparent 28%, transparent 72%, rgba(255, 255, 255, 0.025)),
+    radial-gradient(ellipse at 50% -35%, rgba(205, 220, 245, 0.07), transparent 68%);
 }
 
 .navbar-scrolled .navbar-glass-panel {
@@ -586,10 +586,10 @@ body {
 }
 
 .navbar-glass-search {
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background:
-    radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.13), transparent 70%),
-    rgba(255, 255, 255, 0.075);
+    radial-gradient(ellipse at 20% 0%, rgba(190, 205, 230, 0.065), transparent 70%),
+    rgba(9, 12, 21, 0.38);
   -webkit-backdrop-filter: blur(18px) saturate(175%);
   backdrop-filter: blur(18px) saturate(175%);
   box-shadow:
@@ -615,7 +615,7 @@ body {
 
 .navbar-glass-control {
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.055));
+  background: linear-gradient(145deg, rgba(150, 170, 205, 0.10), rgba(12, 16, 28, 0.34));
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
   box-shadow:
@@ -672,7 +672,7 @@ body {
   border-radius: inherit;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.96;
+  opacity: 0.62;
 }
 
 .navbar-glass-panel > :not(.navbar-glass-shader) {
