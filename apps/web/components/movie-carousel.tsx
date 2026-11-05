@@ -44,10 +44,10 @@ export const MovieCarousel = ({
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="py-4 md:py-6 w-full relative overflow-hidden">
-      <div className="container mx-auto px-4 md:px-10">
+    <section className="py-3 md:py-6 w-full relative overflow-hidden">
+      <div className="container mx-auto px-3 md:px-8">
         {/* Header */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 md:mb-5">
+        <div className="flex items-center justify-between gap-2 mb-3 md:mb-5">
           <div className="flex min-w-0 items-center gap-2.5 md:gap-3">
             {icon ? (
               <span className="text-xl md:text-2xl shrink-0">{icon}</span>
@@ -66,7 +66,7 @@ export const MovieCarousel = ({
           {viewMoreLink && (
             <Link
               href={viewMoreLink}
-              className="self-start sm:self-auto text-gray-400 hover:text-white text-[11px] md:text-xs font-bold uppercase tracking-widest inline-flex items-center gap-1.5 md:gap-2 transition-all hover:translate-x-1 group/link whitespace-nowrap"
+              className="text-gray-400 hover:text-white text-[9px] md:text-xs font-bold uppercase tracking-widest inline-flex items-center gap-1 transition-all whitespace-nowrap"
             >
               Xem tất cả
               <ChevronRight
@@ -96,7 +96,7 @@ export const MovieCarousel = ({
           <Swiper
             modules={[Navigation]}
             spaceBetween={12}
-            slidesPerView={2.15}
+            slidesPerView={2.25}
             navigation={{
               prevEl: navigationPrevRef.current,
               nextEl: navigationNextRef.current,
@@ -109,9 +109,9 @@ export const MovieCarousel = ({
               }
             }}
             breakpoints={{
-              480: { slidesPerView: 2.4, spaceBetween: 14 },
+              480: { slidesPerView: 2.6, spaceBetween: 14 },
               768: { slidesPerView: 3.4, spaceBetween: 18 },
-              1024: { slidesPerView: 4.4, spaceBetween: 18 },
+              1024: { slidesPerView: 5.2, spaceBetween: 18 },
               1440: { slidesPerView: 5.4, spaceBetween: 22 },
             }}
             className="w-full !overflow-hidden !pb-1"
