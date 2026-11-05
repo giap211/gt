@@ -22,21 +22,49 @@ function normalize(value: string) {
     .trim();
 }
 
-function isSameMovie(chartTitle: string, movie: ListMovie) {
+function titleMatchScore(chartTitle: string, movie: ListMovie) {
   const sourceTitle = normalize(chartTitle);
   const catalogTitles = [movie.name, movie.origin_name]
     .filter(Boolean)
     .map(normalize)
     .filter(Boolean);
 
-  return catalogTitles.some((catalogTitle) => {
-    if (sourceTitle === catalogTitle) return true;
-    return (
-      Math.min(sourceTitle.length, catalogTitle.length) >= 6 &&
-      (sourceTitle.includes(catalogTitle) ||
-        catalogTitle.includes(sourceTitle))
+  const meaningfulTokens = (value: string) =>
+    value.split(/\\s+/).filter((token) =>
+      token.length > 2 && !["the", "and", "for", "with"].includes(token),
     );
-  });
+  const sourceTokens = meaningfulTokens(sourceTitle);
+
+  return Math.max(0, ...catalogTitles.map((catalogTitle) => {
+    if (sourceTitle === catalogTitle) return 100;
+    if (
+      Math.min(sourceTitle.length, catalogTitle.length) >= 6 &&
+      (sourceTitle.includes(catalogTitle) || catalogTitle.includes(sourceTitle))
+    ) return 90;
+
+    // Hỗ trợ tên quốc tế khác nhau, ví dụ Doctor X: Mafia in White
+    // và Doctor X: Age of the White Mafia.
+    const catalogTokens = meaningfulTokens(catalogTitle);
+    const shared = sourceTokens.filter((token) => catalogTokens.includes(token));
+    const smallerTokenCount = Math.min(sourceTokens.length, catalogTokens.length);
+    return shared.length >= 2 && smallerTokenCount > 0 &&
+      shared.length / smallerTokenCount >= 0.6
+      ? 60 + shared.length
+      : 0;
+  }));
+}
+
+function getNetflixSearchTerms(title: string) {
+  const cleanTitle = title
+    .replace(/:\\s*(limited series|season \\d+|part \\d+)$/i, "")
+    .trim();
+  const terms = [cleanTitle];
+  const baseTitle = cleanTitle.split(":")[0]?.trim();
+  if (baseTitle && baseTitle !== cleanTitle) terms.push(baseTitle);
+  if (/^doctor x$/i.test(baseTitle || cleanTitle)) {
+    terms.unshift("Doctor X: Age of the White Mafia");
+  }
+  return [...new Set(terms.filter(Boolean))];
 }
 
 async function getTmdbWeeklyTrending() {
@@ -89,23 +117,30 @@ async function findCatalogMatches(
 
   for (const title of titles) {
     if (selected.length >= limit) break;
-    const cleanTitle = title.trim();
-    if (!cleanTitle) continue;
+    const searchTerms = getNetflixSearchTerms(title);
+    let bestMatch: ListMovie | undefined;
+    let bestScore = 0;
 
-    try {
-      const result = await searchMovies(cleanTitle, 1, 10);
-      const movie = result.items.find(
-        (item) =>
-          !seen.has(item.slug) &&
-          (!tmdbType || item.tmdb?.type === tmdbType) &&
-          isSameMovie(cleanTitle, item),
-      );
-      if (!movie) continue;
-      selected.push(movie);
-      seen.add(movie.slug);
-    } catch (error) {
-      console.warn("Could not match hero title:", cleanTitle, error);
+    for (const searchTerm of searchTerms) {
+      try {
+        const result = await searchMovies(searchTerm, 1, 10);
+        for (const item of result.items) {
+          if (seen.has(item.slug) || (tmdbType && item.tmdb?.type !== tmdbType)) continue;
+          const score = titleMatchScore(title, item);
+          if (score > bestScore) {
+            bestMatch = item;
+            bestScore = score;
+          }
+        }
+        if (bestScore >= 90) break;
+      } catch (error) {
+        console.warn("Could not match hero title:", searchTerm, error);
+      }
     }
+
+    if (!bestMatch) continue;
+    selected.push(bestMatch);
+    seen.add(bestMatch.slug);
   }
 
   return selected;
@@ -135,9 +170,15 @@ async function getNetflixVietnamTopTvShows() {
   }
 
   const html = await response.text();
-  const chartStart = html.indexOf("Top 10 TV Shows in Vietnam");
+  const chartStartCandidates = [
+    html.indexOf("Top 10 Shows in Vietnam"),
+    html.indexOf("Top 10 TV Shows in Vietnam"),
+  ].filter((index) => index >= 0);
+  const chartStart = chartStartCandidates.length > 0
+    ? Math.min(...chartStartCandidates)
+    : -1;
   const chartEnd = chartStart >= 0
-    ? html.indexOf("Explore The Most Watched TV Shows", chartStart)
+    ? html.indexOf("Top 10 Shows in Vietnam Overview", chartStart)
     : -1;
   const chartHtml = chartStart >= 0
     ? html.slice(chartStart, chartEnd > chartStart ? chartEnd : chartStart + 180000)
