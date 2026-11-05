@@ -145,8 +145,24 @@ export default function Home() {
           getMoviesByCategory("tinh-cam", 1, true),
         ]);
 
+        let trendingHero: ListMovie[] = [];
+        try {
+          const heroResponse = await fetch("/api/hero-trending");
+          if (heroResponse.ok) {
+            const heroPayload = (await heroResponse.json()) as {
+              items?: ListMovie[];
+            };
+            trendingHero = Array.isArray(heroPayload.items)
+              ? heroPayload.items
+              : [];
+          }
+        } catch (error) {
+          console.error("Failed to fetch trending hero movies", error);
+        }
+
+        // API đã tự lấp chỗ trống bằng phim mới cập nhật nếu Trends không đủ 6 phim.
         const curatedHero = (
-          latestRes?.items || []
+          trendingHero.length ? trendingHero : latestRes?.items || []
         ).slice(0, 6);
 
         if (cancelled) return;
