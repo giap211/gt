@@ -38,7 +38,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
   if (!movies || movies.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[340px] sm:h-[390px] md:h-[540px] lg:h-[610px] overflow-hidden group/hero bg-black">
+    <section className="relative w-full h-[300px] sm:h-[390px] md:h-[560px] lg:h-[620px] overflow-hidden group/hero bg-black">
       <Swiper
         modules={[Autoplay, EffectFade, Pagination, Thumbs]}
         effect="fade"
@@ -75,18 +75,18 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   quality={90}
                   className="object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent md:bg-gradient-to-r md:from-black/85 md:via-black/35 md:to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/25" />
               </div>
 
-              <div className="container relative z-20 h-full flex flex-col items-center justify-end text-center px-4 pb-[82px] md:pb-[112px]">
-                <div className="w-full max-w-3xl animate-fade-up">
+              <div className="container relative z-20 h-full flex flex-col items-center justify-end text-center px-4 pb-[76px] md:items-start md:justify-center md:text-left md:pb-8">
+                <div className="w-full max-w-3xl animate-fade-up md:max-w-xl">
                   <Link
                     href={`/phim/${movie.slug}`}
                     className="inline-block max-w-full text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] hover:text-[#ffd875] transition-colors"
                     aria-label={`Xem phim ${movie.name}`}
                   >
-                    <h1 className="text-[21px] leading-tight sm:text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+                    <h1 className="text-[21px] leading-tight sm:text-2xl md:text-4xl lg:text-5xl font-black tracking-tight md:uppercase">
                       {movie.name}
                     </h1>
                   </Link>
@@ -107,7 +107,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                     </span>
                   )}
 
-                  <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                  <div className="mt-3 flex flex-wrap items-center justify-center md:justify-start gap-1.5">
                     {movie.quality && (
                       <span className="rounded border border-[#ffd875]/70 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-[#ffd875]">
                         {movie.quality}
@@ -134,7 +134,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         })}
       </Swiper>
 
-      <div className="absolute bottom-5 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-fit max-w-[90%]">
+      <div className="absolute bottom-4 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-fit max-w-[90%]">
         <Swiper
           onSwiper={setThumbsSwiper}
           modules={[Thumbs]}
