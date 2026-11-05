@@ -161,7 +161,7 @@ export default function Home() {
           console.error("Failed to fetch trending hero movies", error);
         }
 
-        // API ưu tiên 3 phim TMDB + 3 phim Netflix Việt Nam; phim mới chỉ dùng để lấp chỗ trống.
+        // API ưu tiên 3 phim TMDB + 3 TV shows Netflix Việt Nam; phim mới chỉ dùng để lấp chỗ trống.
         const curatedHero = (
           trendingHero.length ? trendingHero : latestRes?.items || []
         ).slice(0, 6);
