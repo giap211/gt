@@ -3,8 +3,15 @@ import { getLatestMovies, searchMovies, type ListMovie } from "@/lib/ophim-clien
 
 export const revalidate = 1800;
 
-const JUSTWATCH_CHART_URL =
-  "https://www.justwatch.com/us/streaming-charts?c=global&ct=monthly";
+const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+const TMDB_TRENDING_URL = `${TMDB_BASE_URL}/trending/movie/week`;
+
+type TmdbTrendingResponse = {
+  results?: Array<{
+    title?: string;
+    original_title?: string;
+  }>;
+};
 
 function normalize(value: string) {
   return value
@@ -13,47 +20,6 @@ function normalize(value: string) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
-}
-
-function decodeHtml(value: string) {
-  return value
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&#(\d+);/g, (_, code: string) =>
-      String.fromCodePoint(Number(code)),
-    )
-    .replace(/&#x([\da-f]+);/gi, (_, code: string) =>
-      String.fromCodePoint(parseInt(code, 16)),
-    );
-}
-
-function getChartTitles(html: string) {
-  const titles: string[] = [];
-  const seen = new Set<string>();
-  const linkPattern =
-    /<a\b[^>]*href="\/[^"]*\/movie\/[^"]+"[^>]*>([\s\S]*?)<\/a>/gi;
-
-  for (const match of html.matchAll(linkPattern)) {
-    const rawTitle = match[1] ?? "";
-    const title = decodeHtml(
-      rawTitle
-        .replace(/<[^>]*>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim(),
-    );
-    const key = normalize(title);
-
-    if (!title || !key || seen.has(key)) continue;
-    if (title.length > 100) continue;
-
-    seen.add(key);
-    titles.push(title);
-  }
-
-  return titles;
 }
 
 function isSameMovie(chartTitle: string, movie: ListMovie) {
@@ -73,66 +39,88 @@ function isSameMovie(chartTitle: string, movie: ListMovie) {
   });
 }
 
-async function getJustWatchGlobalMonthly() {
-  const response = await fetch(JUSTWATCH_CHART_URL, {
+async function getTmdbWeeklyTrending() {
+  const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
+  const apiKey = process.env.TMDB_API_KEY;
+
+  if (!accessToken && !apiKey) {
+    throw new Error("TMDB credentials are not configured");
+  }
+
+  const url = new URL(TMDB_TRENDING_URL);
+  url.searchParams.set("language", "vi-VN");
+  if (!accessToken && apiKey) {
+    url.searchParams.set("api_key", apiKey);
+  }
+
+  const response = await fetch(url, {
     headers: {
-      Accept: "text/html,application/xhtml+xml",
-      "User-Agent": "Mozilla/5.0 (compatible; GiapTranMovieChart/1.0)",
+      Accept: "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     },
     next: { revalidate: 1800 },
   });
 
   if (!response.ok) {
-    throw new Error(`JustWatch chart returned ${response.status}`);
+    throw new Error(`TMDB trending returned ${response.status}`);
   }
 
-  const html = await response.text();
-  const titles = getChartTitles(html);
+  const data = (await response.json()) as TmdbTrendingResponse;
+  const results = Array.isArray(data.results) ? data.results : [];
+  const titles = results.flatMap((item) =>
+    [item.title, item.original_title]
+      .filter((title): title is string => typeof title === "string" && title.trim().length > 0),
+  );
 
   if (titles.length === 0) {
-    throw new Error("Could not parse movie titles from JustWatch chart");
+    throw new Error("TMDB returned no trending movie titles");
   }
 
   return titles;
 }
 
-export async function GET() {
-  try {
-    const chartTitles = await getJustWatchGlobalMonthly();
-    const selected: ListMovie[] = [];
-    const seen = new Set<string>();
+async function buildHeroItems(titles: string[]) {
+  const selected: ListMovie[] = [];
+  const seen = new Set<string>();
 
-    // Giữ thứ tự xếp hạng của JustWatch; chỉ lấy phim có trong kho OPhim.
-    for (const title of chartTitles) {
+  // Giữ thứ tự trending của TMDB và chỉ lấy phim có trong kho OPhim.
+  for (const title of titles) {
+    if (selected.length >= 6) break;
+
+    const result = await searchMovies(title, 1, 10);
+    const movie = result.items.find(
+      (item) => !seen.has(item.slug) && isSameMovie(title, item),
+    );
+
+    if (!movie) continue;
+    selected.push(movie);
+    seen.add(movie.slug);
+  }
+
+  // Nếu TMDB có ít phim trùng kho OPhim, bổ sung phim mới cập nhật.
+  if (selected.length < 6) {
+    const latest = await getLatestMovies(1);
+    for (const movie of latest.items) {
       if (selected.length >= 6) break;
-
-      const result = await searchMovies(title, 1, 10);
-      const movie = result.items.find(
-        (item) =>
-          !seen.has(item.slug) && isSameMovie(title, item),
-      );
-
-      if (!movie) continue;
+      if (seen.has(movie.slug)) continue;
       selected.push(movie);
       seen.add(movie.slug);
     }
+  }
 
-    // Nếu chart không có đủ phim thuộc kho OPhim, bổ sung phim mới cập nhật.
-    if (selected.length < 6) {
-      const latest = await getLatestMovies(1);
-      for (const movie of latest.items) {
-        if (selected.length >= 6) break;
-        if (seen.has(movie.slug)) continue;
-        selected.push(movie);
-        seen.add(movie.slug);
-      }
-    }
+  return selected.slice(0, 6);
+}
+
+export async function GET() {
+  try {
+    const chartTitles = await getTmdbWeeklyTrending();
+    const items = await buildHeroItems(chartTitles);
 
     return NextResponse.json(
       {
-        items: selected.slice(0, 6),
-        source: "justwatch-global-monthly",
-        chartUrl: JUSTWATCH_CHART_URL,
+        items,
+        source: "tmdb-weekly-trending",
+        chartUrl: "https://www.themoviedb.org/trending/movie/week",
       },
       {
         headers: {
@@ -141,7 +129,7 @@ export async function GET() {
       },
     );
   } catch (error) {
-    console.error("Failed to build JustWatch trending hero:", error);
+    console.error("Failed to build TMDB trending hero:", error);
     const fallback = await getLatestMovies(1);
     return NextResponse.json(
       {
