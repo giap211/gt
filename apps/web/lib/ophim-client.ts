@@ -23,6 +23,10 @@ export interface ListMovie {
   isHot?: boolean;
   category?: Category[];
   country?: Country[];
+  tmdb?: {
+    id?: number | string;
+    type?: "movie" | "tv" | string;
+  };
 }
 
 export interface DetailMovie extends ListMovie {
@@ -111,6 +115,8 @@ type ApiMovieItem = Partial<Omit<ListMovie, "year" | "view">> & {
   episode_current?: string;
   time?: string;
   tmdb?: {
+    id?: number | string;
+    type?: "movie" | "tv" | string;
     vote_average?: number | string;
   };
   imdb?: {
@@ -259,6 +265,9 @@ const cleanAndFilterMovies = (
       time: item.time,
       category: item.category,
       country: item.country,
+      tmdb: item.tmdb?.id
+        ? { id: item.tmdb.id, type: item.tmdb.type }
+        : undefined,
       isHot: isHomeFeed || Boolean(item.tmdb || item.imdb),
     });
   }
@@ -370,6 +379,98 @@ const belongsToCountry = (movie: ListMovie, requestedCountry: string): boolean =
   });
 };
 
+const COUNTRY_ISO_CODES: Record<string, string> = {
+  "han-quoc": "KR", "nhat-ban": "JP", "trung-quoc": "CN",
+  "au-my": "US", "thai-lan": "TH", "hong-kong": "HK",
+  "viet-nam": "VN", "dai-loan": "TW", "an-do": "IN",
+  "anh": "GB", "phap": "FR", "canada": "CA", "duc": "DE",
+  "tay-ban-nha": "ES", "tho-nhi-ky": "TR", "ha-lan": "NL",
+  "indonesia": "ID", "nga": "RU", "mexico": "MX", "ba-lan": "PL",
+  "uc": "AU", "thuy-dien": "SE", "malaysia": "MY", "brazil": "BR",
+  "philippines": "PH", "bo-dao-nha": "PT", "y": "IT", "dan-mach": "DK",
+  "uae": "AE", "na-uy": "NO", "thuy-si": "CH", "nam-phi": "ZA",
+  "ukraine": "UA", "a-rap-xe-ut": "SA", "new-zealand": "NZ",
+  "ireland": "IE", "singapore": "SG", "belgium": "BE",
+  "argentina": "AR", "colombia": "CO", "chile": "CL",
+  "israel": "IL", "iran": "IR", "pakistan": "PK",
+};
+
+type TmdbCountryDetails = {
+  origin_country?: string[];
+  production_countries?: Array<{ iso_3166_1?: string }>;
+};
+
+async function matchesTmdbCountry(
+  movie: ListMovie,
+  requestedCountry: string,
+): Promise<boolean | null> {
+  const tmdbId = String(movie.tmdb?.id ?? "").trim();
+  const tmdbType = movie.tmdb?.type === "tv" ? "tv" : movie.tmdb?.type === "movie" ? "movie" : "";
+  const expectedIso = COUNTRY_ISO_CODES[requestedCountry];
+
+  if (!tmdbId || !/^\\d+$/.test(tmdbId) || !tmdbType || !expectedIso) {
+    return null;
+  }
+
+  const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
+  const apiKey = process.env.TMDB_API_KEY;
+  if (!accessToken && !apiKey) return null;
+
+  const url = new URL(`https://api.themoviedb.org/3/${tmdbType}/${tmdbId}`);
+  url.searchParams.set("language", "en-US");
+  if (!accessToken && apiKey) url.searchParams.set("api_key", apiKey);
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      next: { revalidate: 86400 },
+    });
+    if (!response.ok) return null;
+
+    const details = (await response.json()) as TmdbCountryDetails;
+    const countryCodes = tmdbType === "tv"
+      ? details.origin_country || []
+      : (details.production_countries || [])
+          .map((country) => country.iso_3166_1 || "")
+          .filter(Boolean);
+
+    return countryCodes.length > 0 ? countryCodes.includes(expectedIso) : null;
+  } catch {
+    return null;
+  }
+};
+
+async function filterMoviesByVerifiedCountry(
+  movies: ListMovie[],
+  requestedCountry: string,
+): Promise<ListMovie[]> {
+  const expectedIso = COUNTRY_ISO_CODES[requestedCountry];
+  if (!expectedIso) return movies.filter((movie) => belongsToCountry(movie, requestedCountry));
+
+  // Verify TMDB-tagged entries in small batches to avoid flooding the API.
+  const output: ListMovie[] = [];
+  for (let index = 0; index < movies.length; index += 8) {
+    const batch = movies.slice(index, index + 8);
+    const verified = await Promise.all(
+      batch.map(async (movie) => ({
+        movie,
+        tmdbMatch: await matchesTmdbCountry(movie, requestedCountry),
+      })),
+    );
+
+    for (const entry of verified) {
+      if (entry.tmdbMatch === false) continue;
+      if (entry.tmdbMatch === true || belongsToCountry(entry.movie, requestedCountry)) {
+        output.push(entry.movie);
+      }
+    }
+  }
+  return output;
+}
+
 export const getMoviesByCountry = async (
   country: string,
   page: number = 1,
@@ -391,8 +492,9 @@ export const getMoviesByCountry = async (
 
     return {
       status: true,
-      items: cleanAndFilterMovies(items, cdn, isHome).filter((movie) =>
-        belongsToCountry(movie, normCountry),
+      items: await filterMoviesByVerifiedCountry(
+        cleanAndFilterMovies(items, cdn, isHome),
+        normCountry,
       ),
       pathImage: cdn,
       pagination: data.data.params?.pagination || emptyPagination(),
