@@ -441,43 +441,91 @@ body {
   display: none !important;
 }
 
-/* Cinematic pulse for the hero play button */
-.hero-play-button::before,
+/* Liquid glass treatment for the hero play button */
+.hero-play-button {
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.34),
+    rgba(255, 255, 255, 0.08) 48%,
+    rgba(255, 216, 117, 0.16)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.24),
+    0 0 28px rgba(255, 216, 117, 0.16),
+    inset 0 1px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.hero-play-button::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 28% 12%, rgba(255, 255, 255, 0.72), transparent 38%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 52%);
+  opacity: 0.8;
+}
+
 .hero-play-button::after {
   content: "";
   position: absolute;
-  inset: -7px;
-  border: 1.5px solid rgba(255, 216, 117, 0.7);
-  border-radius: 9999px;
+  z-index: 1;
+  top: -65%;
+  left: -85%;
+  width: 65%;
+  height: 230%;
+  border-radius: 50%;
   pointer-events: none;
-  z-index: -1;
-  animation: hero-play-pulse 2.4s ease-out infinite;
+  transform: rotate(28deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.48),
+    transparent
+  );
+  animation: liquid-glass-shimmer 4.8s ease-in-out infinite;
 }
 
-.hero-play-button::after {
-  animation-delay: 1.2s;
+.hero-play-button:hover {
+  transform: translateY(-2px) scale(1.08);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 12px 38px rgba(0, 0, 0, 0.3),
+    0 0 38px rgba(255, 216, 117, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
-.hero-play-button:hover::before,
-.hero-play-button:hover::after {
-  border-color: rgba(255, 216, 117, 1);
-  animation-duration: 1.5s;
+.hero-play-button:active {
+  transform: scale(0.96);
 }
 
-@keyframes hero-play-pulse {
-  0% {
-    transform: scale(0.85);
-    opacity: 0.85;
+@keyframes liquid-glass-shimmer {
+  0%, 12% {
+    left: -85%;
+    opacity: 0;
   }
-  100% {
-    transform: scale(1.65);
+  24% {
+    opacity: 0.9;
+  }
+  55%, 100% {
+    left: 135%;
     opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-play-button::before,
   .hero-play-button::after {
     animation: none;
+  }
+
+  .hero-play-button {
+    transition: none;
   }
 }
