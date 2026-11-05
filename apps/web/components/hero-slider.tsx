@@ -37,7 +37,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
   if (!movies || movies.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[340px] sm:h-[390px] md:h-[540px] lg:h-[610px] overflow-hidden group/hero bg-[#191b24]">
+    <section className="relative w-full h-[340px] sm:h-[390px] md:h-[540px] lg:h-[610px] overflow-hidden group/hero bg-black">
       <Swiper
         modules={[Autoplay, EffectFade, Pagination, Thumbs]}
         effect="fade"
@@ -63,7 +63,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
               key={movie._id}
               className="relative w-full h-full overflow-hidden"
             >
-              <div className="absolute inset-0 z-0 bg-[#191b24]">
+              <div className="absolute inset-0 z-0 bg-black">
                 <Image
                   src={heroImage}
                   alt={movie.name}
@@ -74,8 +74,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   quality={90}
                   className="object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#191b24] via-[#191b24]/15 to-[#191b24]/5" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#191b24]/35 via-transparent to-[#191b24]/25" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/25" />
               </div>
 
               <div className="container relative z-20 h-full flex flex-col items-center justify-end text-center px-4 pb-[82px] md:pb-[112px]">
