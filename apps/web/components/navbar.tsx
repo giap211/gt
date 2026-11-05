@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
-import { NavbarGlassShader } from "./navbar-glass-shader";
 
 const GENRES = [
   { name: "Hành Động", slug: "hanh-dong" },
@@ -137,17 +136,20 @@ export const Navbar = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 w-full z-50 py-3 sm:py-4 transition-all duration-300 ${isScrolled ? "navbar-scrolled" : ""}`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-[#0b0d14]/90 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_10px_30px_rgba(0,0,0,0.8)] py-2.5 sm:py-3"
+            : "bg-gradient-to-b from-black/80 via-black/30 to-transparent py-3 sm:py-4"
+        }`}
       >
-        <div className="navbar-glass-panel max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-6">
-          <NavbarGlassShader scrolled={isScrolled} />
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-6">
           {/* Left: Brand Logo & Desktop Navigation */}
           <div className="flex items-center gap-3 sm:gap-8">
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setIsMobileDrawerOpen(true)}
               aria-label="Mở menu"
-              className="navbar-glass-control lg:hidden w-9 h-9 flex items-center justify-center rounded-xl text-white/90 transition-colors"
+              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white/80 transition-colors"
             >
               <Menu size={18} />
             </button>
@@ -288,7 +290,7 @@ export const Navbar = () => {
                       setShowLiveSearch(true);
                     }}
                     onFocus={() => setShowLiveSearch(true)}
-                    className="navbar-glass-search w-full text-white text-xs sm:text-[13px] rounded-full py-1.5 sm:py-2 pl-3 sm:pl-4 pr-11 outline-none transition-all placeholder:text-white/40"
+                    className="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.1] border border-white/[0.08] focus:border-[#ffd875]/60 text-white text-xs sm:text-[13px] rounded-full py-1.5 sm:py-2 pl-3 sm:pl-4 pr-11 outline-none shadow-sm transition-all placeholder:text-white/35"
                     placeholder="Tìm kiếm phim..."
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
