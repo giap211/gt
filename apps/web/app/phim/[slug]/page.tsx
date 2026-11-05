@@ -167,7 +167,6 @@ export default function MovieDetailPage({
     movie.status === "completed" ||
     /full|hoàn/i.test(movie.episode_current || "");
 
-  /* ---------- shared left info block ---------- */
   const InfoBlock = ({ mobile = false }: { mobile?: boolean }) => (
     <div className={mobile ? "text-center" : "text-left"}>
       {!mobile && (
@@ -179,11 +178,7 @@ export default function MovieDetailPage({
         </>
       )}
 
-      <div
-        className={`flex flex-wrap gap-1.5 mt-3 ${
-          mobile ? "justify-center" : ""
-        }`}
-      >
+      <div className={`flex flex-wrap gap-1.5 mt-3 ${mobile ? "justify-center" : ""}`}>
         {imdbScore && (
           <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-[#f5c518]/60 text-[#f5c518] text-[11px] font-bold">
             IMDb {imdbScore}
@@ -199,18 +194,12 @@ export default function MovieDetailPage({
         </span>
         {movie.episode_current && (
           <span className="px-1.5 py-0.5 rounded border border-white/20 text-white/65 text-[11px]">
-            {/full/i.test(movie.episode_current)
-              ? "Full"
-              : movie.episode_current}
+            {/full/i.test(movie.episode_current) ? "Full" : movie.episode_current}
           </span>
         )}
       </div>
 
-      <div
-        className={`flex flex-wrap gap-1.5 mt-2 ${
-          mobile ? "justify-center" : ""
-        }`}
-      >
+      <div className={`flex flex-wrap gap-1.5 mt-2 ${mobile ? "justify-center" : ""}`}>
         {movie.category?.map((c) => (
           <Link
             key={c.id}
@@ -223,13 +212,9 @@ export default function MovieDetailPage({
       </div>
 
       <p
-        className={`mt-2.5 text-xs font-medium flex items-center gap-1.5 ${
-          mobile ? "justify-center" : ""
-        } ${completed ? "text-emerald-400" : "text-[#ff9800]"}`}
+        className={`mt-2.5 text-xs font-medium flex items-center gap-1.5 ${mobile ? "justify-center" : ""} ${completed ? "text-emerald-400" : "text-[#ff9800]"}`}
       >
-        <span
-          className={`w-2 h-2 rounded-full ${completed ? "bg-emerald-400" : "bg-[#ff9800]"}`}
-        />
+        <span className={`w-2 h-2 rounded-full ${completed ? "bg-emerald-400" : "bg-[#ff9800]"}`} />
         {completed
           ? `Đã hoàn thành: ${movie.episode_current || "1 tập"}`
           : `Đang chiếu: ${movie.episode_current || "—"}`}
@@ -239,9 +224,7 @@ export default function MovieDetailPage({
         <p className="text-[12px] text-white/40 mb-1">Giới thiệu:</p>
         <div
           className="text-[13px] text-white/55 leading-relaxed line-clamp-4"
-          dangerouslySetInnerHTML={{
-            __html: movie.content || "Đang cập nhật...",
-          }}
+          dangerouslySetInnerHTML={{ __html: movie.content || "Đang cập nhật..." }}
         />
       </div>
 
@@ -298,8 +281,8 @@ export default function MovieDetailPage({
 
   return (
     <main className="min-h-screen bg-[#0f111a] text-white">
-      {/* HERO */}
-      <div className="relative w-full h-[260px] md:h-[380px] lg:h-[480px]">
+      {/* HERO — shorter + lighter overlay so image shows */}
+      <div className="relative w-full h-[220px] md:h-[340px] lg:h-[420px]">
         <Image
           src={heroSrc}
           alt={movie.name}
@@ -307,40 +290,37 @@ export default function MovieDetailPage({
           priority
           quality={90}
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-cover object-top"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f111a] via-[#0f111a]/35 to-transparent" />
+        {/* soft bottom fade only */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f111a] via-[#0f111a]/25 to-black/20" />
+
+        {/* center play — desktop */}
+        <div className="absolute inset-0 hidden lg:flex items-center justify-center z-10 pointer-events-none">
+          <Link
+            href={`/xem-phim/${movie.slug}`}
+            className="pointer-events-auto w-16 h-16 rounded-full bg-[#ffd875] text-[#1a1a1a] flex items-center justify-center shadow-[0_0_32px_rgba(255,216,117,0.4)] hover:scale-105 transition-transform"
+          >
+            <Play size={26} className="fill-current ml-0.5" />
+          </Link>
+        </div>
       </div>
 
       {/* ========== MOBILE ========== */}
-      <div className="lg:hidden relative z-10 -mt-20 px-4 pb-6">
+      <div className="lg:hidden relative z-10 -mt-16 px-4 pb-6">
         <div className="flex flex-col items-center">
           <div className="relative w-[130px] aspect-[2/3] rounded-xl overflow-hidden border border-white/10 shadow-2xl mb-3">
-            <Image
-              src={movie.poster_url}
-              alt={movie.name}
-              fill
-              priority
-              sizes="130px"
-              className="object-cover"
-            />
+            <Image src={movie.poster_url} alt={movie.name} fill priority sizes="130px" className="object-cover" />
           </div>
-          <h1 className="text-xl font-bold text-center leading-tight">
-            {movie.name}
-          </h1>
-          <p className="text-sm text-[#d4a84b] mt-0.5 text-center">
-            {movie.origin_name}
-          </p>
+          <h1 className="text-xl font-bold text-center leading-tight">{movie.name}</h1>
+          <p className="text-sm text-[#d4a84b] mt-0.5 text-center">{movie.origin_name}</p>
 
           <button
             onClick={() => setShowInfo(!showInfo)}
             className="mt-2 flex items-center gap-1 text-[#ffd875] text-sm"
           >
             Thông tin phim
-            <ChevronDown
-              size={14}
-              className={showInfo ? "rotate-180" : ""}
-            />
+            <ChevronDown size={14} className={showInfo ? "rotate-180" : ""} />
           </button>
 
           {showInfo && (
@@ -375,7 +355,6 @@ export default function MovieDetailPage({
           </div>
         </div>
 
-        {/* mobile tabs */}
         <div className="mt-5 border-b border-white/10">
           <div className="flex gap-4 overflow-x-auto no-scrollbar">
             {TABS.map((tab) => {
@@ -384,9 +363,7 @@ export default function MovieDetailPage({
                 <button
                   key={tab}
                   onClick={() => setActiveTab(key)}
-                  className={`relative pb-2.5 text-sm whitespace-nowrap ${
-                    activeTab === key ? "text-[#ffd875]" : "text-white/40"
-                  }`}
+                  className={`relative pb-2.5 text-sm whitespace-nowrap ${activeTab === key ? "text-[#ffd875]" : "text-white/40"}`}
                 >
                   {tab}
                   {activeTab === key && (
@@ -410,7 +387,6 @@ export default function MovieDetailPage({
             related={related}
             actorImages={actorImages}
           />
-
           {activeTab === "tập phim" && (
             <>
               <div id="comments-section">
@@ -430,52 +406,41 @@ export default function MovieDetailPage({
       </div>
 
       {/* ========== DESKTOP PC ========== */}
-      <div className="hidden lg:block relative z-10 -mt-36 pb-10">
-        <div className="max-w-[1180px] mx-auto px-6">
-          <div className="flex gap-5 items-start">
-            {/* LEFT: poster card + info */}
-            <div className="w-[220px] shrink-0">
-              {/* elevated card behind poster */}
-              <div className="rounded-2xl bg-[#161822]/80 border border-white/5 p-3 shadow-2xl">
+      <div className="hidden lg:block relative z-10 -mt-28 pb-10">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="flex gap-6 items-start">
+            {/* LEFT column */}
+            <div className="w-[240px] shrink-0 -mt-16">
+              {/* poster floats higher into hero */}
+              <div className="rounded-2xl bg-[#161822]/90 border border-white/8 p-2.5 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
                 <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden">
                   <Image
                     src={movie.poster_url}
                     alt={movie.name}
                     fill
                     priority
-                    sizes="200px"
+                    sizes="220px"
                     className="object-cover"
                   />
                 </div>
               </div>
 
-              <div className="mt-4 px-1">
+              <div className="mt-4">
                 <InfoBlock />
               </div>
 
-              {/* Top tuần */}
-              <div className="mt-6 px-1">
+              <div className="mt-6">
                 <p className="text-sm font-semibold mb-3 flex items-center gap-1.5">
                   <span>🔥</span> Top phim tuần này
                 </p>
                 <div className="space-y-2.5">
                   {topWeek.map((m, i) => (
-                    <Link
-                      key={m._id}
-                      href={`/phim/${m.slug}`}
-                      className="flex items-center gap-2 group"
-                    >
+                    <Link key={m._id} href={`/phim/${m.slug}`} className="flex items-center gap-2 group">
                       <span className="text-lg font-black italic text-white/20 w-5 shrink-0">
                         {i + 1}
                       </span>
                       <div className="relative w-10 h-14 rounded overflow-hidden shrink-0">
-                        <Image
-                          src={m.poster_url}
-                          alt={m.name}
-                          fill
-                          sizes="40px"
-                          className="object-cover"
-                        />
+                        <Image src={m.poster_url} alt={m.name} fill sizes="40px" className="object-cover" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-medium text-white/80 line-clamp-1 group-hover:text-[#ffd875]">
@@ -491,10 +456,10 @@ export default function MovieDetailPage({
               </div>
             </div>
 
-            {/* RIGHT: action + tabs + content */}
-            <div className="flex-1 min-w-0">
-              {/* Action bar */}
-              <div className="flex items-center gap-4 bg-[#161822] border border-white/8 rounded-2xl px-5 py-3.5 shadow-xl">
+            {/* RIGHT column */}
+            <div className="flex-1 min-w-0 pt-2">
+              {/* Action bar — aligns with top of poster card area */}
+              <div className="flex items-center gap-4 bg-[#161822]/95 backdrop-blur-md border border-white/8 rounded-2xl px-5 py-3 shadow-xl">
                 <Link
                   href={`/xem-phim/${movie.slug}`}
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ffd875] to-[#f0c24d] text-[#1a1a1a] font-bold text-[15px] px-6 py-2.5 rounded-full shrink-0 hover:brightness-105"
@@ -512,18 +477,13 @@ export default function MovieDetailPage({
                     }}
                   />
                   <button className="flex items-center gap-1.5 rounded-full bg-[#282b3a] px-3 py-1.5">
-                    <Star
-                      size={14}
-                      className="fill-[#ffd875] text-[#ffd875]"
-                    />
+                    <Star size={14} className="fill-[#ffd875] text-[#ffd875]" />
                     <span className="text-sm font-bold">0</span>
                     <span className="text-[11px] text-white/50">Đánh giá</span>
                   </button>
                   <button
                     onClick={() =>
-                      document
-                        .getElementById("comments-section-pc")
-                        ?.scrollIntoView({ behavior: "smooth" })
+                      document.getElementById("comments-section-pc")?.scrollIntoView({ behavior: "smooth" })
                     }
                     className="flex flex-col items-center gap-0.5 text-white/55 hover:text-white"
                   >
@@ -542,11 +502,7 @@ export default function MovieDetailPage({
                       <button
                         key={tab}
                         onClick={() => setActiveTab(key)}
-                        className={`relative pb-3 text-sm font-medium ${
-                          activeTab === key
-                            ? "text-[#ffd875]"
-                            : "text-white/40 hover:text-white/70"
-                        }`}
+                        className={`relative pb-3 text-sm font-medium ${activeTab === key ? "text-[#ffd875]" : "text-white/40 hover:text-white/70"}`}
                       >
                         {tab}
                         {activeTab === key && (
@@ -558,7 +514,6 @@ export default function MovieDetailPage({
                 </div>
               </div>
 
-              {/* Content */}
               <div className="mt-5 space-y-6">
                 <TabContent
                   activeTab={activeTab}
@@ -595,8 +550,6 @@ export default function MovieDetailPage({
     </main>
   );
 }
-
-/* ---------- sub components ---------- */
 
 function TabContent({
   activeTab,
@@ -654,7 +607,6 @@ function TabContent({
       );
     }
 
-    /* Phim lẻ – Các bản chiếu */
     return (
       <div>
         <h2 className="text-[17px] font-semibold mb-3">Các bản chiếu</h2>
@@ -665,23 +617,23 @@ function TabContent({
         </div>
         <Link
           href={`/xem-phim/${movie.slug}`}
-          className="flex items-stretch gap-0 rounded-xl overflow-hidden bg-[#1c1e2a] border border-white/8 hover:border-[#ffd875]/25 transition-colors max-w-lg group"
+          className="flex items-stretch rounded-xl overflow-hidden bg-[#1c1e2a] border border-white/8 hover:border-[#ffd875]/25 transition-colors max-w-lg group"
         >
           <div className="flex-1 p-4 flex flex-col justify-center">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="w-4 h-4 rounded bg-[#3b82f6]/30 flex items-center justify-center">
-                <span className="text-[8px] text-[#93c5fd]">▶</span>
+              <span className="w-4 h-4 rounded bg-[#3b82f6]/30 flex items-center justify-center text-[8px] text-[#93c5fd]">
+                ▶
               </span>
               <span className="text-[11px] text-[#93c5fd]">Song ngữ</span>
             </div>
             <p className="text-sm font-semibold text-white group-hover:text-[#ffd875] line-clamp-1">
               {movie.name}
             </p>
-            <span className="mt-3 inline-flex w-fit text-xs font-medium text-white bg-white/10 hover:bg-white/15 px-3 py-1.5 rounded-md border border-white/10">
+            <span className="mt-3 inline-flex w-fit text-xs font-medium text-white bg-white/10 px-3 py-1.5 rounded-md border border-white/10">
               Xem bản này
             </span>
           </div>
-          <div className="relative w-[140px] sm:w-[180px] shrink-0">
+          <div className="relative w-[140px] sm:w-[180px] shrink-0 min-h-[90px]">
             <Image
               src={movie.thumb_url || movie.poster_url}
               alt={movie.name}
@@ -696,16 +648,10 @@ function TabContent({
   }
 
   if (activeTab === "gallery") {
-    return (
-      <p className="py-8 text-center text-white/35 text-sm">
-        Gallery đang cập nhật.
-      </p>
-    );
+    return <p className="py-8 text-center text-white/35 text-sm">Gallery đang cập nhật.</p>;
   }
   if (activeTab === "ost") {
-    return (
-      <p className="py-8 text-center text-white/35 text-sm">OST đang cập nhật.</p>
-    );
+    return <p className="py-8 text-center text-white/35 text-sm">OST đang cập nhật.</p>;
   }
   if (activeTab === "diễn viên") {
     return (
@@ -758,18 +704,10 @@ function TabContent({
   return null;
 }
 
-function FaqSection({
-  name,
-  items,
-}: {
-  name: string;
-  items: { q: string; a: string }[];
-}) {
+function FaqSection({ name, items }: { name: string; items: { q: string; a: string }[] }) {
   return (
     <div>
-      <h2 className="text-[17px] font-semibold mb-3">
-        Câu hỏi thường gặp về {name}
-      </h2>
+      <h2 className="text-[17px] font-semibold mb-3">Câu hỏi thường gặp về {name}</h2>
       <div className="space-y-3">
         {items.map((item) => (
           <div key={item.q}>
@@ -805,9 +743,7 @@ function RelatedSection({ related }: { related: ListMovie[] }) {
             <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-[#ffd875]">
               {m.name}
             </p>
-            <p className="text-[11px] text-white/35 line-clamp-1">
-              {m.origin_name}
-            </p>
+            <p className="text-[11px] text-white/35 line-clamp-1">{m.origin_name}</p>
           </Link>
         ))}
       </div>
