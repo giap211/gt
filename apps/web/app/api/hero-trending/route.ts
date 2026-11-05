@@ -37,8 +37,9 @@ function getChartTitles(html: string) {
     /<a\b[^>]*href="\/[^"]*\/movie\/[^"]+"[^>]*>([\s\S]*?)<\/a>/gi;
 
   for (const match of html.matchAll(linkPattern)) {
+    const rawTitle = match[1] ?? "";
     const title = decodeHtml(
-      match[1]
+      rawTitle
         .replace(/<[^>]*>/g, " ")
         .replace(/\s+/g, " ")
         .trim(),
