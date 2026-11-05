@@ -130,7 +130,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         })}
       </Swiper>
 
-      <div className="absolute bottom-5 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-[min(82%,420px)]">
+      <div className="absolute bottom-5 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-[min(90%,280px)]">
         <Swiper
           onSwiper={setThumbsSwiper}
           modules={[Thumbs]}
