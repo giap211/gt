@@ -165,5 +165,31 @@ export function NavbarGlassShader({ scrolled }: { scrolled: boolean }) {
     };
   }, [scrolled]);
 
-  return <canvas ref={canvasRef} className="navbar-glass-shader" aria-hidden="true" />;
+  return (
+    <>
+      <svg className="navbar-glass-filter-defs" aria-hidden="true" focusable="false">
+        <defs>
+          <filter id="navbar-liquid-refraction" x="-4%" y="-12%" width="108%" height="124%" colorInterpolationFilters="sRGB">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.018 0.035"
+              numOctaves="1"
+              seed="7"
+              result="glassDistortion"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="glassDistortion"
+              scale="5"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="refractedBackdrop"
+            />
+            <feGaussianBlur in="refractedBackdrop" stdDeviation="0.12" />
+          </filter>
+        </defs>
+      </svg>
+      <canvas ref={canvasRef} className="navbar-glass-shader" aria-hidden="true" />
+    </>
+  );
 }
