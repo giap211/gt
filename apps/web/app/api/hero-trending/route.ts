@@ -40,7 +40,8 @@ function matchesTrending(term: string, movie: ListMovie) {
   const title = normalize(movie.name);
   const original = normalize(movie.origin_name || "");
   if (!query || !title) return false;
-  if (title.includes(query) || original.includes(query) || query.includes(title)) {
+  if (title.length >= 4 && query.includes(title)) return true;
+  if (query.length >= 4 && (title.includes(query) || original.includes(query))) {
     return true;
   }
 
