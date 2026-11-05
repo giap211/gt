@@ -45,6 +45,8 @@ export interface DetailMovie extends ListMovie {
   category: Category[];
   country: Country[];
   tmdb?: {
+    id?: number | string;
+    type?: "movie" | "tv" | string;
     vote_average?: number | string;
   };
 }
