@@ -408,7 +408,7 @@ async function matchesTmdbCountry(
   const tmdbType = movie.tmdb?.type === "tv" ? "tv" : movie.tmdb?.type === "movie" ? "movie" : "";
   const expectedIso = COUNTRY_ISO_CODES[requestedCountry];
 
-  if (!tmdbId || !/^\\d+$/.test(tmdbId) || !tmdbType || !expectedIso) {
+  if (!tmdbId || !/^\d+$/.test(tmdbId) || !tmdbType || !expectedIso) {
     return null;
   }
 
