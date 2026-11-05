@@ -266,7 +266,7 @@ export default function Home() {
               />
 
               <MovieCarousel
-                title="Phim Song Ngữ Mới Nhất"
+                title="Phim Phụ Đề Mới Nhất"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #fbbf24 130%)"
                 viewMoreLink="/danh-sach/phim-bo"
                 items={transformMovies(
