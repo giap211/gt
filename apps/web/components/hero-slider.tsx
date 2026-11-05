@@ -146,7 +146,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                     <Link
                       href={`/phim/${movie.slug}`}
                       aria-label={`Xem phim ${movie.name}`}
-                      className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#ffd875] flex items-center justify-center text-black shadow-[0_0_30px_rgba(255,216,117,0.3)] hover:scale-110 transition-all duration-300 group/play"
+                      className="hero-play-button relative z-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#ffd875] flex items-center justify-center text-black shadow-[0_0_30px_rgba(255,216,117,0.3)] hover:scale-110 hover:shadow-[0_0_45px_rgba(255,216,117,0.65)] transition-all duration-300 group/play"
                     >
                       <Play className="fill-current w-6 h-6 md:w-8 md:h-8 ml-1" />
                     </Link>
