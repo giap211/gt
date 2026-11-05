@@ -19,7 +19,7 @@ function decodeXml(value: string) {
 function getTrendingTerms(xml: string) {
   return Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/gi))
     .map((match) => {
-      const title = match[1].match(/<title>([\s\S]*?)<\/title>/i)?.[1];
+      const item = match[1] ?? "";\n      const title = item.match(/<title>([\s\S]*?)<\/title>/i)?.[1];
       return title ? decodeXml(title) : "";
     })
     .filter(Boolean)
