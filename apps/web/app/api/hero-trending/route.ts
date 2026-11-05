@@ -1,96 +1,135 @@
 import { NextResponse } from "next/server";
 import { getLatestMovies, searchMovies, type ListMovie } from "@/lib/ophim-client";
 
-export const revalidate = 600;
+export const revalidate = 1800;
 
-const TRENDING_FEED = "https://trends.google.com/trending/rss?geo=VN";
+type TmdbTrendingMovie = {
+  id: number;
+  title?: string;
+  original_title?: string;
+};
 
-function decodeXml(value: string) {
-  return value
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .trim();
-}
-
-function getTrendingTerms(xml: string) {
-  return Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/gi))
-    .map((match) => {
-      const item = match[1] ?? "";
-      const title = item.match(/<title>([\s\S]*?)<\/title>/i)?.[1];
-      return title ? decodeXml(title) : "";
-    })
-    .filter(Boolean)
-    .slice(0, 30);
-}
+type TmdbTrendingResponse = {
+  results?: TmdbTrendingMovie[];
+};
 
 function normalize(value: string) {
   return value
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\\u0300-\\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 }
 
-function matchesTrending(term: string, movie: ListMovie) {
-  const query = normalize(term);
-  const title = normalize(movie.name);
-  const original = normalize(movie.origin_name || "");
-  if (!query || !title) return false;
-  if (title.length >= 4 && query.includes(title)) return true;
-  if (query.length >= 4 && (title.includes(query) || original.includes(query))) {
-    return true;
+function isSameMovie(trending: TmdbTrendingMovie, movie: ListMovie) {
+  const tmdbTitles = [trending.title, trending.original_title]
+    .filter((value): value is string => Boolean(value))
+    .map(normalize)
+    .filter(Boolean);
+  const catalogTitles = [movie.name, movie.origin_name]
+    .filter(Boolean)
+    .map(normalize)
+    .filter(Boolean);
+
+  return tmdbTitles.some((tmdbTitle) =>
+    catalogTitles.some((catalogTitle) => {
+      if (tmdbTitle === catalogTitle) return true;
+      return (
+        Math.min(tmdbTitle.length, catalogTitle.length) >= 6 &&
+        (tmdbTitle.includes(catalogTitle) ||
+          catalogTitle.includes(tmdbTitle))
+      );
+    }),
+  );
+}
+
+async function getTmdbTrending() {
+  const accessToken = process.env.TMDB_ACCESS_TOKEN;
+  const apiKey = process.env.TMDB_API_KEY;
+
+  if (!accessToken && !apiKey) {
+    throw new Error(
+      "Missing TMDB_ACCESS_TOKEN or TMDB_API_KEY environment variable",
+    );
   }
 
-  const words = query.split(/\s+/).filter((word) => word.length > 2);
-  if (words.length === 0) return false;
-  const movieText = `${title} ${original}`;
-  const matched = words.filter((word) => movieText.includes(word)).length;
-  return matched / words.length >= 0.75;
+  const pages = await Promise.all(
+    [1, 2, 3].map(async (page) => {
+      const url = new URL(
+        "https://api.themoviedb.org/3/trending/movie/week",
+      );
+      url.searchParams.set("language", "vi-VN");
+      url.searchParams.set("page", String(page));
+      if (!accessToken && apiKey) {
+        url.searchParams.set("api_key", apiKey);
+      }
+
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          ...(accessToken
+            ? { Authorization: `Bearer ${accessToken}` }
+            : {}),
+        },
+        next: { revalidate: 1800 },
+      });
+
+      if (!response.ok) {
+        throw new Error(`TMDB trending returned ${response.status}`);
+      }
+
+      return (await response.json()) as TmdbTrendingResponse;
+    }),
+  );
+
+  return pages.flatMap((page) =>
+    Array.isArray(page.results) ? page.results : [],
+  );
 }
 
 export async function GET() {
   try {
-    const response = await fetch(TRENDING_FEED, {
-      headers: { Accept: "application/rss+xml, application/xml, text/xml" },
-      next: { revalidate: 600 },
-    });
-
-    if (!response.ok) throw new Error("Google Trends feed unavailable");
-
-    const terms = getTrendingTerms(await response.text());
+    const trendingMovies = await getTmdbTrending();
     const selected: ListMovie[] = [];
     const seen = new Set<string>();
 
-    // Xử lý theo từng nhóm nhỏ để giữ thứ tự xếp hạng và tránh gọi API dồn dập.
-    for (let index = 0; index < terms.length && selected.length < 6; index += 5) {
-      const batch = terms.slice(index, index + 5);
-      const results = await Promise.all(
-        batch.map(async (term) => ({
-          term,
-          response: await searchMovies(term, 1, 10),
-        })),
+    // Duyệt theo đúng thứ hạng TMDB; chỉ giữ phim có tên khớp trong kho RoPhim.
+    for (
+      let index = 0;
+      index < trendingMovies.length && selected.length < 6;
+      index += 5
+    ) {
+      const batch = trendingMovies.slice(index, index + 5);
+      const matches = await Promise.all(
+        batch.map(async (trending) => {
+          const titles = [
+            trending.title,
+            trending.original_title,
+          ].filter((title): title is string => Boolean(title));
+
+          for (const title of Array.from(new Set(titles))) {
+            const result = await searchMovies(title, 1, 10);
+            const movie = result.items.find(
+              (item) =>
+                !seen.has(item.slug) && isSameMovie(trending, item),
+            );
+            if (movie) return movie;
+          }
+
+          return null;
+        }),
       );
 
-      for (const result of results) {
-        const match = result.response.items.find(
-          (movie) =>
-            matchesTrending(result.term, movie) &&
-            !seen.has(movie.slug),
-        );
-        if (match) {
-          selected.push(match);
-          seen.add(match.slug);
-        }
+      for (const movie of matches) {
+        if (!movie || seen.has(movie.slug)) continue;
+        selected.push(movie);
+        seen.add(movie.slug);
         if (selected.length === 6) break;
       }
     }
 
-    // Nếu Google Trends không đủ phim, lấp chỗ trống bằng phim mới cập nhật.
+    // Nếu kho RoPhim không có đủ phim đang trending, bổ sung phim mới cập nhật.
     if (selected.length < 6) {
       const latest = await getLatestMovies(1);
       for (const movie of latest.items) {
@@ -102,21 +141,21 @@ export async function GET() {
     }
 
     return NextResponse.json(
-      { items: selected.slice(0, 6), source: "google-trends-vn" },
+      { items: selected.slice(0, 6), source: "tmdb-trending-week" },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=600, stale-while-revalidate=1800",
+          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
         },
       },
     );
   } catch (error) {
-    console.error("Failed to build Google Trends hero:", error);
+    console.error("Failed to build TMDB trending hero:", error);
     const fallback = await getLatestMovies(1);
     return NextResponse.json(
       { items: fallback.items.slice(0, 6), source: "latest-movies-fallback" },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=600, stale-while-revalidate=1800",
+          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
         },
       },
     );
