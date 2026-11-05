@@ -79,7 +79,12 @@ async function getTmdbWeeklyTrending() {
   return titles;
 }
 
-async function findCatalogMatches(titles: string[], limit: number, seen: Set<string>) {
+async function findCatalogMatches(
+  titles: string[],
+  limit: number,
+  seen: Set<string>,
+  tmdbType?: "movie" | "tv",
+) {
   const selected: ListMovie[] = [];
 
   for (const title of titles) {
@@ -92,7 +97,7 @@ async function findCatalogMatches(titles: string[], limit: number, seen: Set<str
       const movie = result.items.find(
         (item) =>
           !seen.has(item.slug) &&
-          item.tmdb?.type === "tv" &&
+          (!tmdbType || item.tmdb?.type === tmdbType) &&
           isSameMovie(cleanTitle, item),
       );
       if (!movie) continue;
@@ -164,8 +169,8 @@ async function getNetflixVietnamTopTvShows() {
 
 async function buildHeroItems(tmdbTitles: string[], netflixTvTitles: string[]) {
   const seen = new Set<string>();
-  const tmdbMovies = await findCatalogMatches(tmdbTitles, 3, seen);
-  const netflixTvShows = await findCatalogMatches(netflixTvTitles, 3, seen);
+  const tmdbMovies = await findCatalogMatches(tmdbTitles, 3, seen, "movie");
+  const netflixTvShows = await findCatalogMatches(netflixTvTitles, 3, seen, "tv");
 
   const selected = [
     ...tmdbMovies.map((movie) => ({ ...movie, hero_source: "tmdb" as const })),
