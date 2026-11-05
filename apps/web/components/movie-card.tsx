@@ -23,21 +23,42 @@ interface MovieCardProps {
   variant?: "horizontal" | "vertical";
 }
 
-function buildLangChip(language?: string, episodeCurrent?: string): string | null {
+const PLACEHOLDER =
+  "https://placehold.co/640x360/1a1c28/ffffff?text=No+Image";
+
+function buildLangChip(
+  language?: string,
+  episodeCurrent?: string,
+): string | null {
   if (!language && !episodeCurrent) return null;
 
   const l = (language || "").toLowerCase();
   let prefix = "PĐ.";
-  if (l.includes("vietsub") && (l.includes("thuyết") || l.includes("tm") || l.includes("thuyet"))) {
+  if (
+    l.includes("vietsub") &&
+    (l.includes("thuyết") || l.includes("tm") || l.includes("thuyet"))
+  ) {
     prefix = "VS+TM.";
-  } else if (l.includes("thuyết minh") || l === "tm" || l.includes("thuyet minh")) {
+  } else if (
+    l.includes("thuyết minh") ||
+    l === "tm" ||
+    l.includes("thuyet minh")
+  ) {
     prefix = "TM.";
   } else if (l.includes("lồng") || l.includes("long tieng")) {
     prefix = "LT.";
-  } else if (l.includes("vietsub") || l.includes("phụ đề") || l === "pđ" || l === "pd") {
+  } else if (
+    l.includes("vietsub") ||
+    l.includes("phụ đề") ||
+    l === "pđ" ||
+    l === "pd"
+  ) {
     prefix = "PĐ.";
   } else if (language) {
-    prefix = language.length > 6 ? language.slice(0, 4).toUpperCase() + "." : language.toUpperCase();
+    prefix =
+      language.length > 6
+        ? language.slice(0, 4).toUpperCase() + "."
+        : language.toUpperCase();
   }
 
   let ep = "";
@@ -82,16 +103,17 @@ export const MovieCard = ({
   const handleLinkClick = () => setIsNavigating(true);
 
   const isHorizontal = variant === "horizontal";
-  const imageSrc = isHorizontal ? thumbUrl || posterUrl : posterUrl || thumbUrl;
+  const imageSrc: string =
+    (isHorizontal ? thumbUrl || posterUrl : posterUrl || thumbUrl) ||
+    PLACEHOLDER;
   const langChip = buildLangChip(language, episodeCurrent);
   const qChip = qualityChip(quality);
 
-  // Show "Song ngữ" when language suggests dual audio / VS+TM
   const showBilingual =
     (language || "").toLowerCase().includes("vietsub") ||
     (language || "").toLowerCase().includes("song") ||
     (language || "").toLowerCase().includes("tm") ||
-    true; // RoPhim shows it on most home cards
+    true;
 
   return (
     <div className="group relative w-full">
@@ -106,20 +128,22 @@ export const MovieCard = ({
           src={imageSrc}
           alt={title}
           fill
-          sizes={isHorizontal ? "(max-width: 640px) 70vw, 280px" : "(max-width: 640px) 45vw, 20vw"}
+          sizes={
+            isHorizontal
+              ? "(max-width: 640px) 70vw, 280px"
+              : "(max-width: 640px) 45vw, 20vw"
+          }
           className="object-cover transition-transform duration-400 group-hover:scale-[1.03]"
           quality={80}
           loading="lazy"
         />
 
-        {/* Song ngữ badge - top left */}
         {showBilingual && isHorizontal && (
           <span className="absolute top-2 left-2 z-20 rounded-md bg-[#3b82f6] px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-sm">
             Song ngữ
           </span>
         )}
 
-        {/* Bottom chips */}
         <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-wrap gap-0.5 p-1.5 pointer-events-none">
           {langChip && (
             <span className="rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-[#1a1c28] shadow-sm">
@@ -131,7 +155,6 @@ export const MovieCard = ({
           </span>
         </div>
 
-        {/* Hover dim */}
         <div
           className={`absolute inset-0 bg-black/40 transition-opacity duration-300 z-10 ${
             isNavigating ? "opacity-100" : "opacity-0 group-hover:opacity-100"
