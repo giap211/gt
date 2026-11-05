@@ -30,7 +30,7 @@ function titleMatchScore(chartTitle: string, movie: ListMovie) {
     .filter(Boolean);
 
   const meaningfulTokens = (value: string) =>
-    value.split(/\\s+/).filter((token) =>
+    value.split(/\s+/).filter((token) =>
       token.length > 2 && !["the", "and", "for", "with"].includes(token),
     );
   const sourceTokens = meaningfulTokens(sourceTitle);
@@ -56,7 +56,7 @@ function titleMatchScore(chartTitle: string, movie: ListMovie) {
 
 function getNetflixSearchTerms(title: string) {
   const cleanTitle = title
-    .replace(/:\\s*(limited series|season \\d+|part \\d+)$/i, "")
+    .replace(/:\\s*(limited series|season \d+|part \d+)$/i, "")
     .trim();
   const terms = [cleanTitle];
   const baseTitle = cleanTitle.split(":")[0]?.trim();
