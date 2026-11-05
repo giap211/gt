@@ -102,7 +102,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                       {movie.hero_source === "tmdb"
                         ? "TMDB TRENDING"
                         : movie.hero_source === "netflix"
-                          ? "NETFLIX TOP 10 VIỆT NAM"
+                          ? "NETFLIX TOP 10 TV SHOWS VIỆT NAM"
                           : "ĐỀ XUẤT"}
                     </span>
                   )}
