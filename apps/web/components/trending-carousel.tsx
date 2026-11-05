@@ -4,9 +4,8 @@ import Link from "next/link";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { MovieCard } from "./movie-card";
 
-// Swiper imports
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
+import { Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 
 import { useRef } from "react";
@@ -36,37 +35,34 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="py-5 md:py-10 w-full relative overflow-hidden bg-gradient-to-b from-[#0b0d14] via-[#10121a] to-[#0b0d14]">
+    <section className="py-4 md:py-6 w-full relative overflow-hidden">
       <div className="container mx-auto px-3 md:px-8">
-        {/* Header Style - Netflix Bold Italic */}
-        <div className="flex min-w-0 items-center gap-3 md:gap-4 mb-7 md:mb-12">
-          <div className="h-5 md:h-8 w-1 shrink-0 bg-rophim-primary rounded-full shadow-[0_0_15px_rgba(240,194,77,0.4)]"></div>
-          <h2 className="min-w-0 text-[15px] md:text-3xl font-[950] text-white uppercase tracking-tight md:tracking-tighter italic drop-shadow-md leading-tight">
+        <div className="flex min-w-0 items-center justify-between gap-3 mb-3 md:mb-5">
+          <h2 className="min-w-0 text-base md:text-xl font-bold text-white leading-tight">
             {title}
           </h2>
         </div>
 
-        {/* Swiper Container */}
         <div className="relative group/swiper">
-          {/* Navigation Buttons */}
           <button
             ref={navigationPrevRef}
-            className="absolute left-2 top-[45%] -translate-y-1/2 z-30 w-11 h-11 bg-black/70 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/swiper:opacity-100 transition-all hover:bg-white hover:text-black hover:scale-105 disabled:opacity-0 hidden md:flex shadow-2xl"
+            aria-label="Trước"
+            className="absolute left-1 top-[40%] -translate-y-1/2 z-30 w-9 h-9 bg-black/75 backdrop-blur border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/swiper:opacity-100 transition-all hover:bg-white hover:text-black disabled:opacity-0 hidden md:flex"
           >
-            <ChevronLeft size={28} />
+            <ChevronLeft size={22} />
           </button>
           <button
             ref={navigationNextRef}
-            className="absolute right-2 top-[45%] -translate-y-1/2 z-30 w-11 h-11 bg-black/70 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/swiper:opacity-100 transition-all hover:bg-white hover:text-black hover:scale-105 disabled:opacity-0 hidden md:flex shadow-2xl"
+            aria-label="Sau"
+            className="absolute right-1 top-[40%] -translate-y-1/2 z-30 w-9 h-9 bg-black/75 backdrop-blur border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/swiper:opacity-100 transition-all hover:bg-white hover:text-black disabled:opacity-0 hidden md:flex"
           >
-            <ChevronRight size={28} />
+            <ChevronRight size={22} />
           </button>
 
           <Swiper
-            modules={[Navigation, Autoplay]}
-            spaceBetween={12}
+            modules={[Navigation]}
+            spaceBetween={10}
             slidesPerView={2.2}
-            autoplay={{ delay: 5000, disableOnInteraction: true }}
             navigation={{
               prevEl: navigationPrevRef.current,
               nextEl: navigationNextRef.current,
@@ -79,37 +75,46 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
               }
             }}
             breakpoints={{
-              640: { slidesPerView: 3.2, spaceBetween: 15 },
-              768: { slidesPerView: 4.2, spaceBetween: 20 },
-              1024: { slidesPerView: 5.2, spaceBetween: 20 },
-              1280: { slidesPerView: 6.5, spaceBetween: 20 },
+              640: { slidesPerView: 3.2, spaceBetween: 12 },
+              768: { slidesPerView: 4.2, spaceBetween: 14 },
+              1024: { slidesPerView: 5.4, spaceBetween: 14 },
+              1280: { slidesPerView: 6.2, spaceBetween: 16 },
             }}
-            className="w-full !overflow-hidden !py-4"
+            className="w-full !overflow-hidden"
           >
             {items.map((movie, index) => (
               <SwiperSlide
                 key={movie.id}
                 className="h-auto group/slide select-none"
               >
-                <div className="flex flex-col gap-2 w-full">
-                  {/* Poster Container */}
-                  <div className="relative aspect-[2/3] w-full rounded-md overflow-hidden shadow-xl transition-transform duration-500 group-hover/slide:-translate-y-2 z-10">
-                    <MovieCard {...movie} hideInfo />
-                  </div>
-
-                  {/* Ranking & Info Bar */}
-                  <div className="flex items-start gap-3 px-0.5 mt-2">
-                    <span className="text-3xl md:text-4xl font-black italic text-[#ffd875] leading-none tracking-tighter shrink-0 pt-0.5">
+                <div className="relative flex flex-col gap-1.5 w-full">
+                  {/* Ranking number behind poster - RoPhim style */}
+                  <div className="absolute -left-1 bottom-8 z-0 pointer-events-none select-none">
+                    <span
+                      className="ranking-number-hollow text-[72px] md:text-[96px] leading-none font-black italic"
+                      style={{
+                        WebkitTextStroke: "2px rgba(255,255,255,0.25)",
+                        color: "transparent",
+                      }}
+                    >
                       {index + 1}
                     </span>
+                  </div>
 
-                    <div className="flex-1 min-w-0 font-italic">
-                      <h3 className="text-[12.5px] md:text-[13px] font-black text-white line-clamp-1 group-hover/slide:text-[#ffd875] transition-colors leading-tight mb-1 italic uppercase tracking-tighter">
+                  <div className="relative z-10 ml-4 md:ml-6">
+                    <div className="relative aspect-[2/3] w-full rounded-md overflow-hidden shadow-xl transition-transform duration-300 group-hover/slide:-translate-y-1">
+                      <MovieCard {...movie} hideInfo />
+                    </div>
+
+                    <div className="mt-2 px-0.5">
+                      <h3 className="text-[12px] md:text-[13px] font-semibold text-white line-clamp-1 group-hover/slide:text-[#ffd875] transition-colors leading-tight">
                         <Link href={`/phim/${movie.slug}`}>{movie.title}</Link>
                       </h3>
-                      <p className="text-[10px] text-white/30 font-black line-clamp-1 truncate uppercase tracking-tighter italic opacity-40 leading-none">
-                        {movie.originalTitle || movie.title}
-                      </p>
+                      {movie.originalTitle && (
+                        <p className="text-[10px] text-white/35 line-clamp-1 mt-0.5">
+                          {movie.originalTitle}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
