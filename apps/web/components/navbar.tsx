@@ -69,11 +69,28 @@ export const Navbar = () => {
   const { user, openAuth, openLibrary, logout } = useMember();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    const updateScrollState = () => {
+      const scrollTop = Math.max(
+        window.scrollY || 0,
+        document.documentElement.scrollTop || 0,
+        document.body.scrollTop || 0,
+      );
+
+      setIsScrolled(scrollTop > 20);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    // Set the correct appearance immediately, including restored browser scroll.
+    updateScrollState();
+
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    document.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("pageshow", updateScrollState);
+
+    return () => {
+      window.removeEventListener("scroll", updateScrollState);
+      document.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("pageshow", updateScrollState);
+    };
   }, []);
 
   // Close overlays on route change
