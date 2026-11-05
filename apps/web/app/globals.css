@@ -440,3 +440,44 @@ body {
 .__next-dev-tools-icon {
   display: none !important;
 }
+
+/* Cinematic pulse for the hero play button */
+.hero-play-button::before,
+.hero-play-button::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border: 1.5px solid rgba(255, 216, 117, 0.7);
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: -1;
+  animation: hero-play-pulse 2.4s ease-out infinite;
+}
+
+.hero-play-button::after {
+  animation-delay: 1.2s;
+}
+
+.hero-play-button:hover::before,
+.hero-play-button:hover::after {
+  border-color: rgba(255, 216, 117, 1);
+  animation-duration: 1.5s;
+}
+
+@keyframes hero-play-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-play-button::before,
+  .hero-play-button::after {
+    animation: none;
+  }
+}
