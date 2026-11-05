@@ -635,6 +635,22 @@ body {
 
 
 
+/* SVG displacement is an enhancement; unsupported browsers retain a clear glass edge. */
+.navbar-glass-filter-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+@supports (backdrop-filter: url("#navbar-liquid-refraction")) {
+  .navbar-glass-panel {
+    -webkit-backdrop-filter: url("#navbar-liquid-refraction") saturate(1.35);
+    backdrop-filter: url("#navbar-liquid-refraction") saturate(1.35);
+  }
+}
+
 /* WebGL2 glass lighting layer inspired by Liquid Glass Studio.
    Native backdrop-filter remains responsible for the live page backdrop. */
 .navbar-glass-panel {
