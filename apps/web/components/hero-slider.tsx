@@ -52,13 +52,6 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
               ? thumbsSwiper
               : null,
         }}
-        pagination={{
-          clickable: true,
-          bulletClass:
-            "swiper-pagination-bullet !bg-white/30 !w-5 !h-1 !rounded-full !transition-all !duration-300 md:hidden",
-          bulletActiveClass:
-            "swiper-pagination-bullet-active !bg-[#ffd875] !w-8",
-        }}
         className="h-full w-full"
       >
         {movies.map((movie, index) => {
