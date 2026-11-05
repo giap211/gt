@@ -17,6 +17,7 @@ import {
 
 type HeroMovie = ListMovie & {
   backdrop_url?: string;
+  hero_source?: "tmdb" | "netflix" | "latest";
 };
 
 export default function Home() {
@@ -145,12 +146,12 @@ export default function Home() {
           getMoviesByCategory("tinh-cam", 1, true),
         ]);
 
-        let trendingHero: ListMovie[] = [];
+        let trendingHero: HeroMovie[] = [];
         try {
           const heroResponse = await fetch("/api/hero-trending");
           if (heroResponse.ok) {
             const heroPayload = (await heroResponse.json()) as {
-              items?: ListMovie[];
+              items?: HeroMovie[];
             };
             trendingHero = Array.isArray(heroPayload.items)
               ? heroPayload.items
@@ -160,7 +161,7 @@ export default function Home() {
           console.error("Failed to fetch trending hero movies", error);
         }
 
-        // API đã tự lấp chỗ trống bằng phim mới cập nhật nếu Trends không đủ 6 phim.
+        // API ưu tiên 3 phim TMDB + 3 phim Netflix Việt Nam; phim mới chỉ dùng để lấp chỗ trống.
         const curatedHero = (
           trendingHero.length ? trendingHero : latestRes?.items || []
         ).slice(0, 6);
