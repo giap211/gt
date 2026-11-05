@@ -148,7 +148,7 @@ async function getNetflixVietnamTopTvShows() {
   const imageAltPattern = /<img\b[^>]*\balt=(["'])(.*?)\1[^>]*>/gis;
 
   for (const match of chartHtml.matchAll(imageAltPattern)) {
-    const title = decodeHtml(match[2]).trim();
+    const title = decodeHtml(match[2] ?? "").trim();
     if (
       !title ||
       /^(image|logo|netflix|top 10)$/i.test(title) ||
