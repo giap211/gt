@@ -39,11 +39,13 @@ void main() {
   vec3 coolGlass = vec3(0.78, 0.88, 1.0);
   vec3 warmGlass = vec3(1.0, 0.88, 0.63);
   vec3 light = mix(coolGlass, warmGlass, smoothstep(0.25, 0.9, sweep));
-  float alpha = inside * (0.025 + movingGlare * 0.055 + topReflection * 0.045)
-              + rim * (0.13 + edgeLight * 0.27 + sideLight * 0.12)
-              + movingGlare * topReflection * 0.07;
+  // Keep the center almost transparent so movie art and page content remain visible.
+  // The glass is defined by restrained edge reflections, not a white overlay.
+  float alpha = inside * (movingGlare * 0.012 + topReflection * 0.008)
+              + rim * (0.035 + edgeLight * 0.075 + sideLight * 0.035)
+              + movingGlare * topReflection * 0.012;
   alpha *= strength;
-  outColor = vec4(light, clamp(alpha, 0.0, 0.42));
+  outColor = vec4(light * 0.78, clamp(alpha, 0.0, 0.11));
 }`;
 
 function compileShader(gl: WebGL2RenderingContext, type: number, source: string) {
