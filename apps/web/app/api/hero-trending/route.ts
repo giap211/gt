@@ -185,10 +185,26 @@ async function buildHeroItems(tmdbTitles: string[], netflixTitles: string[]) {
 
 export async function GET() {
   try {
-    const [tmdbTitles, netflixTitles] = await Promise.all([
+    // Hai nguồn chạy độc lập: một nguồn lỗi không làm mất dữ liệu của nguồn còn lại.
+    const [tmdbResult, netflixResult] = await Promise.allSettled([
       getTmdbWeeklyTrending(),
       getNetflixVietnamTopMovies(),
     ]);
+
+    const tmdbTitles = tmdbResult.status === "fulfilled" ? tmdbResult.value : [];
+    const netflixTitles = netflixResult.status === "fulfilled" ? netflixResult.value : [];
+
+    if (tmdbTitles.length === 0 && netflixTitles.length === 0) {
+      throw new Error("TMDB and Netflix charts are both unavailable");
+    }
+
+    if (tmdbResult.status === "rejected") {
+      console.warn("TMDB trending unavailable:", tmdbResult.reason);
+    }
+    if (netflixResult.status === "rejected") {
+      console.warn("Netflix Vietnam Top 10 unavailable:", netflixResult.reason);
+    }
+
     const items = await buildHeroItems(tmdbTitles, netflixTitles);
 
     return NextResponse.json(
