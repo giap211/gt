@@ -103,7 +103,7 @@ export default function MovieDetailPage({
   }, [slug]);
 
   useEffect(() => {
-    if (!movie?.actor?.length) {
+    if (!movie?.actor?.length || !movie.tmdb?.id) {
       setActorImages({});
       return;
     }
@@ -114,13 +114,17 @@ export default function MovieDetailPage({
         const response = await fetch("/api/actor-images", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ names: movie.actor.slice(0, 18) }),
+          body: JSON.stringify({
+            tmdbId: movie.tmdb?.id,
+            tmdbType: movie.tmdb?.type,
+            names: movie.actor.slice(0, 18),
+          }),
         });
         if (!response.ok) return;
         const data = (await response.json()) as { images?: Record<string, string> };
         if (!cancelled) setActorImages(data.images || {});
       } catch (error) {
-        console.error("Không tải được ảnh diễn viên:", error);
+        console.error("Không tải được ảnh diễn viên TMDB:", error);
       }
     };
 
@@ -128,7 +132,7 @@ export default function MovieDetailPage({
     return () => {
       cancelled = true;
     };
-  }, [movie?.actor]);
+  }, [movie?.actor, movie?.tmdb?.id, movie?.tmdb?.type]);
 
   if (loading) {
     return (
