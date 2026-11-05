@@ -135,8 +135,11 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           onSwiper={setThumbsSwiper}
           modules={[Thumbs]}
           watchSlidesProgress
-          slidesPerView="auto"
+          slidesPerView={6}
           centeredSlides
+          centeredSlidesBounds
+          allowTouchMove={false}
+          simulateTouch={false}
           spaceBetween={9}
           className="hero-cast-slider !overflow-visible"
         >
