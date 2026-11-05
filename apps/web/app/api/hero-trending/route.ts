@@ -90,7 +90,10 @@ async function findCatalogMatches(titles: string[], limit: number, seen: Set<str
     try {
       const result = await searchMovies(cleanTitle, 1, 10);
       const movie = result.items.find(
-        (item) => !seen.has(item.slug) && isSameMovie(cleanTitle, item),
+        (item) =>
+          !seen.has(item.slug) &&
+          item.tmdb?.type === "tv" &&
+          isSameMovie(cleanTitle, item),
       );
       if (!movie) continue;
       selected.push(movie);
@@ -112,8 +115,8 @@ function decodeHtml(value: string) {
     .replace(/&gt;/g, ">");
 }
 
-async function getNetflixVietnamTopMovies() {
-  const response = await fetch("https://www.netflix.com/tudum/top10/vietnam/films", {
+async function getNetflixVietnamTopTvShows() {
+  const response = await fetch("https://www.netflix.com/tudum/top10/vietnam/tv", {
     headers: {
       Accept: "text/html",
       "Accept-Language": "en-US,en;q=0.9,vi;q=0.8",
@@ -127,9 +130,9 @@ async function getNetflixVietnamTopMovies() {
   }
 
   const html = await response.text();
-  const chartStart = html.indexOf("Top 10 Movies in Vietnam");
+  const chartStart = html.indexOf("Top 10 TV Shows in Vietnam");
   const chartEnd = chartStart >= 0
-    ? html.indexOf("Explore The Most Watched Movies", chartStart)
+    ? html.indexOf("Explore The Most Watched TV Shows", chartStart)
     : -1;
   const chartHtml = chartStart >= 0
     ? html.slice(chartStart, chartEnd > chartStart ? chartEnd : chartStart + 180000)
@@ -153,20 +156,20 @@ async function getNetflixVietnamTopMovies() {
   }
 
   if (titles.length === 0) {
-    throw new Error("Could not read movie titles from Netflix Vietnam Top 10");
+    throw new Error("Could not read TV show titles from Netflix Vietnam Top 10");
   }
 
   return titles;
 }
 
-async function buildHeroItems(tmdbTitles: string[], netflixTitles: string[]) {
+async function buildHeroItems(tmdbTitles: string[], netflixTvTitles: string[]) {
   const seen = new Set<string>();
   const tmdbMovies = await findCatalogMatches(tmdbTitles, 3, seen);
-  const netflixMovies = await findCatalogMatches(netflixTitles, 3, seen);
+  const netflixTvShows = await findCatalogMatches(netflixTvTitles, 3, seen);
 
   const selected = [
     ...tmdbMovies.map((movie) => ({ ...movie, hero_source: "tmdb" as const })),
-    ...netflixMovies.map((movie) => ({ ...movie, hero_source: "netflix" as const })),
+    ...netflixTvShows.map((movie) => ({ ...movie, hero_source: "netflix" as const })),
   ];
 
   // Chỉ dùng phim mới cập nhật khi hai bảng xếp hạng không đủ phim có trong kho.
@@ -188,13 +191,13 @@ export async function GET() {
     // Hai nguồn chạy độc lập: một nguồn lỗi không làm mất dữ liệu của nguồn còn lại.
     const [tmdbResult, netflixResult] = await Promise.allSettled([
       getTmdbWeeklyTrending(),
-      getNetflixVietnamTopMovies(),
+      getNetflixVietnamTopTvShows(),
     ]);
 
     const tmdbTitles = tmdbResult.status === "fulfilled" ? tmdbResult.value : [];
-    const netflixTitles = netflixResult.status === "fulfilled" ? netflixResult.value : [];
+    const netflixTvTitles = netflixResult.status === "fulfilled" ? netflixResult.value : [];
 
-    if (tmdbTitles.length === 0 && netflixTitles.length === 0) {
+    if (tmdbTitles.length === 0 && netflixTvTitles.length === 0) {
       throw new Error("TMDB and Netflix charts are both unavailable");
     }
 
@@ -202,18 +205,18 @@ export async function GET() {
       console.warn("TMDB trending unavailable:", tmdbResult.reason);
     }
     if (netflixResult.status === "rejected") {
-      console.warn("Netflix Vietnam Top 10 unavailable:", netflixResult.reason);
+      console.warn("Netflix Vietnam TV Top 10 unavailable:", netflixResult.reason);
     }
 
-    const items = await buildHeroItems(tmdbTitles, netflixTitles);
+    const items = await buildHeroItems(tmdbTitles, netflixTvTitles);
 
     return NextResponse.json(
       {
         items,
-        source: "tmdb-and-netflix-vietnam",
+        source: "tmdb-movies-and-netflix-tv-vietnam",
         sources: {
           tmdb: "https://www.themoviedb.org/trending/movie/week",
-          netflix: "https://www.netflix.com/tudum/top10/vietnam/films",
+          netflix: "https://www.netflix.com/tudum/top10/vietnam/tv",
         },
       },
       {
