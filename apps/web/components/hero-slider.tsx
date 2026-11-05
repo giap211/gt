@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Pagination, Thumbs } from "swiper/modules";
-import { Play } from "lucide-react";
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
@@ -33,58 +32,16 @@ interface HeroSliderProps {
 }
 
 export const HeroSlider = ({ movies }: HeroSliderProps) => {
-  const [thumbsSwiper, setThumbsSwiper] =
-    useState<SwiperType | null>(null);
+  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
 
   if (!movies || movies.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[500px] md:h-[700px] lg:h-[800px] overflow-hidden group/hero">
-      <svg aria-hidden="true" className="absolute w-0 h-0 overflow-hidden" focusable="false">
-        <defs>
-          <filter
-            id="hero-liquid-glass"
-            x="-35%"
-            y="-35%"
-            width="170%"
-            height="170%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.025 0.025"
-              numOctaves="2"
-              seed="8"
-              result="glassNoise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="glassNoise"
-              scale="13"
-              xChannelSelector="R"
-              yChannelSelector="G"
-              result="refractedBackdrop"
-            />
-            <feGaussianBlur in="refractedBackdrop" stdDeviation="0.35" result="softGlass" />
-            <feSpecularLighting
-              in="glassNoise"
-              surfaceScale="3.5"
-              specularConstant="0.75"
-              specularExponent="22"
-              lightingColor="#ffffff"
-              result="glassHighlight"
-            >
-              <fePointLight x="-40" y="-55" z="90" />
-            </feSpecularLighting>
-            <feComposite in="glassHighlight" in2="SourceAlpha" operator="in" result="rimHighlight" />
-            <feBlend in="softGlass" in2="rimHighlight" mode="screen" />
-          </filter>
-        </defs>
-      </svg>
+    <section className="relative w-full h-[340px] sm:h-[390px] md:h-[540px] lg:h-[610px] overflow-hidden group/hero bg-[#191b24]">
       <Swiper
         modules={[Autoplay, EffectFade, Pagination, Thumbs]}
         effect="fade"
-        speed={500}
+        speed={650}
         autoplay={{
           delay: 8000,
           disableOnInteraction: false,
@@ -98,24 +55,22 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         pagination={{
           clickable: true,
           bulletClass:
-            "swiper-pagination-bullet !bg-white/20 !w-8 !h-1 !rounded-none !transition-all !duration-500 md:hidden",
+            "swiper-pagination-bullet !bg-white/30 !w-5 !h-1 !rounded-full !transition-all !duration-300 md:hidden",
           bulletActiveClass:
-            "swiper-pagination-bullet-active !bg-[#ffd875] !w-12",
+            "swiper-pagination-bullet-active !bg-[#ffd875] !w-8",
         }}
         className="h-full w-full"
       >
         {movies.map((movie, index) => {
           const heroImage =
-            movie.backdrop_url ||
-            movie.thumb_url ||
-            movie.poster_url;
+            movie.backdrop_url || movie.thumb_url || movie.poster_url;
 
           return (
             <SwiperSlide
               key={movie._id}
               className="relative w-full h-full overflow-hidden"
             >
-              <div className="absolute inset-0 z-0 overflow-hidden bg-[#0a0a0a]">
+              <div className="absolute inset-0 z-0 bg-[#191b24]">
                 <Image
                   src={heroImage}
                   alt={movie.name}
@@ -124,73 +79,49 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   loading={index === 0 ? undefined : "lazy"}
                   sizes="100vw"
                   quality={90}
-                  className="object-cover object-[center_25%] transition-transform duration-[15000ms] ease-out group-hover:scale-110 opacity-100"
+                  className="object-cover object-center"
                 />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0d14] via-[#0b0d14]/20 to-transparent z-10" />
-
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0b0d14]/60 via-transparent to-transparent z-10" />
-
-                <div className="absolute inset-0 bg-[#ffaa00]/10 mix-blend-soft-light z-10" />
-
-                <div className="absolute inset-0 bg-[#ffd875]/5 mix-blend-overlay z-10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#191b24] via-[#191b24]/15 to-[#191b24]/5" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#191b24]/35 via-transparent to-[#191b24]/25" />
               </div>
 
-              <div className="container relative z-20 h-full flex flex-col justify-center pt-20 px-6 md:px-16">
-                <div className="max-w-3xl space-y-4 md:space-y-6 animate-fade-up">
-                  <div className="space-y-1">
-                    <h1
-                      className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tight drop-shadow-2xl leading-none"
-                      style={{
-                        fontFamily: "'Playfair Display', serif",
-                      }}
-                    >
+              <div className="container relative z-20 h-full flex flex-col items-center justify-end text-center px-4 pb-[82px] md:pb-[112px]">
+                <div className="w-full max-w-3xl animate-fade-up">
+                  <Link
+                    href={`/phim/${movie.slug}`}
+                    className="inline-block max-w-full text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] hover:text-[#ffd875] transition-colors"
+                    aria-label={`Xem phim ${movie.name}`}
+                  >
+                    <h1 className="text-[21px] leading-tight sm:text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight">
                       {movie.name}
                     </h1>
+                  </Link>
 
-                    <p className="text-lg md:text-xl text-[#ffd875] font-medium tracking-wide opacity-90 italic">
+                  {movie.origin_name && (
+                    <p className="mt-1 text-xs sm:text-sm md:text-base text-[#ffd875]/90 font-medium">
                       {movie.origin_name}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    {movie.quality && (
-                      <span className="border-[0.5px] border-white/40 bg-black/40 text-[#ffd875] text-[10px] md:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
-                        {movie.quality}
-                      </span>
-                    )}
-
-                    <span className="border-[0.5px] border-white/40 bg-white/5 text-white/90 text-[10px] md:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
-                      {movie.year}
-                    </span>
-
-                    {movie.episode_current && (
-                      <span className="border-[0.5px] border-white/40 bg-white/5 text-white/90 text-[10px] md:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
-                        {movie.episode_current}
-                      </span>
-                    )}
-
-                    {movie.lang && (
-                      <span className="bg-white/10 text-white/70 text-[10px] md:text-[11px] font-bold px-3 py-1 rounded-md uppercase tracking-tighter">
-                        {movie.lang}
-                      </span>
-                    )}
-                  </div>
-
-                  {movie.time && (
-                    <p className="text-white/80 text-sm md:text-base line-clamp-2 max-w-2xl leading-relaxed drop-shadow-md">
-                      {movie.time}
                     </p>
                   )}
 
-                  <div className="pt-4">
-                    <Link
-                      href={`/phim/${movie.slug}`}
-                      aria-label={`Xem phim ${movie.name}`}
-                      className="hero-play-button relative isolate w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center text-white transition-all duration-300 group/play"
-                    >
-                      <Play className="relative z-10 fill-current w-6 h-6 md:w-8 md:h-8 ml-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.35)]" />
-                    </Link>
+                  <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                    {movie.quality && (
+                      <span className="rounded border border-[#ffd875]/70 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-[#ffd875]">
+                        {movie.quality}
+                      </span>
+                    )}
+                    <span className="rounded border border-white/55 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
+                      {movie.year}
+                    </span>
+                    {movie.episode_current && (
+                      <span className="rounded border border-white/55 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
+                        {movie.episode_current}
+                      </span>
+                    )}
+                    {movie.lang && (
+                      <span className="rounded border border-white/45 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
+                        {movie.lang}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -199,31 +130,30 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         })}
       </Swiper>
 
-      <div className="absolute bottom-12 right-6 md:right-16 z-40 w-fit max-w-[280px] md:max-w-[450px] hidden md:block">
+      <div className="absolute bottom-5 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-[min(82%,420px)]">
         <Swiper
           onSwiper={setThumbsSwiper}
           modules={[Thumbs]}
           watchSlidesProgress
-          slidesPerView={4}
-          spaceBetween={12}
-          className="thumbs-slider !overflow-visible"
+          slidesPerView="auto"
+          centeredSlides
+          spaceBetween={9}
+          className="hero-cast-slider !overflow-visible"
         >
           {movies.map((movie) => (
             <SwiperSlide
               key={movie._id}
-              className="cursor-pointer group/thumb"
+              className="!w-8 !h-8 sm:!w-9 sm:!h-9 cursor-pointer"
             >
-              <div className="relative aspect-video rounded-md overflow-hidden border-2 border-transparent transition-all duration-300 group-[.swiper-slide-thumb-active]:border-[#ffd875] group-[.swiper-slide-thumb-active]:scale-110 group-[.swiper-slide-thumb-active]:shadow-[0_0_20px_rgba(255,216,117,0.5)]">
+              <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-white/45 bg-[#292c38] transition-all duration-300 group-[.swiper-slide-thumb-active]:border-[#ffd875] group-[.swiper-slide-thumb-active]:scale-110 group-[.swiper-slide-thumb-active]:shadow-[0_0_12px_rgba(255,216,117,0.45)]">
                 <Image
-                  src={movie.thumb_url || movie.poster_url}
+                  src={movie.poster_url || movie.thumb_url}
                   alt={movie.name}
                   fill
-                  sizes="180px"
-                  quality={75}
-                  className="object-cover transition-transform duration-500 group-hover/thumb:scale-110"
+                  sizes="40px"
+                  quality={70}
+                  className="object-cover"
                 />
-
-                <div className="absolute inset-0 bg-black/60 group-hover/thumb:bg-transparent group-[.swiper-slide-thumb-active]:bg-transparent transition-colors duration-300" />
               </div>
             </SwiperSlide>
           ))}
