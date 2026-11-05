@@ -28,6 +28,7 @@ import { HideDevBadge } from "@/components/hide-dev-badge";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { MemberProvider } from "@/components/member-provider";
 import NextTopLoader from "nextjs-toploader";
+import { RouteScrollReset } from "@/components/route-scroll-reset";
 
 export const metadata: Metadata = {
   title: "GiapTran - Xem phim chất lượng cao",
@@ -60,6 +61,7 @@ export default function RootLayout({
         className={`${beVietnamPro.variable} ${oswald.variable} antialiased bg-black text-white font-sans`}
       >
         <NextTopLoader color="#ffd875" showSpinner={false} />
+        <RouteScrollReset />
         <HideDevBadge />
         <MemberProvider>
           <Navbar />
