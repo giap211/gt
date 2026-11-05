@@ -123,18 +123,16 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         })}
       </Swiper>
 
-      <div className="absolute bottom-5 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-[min(90%,280px)]">
+      <div className="absolute bottom-5 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-fit max-w-[90%]">
         <Swiper
           onSwiper={setThumbsSwiper}
           modules={[Thumbs]}
           watchSlidesProgress
-          slidesPerView={6}
-          centeredSlides
-          centeredSlidesBounds
+          slidesPerView="auto"
           allowTouchMove={false}
           simulateTouch={false}
           spaceBetween={9}
-          className="hero-cast-slider !overflow-visible"
+          className="hero-cast-slider !w-fit !overflow-visible [&_.swiper-wrapper]:!justify-center"
         >
           {movies.map((movie) => (
             <SwiperSlide
