@@ -137,7 +137,7 @@ async function getNetflixVietnamTopMovies() {
 
   const titles: string[] = [];
   const seenTitles = new Set<string>();
-  const imageAltPattern = /<img\\b[^>]*\\balt=(["'])(.*?)\\1[^>]*>/gis;
+  const imageAltPattern = /<img\b[^>]*\balt=(["'])(.*?)\1[^>]*>/gis;
 
   for (const match of chartHtml.matchAll(imageAltPattern)) {
     const title = decodeHtml(match[2]).trim();
