@@ -36,6 +36,7 @@ export default function Home() {
     costume: ListMovie[];
     horror: ListMovie[];
     romance: ListMovie[];
+    viet: ListMovie[];
     hero: HeroMovie[];
   }>({
     latest: [],
@@ -52,6 +53,7 @@ export default function Home() {
     costume: [],
     horror: [],
     romance: [],
+    viet: [],
     hero: [],
   });
 
@@ -95,10 +97,7 @@ export default function Home() {
       if (cancelled) return;
 
       const backdropBySlug = new Map(
-        results.map((item) => [
-          item.slug,
-          item.backdrop_url,
-        ]),
+        results.map((item) => [item.slug, item.backdrop_url]),
       );
 
       setData((current) => ({
@@ -106,8 +105,7 @@ export default function Home() {
         hero: current.hero.map((movie) => ({
           ...movie,
           backdrop_url:
-            backdropBySlug.get(movie.slug) ||
-            movie.backdrop_url,
+            backdropBySlug.get(movie.slug) || movie.backdrop_url,
         })),
       }));
     };
@@ -129,6 +127,7 @@ export default function Home() {
           costumeRes,
           horrorRes,
           romanceRes,
+          vietRes,
         ] = await Promise.all([
           getLatestMovies(1),
           getMoviesByCountry("han-quoc", 1, true),
@@ -144,6 +143,7 @@ export default function Home() {
           getMoviesByCategory("co-trang", 1, true),
           getMoviesByCategory("kinh-di", 1, true),
           getMoviesByCategory("tinh-cam", 1, true),
+          getMoviesByCountry("viet-nam", 1, true),
         ]);
 
         let trendingHero: HeroMovie[] = [];
@@ -161,7 +161,6 @@ export default function Home() {
           console.error("Failed to fetch trending hero movies", error);
         }
 
-        // API ưu tiên 3 phim TMDB + 3 TV shows Netflix Việt Nam; phim mới chỉ dùng để lấp chỗ trống.
         const curatedHero = (
           trendingHero.length ? trendingHero : latestRes?.items || []
         ).slice(0, 6);
@@ -186,10 +185,10 @@ export default function Home() {
           costume: costumeRes?.items || [],
           horror: horrorRes?.items || [],
           romance: romanceRes?.items || [],
+          viet: vietRes?.items || [],
           hero: curatedHero,
         });
 
-        // Tải ảnh TMDB sau khi danh sách phim đã hiển thị.
         void fetchHeroBackdrops(curatedHero);
       } catch (error) {
         console.error("Failed to fetch movies", error);
@@ -210,10 +209,7 @@ export default function Home() {
   const uniqueMovies = (movies: ListMovie[]) => {
     return Array.from(
       new Map(
-        (movies || []).map((movie) => [
-          movie._id || movie.slug,
-          movie,
-        ]),
+        (movies || []).map((movie) => [movie._id || movie.slug, movie]),
       ),
     ).map(([, movie]) => movie);
   };
@@ -236,136 +232,163 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white font-sans overflow-x-hidden">
+    <main className="min-h-screen bg-[#0b0d14] text-white font-sans overflow-x-hidden">
       <HeroSlider movies={data.hero.slice(0, 6)} />
 
-      <div className="flex flex-col gap-0 pb-20 -mt-8 relative z-30">
+      <div className="flex flex-col gap-0 pb-16 -mt-6 relative z-30">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-48 space-y-4">
             <div className="w-12 h-12 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin"></div>
-
             <p className="text-white/40 animate-pulse text-sm font-medium tracking-wider uppercase">
               Đang đồng bộ dữ liệu...
             </p>
           </div>
         ) : (
           <>
-            <div className="mb-0">
-              <TopicGrid />
-            </div>
+            <TopicGrid />
 
-            <div className="container mx-auto space-y-4 md:space-y-8">
+            <div className="container mx-auto space-y-2 md:space-y-6">
+              {/* Điện ảnh Hàn Quốc */}
               <MovieCarousel
-                title="Phim Hàn Quốc mới"
-                icon="🇰🇷"
+                title="Điện ảnh Hàn Quốc"
                 viewMoreLink="/quoc-gia/han-quoc"
                 items={transformMovies(data.korean)}
               />
 
+              {/* Một phim Hoa Ngữ */}
               <MovieCarousel
-                title="Phim Trung Quốc mới"
-                icon="🇨🇳"
+                title="Một phim Hoa Ngữ"
                 viewMoreLink="/quoc-gia/trung-quoc"
                 items={transformMovies(data.chinese)}
               />
 
+              {/* Thiên đường Phim Thái */}
               <MovieCarousel
-                title="Phim US-UK mới"
-                icon="🇺🇸"
-                viewMoreLink="/quoc-gia/au-my"
-                items={transformMovies(data.usuk)}
-              />
-
-              <TrendingCarousel
-                title="Đây Rồi Top Phim Xem Nhiều Nhất"
-                items={transformMovies(
-                  uniqueMovies([
-                    ...data.latest,
-                    ...data.series,
-                    ...data.single,
-                  ])
-                    .sort((a, b) => b.view - a.view)
-                    .slice(0, 10),
-                )}
-              />
-
-              <MovieCarousel
-                title="Phim Điện Ảnh Mới Coóng"
-                icon="🚀"
-                viewMoreLink="/danh-sach/phim-le"
-                items={transformMovies(data.single)}
-              />
-
-              <TrendingCarousel
-                title="Top 10 phim bộ hôm nay"
-                items={transformMovies(
-                  [...data.series]
-                    .sort((a, b) => b.view - a.view)
-                    .slice(0, 10),
-                )}
-              />
-
-              <MovieCarousel
-                title="Mãn Nhãn Với Phim Chiếu Rạp"
-                icon="🍿"
-                viewMoreLink="/the-loai/chieu-rap"
-                items={transformMovies(data.cinema)}
-              />
-
-              <AdsBanner />
-
-              <TrendingCarousel
-                title="Top 10 phim lẻ hôm nay"
-                items={transformMovies(
-                  [...data.single]
-                    .sort((a, b) => b.view - a.view)
-                    .slice(0, 10),
-                )}
-              />
-
-              <MovieCarousel
-                title="Phim Nhật Mới Oanh Tạc Chốn Này"
-                icon="🍣"
-                viewMoreLink="/quoc-gia/nhat-ban"
-                items={transformMovies(data.japanese)}
-              />
-
-              <MovieCarousel
-                title="Phim Thái Now: Không drama đời không nể"
-                icon="🐘"
+                title="Thiên đường Phim Thái"
                 viewMoreLink="/quoc-gia/thai-lan"
                 items={transformMovies(data.thai)}
               />
 
-              <div className="py-10">
+              {/* Phim US-UK Mới */}
+              <MovieCarousel
+                title="Phim US-UK Mới"
+                viewMoreLink="/quoc-gia/au-my"
+                items={transformMovies(data.usuk)}
+              />
+
+              {/* Phim Song Ngữ Mới Nhất */}
+              <MovieCarousel
+                title="Phim Song Ngữ Mới Nhất"
+                viewMoreLink="/danh-sach/phim-bo"
+                items={transformMovies(
+                  uniqueMovies([...data.series, ...data.single]).slice(0, 12),
+                )}
+              />
+
+              {/* Phim Điện Ảnh Mới Coóng */}
+              <MovieCarousel
+                title="Phim Điện Ảnh Mới Coóng"
+                viewMoreLink="/danh-sach/phim-le"
+                items={transformMovies(data.single)}
+              />
+
+              {/* Dấu ấn điện ảnh Việt */}
+              <MovieCarousel
+                title="Dấu ấn điện ảnh Việt"
+                viewMoreLink="/quoc-gia/viet-nam"
+                items={transformMovies(data.viet)}
+              />
+
+              {/* Đêm Kinh Hoàng */}
+              <MovieCarousel
+                title="Đêm Kinh Hoàng"
+                viewMoreLink="/the-loai/kinh-di"
+                items={transformMovies(data.horror)}
+              />
+
+              {/* Mê Cung Phim Nhật */}
+              <MovieCarousel
+                title="Mê Cung Phim Nhật"
+                viewMoreLink="/quoc-gia/nhat-ban"
+                items={transformMovies(data.japanese)}
+              />
+
+              {/* Phim Bộ Đã Hoàn Thành */}
+              <MovieCarousel
+                title="Phim Bộ Đã Hoàn Thành"
+                viewMoreLink="/danh-sach/phim-bo"
+                items={transformMovies(data.series)}
+              />
+
+              {/* Hành Động Nghẹt Thở */}
+              <MovieCarousel
+                title="Hành Động Nghẹt Thở"
+                viewMoreLink="/the-loai/hanh-dong"
+                items={transformMovies(
+                  uniqueMovies([...data.usuk, ...data.korean]).slice(0, 12),
+                )}
+              />
+
+              {/* Trinh Thám & Bí Ẩn */}
+              <MovieCarousel
+                title="Trinh Thám & Bí Ẩn"
+                viewMoreLink="/the-loai/hinh-su"
+                items={transformMovies(
+                  uniqueMovies([...data.korean, ...data.japanese]).slice(0, 12),
+                )}
+              />
+
+              {/* Tinh Hoa Điện Ảnh Hồng Kông */}
+              <MovieCarousel
+                title="Tinh Hoa Điện Ảnh Hồng Kông"
+                viewMoreLink="/quoc-gia/hong-kong"
+                items={transformMovies(data.hongkong)}
+              />
+
+              {/* Top 10 phim lẻ hôm nay */}
+              <TrendingCarousel
+                title="Top 10 phim lẻ hôm nay"
+                items={transformMovies(
+                  [...data.single]
+                    .sort((a, b) => (b.view || 0) - (a.view || 0))
+                    .slice(0, 10),
+                )}
+              />
+
+              {/* Thế giới Anime */}
+              <div className="py-4">
                 <MovieCarousel
-                  title="Kho Tàng Anime Mới Nhất"
-                  icon="⚡"
+                  title="Thế giới Anime"
                   viewMoreLink="/danh-sach/hoat-hinh"
                   items={transformMovies(data.cartoon)}
                 />
               </div>
 
+              {/* Cổ Trang Trung Quốc */}
               <MovieCarousel
-                title="Điện Ảnh Hồng Kông Ở Chỗ Này Nầy"
-                icon="🐲"
-                viewMoreLink="/quoc-gia/hong-kong"
-                items={transformMovies(data.hongkong)}
-              />
-
-              <MovieCarousel
-                title="Phim Cổ Trang Hay"
-                icon="⚔️"
+                title="Cổ Trang Trung Quốc"
                 viewMoreLink="/the-loai/co-trang"
                 items={transformMovies(data.costume)}
               />
 
-              <MovieCarousel
-                title="Yêu Kiểu Hàn"
-                icon="💖"
-                viewMoreLink="/the-loai/tinh-cam"
-                items={transformMovies(data.romance)}
+              {/* Top 10 phim bộ hôm nay */}
+              <TrendingCarousel
+                title="Top 10 phim bộ hôm nay"
+                items={transformMovies(
+                  [...data.series]
+                    .sort((a, b) => (b.view || 0) - (a.view || 0))
+                    .slice(0, 10),
+                )}
               />
+
+              {/* Mãn Nhãn với Phim Chiếu Rạp */}
+              <MovieCarousel
+                title="Mãn Nhãn với Phim Chiếu Rạp"
+                viewMoreLink="/the-loai/chieu-rap"
+                items={transformMovies(data.cinema)}
+              />
+
+              <AdsBanner />
 
               <GhibliSection />
             </div>
