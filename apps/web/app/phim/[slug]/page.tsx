@@ -258,26 +258,25 @@ export default function MovieDetailPage({
           )}
         </div>
 
-        {/* Nút Xem Ngay */}
-        <div className="mt-6 flex justify-center">
+        {/* Nút xem phim + các thao tác */}
+        <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-center gap-6 md:gap-8">
           <Link
             href={`/xem-phim/${movie.slug}`}
-            className="inline-flex items-center justify-center gap-2.5 w-full max-w-sm bg-gradient-to-r from-[#ffd875] to-[#f5c84c] text-[#1a1a1a] font-bold text-base py-3.5 rounded-full shadow-lg shadow-[#ffd875]/20 hover:brightness-105 active:scale-[0.98] transition-all"
+            className="inline-flex items-center justify-center gap-2.5 w-full md:w-auto md:min-w-[220px] md:max-w-sm bg-gradient-to-r from-[#ffd875] to-[#f5c84c] text-[#1a1a1a] font-bold text-base py-3.5 rounded-full shadow-lg shadow-[#ffd875]/20 hover:brightness-105 active:scale-[0.98] transition-all"
           >
             <Play size={18} className="fill-current" />
             Xem Ngay
           </Link>
-        </div>
 
-        {/* Actions row */}
-        <div className="mt-6 flex items-center justify-center gap-6 sm:gap-8">
-          <MemberMovieActions
-            movie={{
-              movieSlug: movie.slug,
-              movieTitle: movie.name,
-              posterUrl: movie.poster_url,
-            }}
-          />
+          <div className="flex items-center justify-center gap-6 sm:gap-8">
+            <MemberMovieActions
+              movie={{
+                movieSlug: movie.slug,
+                movieTitle: movie.name,
+                posterUrl: movie.poster_url,
+              }}
+            />
+          </div>
         </div>
 
         {/* ========== TABS ========== */}
