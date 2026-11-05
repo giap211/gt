@@ -25,6 +25,7 @@ interface Movie {
   lang?: string;
   episode_current?: string;
   time?: string;
+  hero_source?: "tmdb" | "netflix" | "latest";
 }
 
 interface HeroSliderProps {
@@ -94,6 +95,16 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                     <p className="mt-1 text-xs sm:text-sm md:text-base text-[#ffd875]/90 font-medium">
                       {movie.origin_name}
                     </p>
+                  )}
+
+                  {movie.hero_source && (
+                    <span className="mt-2 inline-flex rounded-full border border-white/30 bg-black/40 px-2.5 py-1 text-[9px] sm:text-[10px] font-semibold tracking-wider text-white/90 backdrop-blur-md">
+                      {movie.hero_source === "tmdb"
+                        ? "TMDB TRENDING"
+                        : movie.hero_source === "netflix"
+                          ? "NETFLIX TOP 10 VIỆT NAM"
+                          : "ĐỀ XUẤT"}
+                    </span>
                   )}
 
                   <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
