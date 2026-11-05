@@ -79,31 +79,103 @@ async function getTmdbWeeklyTrending() {
   return titles;
 }
 
-async function buildHeroItems(titles: string[]) {
+async function findCatalogMatches(titles: string[], limit: number, seen: Set<string>) {
   const selected: ListMovie[] = [];
-  const seen = new Set<string>();
 
-  // Giữ thứ tự trending của TMDB và chỉ lấy phim có trong kho OPhim.
   for (const title of titles) {
-    if (selected.length >= 6) break;
+    if (selected.length >= limit) break;
+    const cleanTitle = title.trim();
+    if (!cleanTitle) continue;
 
-    const result = await searchMovies(title, 1, 10);
-    const movie = result.items.find(
-      (item) => !seen.has(item.slug) && isSameMovie(title, item),
-    );
-
-    if (!movie) continue;
-    selected.push(movie);
-    seen.add(movie.slug);
+    try {
+      const result = await searchMovies(cleanTitle, 1, 10);
+      const movie = result.items.find(
+        (item) => !seen.has(item.slug) && isSameMovie(cleanTitle, item),
+      );
+      if (!movie) continue;
+      selected.push(movie);
+      seen.add(movie.slug);
+    } catch (error) {
+      console.warn("Could not match hero title:", cleanTitle, error);
+    }
   }
 
-  // Nếu TMDB có ít phim trùng kho OPhim, bổ sung phim mới cập nhật.
+  return selected;
+}
+
+function decodeHtml(value: string) {
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
+async function getNetflixVietnamTopMovies() {
+  const response = await fetch("https://www.netflix.com/tudum/top10/vietnam/films", {
+    headers: {
+      Accept: "text/html",
+      "Accept-Language": "en-US,en;q=0.9,vi;q=0.8",
+      "User-Agent": "Mozilla/5.0 (compatible; RoPhim/1.0)",
+    },
+    next: { revalidate: 21600 },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Netflix Top 10 returned ${response.status}`);
+  }
+
+  const html = await response.text();
+  const chartStart = html.indexOf("Top 10 Movies in Vietnam");
+  const chartEnd = chartStart >= 0
+    ? html.indexOf("Explore The Most Watched Movies", chartStart)
+    : -1;
+  const chartHtml = chartStart >= 0
+    ? html.slice(chartStart, chartEnd > chartStart ? chartEnd : chartStart + 180000)
+    : html;
+
+  const titles: string[] = [];
+  const seenTitles = new Set<string>();
+  const imageAltPattern = /<img\\b[^>]*\\balt=(["'])(.*?)\\1[^>]*>/gis;
+
+  for (const match of chartHtml.matchAll(imageAltPattern)) {
+    const title = decodeHtml(match[2]).trim();
+    if (
+      !title ||
+      /^(image|logo|netflix|top 10)$/i.test(title) ||
+      seenTitles.has(normalize(title))
+    ) continue;
+
+    seenTitles.add(normalize(title));
+    titles.push(title);
+    if (titles.length >= 10) break;
+  }
+
+  if (titles.length === 0) {
+    throw new Error("Could not read movie titles from Netflix Vietnam Top 10");
+  }
+
+  return titles;
+}
+
+async function buildHeroItems(tmdbTitles: string[], netflixTitles: string[]) {
+  const seen = new Set<string>();
+  const tmdbMovies = await findCatalogMatches(tmdbTitles, 3, seen);
+  const netflixMovies = await findCatalogMatches(netflixTitles, 3, seen);
+
+  const selected = [
+    ...tmdbMovies.map((movie) => ({ ...movie, hero_source: "tmdb" as const })),
+    ...netflixMovies.map((movie) => ({ ...movie, hero_source: "netflix" as const })),
+  ];
+
+  // Chỉ dùng phim mới cập nhật khi hai bảng xếp hạng không đủ phim có trong kho.
   if (selected.length < 6) {
     const latest = await getLatestMovies(1);
     for (const movie of latest.items) {
       if (selected.length >= 6) break;
       if (seen.has(movie.slug)) continue;
-      selected.push(movie);
+      selected.push({ ...movie, hero_source: "latest" as const });
       seen.add(movie.slug);
     }
   }
@@ -113,27 +185,36 @@ async function buildHeroItems(titles: string[]) {
 
 export async function GET() {
   try {
-    const chartTitles = await getTmdbWeeklyTrending();
-    const items = await buildHeroItems(chartTitles);
+    const [tmdbTitles, netflixTitles] = await Promise.all([
+      getTmdbWeeklyTrending(),
+      getNetflixVietnamTopMovies(),
+    ]);
+    const items = await buildHeroItems(tmdbTitles, netflixTitles);
 
     return NextResponse.json(
       {
         items,
-        source: "tmdb-weekly-trending",
-        chartUrl: "https://www.themoviedb.org/trending/movie/week",
+        source: "tmdb-and-netflix-vietnam",
+        sources: {
+          tmdb: "https://www.themoviedb.org/trending/movie/week",
+          netflix: "https://www.netflix.com/tudum/top10/vietnam/films",
+        },
       },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+          "Cache-Control": "public, s-maxage=21600, stale-while-revalidate=43200",
         },
       },
     );
   } catch (error) {
-    console.error("Failed to build TMDB trending hero:", error);
+    console.error("Failed to build mixed trending hero:", error);
     const fallback = await getLatestMovies(1);
     return NextResponse.json(
       {
-        items: fallback.items.slice(0, 6),
+        items: fallback.items.slice(0, 6).map((movie) => ({
+          ...movie,
+          hero_source: "latest" as const,
+        })),
         source: "latest-movies-fallback",
       },
       {
