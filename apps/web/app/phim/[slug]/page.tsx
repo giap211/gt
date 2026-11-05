@@ -208,7 +208,7 @@ export default function MovieDetailPage({
             <div className="mt-4 w-full text-left space-y-3 bg-white/5 rounded-2xl p-4 border border-white/5">
               <div className="flex flex-wrap gap-2">
                 <span className="px-2.5 py-1 rounded border border-[#ffd875]/60 text-[#ffd875] text-xs font-bold">
-                  IMDb {movie.tmdb?.vote_average?.toFixed(1) || "—"}
+                  IMDb {movie.tmdb?.vote_average != null ? Number(movie.tmdb.vote_average).toFixed(1) : "—"}
                 </span>
                 <span className="px-2.5 py-1 rounded border border-white/20 text-white/60 text-xs">
                   {movie.year}
