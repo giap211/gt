@@ -3,44 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const SOCIAL_LINKS = [
-  {
-    name: "Facebook",
-    url: "https://www.facebook.com/",
-    mark: "FB",
-  },
-  {
-    name: "Tiktok",
-    url: "https://www.tiktok.com/",
-    mark: "TT",
-  },
-  {
-    name: "Youtube",
-    url: "https://www.youtube.com/",
-    mark: "YT",
-  },
-  {
-    name: "X",
-    url: "https://x.com/",
-    mark: "X",
-  },
-  {
-    name: "Discord",
-    url: "https://discord.gg/",
-    mark: "DC",
-  },
-  {
-    name: "Instagram",
-    url: "https://www.instagram.com/",
-    mark: "IG",
-  },
-  {
-    name: "Threads",
-    url: "https://www.threads.net/",
-    mark: "TH",
-  },
-];
-
 const FOOTER_LINKS = [
   { name: "Hỏi-Đáp", url: "/hoi-dap" },
   { name: "Chính sách bảo mật", url: "/chinh-sach-bao-mat" },
@@ -49,86 +11,90 @@ const FOOTER_LINKS = [
   { name: "Liên hệ", url: "/lien-he" },
 ];
 
+const PARTNER_LINKS = [
+  { name: "Dongphim", url: "#" },
+  { name: "Ghienphim", url: "#" },
+  { name: "Motphim", url: "#" },
+  { name: "Subnhanh", url: "#" },
+  { name: "Onflix", url: "#" },
+];
+
 export const Footer = () => {
   return (
-    <footer className="bg-[#0b0d14] text-gray-400 py-12 border-t border-white/10">
-      <div className="container mx-auto px-4 lg:px-8 text-center">
-        {/* Logo & Slogan */}
-        <div className="mb-6 flex flex-col items-center">
-          <Link href="/" className="mb-4 block">
+    <footer className="relative bg-[#0b0d14] text-gray-400 pt-10 pb-8 border-t border-white/5 overflow-hidden">
+      {/* Watermark play icon */}
+      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-1/2 opacity-[0.04] hidden md:block">
+        <svg
+          viewBox="0 0 200 200"
+          className="w-full h-full"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
+          <circle cx="100" cy="100" r="70" />
+          <circle cx="100" cy="100" r="50" />
+          <path d="M85 70 L85 130 L135 100 Z" fill="currentColor" stroke="none" />
+        </svg>
+      </div>
+
+      <div className="container mx-auto px-4 lg:px-8 relative z-10">
+        {/* Hoàng Sa badge */}
+        <div className="mb-6">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#8b1a1a] px-3.5 py-1.5 text-xs font-semibold text-white">
+            <span className="text-[#ffd875]">★</span>
+            Hoàng Sa &amp; Trường Sa là của Việt Nam!
+          </span>
+        </div>
+
+        {/* Logo */}
+        <div className="mb-5 flex items-center gap-3">
+          <Link href="/" className="inline-flex items-center gap-2">
             <Image
               src="/images/logo.svg"
               alt="RoPhim Logo"
-              width={150}
-              height={45}
-              className="h-12 w-auto"
+              width={130}
+              height={40}
+              className="h-9 w-auto"
             />
           </Link>
-          <p className="text-gray-500 max-w-2xl mx-auto text-sm leading-relaxed">
-            Trang xem phim online chất lượng cao miễn phí Vietsub,
-            thuyết minh, lồng tiếng full HD. Kho phim mới khổng lồ, phim chiếu
-            rạp, phim bộ, phim lẻ từ nhiều quốc gia như Việt Nam, Hàn Quốc,
-            Trung Quốc, Thái Lan, Nhật Bản, Âu Mỹ… đa dạng thể loại.
-          </p>
         </div>
 
-        {/* Social Links */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
-          {SOCIAL_LINKS.map((social) => (
-            <a
-              key={social.name}
-              href={social.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={social.name}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#191b24] text-[10px] font-black text-white/55 transition-all hover:border-[#ffd875]/50 hover:bg-[#ffd875] hover:text-black"
-            >
-              {social.mark}
-            </a>
-          ))}
-        </div>
-
-        {/* Footer Links */}
-        <div className="flex flex-wrap justify-center gap-6 text-sm font-medium mb-8">
+        {/* Main links */}
+        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm mb-3">
           {FOOTER_LINKS.map((link) => (
             <Link
               key={link.name}
               href={link.url}
-              className="hover:text-[#ffd875] transition-colors hover:underline decoration-[#ffd875]/50 underline-offset-4"
+              className="text-white/60 hover:text-[#ffd875] transition-colors"
             >
               {link.name}
             </Link>
           ))}
         </div>
 
-        {/* Copyright */}
-        <div className="text-gray-600 text-xs border-t border-white/5 pt-6">
-          <p className="mb-4 text-[#ffd875] font-bold text-sm">
-            Tự hào là người Việt Nam ❤️
-          </p>
-          <Link href="/" className="mb-6 block">
-            <Image
-              src="/images/logo.svg"
-              alt="RoPhim Logo"
-              width={120}
-              height={34}
-              className="h-8 w-auto mx-auto grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all"
-            />
-          </Link>
-          <div className="mt-6 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2">
-              <span className="w-1 h-1 bg-gray-700 rounded-full"></span>
-              <span>Hoàng Sa & Trường Sa là của Việt Nam!</span>
-              <span className="ml-1" aria-label="Vietnam Flag">
-                🇻🇳
-              </span>
-            </div>
-            <p className="mt-2">
-              © 2026 <span className="text-rophim-primary">RoPhim</span>. All
-              Rights Reserved.
-            </p>
-          </div>
+        {/* Partner links */}
+        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm mb-5">
+          {PARTNER_LINKS.map((link) => (
+            <a
+              key={link.name}
+              href={link.url}
+              className="text-white/40 hover:text-white/70 transition-colors"
+            >
+              {link.name}
+            </a>
+          ))}
         </div>
+
+        {/* Description */}
+        <p className="text-white/35 text-xs leading-relaxed max-w-3xl mb-4">
+          RoPhim – Phim hay cả rổ - Trang xem phim online chất lượng cao miễn phí
+          Vietsub, thuyết minh, lồng tiếng full HD. Kho phim mới khổng lồ, phim
+          chiếu rạp, phim bộ, phim lẻ từ nhiều quốc gia như Việt Nam, Hàn Quốc,
+          Trung Quốc, Thái Lan, Nhật Bản, Âu Mỹ… đa dạng thể loại. Khám phá nền
+          tảng phim trực tuyến hay nhất 2026 chất lượng 4K!
+        </p>
+
+        <p className="text-white/30 text-xs">© 2026 RoPhim</p>
       </div>
     </footer>
   );
