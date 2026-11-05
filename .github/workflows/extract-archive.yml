@@ -1,10 +1,7 @@
 name: Extract RoPhim archive
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/extract-archive.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
