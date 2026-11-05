@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
+import { NavbarGlassShader } from "./navbar-glass-shader";
 
 const GENRES = [
   { name: "Hành Động", slug: "hanh-dong" },
@@ -139,6 +140,7 @@ export const Navbar = () => {
         className={`fixed top-0 left-0 w-full z-50 py-3 sm:py-4 transition-all duration-300 ${isScrolled ? "navbar-scrolled" : ""}`}
       >
         <div className="navbar-glass-panel max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-6">
+          <NavbarGlassShader scrolled={isScrolled} />
           {/* Left: Brand Logo & Desktop Navigation */}
           <div className="flex items-center gap-3 sm:gap-8">
             {/* Mobile Hamburger Button */}
