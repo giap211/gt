@@ -167,12 +167,14 @@ async function getNetflixVietnamTopTvShows() {
   return titles;
 }
 
+type HeroItem = ListMovie & { hero_source: "tmdb" | "netflix" | "latest" };
+
 async function buildHeroItems(tmdbTitles: string[], netflixTvTitles: string[]) {
   const seen = new Set<string>();
   const tmdbMovies = await findCatalogMatches(tmdbTitles, 3, seen, "movie");
   const netflixTvShows = await findCatalogMatches(netflixTvTitles, 3, seen, "tv");
 
-  const selected = [
+  const selected: HeroItem[] = [
     ...tmdbMovies.map((movie) => ({ ...movie, hero_source: "tmdb" as const })),
     ...netflixTvShows.map((movie) => ({ ...movie, hero_source: "netflix" as const })),
   ];
