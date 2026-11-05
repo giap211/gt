@@ -36,12 +36,12 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="py-8 md:py-14 w-full relative overflow-hidden bg-gradient-to-b from-[#0b0d14] via-[#10121a] to-[#0b0d14]">
-      <div className="container mx-auto px-4 md:px-10">
+    <section className="py-5 md:py-10 w-full relative overflow-hidden bg-gradient-to-b from-[#0b0d14] via-[#10121a] to-[#0b0d14]">
+      <div className="container mx-auto px-3 md:px-8">
         {/* Header Style - Netflix Bold Italic */}
         <div className="flex min-w-0 items-center gap-3 md:gap-4 mb-7 md:mb-12">
-          <div className="h-7 md:h-10 w-1.5 shrink-0 bg-rophim-primary rounded-full shadow-[0_0_15px_rgba(240,194,77,0.4)]"></div>
-          <h2 className="min-w-0 text-xl md:text-4xl font-[950] text-white uppercase tracking-tight md:tracking-tighter italic drop-shadow-md leading-tight">
+          <div className="h-5 md:h-8 w-1 shrink-0 bg-rophim-primary rounded-full shadow-[0_0_15px_rgba(240,194,77,0.4)]"></div>
+          <h2 className="min-w-0 text-[15px] md:text-3xl font-[950] text-white uppercase tracking-tight md:tracking-tighter italic drop-shadow-md leading-tight">
             {title}
           </h2>
         </div>
@@ -64,7 +64,7 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
 
           <Swiper
             modules={[Navigation, Autoplay]}
-            spaceBetween={20}
+            spaceBetween={12}
             slidesPerView={2.2}
             autoplay={{ delay: 5000, disableOnInteraction: true }}
             navigation={{
