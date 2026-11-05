@@ -40,6 +40,47 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
 
   return (
     <section className="relative w-full h-[500px] md:h-[700px] lg:h-[800px] overflow-hidden group/hero">
+      <svg aria-hidden="true" className="absolute w-0 h-0 overflow-hidden" focusable="false">
+        <defs>
+          <filter
+            id="hero-liquid-glass"
+            x="-35%"
+            y="-35%"
+            width="170%"
+            height="170%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.025 0.025"
+              numOctaves="2"
+              seed="8"
+              result="glassNoise"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="glassNoise"
+              scale="13"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="refractedBackdrop"
+            />
+            <feGaussianBlur in="refractedBackdrop" stdDeviation="0.35" result="softGlass" />
+            <feSpecularLighting
+              in="glassNoise"
+              surfaceScale="3.5"
+              specularConstant="0.75"
+              specularExponent="22"
+              lightingColor="#ffffff"
+              result="glassHighlight"
+            >
+              <fePointLight x="-40" y="-55" z="90" />
+            </feSpecularLighting>
+            <feComposite in="glassHighlight" in2="SourceAlpha" operator="in" result="rimHighlight" />
+            <feBlend in="softGlass" in2="rimHighlight" mode="screen" />
+          </filter>
+        </defs>
+      </svg>
       <Swiper
         modules={[Autoplay, EffectFade, Pagination, Thumbs]}
         effect="fade"
