@@ -22,6 +22,7 @@ export interface ListMovie {
   rating?: number | string;
   isHot?: boolean;
   category?: Category[];
+  country?: Country[];
 }
 
 export interface DetailMovie extends ListMovie {
@@ -257,6 +258,7 @@ const cleanAndFilterMovies = (
       episode_current: item.episode_current || "Full",
       time: item.time,
       category: item.category,
+      country: item.country,
       isHot: isHomeFeed || Boolean(item.tmdb || item.imdb),
     });
   }
@@ -347,6 +349,27 @@ export const getMoviesByType = async (
   }
 };
 
+const normalizeCountryIdentifier = (value: string): string =>
+  value
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/đ/g, "d")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const belongsToCountry = (movie: ListMovie, requestedCountry: string): boolean => {
+  if (!Array.isArray(movie.country) || movie.country.length === 0) return false;
+
+  const expected = normalizeCountryIdentifier(requestedCountry);
+  return movie.country.some((country) => {
+    const slug = country.slug ? normalizeCountryIdentifier(country.slug) : "";
+    const name = country.name ? normalizeCountryIdentifier(country.name) : "";
+    return slug === expected || name === expected;
+  });
+};
+
 export const getMoviesByCountry = async (
   country: string,
   page: number = 1,
@@ -368,7 +391,9 @@ export const getMoviesByCountry = async (
 
     return {
       status: true,
-      items: cleanAndFilterMovies(items, cdn, isHome),
+      items: cleanAndFilterMovies(items, cdn, isHome).filter((movie) =>
+        belongsToCountry(movie, normCountry),
+      ),
       pathImage: cdn,
       pagination: data.data.params?.pagination || emptyPagination(),
     };
