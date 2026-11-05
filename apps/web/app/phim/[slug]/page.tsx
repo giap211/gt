@@ -49,6 +49,7 @@ export default function MovieDetailPage({
   const [showInfo, setShowInfo] = useState(false);
   const [backdropUrl, setBackdropUrl] = useState<string | null>(null);
   const [selectedServer, setSelectedServer] = useState(0);
+  const [actorImages, setActorImages] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,6 +101,34 @@ export default function MovieDetailPage({
       cancelled = true;
     };
   }, [slug]);
+
+  useEffect(() => {
+    if (!movie?.actor?.length) {
+      setActorImages({});
+      return;
+    }
+
+    let cancelled = false;
+    const loadActorImages = async () => {
+      try {
+        const response = await fetch("/api/actor-images", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ names: movie.actor.slice(0, 18) }),
+        });
+        if (!response.ok) return;
+        const data = (await response.json()) as { images?: Record<string, string> };
+        if (!cancelled) setActorImages(data.images || {});
+      } catch (error) {
+        console.error("Không tải được ảnh diễn viên:", error);
+      }
+    };
+
+    loadActorImages();
+    return () => {
+      cancelled = true;
+    };
+  }, [movie?.actor]);
 
   if (loading) {
     return (
@@ -397,16 +426,31 @@ export default function MovieDetailPage({
 
           {/* DIỄN VIÊN */}
           {activeTab === "diễn viên" && (
-            <div className="py-4 space-y-5">
+            <div className="py-4 space-y-7">
               {movie.actor && movie.actor.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-3 gap-y-6">
                   {movie.actor.map((name) => (
-                    <span
-                      key={name}
-                      className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-white/80"
-                    >
-                      {name}
-                    </span>
+                    <div key={name} className="min-w-0 text-center group">
+                      <div className="relative mx-auto w-full max-w-[112px] aspect-[3/4] rounded-2xl overflow-hidden bg-white/[0.06] border border-white/10 shadow-lg transition-all duration-300 group-hover:-translate-y-1 group-hover:border-[#ffd875]/40">
+                        {actorImages[name] ? (
+                          <img
+                            src={actorImages[name]}
+                            alt={name}
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/10 to-white/[0.02] text-2xl font-bold text-white/35">
+                            {name.trim().charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+                      </div>
+                      <p className="mt-2.5 text-xs sm:text-sm font-medium text-white/85 leading-snug line-clamp-2 group-hover:text-[#ffd875] transition-colors">
+                        {name}
+                      </p>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -416,8 +460,8 @@ export default function MovieDetailPage({
               )}
 
               {movie.director && movie.director.length > 0 && (
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-2">
+                <div className="pt-5 border-t border-white/10">
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">
                     Đạo diễn
                   </p>
                   <div className="flex flex-wrap gap-2">
