@@ -26,14 +26,18 @@ void main() {
   float radius = min(25.0, min(halfSize.x, halfSize.y) * 0.48);
   float distanceToEdge = roundedBox(p, halfSize, radius);
   float inside = 1.0 - smoothstep(0.0, 1.6, distanceToEdge);
-  float rim = 1.0 - smoothstep(0.0, 9.0, abs(distanceToEdge));
+  // Narrow bevel bands sit on the inner edge, leaving the glass center untouched.
+  float rim = exp(-pow((distanceToEdge + 1.5) / 3.2, 2.0));
+  float outerRim = exp(-pow((distanceToEdge - 1.0) / 2.0, 2.0));
   vec2 normal = normalize(vec2(dFdx(distanceToEdge), dFdy(distanceToEdge)) + vec2(0.0001));
 
   float sweep = p.x / max(u_resolution.x, 1.0);
   float movingGlare = exp(-pow((sweep - (0.18 + 0.13 * sin(u_time * 0.22))) * 5.2, 2.0));
   float topReflection = exp(-pow((p.y - halfSize.y * 0.78) / 13.0, 2.0));
-  float edgeLight = pow(1.0 - abs(normal.y), 2.2) * rim;
+  float fresnel = pow(1.0 - abs(normal.y * 0.72 + normal.x * 0.28), 2.4);
+  float edgeLight = fresnel * rim;
   float sideLight = pow(1.0 - abs(normal.x), 2.0) * rim;
+  float bevelGlint = outerRim * (0.22 + 0.18 * abs(normal.y));
   float strength = mix(0.72, 1.0, u_scrolled);
 
   vec3 coolGlass = vec3(0.78, 0.88, 1.0);
@@ -41,11 +45,12 @@ void main() {
   vec3 light = mix(coolGlass, warmGlass, smoothstep(0.25, 0.9, sweep));
   // Keep the center almost transparent so movie art and page content remain visible.
   // The glass is defined by restrained edge reflections, not a white overlay.
-  float alpha = inside * (movingGlare * 0.012 + topReflection * 0.008)
-              + rim * (0.035 + edgeLight * 0.075 + sideLight * 0.035)
-              + movingGlare * topReflection * 0.012;
+  float alpha = rim * (0.055 + edgeLight * 0.15 + sideLight * 0.055)
+              + bevelGlint * 0.10
+              + movingGlare * topReflection * rim * 0.035;
   alpha *= strength;
-  outColor = vec4(light * 0.78, clamp(alpha, 0.0, 0.11));
+  // Zero fill in the center: only the curved perimeter catches light.
+  outColor = vec4(light, clamp(alpha, 0.0, 0.24));
 }`;
 
 function compileShader(gl: WebGL2RenderingContext, type: number, source: string) {
