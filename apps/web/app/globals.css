@@ -545,9 +545,10 @@ body {
   padding-bottom: 8px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 24px;
+  /* Keep the panel genuinely see-through; blur and edge reflections create the glass. */
   background:
-    radial-gradient(ellipse at 16% 0%, rgba(190, 205, 230, 0.075), transparent 42%),
-    linear-gradient(135deg, rgba(24, 29, 43, 0.76), rgba(13, 16, 27, 0.68) 48%, rgba(54, 44, 25, 0.24));
+    radial-gradient(ellipse at 16% 0%, rgba(190, 205, 230, 0.025), transparent 42%),
+    linear-gradient(135deg, rgba(24, 29, 43, 0.12), rgba(13, 16, 27, 0.08) 48%, rgba(54, 44, 25, 0.035));
   -webkit-backdrop-filter: blur(30px) saturate(190%);
   backdrop-filter: blur(30px) saturate(190%);
   box-shadow:
@@ -577,8 +578,8 @@ body {
 .navbar-scrolled .navbar-glass-panel {
   border-color: rgba(255, 255, 255, 0.27);
   background:
-    radial-gradient(ellipse at 18% 0%, rgba(255, 255, 255, 0.19), transparent 44%),
-    linear-gradient(135deg, rgba(27, 30, 43, 0.82), rgba(15, 17, 27, 0.76) 55%, rgba(34, 29, 18, 0.68));
+    radial-gradient(ellipse at 18% 0%, rgba(190, 205, 230, 0.035), transparent 44%),
+    linear-gradient(135deg, rgba(27, 30, 43, 0.18), rgba(15, 17, 27, 0.13) 55%, rgba(34, 29, 18, 0.07));
   box-shadow:
     0 14px 44px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.3),
@@ -634,12 +635,12 @@ body {
     padding-top: 6px;
     padding-bottom: 6px;
     border-radius: 19px;
-    background-color: rgba(18, 20, 29, 0.58);
+    background: linear-gradient(135deg, rgba(24, 29, 43, 0.12), rgba(13, 16, 27, 0.08));
   }
 
   .navbar-scrolled .navbar-glass-panel {
     border-radius: 18px;
-    background-color: rgba(15, 17, 26, 0.84);
+    background: linear-gradient(135deg, rgba(27, 30, 43, 0.18), rgba(15, 17, 27, 0.13));
   }
 }
 
