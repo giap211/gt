@@ -69,27 +69,18 @@ export default function Home() {
             const response = await fetch(
               `/api/hero-image/${encodeURIComponent(movie.slug)}`,
             );
-
             if (!response.ok) {
-              return {
-                slug: movie.slug,
-                backdrop_url: undefined,
-              };
+              return { slug: movie.slug, backdrop_url: undefined };
             }
-
             const result = (await response.json()) as {
               backdropUrl?: string | null;
             };
-
             return {
               slug: movie.slug,
               backdrop_url: result.backdropUrl || undefined,
             };
           } catch {
-            return {
-              slug: movie.slug,
-              backdrop_url: undefined,
-            };
+            return { slug: movie.slug, backdrop_url: undefined };
           }
         }),
       );
@@ -193,14 +184,11 @@ export default function Home() {
       } catch (error) {
         console.error("Failed to fetch movies", error);
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchData();
-
     return () => {
       cancelled = true;
     };
@@ -220,6 +208,7 @@ export default function Home() {
       title: m.name,
       originalTitle: m.origin_name,
       posterUrl: m.poster_url,
+      thumbUrl: m.thumb_url,
       slug: m.slug,
       year: m.year,
       quality: m.quality || "HD",
@@ -235,10 +224,10 @@ export default function Home() {
     <main className="min-h-screen bg-[#0b0d14] text-white font-sans overflow-x-hidden">
       <HeroSlider movies={data.hero.slice(0, 6)} />
 
-      <div className="flex flex-col gap-0 pb-16 -mt-6 relative z-30">
+      <div className="flex flex-col gap-0 pb-16 -mt-4 relative z-30">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-48 space-y-4">
-            <div className="w-12 h-12 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin" />
             <p className="text-white/40 animate-pulse text-sm font-medium tracking-wider uppercase">
               Đang đồng bộ dữ liệu...
             </p>
@@ -247,105 +236,104 @@ export default function Home() {
           <>
             <TopicGrid />
 
-            <div className="container mx-auto space-y-2 md:space-y-6">
-              {/* Điện ảnh Hàn Quốc */}
+            <div className="space-y-1 md:space-y-2">
               <MovieCarousel
                 title="Điện ảnh Hàn Quốc"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)"
                 viewMoreLink="/quoc-gia/han-quoc"
                 items={transformMovies(data.korean)}
               />
 
-              {/* Một phim Hoa Ngữ */}
               <MovieCarousel
-                title="Một phim Hoa Ngữ"
+                title="Mọt phim Hoa Ngữ"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #f472b6 130%)"
                 viewMoreLink="/quoc-gia/trung-quoc"
                 items={transformMovies(data.chinese)}
               />
 
-              {/* Thiên đường Phim Thái */}
               <MovieCarousel
                 title="Thiên đường Phim Thái"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #34d399 130%)"
                 viewMoreLink="/quoc-gia/thai-lan"
                 items={transformMovies(data.thai)}
               />
 
-              {/* Phim US-UK Mới */}
               <MovieCarousel
                 title="Phim US-UK Mới"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #60a5fa 130%)"
                 viewMoreLink="/quoc-gia/au-my"
                 items={transformMovies(data.usuk)}
               />
 
-              {/* Phim Song Ngữ Mới Nhất */}
               <MovieCarousel
                 title="Phim Song Ngữ Mới Nhất"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #fbbf24 130%)"
                 viewMoreLink="/danh-sach/phim-bo"
                 items={transformMovies(
-                  uniqueMovies([...data.series, ...data.single]).slice(0, 12),
+                  uniqueMovies([...data.series, ...data.single]).slice(0, 14),
                 )}
               />
 
-              {/* Phim Điện Ảnh Mới Coóng */}
               <MovieCarousel
                 title="Phim Điện Ảnh Mới Coóng"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #fb923c 130%)"
                 viewMoreLink="/danh-sach/phim-le"
                 items={transformMovies(data.single)}
               />
 
-              {/* Dấu ấn điện ảnh Việt */}
               <MovieCarousel
                 title="Dấu ấn điện ảnh Việt"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #ef4444 130%)"
                 viewMoreLink="/quoc-gia/viet-nam"
                 items={transformMovies(data.viet)}
               />
 
-              {/* Đêm Kinh Hoàng */}
               <MovieCarousel
                 title="Đêm Kinh Hoàng"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #a855f7 130%)"
                 viewMoreLink="/the-loai/kinh-di"
                 items={transformMovies(data.horror)}
               />
 
-              {/* Mê Cung Phim Nhật */}
               <MovieCarousel
                 title="Mê Cung Phim Nhật"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #f43f5e 130%)"
                 viewMoreLink="/quoc-gia/nhat-ban"
                 items={transformMovies(data.japanese)}
               />
 
-              {/* Phim Bộ Đã Hoàn Thành */}
               <MovieCarousel
                 title="Phim Bộ Đã Hoàn Thành"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #22d3ee 130%)"
                 viewMoreLink="/danh-sach/phim-bo"
                 items={transformMovies(data.series)}
               />
 
-              {/* Hành Động Nghẹt Thở */}
               <MovieCarousel
                 title="Hành Động Nghẹt Thở"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #f97316 130%)"
                 viewMoreLink="/the-loai/hanh-dong"
                 items={transformMovies(
-                  uniqueMovies([...data.usuk, ...data.korean]).slice(0, 12),
+                  uniqueMovies([...data.usuk, ...data.korean]).slice(0, 14),
                 )}
               />
 
-              {/* Trinh Thám & Bí Ẩn */}
               <MovieCarousel
                 title="Trinh Thám & Bí Ẩn"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #818cf8 130%)"
                 viewMoreLink="/the-loai/hinh-su"
                 items={transformMovies(
-                  uniqueMovies([...data.korean, ...data.japanese]).slice(0, 12),
+                  uniqueMovies([...data.korean, ...data.japanese]).slice(0, 14),
                 )}
               />
 
-              {/* Tinh Hoa Điện Ảnh Hồng Kông */}
               <MovieCarousel
                 title="Tinh Hoa Điện Ảnh Hồng Kông"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #eab308 130%)"
                 viewMoreLink="/quoc-gia/hong-kong"
                 items={transformMovies(data.hongkong)}
               />
 
-              {/* Top 10 phim lẻ hôm nay */}
               <TrendingCarousel
                 title="Top 10 phim lẻ hôm nay"
                 items={transformMovies(
@@ -355,23 +343,20 @@ export default function Home() {
                 )}
               />
 
-              {/* Thế giới Anime */}
-              <div className="py-4">
-                <MovieCarousel
-                  title="Thế giới Anime"
-                  viewMoreLink="/danh-sach/hoat-hinh"
-                  items={transformMovies(data.cartoon)}
-                />
-              </div>
+              <MovieCarousel
+                title="Thế giới Anime"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #38bdf8 130%)"
+                viewMoreLink="/danh-sach/hoat-hinh"
+                items={transformMovies(data.cartoon)}
+              />
 
-              {/* Cổ Trang Trung Quốc */}
               <MovieCarousel
                 title="Cổ Trang Trung Quốc"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #c084fc 130%)"
                 viewMoreLink="/the-loai/co-trang"
                 items={transformMovies(data.costume)}
               />
 
-              {/* Top 10 phim bộ hôm nay */}
               <TrendingCarousel
                 title="Top 10 phim bộ hôm nay"
                 items={transformMovies(
@@ -381,15 +366,14 @@ export default function Home() {
                 )}
               />
 
-              {/* Mãn Nhãn với Phim Chiếu Rạp */}
               <MovieCarousel
                 title="Mãn Nhãn với Phim Chiếu Rạp"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #4ade80 130%)"
                 viewMoreLink="/the-loai/chieu-rap"
                 items={transformMovies(data.cinema)}
               />
 
               <AdsBanner />
-
               <GhibliSection />
             </div>
           </>
