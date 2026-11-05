@@ -1,17 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import {
-  Play,
-  ChevronDown,
-  List,
-  Heart,
-  Bell,
-  Plus,
-  Send,
-  MessageCircle,
-  Star,
-} from "lucide-react";
+import { Play, ChevronDown, List, MessageCircle, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -55,45 +45,33 @@ export default function MovieDetailPage({
           getMovieDetail(slug),
           getLatestMovies(1),
         ]);
-
-        if (movieRes && movieRes.status) {
+        if (movieRes?.status) {
           setMovie(movieRes.movie);
           setEpisodes(movieRes.episodes || []);
         }
-
-        if (latestRes && latestRes.status) {
-          setLatestMovies(latestRes.items);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data", error);
+        if (latestRes?.status) setLatestMovies(latestRes.items);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoading(false);
       }
     };
-
     if (slug) fetchData();
   }, [slug]);
 
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
-
-    const loadBackdrop = async () => {
+    (async () => {
       try {
-        const response = await fetch(
-          `/api/hero-image/${encodeURIComponent(slug)}`,
-        );
-        if (!response.ok) return;
-        const result = await response.json();
-        if (!cancelled && result.backdropUrl) {
-          setBackdropUrl(result.backdropUrl);
-        }
-      } catch (error) {
-        console.error("Không tải được ảnh nền:", error);
+        const res = await fetch(`/api/hero-image/${encodeURIComponent(slug)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data.backdropUrl) setBackdropUrl(data.backdropUrl);
+      } catch {
+        /* ignore */
       }
-    };
-
-    loadBackdrop();
+    })();
     return () => {
       cancelled = true;
     };
@@ -104,11 +82,10 @@ export default function MovieDetailPage({
       setActorImages({});
       return;
     }
-
     let cancelled = false;
-    const loadActorImages = async () => {
+    (async () => {
       try {
-        const response = await fetch("/api/actor-images", {
+        const res = await fetch("/api/actor-images", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -117,17 +94,13 @@ export default function MovieDetailPage({
             names: movie.actor.slice(0, 18),
           }),
         });
-        if (!response.ok) return;
-        const data = (await response.json()) as {
-          images?: Record<string, string>;
-        };
+        if (!res.ok) return;
+        const data = (await res.json()) as { images?: Record<string, string> };
         if (!cancelled) setActorImages(data.images || {});
-      } catch (error) {
-        console.error("Không tải được ảnh diễn viên TMDB:", error);
+      } catch {
+        /* ignore */
       }
-    };
-
-    loadActorImages();
+    })();
     return () => {
       cancelled = true;
     };
@@ -135,28 +108,19 @@ export default function MovieDetailPage({
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0f111a] text-white flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5">
-          <div className="w-14 h-14 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#ffd875] text-sm font-bold uppercase tracking-widest animate-pulse">
-            Đang tải thông tin phim...
-          </p>
-        </div>
+      <main className="min-h-screen bg-[#0f111a] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin" />
       </main>
     );
   }
 
   if (!movie) {
     return (
-      <main className="min-h-screen bg-[#0f111a] text-white">
-        <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-2xl font-bold text-red-500">
-            Không tìm thấy phim này!
-          </h1>
-          <Link href="/" className="text-[#ffd875] hover:underline mt-4 block">
-            Quay lại trang chủ
-          </Link>
-        </div>
+      <main className="min-h-screen bg-[#0f111a] text-white flex flex-col items-center justify-center gap-4">
+        <h1 className="text-xl font-bold text-red-400">Không tìm thấy phim</h1>
+        <Link href="/" className="text-[#ffd875] hover:underline">
+          Về trang chủ
+        </Link>
       </main>
     );
   }
@@ -167,118 +131,137 @@ export default function MovieDetailPage({
       ? Number(movie.tmdb.vote_average).toFixed(1)
       : null;
 
-  const suggestedMovies = latestMovies.map((m) => ({
-    id: m._id,
-    title: m.name,
-    originalTitle: m.origin_name,
-    posterUrl: m.poster_url,
-    slug: m.slug,
-    episodeCurrent: m.episode_current,
-  }));
-
   const TABS = ["Tập phim", "Gallery", "OST", "Diễn viên", "Đề xuất"];
 
+  const heroSrc = backdropUrl || movie.thumb_url || movie.poster_url;
+
   return (
-    <main className="min-h-screen bg-[#0f111a] text-white font-sans overflow-x-hidden pb-16">
-      {/* ========== HERO BACKDROP ========== */}
-      <div className="relative w-full h-[240px] sm:h-[320px] md:h-[420px] lg:h-[480px] overflow-hidden">
+    <main className="min-h-screen bg-[#0f111a] text-white overflow-x-hidden pb-20">
+      {/* ===== HERO ===== */}
+      <section className="relative w-full h-[280px] sm:h-[360px] md:h-[440px] lg:h-[520px]">
         <Image
-          src={backdropUrl || movie.thumb_url || movie.poster_url}
+          src={heroSrc}
           alt={movie.name}
           fill
-          className="object-cover object-top"
           priority
-          sizes="100vw"
           quality={90}
+          sizes="100vw"
+          className="object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f111a] via-[#0f111a]/50 to-transparent z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0f111a]/80 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f111a] via-[#0f111a]/40 to-black/30" />
 
-        {/* Floating Xem Ngay on hero (mobile center) */}
-        <div className="absolute inset-0 z-20 flex items-center justify-center md:hidden">
+        {/* Center play (desktop) */}
+        <div className="absolute inset-0 hidden md:flex items-center justify-center z-10">
           <Link
             href={`/xem-phim/${movie.slug}`}
-            className="flex items-center justify-center w-16 h-16 rounded-full bg-[#ffd875] text-[#1a1a1a] shadow-xl shadow-[#ffd875]/30"
+            className="w-[72px] h-[72px] rounded-full bg-[#ffd875] text-[#1a1a1a] flex items-center justify-center shadow-[0_0_40px_rgba(255,216,117,0.45)] hover:scale-105 transition-transform"
           >
-            <Play size={28} className="fill-current ml-1" />
+            <Play size={30} className="fill-current ml-1" />
           </Link>
         </div>
-      </div>
+      </section>
 
-      {/* ========== ACTION BAR ========== */}
-      <div className="relative z-30 -mt-8 md:-mt-12 px-3 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-[#161822]/95 backdrop-blur-xl border border-white/8 rounded-2xl px-4 py-3 shadow-2xl">
-            <Link
-              href={`/xem-phim/${movie.slug}`}
-              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#ffd875] to-[#f5c84c] text-[#1a1a1a] font-bold text-[15px] px-6 py-2.5 rounded-full shadow-lg shadow-[#ffd875]/20 hover:brightness-105 active:scale-[0.98] transition-all shrink-0"
-            >
-              <Play size={16} className="fill-current" />
-              Xem Ngay
-            </Link>
-
-            <div className="flex items-center justify-between sm:justify-end gap-1 sm:gap-2 flex-1">
-              <MemberMovieActions
-                movie={{
-                  movieSlug: movie.slug,
-                  movieTitle: movie.name,
-                  posterUrl: movie.poster_url,
-                }}
-              />
-
-              <button className="flex flex-col items-center gap-0.5 px-2 py-1 text-white/50 hover:text-white transition-colors">
-                <div className="flex items-center gap-1">
-                  <Star size={16} className="text-[#ffd875]" />
-                  <span className="text-xs font-bold text-white">0</span>
-                </div>
-                <span className="text-[10px]">Đánh giá</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  document
-                    .getElementById("comments-section")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="flex flex-col items-center gap-0.5 px-2 py-1 text-white/50 hover:text-white transition-colors"
-              >
-                <MessageCircle size={16} />
-                <span className="text-[10px]">Bình luận</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ========== MAIN 2-COLUMN CONTENT ========== */}
-      <div className="relative z-20 max-w-6xl mx-auto px-3 sm:px-6 mt-6 md:mt-8">
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* ---- LEFT SIDEBAR ---- */}
-          <aside className="lg:w-[260px] xl:w-[280px] shrink-0">
-            {/* Poster */}
-            <div className="relative w-[140px] sm:w-[180px] lg:w-full mx-auto lg:mx-0 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-4">
+      {/* ===== OVERLAP: poster + action bar ===== */}
+      <div className="relative z-20 max-w-[1200px] mx-auto px-3 sm:px-5 -mt-16 sm:-mt-20 md:-mt-24">
+        <div className="flex items-end gap-3 sm:gap-4">
+          {/* Poster card - overlaps hero */}
+          <div className="shrink-0 w-[110px] sm:w-[150px] md:w-[180px] lg:w-[200px]">
+            <div className="relative aspect-[2/3] rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-[#161822]">
               <Image
                 src={movie.poster_url}
                 alt={movie.name}
                 fill
-                className="object-cover"
-                sizes="280px"
                 priority
+                sizes="200px"
+                className="object-cover"
               />
             </div>
+          </div>
 
-            {/* Title */}
-            <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight text-center lg:text-left">
-              {movie.name}
-            </h1>
-            <p className="text-sm text-[#ffd875]/80 mt-1 text-center lg:text-left">
-              {movie.origin_name}
-            </p>
+          {/* Action bar */}
+          <div className="flex-1 min-w-0 pb-1">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 bg-[#161822]/95 backdrop-blur-md border border-white/8 rounded-2xl px-3 sm:px-5 py-2.5 sm:py-3 shadow-xl">
+              <Link
+                href={`/xem-phim/${movie.slug}`}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ffd875] to-[#f0c24d] text-[#1a1a1a] font-bold text-sm sm:text-[15px] px-5 sm:px-6 py-2.5 rounded-full shrink-0 hover:brightness-105 transition-all"
+              >
+                <Play size={15} className="fill-current" />
+                Xem Ngay
+              </Link>
 
-            {/* Badges */}
-            <div className="flex flex-wrap gap-1.5 mt-3 justify-center lg:justify-start">
+              <div className="flex items-center gap-3 sm:gap-4 ml-auto">
+                <MemberMovieActions
+                  movie={{
+                    movieSlug: movie.slug,
+                    movieTitle: movie.name,
+                    posterUrl: movie.poster_url,
+                  }}
+                />
+
+                <button className="hidden sm:flex items-center gap-1.5 rounded-full bg-[#282b3a] px-3 py-1.5 hover:bg-[#32364a] transition-colors">
+                  <Star size={14} className="fill-[#ffd875] text-[#ffd875]" />
+                  <span className="text-sm font-bold">0</span>
+                  <span className="text-[11px] text-white/50">Đánh giá</span>
+                </button>
+
+                <button
+                  onClick={() =>
+                    document
+                      .getElementById("comments-section")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="hidden sm:flex flex-col items-center gap-0.5 text-white/60 hover:text-white transition-colors"
+                >
+                  <MessageCircle size={18} />
+                  <span className="text-[10px]">Bình luận</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Tabs under action bar */}
+            <div className="mt-3 border-b border-white/10">
+              <div className="flex gap-4 sm:gap-5 overflow-x-auto no-scrollbar">
+                {TABS.map((tab) => {
+                  const key = tab.toLowerCase();
+                  const active = activeTab === key;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(key)}
+                      className={`relative pb-2.5 text-sm font-medium whitespace-nowrap transition-colors ${
+                        active
+                          ? "text-[#ffd875]"
+                          : "text-white/40 hover:text-white/70"
+                      }`}
+                    >
+                      {tab}
+                      {active && (
+                        <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#ffd875] rounded-full" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ===== 2 COL: info left + content right ===== */}
+        <div className="mt-5 flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* LEFT info under poster */}
+          <aside className="lg:w-[200px] shrink-0 space-y-3">
+            <div>
+              <h1 className="text-lg sm:text-xl font-bold leading-snug">
+                {movie.name}
+              </h1>
+              <p className="text-sm text-[#ffd875]/85 mt-0.5">
+                {movie.origin_name}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5">
               {imdbScore && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-[#f5c518]/60 bg-[#f5c518]/10 text-[#f5c518] text-[11px] font-bold">
+                <span className="px-2 py-0.5 rounded border border-[#f5c518]/50 text-[#f5c518] text-[11px] font-bold">
                   IMDb {imdbScore}
                 </span>
               )}
@@ -287,175 +270,135 @@ export default function MovieDetailPage({
                   {movie.quality}
                 </span>
               )}
-              <span className="px-2 py-0.5 rounded border border-white/20 text-white/70 text-[11px]">
+              <span className="px-2 py-0.5 rounded border border-white/15 text-white/60 text-[11px]">
                 {movie.year}
               </span>
               {movie.episode_current && (
-                <span className="px-2 py-0.5 rounded border border-white/20 text-white/70 text-[11px]">
+                <span className="px-2 py-0.5 rounded border border-white/15 text-white/60 text-[11px]">
                   {movie.episode_current}
                 </span>
               )}
             </div>
 
-            {/* Categories */}
-            <div className="flex flex-wrap gap-1.5 mt-3 justify-center lg:justify-start">
+            <div className="flex flex-wrap gap-1.5">
               {movie.category?.map((c) => (
                 <Link
                   key={c.id}
                   href={`/the-loai/${c.slug}`}
-                  className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[11px] text-white/60 hover:text-white hover:border-white/25 transition-colors"
+                  className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-white/55 hover:text-white"
                 >
                   {c.name}
                 </Link>
               ))}
             </div>
 
-            {/* Progress */}
             {movie.episode_current && movie.episode_total && (
-              <div className="mt-3 flex items-center gap-1.5 text-[#ff9800] text-xs font-medium justify-center lg:justify-start">
-                <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-[#ff9800] border-t-transparent animate-spin" />
+              <p className="text-[#ff9800] text-xs font-medium flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full border-2 border-[#ff9800] border-t-transparent animate-spin inline-block" />
                 Đã chiếu: {movie.episode_current} / {movie.episode_total} tập
-              </div>
+              </p>
             )}
 
-            {/* Intro */}
-            <div className="mt-4 hidden lg:block">
-              <p className="text-xs font-semibold text-white/50 mb-1.5">
-                Giới thiệu:
-              </p>
-              <div
-                className="text-sm text-white/55 leading-relaxed line-clamp-5"
-                dangerouslySetInnerHTML={{
-                  __html: movie.content || "Đang cập nhật...",
-                }}
-              />
-            </div>
+            <div className="hidden lg:block space-y-3 pt-1">
+              <div>
+                <p className="text-xs text-white/40 mb-1">Giới thiệu:</p>
+                <div
+                  className="text-[13px] text-white/55 leading-relaxed line-clamp-6"
+                  dangerouslySetInnerHTML={{
+                    __html: movie.content || "Đang cập nhật...",
+                  }}
+                />
+              </div>
 
-            {/* Meta */}
-            <div className="mt-4 space-y-1.5 text-sm hidden lg:block">
-              <p>
-                <span className="text-white/40">Thời lượng: </span>
-                <span className="text-white/80">
-                  {movie.time || "Đang cập nhật"}
-                </span>
-              </p>
-              <p>
-                <span className="text-white/40">Quốc gia: </span>
-                <span className="text-white/80">
-                  {movie.country?.[0]?.name || "—"}
-                </span>
-              </p>
-              {movie.director && movie.director.length > 0 && (
+              <div className="text-[13px] space-y-1">
                 <p>
-                  <span className="text-white/40">Đạo diễn: </span>
-                  <span className="text-white/80">
-                    {movie.director.join(", ")}
-                  </span>
+                  <span className="text-white/35">Thời lượng: </span>
+                  {movie.time || "—"}
                 </p>
+                <p>
+                  <span className="text-white/35">Quốc gia: </span>
+                  {movie.country?.[0]?.name || "—"}
+                </p>
+                {movie.director?.length > 0 && (
+                  <p>
+                    <span className="text-white/35">Đạo diễn: </span>
+                    {movie.director.join(", ")}
+                  </p>
+                )}
+              </div>
+
+              {movie.actor?.length > 0 && (
+                <div>
+                  <p className="text-xs text-white/40 mb-2">Diễn viên</p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {movie.actor.slice(0, 6).map((name) => (
+                      <div
+                        key={name}
+                        className="flex flex-col items-center gap-1"
+                      >
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-white/5 border border-white/10">
+                          {actorImages[name] ? (
+                            <img
+                              src={actorImages[name]}
+                              alt={name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs font-bold text-white/30">
+                              {name.trim().charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-white/55 text-center line-clamp-2 leading-tight">
+                          {name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
-
-            {/* Actors - left column circles */}
-            {movie.actor && movie.actor.length > 0 && (
-              <div className="mt-5 hidden lg:block">
-                <p className="text-xs font-semibold text-white/50 mb-3">
-                  Diễn viên
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {movie.actor.slice(0, 8).map((name) => (
-                    <div key={name} className="flex flex-col items-center gap-1.5">
-                      <div className="w-14 h-14 rounded-full overflow-hidden bg-white/5 border border-white/10">
-                        {actorImages[name] ? (
-                          <img
-                            src={actorImages[name]}
-                            alt={name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            referrerPolicy="no-referrer"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-sm font-bold text-white/30">
-                            {name.trim().charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-white/60 text-center line-clamp-2 leading-tight">
-                        {name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </aside>
 
-          {/* ---- RIGHT CONTENT ---- */}
+          {/* RIGHT tab content */}
           <div className="flex-1 min-w-0">
-            {/* Tabs */}
-            <div className="border-b border-white/10 mb-4">
-              <div className="flex items-center gap-5 overflow-x-auto no-scrollbar">
-                {TABS.map((tab) => {
-                  const key = tab.toLowerCase();
-                  const isActive = activeTab === key;
-                  return (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveTab(key)}
-                      className={`relative pb-3 text-sm font-medium whitespace-nowrap transition-colors ${
-                        isActive
-                          ? "text-[#ffd875]"
-                          : "text-white/40 hover:text-white/70"
-                      }`}
-                    >
-                      {tab}
-                      {isActive && (
-                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffd875] rounded-full" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* TAB: Tập phim */}
             {activeTab === "tập phim" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 text-white font-semibold text-[15px]">
-                      <List size={16} className="text-white/50" />
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button className="flex items-center gap-1.5 text-sm font-semibold">
+                      <List size={15} className="text-white/40" />
                       Phần 1
-                      <ChevronDown size={14} className="text-white/40" />
+                      <ChevronDown size={13} className="text-white/35" />
                     </button>
-
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {episodes.length > 0 ? (
-                        episodes.map((ep, idx) => (
+                    {episodes.length > 0
+                      ? episodes.map((ep, idx) => (
                           <button
                             key={idx}
                             onClick={() => setSelectedServer(idx)}
-                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium border transition-colors ${
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium border ${
                               selectedServer === idx
-                                ? "bg-[#ffd875]/15 border-[#ffd875]/50 text-[#ffd875]"
-                                : "bg-white/5 border-white/10 text-white/55 hover:bg-white/10"
+                                ? "bg-[#ffd875]/15 border-[#ffd875]/45 text-[#ffd875]"
+                                : "bg-white/5 border-white/10 text-white/50"
                             }`}
                           >
                             {ep.server_name || `Server ${idx + 1}`}
                           </button>
                         ))
-                      ) : (
-                        <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-white/5 border border-white/10 text-white/55">
-                          Vietsub
-                        </span>
-                      )}
-                    </div>
+                      : (
+                          <span className="px-2.5 py-1 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/50">
+                            Vietsub
+                          </span>
+                        )}
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-white/45">Rút gọn</span>
+                    <span className="text-xs text-white/40">Rút gọn</span>
                     <button
                       onClick={() => setIsCompact(!isCompact)}
-                      className={`relative w-9 h-[18px] rounded-full transition-colors ${
+                      className={`relative w-9 h-[18px] rounded-full ${
                         isCompact ? "bg-[#ffd875]" : "bg-white/20"
                       }`}
                     >
@@ -479,100 +422,82 @@ export default function MovieDetailPage({
                     {currentServerData.map((ep) => (
                       <Link
                         key={ep.slug || ep.name}
-                        href={`/xem-phim/${movie.slug}?tap=${ep.slug || ep.name}`}
-                        className="flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg bg-[#1c1e2a] border border-white/5 text-[13px] font-medium text-white/75 hover:bg-[#ffd875]/10 hover:border-[#ffd875]/30 hover:text-[#ffd875] transition-all active:scale-[0.97]"
+                        href={`/xem-phim/${movie.slug}?tap=${encodeURIComponent(ep.slug || ep.name)}`}
+                        className="flex items-center justify-center gap-1 py-2.5 px-2 rounded-lg bg-[#1c1e2a] border border-white/5 text-[13px] text-white/75 hover:bg-[#ffd875]/10 hover:border-[#ffd875]/30 hover:text-[#ffd875] transition-all"
                       >
-                        <Play size={11} className="opacity-50" />
+                        <Play size={11} className="opacity-40" />
                         {formatEpisodeName(ep.name)}
                       </Link>
                     ))}
                   </div>
                 ) : (
-                  <div className="py-10 text-center text-white/40 text-sm">
+                  <p className="py-8 text-center text-white/35 text-sm">
                     Chưa có danh sách tập.
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* TAB: Gallery */}
-            {activeTab === "gallery" && (
-              <div className="py-10 text-center text-white/40 text-sm">
-                Gallery đang được cập nhật.
-              </div>
-            )}
-
-            {/* TAB: OST */}
-            {activeTab === "ost" && (
-              <div className="py-10 text-center text-white/40 text-sm">
-                OST đang được cập nhật.
-              </div>
-            )}
-
-            {/* TAB: Diễn viên */}
-            {activeTab === "diễn viên" && (
-              <div className="py-4">
-                {movie.actor && movie.actor.length > 0 ? (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-3 gap-y-5">
-                    {movie.actor.map((name) => (
-                      <div key={name} className="min-w-0 text-center group">
-                        <div className="relative mx-auto w-full max-w-[100px] aspect-square rounded-full overflow-hidden bg-white/[0.06] border border-white/10">
-                          {actorImages[name] ? (
-                            <img
-                              src={actorImages[name]}
-                              alt={name}
-                              loading="lazy"
-                              referrerPolicy="no-referrer"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-xl font-bold text-white/30">
-                              {name.trim().charAt(0).toUpperCase()}
-                            </div>
-                          )}
-                        </div>
-                        <p className="mt-2 text-xs font-medium text-white/80 line-clamp-2 group-hover:text-[#ffd875]">
-                          {name}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-white/40 text-sm py-6">
-                    Thông tin diễn viên đang được cập nhật.
                   </p>
                 )}
               </div>
             )}
 
-            {/* TAB: Đề xuất */}
-            {activeTab === "đề xuất" && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {suggestedMovies.slice(0, 12).map((m) => (
-                  <Link key={m.id} href={`/phim/${m.slug}`} className="group">
-                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden border border-white/5">
-                      <Image
-                        src={m.posterUrl}
-                        alt={m.title}
-                        fill
-                        sizes="(max-width: 640px) 50vw, 20vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                      {m.episodeCurrent && (
-                        <span className="absolute bottom-1.5 left-1.5 bg-[#2ca35d] text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
-                          {m.episodeCurrent}
-                        </span>
+            {activeTab === "gallery" && (
+              <p className="py-10 text-center text-white/35 text-sm">
+                Gallery đang cập nhật.
+              </p>
+            )}
+
+            {activeTab === "ost" && (
+              <p className="py-10 text-center text-white/35 text-sm">
+                OST đang cập nhật.
+              </p>
+            )}
+
+            {activeTab === "diễn viên" && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                {(movie.actor || []).map((name) => (
+                  <div key={name} className="text-center">
+                    <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-white/5 border border-white/10">
+                      {actorImages[name] ? (
+                        <img
+                          src={actorImages[name]}
+                          alt={name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-lg font-bold text-white/25">
+                          {name.trim().charAt(0).toUpperCase()}
+                        </div>
                       )}
                     </div>
-                    <p className="mt-1.5 text-xs font-semibold text-white/80 line-clamp-1 group-hover:text-[#ffd875]">
-                      {m.title}
+                    <p className="mt-1.5 text-xs text-white/70 line-clamp-2">
+                      {name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === "đề xuất" && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {latestMovies.slice(0, 12).map((m) => (
+                  <Link key={m._id} href={`/phim/${m.slug}`} className="group">
+                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
+                      <Image
+                        src={m.poster_url}
+                        alt={m.name}
+                        fill
+                        sizes="25vw"
+                        className="object-cover group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+                    <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-[#ffd875]">
+                      {m.name}
                     </p>
                   </Link>
                 ))}
               </div>
             )}
 
-            {/* Comments */}
             <div id="comments-section" className="mt-8">
               <CommentsPanel
                 movie={{
