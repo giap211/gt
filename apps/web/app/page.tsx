@@ -7,6 +7,7 @@ import { TrendingCarousel } from "@/components/trending-carousel";
 import { TopicGrid } from "@/components/topic-grid";
 import { AdsBanner } from "@/components/ads-banner";
 import { GhibliSection } from "@/components/ghibli-section";
+import { ContinueWatchingSection } from "@/components/continue-watching-section";
 import {
   getLatestMovies,
   getMoviesByType,
@@ -237,6 +238,7 @@ export default function Home() {
             <TopicGrid />
 
             <div className="space-y-1 md:space-y-2">
+              <ContinueWatchingSection />
               <MovieCarousel
                 title="Điện ảnh Hàn Quốc"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)"
