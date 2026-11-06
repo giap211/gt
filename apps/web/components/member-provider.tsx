@@ -191,11 +191,28 @@ function MemberLibraryModal({
                     <h3 className="truncate text-sm font-black uppercase tracking-tight text-white">
                       {item.movieTitle}
                     </h3>
-                    <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-white/35">
+                    <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-white/45">
                       {view === "history" && "episodeName" in item
                         ? `Tập ${item.episodeName}`
                         : "Đã lưu vào tủ phim"}
                     </p>
+                    {view === "history" && "progressSeconds" in item && (
+                      <p className="mt-1 text-[11px] font-semibold text-[#ffd875]">
+                        {(() => {
+                          const seconds = Math.max(0, Math.floor(item.progressSeconds || 0));
+                          const minutes = Math.floor(seconds / 60);
+                          const remainingSeconds = seconds % 60;
+                          const hours = Math.floor(minutes / 60);
+                          const remainingMinutes = minutes % 60;
+                          const progress = hours > 0
+                            ? `${hours} giờ ${remainingMinutes} phút`
+                            : minutes > 0
+                              ? `${minutes} phút ${remainingSeconds} giây`
+                              : `${remainingSeconds} giây`;
+                          return `Đã xem ${progress}`;
+                        })()}
+                      </p>
+                    )}
                   </div>
                   <span className="shrink-0 rounded-full bg-[#ffd875] px-3 py-1 text-[10px] font-black uppercase text-black">
                     {view === "history" ? "Xem tiếp" : "Xem"}
