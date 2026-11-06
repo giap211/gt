@@ -89,6 +89,7 @@ export class MemberController {
       posterUrl?: string;
       episodeName: string;
       progressSeconds?: number;
+      totalDurationSeconds?: number;
     },
   ) {
     const user = await this.requireUser(request);
