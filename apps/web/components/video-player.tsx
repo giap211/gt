@@ -70,6 +70,7 @@ export const VideoPlayer = ({
     let hlsInstance: Hls | null = null;
     let knownDurationSeconds = 0;
     let art: Artplayer | null = null;
+    let resumeObserver: MutationObserver | null = null;
     let seekWatchTimer: ReturnType<typeof setTimeout> | null = null;
     let stallWatchTimer: ReturnType<typeof setInterval> | null = null;
     let lastTime = 0;
@@ -299,9 +300,7 @@ export const VideoPlayer = ({
 
       if (art) {
         const player = art.template.$player as HTMLElement;
-        const resumePanel = player.querySelector(".art-auto-playback") as HTMLElement | null;
         const centerPlay = art.template.$state as HTMLElement;
-        let resumeObserver: MutationObserver | null = null;
 
         const configureResumeChoice = () => {
           const panel = player.querySelector(".art-auto-playback") as HTMLElement | null;
