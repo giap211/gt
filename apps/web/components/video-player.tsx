@@ -1,8 +1,9 @@
 
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Artplayer from "artplayer";
+import { Play } from "lucide-react";
 import Hls from "hls.js";
 
 // Tắt double-click fullscreen / play mặc định
@@ -38,6 +39,31 @@ export const VideoPlayer = ({
       url.includes("/video/") ||
       url.includes("embed"));
 
+  const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
+
+  useEffect(() => {
+    setShowResumeChoice(startAtSeconds > 0 && !isEmbed);
+  }, [startAtSeconds, isEmbed]);
+
+  const startPlayback = (resume: boolean) => {
+    const video = artRef.current?.querySelector("video");
+    if (!video) return;
+    const play = () => {
+      if (resume && Number.isFinite(video.duration) && video.duration > 0) {
+        video.currentTime = Math.min(startAtSeconds, Math.max(0, video.duration - 2));
+      } else if (!resume) {
+        video.currentTime = 0;
+      }
+      video.play().catch(() => {});
+    };
+    if (video.readyState < 1) {
+      video.addEventListener("loadedmetadata", play, { once: true });
+    } else {
+      play();
+    }
+    setShowResumeChoice(false);
+  };
+
   useEffect(() => {
     if (!artRef.current || isEmbed) return;
 
@@ -48,7 +74,6 @@ export const VideoPlayer = ({
     let stallWatchTimer: ReturnType<typeof setInterval> | null = null;
     let lastTime = 0;
     let stuckCount = 0;
-    let restorePlaybackPosition: (() => void) | null = null;
 
     const clearTimers = () => {
       if (seekWatchTimer) {
@@ -94,7 +119,7 @@ export const VideoPlayer = ({
         volume: 0.7,
         isLive: false,
         muted: false,
-        autoplay: true,
+        autoplay: startAtSeconds <= 0,
         pip: true,
         autoSize: false,
         autoMini: false,
@@ -157,8 +182,7 @@ export const VideoPlayer = ({
 
               hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 // HLS có thể chỉ xác định duration sau khi manifest được phân tích.
-                restorePlaybackPosition?.();
-                video.play().catch(() => {});
+                if (startAtSeconds <= 0) video.play().catch(() => {});
               });
 
               hls.on(Hls.Events.LEVEL_LOADED, (_event, data) => {
@@ -275,30 +299,6 @@ export const VideoPlayer = ({
 
       if (art) {
         const video = art.video as HTMLVideoElement;
-        let positionRestored = startAtSeconds <= 0;
-
-        const restorePosition = () => {
-          if (positionRestored || startAtSeconds <= 0) return;
-          if (!Number.isFinite(video.duration) || video.duration <= 0) return;
-
-          const target = Math.min(
-            startAtSeconds,
-            Math.max(0, video.duration - 2),
-          );
-
-          try {
-            // Đặt vị trí sau khi metadata/manifest đã sẵn sàng.
-            video.currentTime = target;
-            const hls = (art as any)?.hls as Hls | undefined;
-            hls?.startLoad(target);
-            positionRestored = true;
-            art!.notice.show = "Tiếp tục từ vị trí đã xem";
-          } catch {
-            // Chờ sự kiện sẵn sàng tiếp theo rồi thử lại.
-          }
-        };
-
-        restorePlaybackPosition = restorePosition;
         const reportProgress = () => {
           if (!video.paused && Number.isFinite(video.currentTime)) {
             const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
@@ -308,18 +308,10 @@ export const VideoPlayer = ({
           }
         };
 
-        video.addEventListener("loadedmetadata", restorePosition);
-        video.addEventListener("durationchange", restorePosition);
-        video.addEventListener("canplay", restorePosition);
-        if (video.readyState >= 1) restorePosition();
         video.addEventListener("timeupdate", reportProgress);
 
         const previousCleanup = (art as any).__seekCleanup as (() => void) | undefined;
         (art as any).__seekCleanup = () => {
-          restorePlaybackPosition = null;
-          video.removeEventListener("loadedmetadata", restorePosition);
-          video.removeEventListener("durationchange", restorePosition);
-          video.removeEventListener("canplay", restorePosition);
           video.removeEventListener("timeupdate", reportProgress);
           previousCleanup?.();
         };
@@ -496,9 +488,30 @@ export const VideoPlayer = ({
   }
 
   return (
-    <div
-      ref={artRef}
-      className="w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10"
-    />
+    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
+      <div ref={artRef} className="w-full h-full" />
+      {showResumeChoice && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/65 backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 px-4">
+            <button
+              type="button"
+              onClick={() => startPlayback(false)}
+              className="min-w-[150px] inline-flex items-center justify-center gap-2 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 px-6 py-3 text-sm font-bold text-white transition-all"
+            >
+              <Play size={18} fill="currentColor" />
+              Phát từ đầu
+            </button>
+            <button
+              type="button"
+              onClick={() => startPlayback(true)}
+              className="min-w-[170px] inline-flex items-center justify-center gap-2 rounded-full bg-[#ffd875] hover:brightness-110 px-6 py-3 text-sm font-black text-black transition-all shadow-[0_0_24px_rgba(255,216,117,0.25)]"
+            >
+              <Play size={18} fill="currentColor" />
+              Tiếp tục xem
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
