@@ -435,7 +435,18 @@ export const VideoPlayer = ({
       if (art) {
         const video = art.video as HTMLVideoElement;
         const reportProgress = () => {
-          setShowSkipIntro(video.currentTime >= 30 && video.currentTime < 90);
+          const intro = introSegmentRef.current;
+          const hasIntro =
+            typeof intro.startSeconds === "number" &&
+            typeof intro.endSeconds === "number" &&
+            Number.isFinite(intro.startSeconds) &&
+            Number.isFinite(intro.endSeconds) &&
+            intro.endSeconds > intro.startSeconds;
+          setShowSkipIntro(
+            hasIntro &&
+            video.currentTime >= intro.startSeconds! &&
+            video.currentTime < intro.endSeconds!
+          );
           if (!video.paused && Number.isFinite(video.currentTime)) {
             const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
               ? video.duration
@@ -633,7 +644,15 @@ export const VideoPlayer = ({
           onClick={() => {
             const video = artRef.current?.querySelector("video");
             if (!video) return;
-            video.currentTime = 90;
+            const endSeconds = introSegmentRef.current.endSeconds;
+            if (typeof endSeconds !== "number" || !Number.isFinite(endSeconds)) return;
+            video.currentTime = endSeconds;
+            try {
+              const hls = (artRef.current as any)?.art?.hls;
+              hls?.startLoad(endSeconds);
+            } catch {
+              // The browser's native HLS implementation does not expose hls.js.
+            }
             video.play().catch(() => {});
             setShowSkipIntro(false);
           }}
