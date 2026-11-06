@@ -5,7 +5,7 @@ services:
     plan: free
     region: singapore
     branch: main
-    autoDeployTrigger: off
+    autoDeployTrigger: commit
     healthCheckPath: /health
     buildCommand: corepack enable && corepack prepare pnpm@9.0.0 --activate && pnpm install --frozen-lockfile --prod=false && pnpm --filter @rophim/database migrate:deploy && pnpm --filter @rophim/database build && pnpm --filter @rophim/server build
     startCommand: pnpm --filter @rophim/server start:prod
