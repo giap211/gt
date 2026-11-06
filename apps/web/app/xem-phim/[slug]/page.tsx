@@ -58,6 +58,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   } | null>(null);
   const [currentServer, setCurrentServer] = useState(0);
   const [isCinemaMode, setIsCinemaMode] = useState(false);
+  const [introSegment, setIntroSegment] = useState<{ startSeconds: number; endSeconds: number } | null>(null);
   const [copiedToast, setCopiedToast] = useState(false);
   const { user } = useMember();
   const lastHistorySaveRef = useRef(0);
@@ -122,6 +123,45 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     };
     if (slug) fetchData();
   }, [slug, tapParam]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIntroSegment(null);
+    if (!movie?.tmdb?.id || !currentEpisode) return;
+
+    const isSeries = movie.type === "series" || movie.type === "tvshows";
+    let season = 1;
+    let episodeNumber = 0;
+    const namedEpisode = currentEpisode.name.match(/s(\d{1,2})\s*e(\d{1,3})/i);
+    const simpleEpisode = currentEpisode.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) ||
+      currentEpisode.name.match(/^0*(\d+)$/);
+    if (namedEpisode) {
+      season = Number(namedEpisode[1]);
+      episodeNumber = Number(namedEpisode[2]);
+    } else if (simpleEpisode) {
+      episodeNumber = Number(simpleEpisode[1]);
+    }
+
+    if (isSeries && (!episodeNumber || !Number.isInteger(episodeNumber))) return;
+
+    const params = new URLSearchParams({
+      tmdbId: String(movie.tmdb.id),
+      type: isSeries ? "tv" : "movie",
+      ...(isSeries ? { season: String(season), episode: String(episodeNumber) } : {}),
+    });
+
+    fetch(`/api/skip-intro?${params.toString()}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (cancelled || !data || !Number.isFinite(data.startSeconds) || !Number.isFinite(data.endSeconds)) return;
+        if (data.endSeconds > data.startSeconds) {
+          setIntroSegment({ startSeconds: data.startSeconds, endSeconds: data.endSeconds });
+        }
+      })
+      .catch(() => undefined);
+
+    return () => { cancelled = true; };
+  }, [movie, currentEpisode]);
 
   useEffect(() => {
     if (!user || !movie || !currentEpisode) return;
@@ -303,6 +343,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   poster={movie.thumb_url}
                   title={`${movie.name} - ${formatEpisodeName(currentEpisode.name)}`}
                   startAtSeconds={resumeAt}
+                  introStartSeconds={introSegment?.startSeconds}
+                  introEndSeconds={introSegment?.endSeconds}
                   onProgress={handlePlaybackProgress}
                 />
               )}
