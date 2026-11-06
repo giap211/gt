@@ -174,7 +174,7 @@ export const Navbar = () => {
             {/* Brand Logo */}
             <Link href="/" className="shrink-0 flex items-center gap-2 group">
               <Image
-                alt="RoPhim Logo"
+                alt="Phim Lậu Logo"
                 width={110}
                 height={32}
                 src="/images/logo.svg"
@@ -491,7 +491,7 @@ export const Navbar = () => {
             <div className="p-4 border-b border-white/[0.08] flex items-center justify-between">
               <Link href="/" onClick={() => setIsMobileDrawerOpen(false)}>
                 <Image
-                  alt="RoPhim Logo"
+                  alt="Phim Lậu Logo"
                   width={95}
                   height={28}
                   src="/images/logo.svg"
@@ -656,7 +656,7 @@ export const Navbar = () => {
 
             {/* Footer */}
             <div className="p-3 border-t border-white/[0.06] text-center text-[10px] text-white/30">
-              RoPhim © 2026 — Trải nghiệm phim đỉnh cao
+              Phim Lậu © 2026 — Trải nghiệm phim đỉnh cao
             </div>
           </div>
         </div>
