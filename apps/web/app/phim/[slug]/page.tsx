@@ -607,40 +607,64 @@ function TabContent({
       );
     }
 
+    const selectedVersion = episodes[selectedServer] || episodes[0];
+    const selectedVersionEpisode = selectedVersion?.server_data?.[0];
+    const versionName = selectedVersion?.server_name || "Vietsub 1";
+    const versionHref = selectedVersionEpisode
+      ? `/xem-phim/${movie.slug}?tap=${encodeURIComponent(selectedVersionEpisode.slug || selectedVersionEpisode.name)}`
+      : `/xem-phim/${movie.slug}`;
+
     return (
       <div>
-        <h2 className="text-[17px] font-semibold mb-3">Các bản chiếu</h2>
-        <div className="flex gap-2 mb-3">
-          <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#3b82f6]/15 border border-[#3b82f6]/35 text-[#93c5fd]">
-            Song ngữ
-          </span>
-        </div>
-        <Link
-          href={`/xem-phim/${movie.slug}`}
-          className="flex items-stretch rounded-xl overflow-hidden bg-[#1c1e2a] border border-white/8 hover:border-[#ffd875]/25 transition-colors max-w-lg group"
-        >
-          <div className="flex-1 p-4 flex flex-col justify-center">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="w-4 h-4 rounded bg-[#3b82f6]/30 flex items-center justify-center text-[8px] text-[#93c5fd]">
-                ▶
-              </span>
-              <span className="text-[11px] text-[#93c5fd]">Song ngữ</span>
-            </div>
-            <p className="text-sm font-semibold text-white group-hover:text-[#ffd875] line-clamp-1">
-              {movie.name}
-            </p>
-            <span className="mt-3 inline-flex w-fit text-xs font-medium text-white bg-white/10 px-3 py-1.5 rounded-md border border-white/10">
-              Xem bản này
+        <h2 className="text-[17px]] font-semibold mb-6">Các bản chiếu</h2>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {episodes.length > 0 ? episodes.map((version, idx) => (
+            <button
+              key={`${version.server_name}-${idx}`}
+              type="button"
+              onClick={() => setSelectedServer(idx)}
+              className={`rounded-xl border px-3.5 py-2 text-sm font-medium transition-all ${
+                selectedServer === idx
+                  ? "border-[#ffd875] bg-[#202331] text-[#ffd875] shadow-[0_0_14px_rgba(255,216,117,0.12)]"
+                  : "border-white/15 bg-[#202331] text-white/85 hover:border-white/30"
+              }`}
+            >
+              {version.server_name || `Bản chiếu ${idx + 1}`}
+            </button>
+          )) : (
+            <span className="rounded-xl border border-[#ffd875] bg-[#202331] px-3.5 py-2 text-sm font-medium text-[#ffd875]">
+              Vietsub 1
             </span>
-          </div>
-          <div className="relative w-[140px] sm:w-[180px] shrink-0 min-h-[90px]">
+          )}
+        </div>
+
+        <Link
+          href={versionHref}
+          className="group relative flex min-h-[190px] max-w-2xl items-center overflow-hidden rounded-[22px] border border-white/10 bg-[#626474] transition-colors hover:border-[#ffd875]/40 sm:min-h-[205px]"
+        >
+          <div className="absolute inset-0">
             <Image
               src={movie.thumb_url || movie.poster_url}
-              alt={movie.name}
+              alt=""
               fill
-              sizes="180px"
-              className="object-cover"
+              sizes="640px"
+              className="object-cover object-center opacity-55 transition-transform duration-500 group-hover:scale-105"
             />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#626474] via-[#626474]/95 to-[#626474]/35" />
+          </div>
+          <div className="relative z-10 flex w-full flex-col items-start p-5 sm:p-7">
+            <div className="mb-3 flex items-center gap-2 text-white">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#6675ee] text-lg shadow-sm">
+                ▰
+              </span>
+              <span className="text-base font-medium">{versionName}</span>
+            </div>
+            <p className="max-w-[75%] text-xl font-bold leading-snug text-white sm:text-2xl">
+              {movie.name}
+            </p>
+            <span className="mt-5 inline-flex items-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-[#171923] shadow-sm transition-colors group-hover:bg-[#ffd875]">
+              Xem bản này
+            </span>
           </div>
         </Link>
       </div>
