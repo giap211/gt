@@ -148,7 +148,7 @@ function MemberLibraryModal({
 
   if (!view) return null;
 
-  const title = view === "favorites" ? "Tủ phim của bạn" : "Lịch sử xem";
+  const title = view === "favorites" ? "Tủ phim của bạn" : "Phim đang xem";
   const items = view === "favorites" ? favorites : history;
 
   return (
@@ -183,7 +183,7 @@ function MemberLibraryModal({
               {items.map((item) => (
                 <Link
                   key={item.id}
-                  href={`/phim/${item.movieSlug}`}
+                  href={view === "history" && "episodeSlug" in item ? `/xem-phim/${item.movieSlug}?tap=${encodeURIComponent(item.episodeSlug || "")}&at=${Math.max(0, Math.floor(item.progressSeconds || 0))}` : `/phim/${item.movieSlug}` }
                   onClick={onClose}
                   className="flex items-center justify-between gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-colors hover:border-[#ffd875]/30 hover:bg-white/[0.06]"
                 >
@@ -198,7 +198,7 @@ function MemberLibraryModal({
                     </p>
                   </div>
                   <span className="shrink-0 rounded-full bg-[#ffd875] px-3 py-1 text-[10px] font-black uppercase text-black">
-                    Xem
+                    {view === "history" ? "Xem tiếp" : "Xem"}
                   </span>
                 </Link>
               ))}
