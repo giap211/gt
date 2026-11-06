@@ -14,6 +14,7 @@ interface MovieCardProps {
   href?: string;
   progressSeconds?: number;
   totalDurationSeconds?: number;
+  simulateProgressWhenEmpty?: boolean;
   year?: string | number;
   quality?: string;
   episodeCurrent?: string;
@@ -103,6 +104,7 @@ export const MovieCard = ({
   href,
   progressSeconds,
   totalDurationSeconds,
+  simulateProgressWhenEmpty = false,
   quality = "HD",
   language,
   episodeCurrent,
@@ -124,6 +126,14 @@ export const MovieCard = ({
     PLACEHOLDER;
   const langChip = buildLangChip(language, episodeCurrent);
   const qChip = qualityChip(quality);
+  const hasRuntime = Boolean(totalDurationSeconds && totalDurationSeconds > 0);
+  const hasRealProgress = typeof progressSeconds === "number" && progressSeconds > 0;
+  const displayProgressSeconds = hasRealProgress
+    ? Math.min(progressSeconds as number, totalDurationSeconds || 0)
+    : simulateProgressWhenEmpty && hasRuntime
+      ? Math.round((totalDurationSeconds as number) * 0.18)
+      : 0;
+  const showProgressBar = hasRuntime && (hasRealProgress || simulateProgressWhenEmpty);
 
   const showBilingual =
     (language || "").toLowerCase().includes("vietsub") ||
@@ -177,11 +187,11 @@ export const MovieCard = ({
           }`}
         />
 
-        {typeof progressSeconds === "number" && totalDurationSeconds && totalDurationSeconds > 0 && (
+        {showProgressBar && (
           <div className="absolute bottom-0 left-0 right-0 z-30 h-[5px] bg-white/35">
             <div
               className="relative h-full bg-[#ffd875] shadow-[0_0_8px_rgba(255,216,117,0.65)]"
-              style={{ width: `${Math.min(100, Math.max(0, (progressSeconds / totalDurationSeconds) * 100))}%` }}
+              style={{ width: `${Math.min(100, Math.max(0, (displayProgressSeconds / (totalDurationSeconds || 1)) * 100))}%` }}
             >
               <span className="absolute -right-[4px] -top-[2px] h-[9px] w-[9px] rounded-full border-2 border-[#ffd875] bg-white shadow-md" />
             </div>
@@ -189,10 +199,10 @@ export const MovieCard = ({
         )}
       </Link>
 
-      {typeof progressSeconds === "number" && totalDurationSeconds && totalDurationSeconds > 0 && (
+      {showProgressBar && hasRealProgress && (
         <div className="mt-1 flex items-center justify-between gap-2 px-0.5 text-[9px] font-semibold tabular-nums text-white/50">
-          <span>{formatPlaybackTime(progressSeconds)} / {formatPlaybackTime(totalDurationSeconds)}</span>
-          <span className="text-[#ffd875]">{Math.min(100, Math.round((progressSeconds / totalDurationSeconds) * 100))}%</span>
+          <span>{formatPlaybackTime(displayProgressSeconds)} / {formatPlaybackTime(totalDurationSeconds || 0)}</span>
+          <span className="text-[#ffd875]">{Math.min(100, Math.round((displayProgressSeconds / (totalDurationSeconds || 1)) * 100))}%</span>
         </div>
       )}
 
