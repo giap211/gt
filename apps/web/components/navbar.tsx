@@ -307,8 +307,8 @@ export const Navbar = () => {
                       setShowLiveSearch(true);
                     }}
                     onFocus={() => setShowLiveSearch(true)}
-                    className="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.1] border border-white/[0.08] focus:border-[#ffd875]/60 text-white text-xs sm:text-[13px] rounded-full py-1.5 sm:py-2 pl-3 sm:pl-4 pr-11 outline-none shadow-sm transition-all placeholder:text-white/35"
-                    placeholder="Tìm kiếm phim..."
+                    className="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.1] border border-white/[0.08] focus:border-[#ffd875]/60 text-white text-[16px] sm:text-[13px] rounded-full py-1.5 sm:py-2 pl-3 sm:pl-4 pr-11 outline-none shadow-sm transition-all placeholder:text-white/35"
+                    placeholder="Tìm phim..."
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
                     {isSearching ? (
