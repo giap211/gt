@@ -158,7 +158,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     return () => window.clearTimeout(timeoutId);
   }, [user, movie, currentEpisode, resumeAt]);
 
-  const handlePlaybackProgress = useCallback((seconds: number) => {
+  const handlePlaybackProgress = useCallback((seconds: number, durationSeconds: number) => {
     if (!user || !movie || !currentEpisode) return;
     const now = Date.now();
     if (now - lastHistorySaveRef.current < 10000) return;
@@ -170,6 +170,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       episodeName: currentEpisode.name,
       episodeSlug: currentEpisode.slug,
       progressSeconds: Math.floor(seconds),
+      totalDurationSeconds: Math.floor(durationSeconds || 0),
     }).catch(() => undefined);
   }, [user, movie, currentEpisode]);
   const handleShare = async () => {
