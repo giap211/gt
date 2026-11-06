@@ -64,6 +64,13 @@ export const VideoPlayer = ({
 
   const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [showDebug, setShowDebug] = useState(() => {
+    try {
+      return typeof window !== "undefined" && window.localStorage.getItem("player-skip-intro-debug") === "on";
+    } catch {
+      return false;
+    }
+  });
   const [debugCurrentTime, setDebugCurrentTime] = useState<number | null>(null);
   const [debugVideoState, setDebugVideoState] = useState("Đang chờ trình phát");
 
@@ -152,6 +159,22 @@ export const VideoPlayer = ({
         autoMini: false,
         screenshot: true,
         setting: true,
+        settings: [
+          {
+            html: "Hiện debug Skip Intro",
+            tooltip: "Hiển thị thông tin kiểm tra Skip Intro trên trình phát",
+            switch: showDebug,
+            onSwitch: (item: { switch?: boolean }) => {
+              const enabled = Boolean(item.switch);
+              setShowDebug(enabled);
+              try {
+                window.localStorage.setItem("player-skip-intro-debug", enabled ? "on" : "off");
+              } catch {
+                // Bỏ qua nếu trình duyệt không cho phép lưu cài đặt.
+              }
+            },
+          },
+        ],
         loop: false,
         flip: true,
         playbackRate: true,
@@ -661,6 +684,7 @@ export const VideoPlayer = ({
   return (
     <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10 ${showResumeChoice ? "[&_.art-state]:!hidden [&_.art-controls]:!hidden [&_.art-bottom]:!hidden" : ""}`}>
       <div ref={artRef} className="w-full h-full" />
+      {showDebug && (
       <div className="absolute left-2 top-2 z-40 max-w-[min(92%,420px)] rounded-lg border border-cyan-300/40 bg-black/90 p-2.5 text-[10px] leading-relaxed text-white shadow-xl sm:left-3 sm:top-3 sm:text-xs">
         <div className="mb-1 flex items-center justify-between gap-3">
           <strong className="text-cyan-300">DEBUG SKIP INTRO</strong>
@@ -675,6 +699,7 @@ export const VideoPlayer = ({
         <div>Resume overlay: <b>{showResumeChoice ? "ĐANG HIỆN" : "TẮT"}</b></div>
         <div>Nút cần hiện: <b className={showSkipIntro && !showResumeChoice ? "text-green-300" : "text-amber-300"}>{showSkipIntro && !showResumeChoice ? "CÓ" : "KHÔNG"}</b></div>
       </div>
+      )}
       {showSkipIntro && !showResumeChoice && (
         <button
           type="button"
