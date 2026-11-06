@@ -8,7 +8,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 
-import { useRef } from "react";
+import { useId, useRef } from "react";
 
 interface TrendingCarouselProps {
   title: string;
@@ -30,6 +30,7 @@ interface TrendingCarouselProps {
 }
 
 export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
+  const clipIdPrefix = useId().replace(/:/g, "");
   const navigationPrevRef = useRef<HTMLButtonElement | null>(null);
   const navigationNextRef = useRef<HTMLButtonElement | null>(null);
 
@@ -102,7 +103,19 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
                   </div>
 
                   <div className="relative z-10 ml-4 md:ml-6">
-                    <div className="relative aspect-[2/3] w-full rounded-md overflow-hidden shadow-xl transition-transform duration-300 group-hover/slide:-translate-y-1">
+                    <svg aria-hidden="true" className="absolute h-0 w-0" focusable="false">
+                      <defs>
+                        <clipPath id={`trending-poster-clip-${clipIdPrefix}-${index}`} clipPathUnits="objectBoundingBox">
+                          <path d={index % 2 === 0
+                            ? "M 0 0.12 C 0 0.08 0.025 0.055 0.065 0.052 L 0.925 0 C 0.965 0 1 0.03 1 0.07 L 1 0.94 C 1 0.975 0.975 1 0.94 1 L 0.06 1 C 0.025 1 0 0.975 0 0.94 Z"
+                            : "M 0 0.07 C 0 0.03 0.035 0 0.075 0 L 0.935 0.052 C 0.975 0.055 1 0.08 1 0.12 L 1 0.94 C 1 0.975 0.975 1 0.94 1 L 0.06 1 C 0.025 1 0 0.975 0 0.94 Z"} />
+                        </clipPath>
+                      </defs>
+                    </svg>
+                    <div
+                      className="relative aspect-[2/3] w-full overflow-hidden shadow-xl transition-transform duration-300 group-hover/slide:-translate-y-1"
+                      style={{ clipPath: `url(#trending-poster-clip-${clipIdPrefix}-${index})` }}
+                    >
                       <MovieCard {...movie} hideInfo variant="vertical" />
                     </div>
 
