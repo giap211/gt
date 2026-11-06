@@ -240,7 +240,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2 text-[11px] font-bold text-white/40 uppercase tracking-widest">
             <Link href="/" className="hover:text-white transition-colors">
-              RoPhim
+              Phim Lậu
             </Link>
             <span>/</span>
             <Link
