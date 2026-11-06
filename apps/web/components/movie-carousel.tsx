@@ -14,7 +14,7 @@ interface MovieCarouselProps {
   title: string;
   icon?: string;
   viewMoreLink?: string;
-  /** gradient text color for title like RoPhim */
+  /** gradient text color for title like Phim Lậu */
   titleGradient?: string;
   layout?: "standard" | "ranked";
   items: {
