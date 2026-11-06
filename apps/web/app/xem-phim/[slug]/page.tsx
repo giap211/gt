@@ -154,9 +154,9 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     if (isSeries && (!episodeNumber || !Number.isInteger(episodeNumber))) { setIntroDebugStatus(`DỪNG: không đọc được số tập từ tên “${currentEpisode.name}”`); return; }
     const titleForLookup = (movie.origin_name || movie.name || "").trim();
     const tmdbId = movie.tmdb?.id ? String(movie.tmdb.id) : "";
+    // Limit the temporary AniSkip test to Boruto episode 2 only.
+    const testAniSkip = slug === "boruto-naruto-hau-sinh-kha-uy" && isSeries && episodeNumber === 2;
     setIntroDebugStatus(`Đang gọi API · ${testAniSkip ? "AniSkip MAL 34566" : (tmdbId ? `TMDB ${tmdbId}` : "Tìm TMDB theo tên")} · ${isSeries ? `TV S${season}E${episodeNumber}` : "Movie"}`);
-
-    const testAniSkip = slug === "boruto-naruto-hau-sinh-kha-uy" && isSeries;
     const params = new URLSearchParams({
       ...(testAniSkip ? { malId: "34566" } : {}),
       ...(tmdbId ? { tmdbId } : { title: titleForLookup, year: String(movie.year || "") }),
