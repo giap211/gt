@@ -11,6 +11,7 @@ interface MovieCardProps {
   posterUrl: string;
   thumbUrl?: string;
   slug: string;
+  href?: string;
   year?: string | number;
   quality?: string;
   episodeCurrent?: string;
@@ -87,6 +88,7 @@ export const MovieCard = ({
   posterUrl,
   thumbUrl,
   slug,
+  href,
   quality = "HD",
   language,
   episodeCurrent,
@@ -118,7 +120,7 @@ export const MovieCard = ({
   return (
     <div className="group relative w-full">
       <Link
-        href={`/phim/${slug}`}
+        href={href || `/phim/${slug}`}
         onClick={handleLinkClick}
         className={`block relative overflow-hidden rounded-lg ${
           isHorizontal ? "aspect-[16/9]" : "aspect-[2/3]"
@@ -165,7 +167,7 @@ export const MovieCard = ({
       {!hideInfo && (
         <div className="mt-2 px-0.5">
           <Link
-            href={`/phim/${slug}`}
+            href={href || `/phim/${slug}`}
             onClick={handleLinkClick}
             className="block"
             title={title}
