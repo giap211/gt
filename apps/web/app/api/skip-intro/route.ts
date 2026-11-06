@@ -138,6 +138,7 @@ export async function GET(request: Request) {
   const type = searchParams.get("type") === "tv" ? "tv" : "movie";
   const season = Number(searchParams.get("season") || 1);
   const episode = Number(searchParams.get("episode") || 0);
+  const malId = (searchParams.get("malId") || "").trim();
 
   if (
     (tmdbId && !/^\d+$/.test(tmdbId)) ||
@@ -153,6 +154,41 @@ export async function GET(request: Request) {
   }
 
   try {
+    // Temporary AniSkip test for Boruto: Naruto Next Generations (MAL 34566).
+    // episodeLength=0 requests timestamps without filtering by a specific encode duration.
+    if (malId === "34566" && type === "tv") {
+      const aniUrl = new URL(`https://api.aniskip.com/v2/skip-times/${malId}/${episode}`);
+      aniUrl.searchParams.append("types[]", "op");
+      aniUrl.searchParams.append("types[]", "mixed-op");
+      aniUrl.searchParams.set("episodeLength", "0");
+      const aniResponse = await fetch(aniUrl, {
+        headers: { Accept: "application/json" },
+        next: { revalidate },
+      });
+      if (!aniResponse.ok) return emptyResult("aniskip-http-error", aniResponse.status);
+      const aniData = await aniResponse.json() as {
+        found?: boolean;
+        results?: Array<{ interval?: { startTime?: number; endTime?: number }; skipType?: string }>;
+      };
+      const opening = (aniData.results || []).find((item) =>
+        (item.skipType === "op" || item.skipType === "mixed-op") &&
+        typeof item.interval?.startTime === "number" &&
+        typeof item.interval?.endTime === "number" &&
+        item.interval.endTime > item.interval.startTime
+      );
+      if (!aniData.found || !opening?.interval) return emptyResult("aniskip-intro-not-found");
+      return NextResponse.json({
+        startSeconds: opening.interval.startTime,
+        endSeconds: opening.interval.endTime,
+        reason: null,
+        source: "AniSkip",
+        malId,
+        skipType: opening.skipType,
+      }, {
+        headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
+      });
+    }
+
     // If OPhim omitted the ID, require an exact title and year match from TMDB.
     if (!tmdbId) {
       const resolved = await resolveTmdbIdByTitle(title, year, type);
