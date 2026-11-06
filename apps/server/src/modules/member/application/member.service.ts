@@ -14,6 +14,7 @@ interface CommentInput extends MovieInput {
 interface WatchHistoryInput extends MovieInput {
   episodeName: string;
   progressSeconds?: number;
+  totalDurationSeconds?: number;
 }
 
 @Injectable()
@@ -130,6 +131,10 @@ export class MemberService {
       0,
       Math.floor(Number(input.progressSeconds || 0)),
     );
+    const totalDurationSeconds = Math.max(
+      0,
+      Math.floor(Number(input.totalDurationSeconds || 0)),
+    );
 
     return this.prisma.watchHistory.upsert({
       where: {
@@ -142,12 +147,14 @@ export class MemberService {
       update: {
         ...movie,
         progressSeconds,
+        ...(totalDurationSeconds > 0 ? { totalDurationSeconds } : {}),
       },
       create: {
         userId,
         ...movie,
         episodeName,
         progressSeconds,
+        totalDurationSeconds,
       },
     });
   }
