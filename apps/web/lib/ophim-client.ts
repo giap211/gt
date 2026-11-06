@@ -284,7 +284,7 @@ async function fetchWithFallback<T>(path: string): Promise<T | null> {
         next: { revalidate: 1800 },
         headers: {
           Accept: "application/json",
-          "User-Agent": "RoPhim/1.0",
+          "User-Agent": "PhimLau/1.0",
         },
       });
 
@@ -618,7 +618,7 @@ export const getVSMovEpisodes = async (slug: string): Promise<Episode[]> => {
         next: { revalidate: 1800 },
         headers: {
           Accept: "application/json",
-          "User-Agent": "RoPhim/1.0",
+          "User-Agent": "PhimLau/1.0",
         },
       },
     );
