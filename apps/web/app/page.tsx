@@ -370,6 +370,7 @@ export default function Home() {
                 title="Mãn Nhãn với Phim Chiếu Rạp"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #4ade80 130%)"
                 viewMoreLink="/the-loai/chieu-rap"
+                layout="ranked"
                 items={transformMovies(data.cinema)}
               />
 
