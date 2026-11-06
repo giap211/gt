@@ -226,6 +226,7 @@ export default function Home() {
       <HeroSlider movies={data.hero.slice(0, 6)} />
 
       <div className="flex flex-col gap-0 pb-16 -mt-4 relative z-30">
+        <ContinueWatchingSection />
         {loading ? (
           <div className="flex flex-col items-center justify-center py-48 space-y-4">
             <div className="w-12 h-12 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin" />
@@ -238,7 +239,6 @@ export default function Home() {
             <TopicGrid />
 
             <div className="space-y-1 md:space-y-2">
-              <ContinueWatchingSection />
               <MovieCarousel
                 title="Điện ảnh Hàn Quốc"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)"
