@@ -164,7 +164,7 @@ export const VideoPlayer = ({
             html: "Hiện debug Skip Intro",
             tooltip: "Hiển thị thông tin kiểm tra Skip Intro trên trình phát",
             switch: showDebug,
-            onSwitch: (item: { switch?: boolean }) => {
+            onSwitch: (item) => {
               const enabled = !item.switch;
               setShowDebug(enabled);
               try {
