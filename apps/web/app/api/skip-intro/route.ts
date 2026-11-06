@@ -41,7 +41,7 @@ type TmdbSearchResult = {
 };
 
 function normalizeTitle(value: string) {
-  return value.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "")
+  return value.normalize("NFD").replace(/\p{M}/gu, "")
     .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
