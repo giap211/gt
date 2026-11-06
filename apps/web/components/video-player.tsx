@@ -639,8 +639,8 @@ export const VideoPlayer = ({
           type="button"
           onClick={() => {
             const video = artRef.current?.querySelector("video");
-            if (!video || !Number.isFinite(introEndSeconds)) return;
-            video.currentTime = Number(introEndSeconds);
+            if (!video) return;
+            video.currentTime = 90;
             video.play().catch(() => {});
             setShowSkipIntro(false);
           }}
