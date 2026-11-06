@@ -647,12 +647,6 @@ export const VideoPlayer = ({
             const endSeconds = introSegmentRef.current.endSeconds;
             if (typeof endSeconds !== "number" || !Number.isFinite(endSeconds)) return;
             video.currentTime = endSeconds;
-            try {
-              const hls = (artRef.current as any)?.art?.hls;
-              hls?.startLoad(endSeconds);
-            } catch {
-              // The browser's native HLS implementation does not expose hls.js.
-            }
             video.play().catch(() => {});
             setShowSkipIntro(false);
           }}
