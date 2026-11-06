@@ -466,10 +466,10 @@ export const Navbar = () => {
             ) : (
               <button
                 onClick={() => openAuth("login")}
-                className="flex h-[38px] sm:h-[42px] items-center gap-1.5 rounded-full bg-[#ffd875] hover:bg-[#ffe28d] px-3 sm:px-4 text-black text-sm font-bold transition-all shadow-[0_2px_10px_rgba(255,216,117,0.3)]"
+                className="flex h-[38px] sm:h-[42px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-[#ffd875] hover:bg-[#ffe28d] px-3 sm:px-4 text-black text-sm font-bold transition-all shadow-[0_2px_10px_rgba(255,216,117,0.3)]"
               >
-                <UserCircle size={15} />
-                <span>Đăng Nhập</span>
+                <UserCircle size={15} className="shrink-0" />
+                <span className="whitespace-nowrap">Đăng Nhập</span>
               </button>
             )}
           </div>
