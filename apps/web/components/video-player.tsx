@@ -15,7 +15,7 @@ interface VideoPlayerProps {
   title?: string;
   onReady?: (art: Artplayer) => void;
   startAtSeconds?: number;
-  onProgress?: (seconds: number) => void;
+  onProgress?: (seconds: number, durationSeconds: number) => void;
 }
 
 export const VideoPlayer = ({
@@ -293,7 +293,7 @@ export const VideoPlayer = ({
         restorePlaybackPosition = restorePosition;
         const reportProgress = () => {
           if (!video.paused && Number.isFinite(video.currentTime)) {
-            onProgress?.(video.currentTime);
+            onProgress?.(video.currentTime, Number.isFinite(video.duration) ? video.duration : 0);
           }
         };
 
