@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-// Matching RoPhim screenshot category pills
+// Matching Phim Lậu screenshot category pills
 const TOPICS = [
   {
     name: "Phim 4K",
