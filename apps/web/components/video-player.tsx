@@ -52,7 +52,7 @@ export const VideoPlayer = ({
     !isHlsStream &&
     typeof url === "string" &&
     (/\/player\/(?:\?|$)/i.test(url) ||
-      /\\/embed(?:\\/|\\?|$)/i.test(url) ||
+      /\/embed(?:\/|\?|$)/i.test(url) ||
       /youtube\.com|youtu\.be/i.test(url) ||
       /streamvsmov\.com|vsmov\.com\/video/i.test(url));
 
