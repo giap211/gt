@@ -42,6 +42,7 @@ export const VideoPlayer = ({
     if (!artRef.current || isEmbed) return;
 
     let hlsInstance: Hls | null = null;
+    let knownDurationSeconds = 0;
     let art: Artplayer | null = null;
     let seekWatchTimer: ReturnType<typeof setTimeout> | null = null;
     let stallWatchTimer: ReturnType<typeof setInterval> | null = null;
@@ -158,6 +159,13 @@ export const VideoPlayer = ({
                 // HLS có thể chỉ xác định duration sau khi manifest được phân tích.
                 restorePlaybackPosition?.();
                 video.play().catch(() => {});
+              });
+
+              hls.on(Hls.Events.LEVEL_LOADED, (_event, data) => {
+                const duration = Number(data.details?.totalduration);
+                if (Number.isFinite(duration) && duration > 0) {
+                  knownDurationSeconds = duration;
+                }
               });
 
               hls.on(Hls.Events.ERROR, (_event, data) => {
@@ -293,7 +301,10 @@ export const VideoPlayer = ({
         restorePlaybackPosition = restorePosition;
         const reportProgress = () => {
           if (!video.paused && Number.isFinite(video.currentTime)) {
-            onProgress?.(video.currentTime, Number.isFinite(video.duration) ? video.duration : 0);
+            const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
+              ? video.duration
+              : knownDurationSeconds;
+            onProgress?.(video.currentTime, mediaDuration);
           }
         };
 
