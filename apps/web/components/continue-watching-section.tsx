@@ -41,6 +41,8 @@ export function ContinueWatchingSection() {
         posterUrl: item.posterUrl || "https://placehold.co/640x360/1a1c28/ffffff?text=Phim+Lau",
         slug: item.movieSlug,
         href: `/xem-phim/${item.movieSlug}?tap=${encodeURIComponent(item.episodeSlug || "")}&at=${Math.max(0, Math.floor(item.progressSeconds || 0))}`,
+        progressSeconds: item.progressSeconds || 0,
+        totalDurationSeconds: item.totalDurationSeconds || 0,
         episodeCurrent: item.episodeName ? `Tập ${item.episodeName}` : "Đang xem",
         language: "Đang xem",
       }))}
