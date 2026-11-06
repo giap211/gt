@@ -606,7 +606,7 @@ export const VideoPlayer = ({
   }
 
   return (
-    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
+    <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10 ${showResumeChoice ? "[&_.art-state]:!hidden [&_.art-controls]:!hidden [&_.art-bottom]:!hidden" : ""}`}>
       <div ref={artRef} className="w-full h-full" />
       {showResumeChoice && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/65 backdrop-blur-sm">
