@@ -396,7 +396,10 @@ export const VideoPlayer = ({
           syncCenterPlay();
           resumeObserver?.disconnect();
           resumeObserver = new MutationObserver(() => {
-            configureResumeChoice();
+            const activePanel = player.querySelector(".art-layer-auto-playback");
+            if (activePanel && !activePanel.querySelector(".art-auto-playback-start")) {
+              configureResumeChoice();
+            }
             syncCenterPlay();
           });
           resumeObserver.observe(player, {
