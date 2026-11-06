@@ -307,7 +307,7 @@ export const Navbar = () => {
                       setShowLiveSearch(true);
                     }}
                     onFocus={() => setShowLiveSearch(true)}
-                    className="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.1] border border-white/[0.08] focus:border-[#ffd875]/60 text-white text-[16px] sm:text-[13px] rounded-full py-1.5 sm:py-2 pl-3 sm:pl-4 pr-11 outline-none shadow-sm transition-all placeholder:text-white/35"
+                    className="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.1] border border-white/[0.08] focus:border-[#ffd875]/60 text-white text-base rounded-full py-1.5 sm:py-2 pl-3 sm:pl-4 pr-11 outline-none shadow-sm transition-all placeholder:text-white/35"
                     placeholder="Tìm phim..."
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
@@ -408,12 +408,12 @@ export const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex h-8 sm:h-9 items-center gap-1.5 sm:gap-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 px-2.5 sm:px-3 text-white transition-all shadow-sm"
+                  className="flex h-[38px] sm:h-[42px] items-center gap-1.5 sm:gap-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 px-2.5 sm:px-3 text-white transition-all shadow-sm"
                 >
                   <div className="w-5 h-5 rounded-full bg-[#ffd875] text-black font-black text-[10px] flex items-center justify-center">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className="hidden sm:inline max-w-[90px] truncate text-xs font-semibold text-white/90">
+                  <span className="hidden sm:inline max-w-[90px] truncate text-sm font-semibold text-white/90">
                     {user.name}
                   </span>
                   <ChevronDown size={12} className="text-white/40" />
@@ -466,7 +466,7 @@ export const Navbar = () => {
             ) : (
               <button
                 onClick={() => openAuth("login")}
-                className="flex h-8 sm:h-9 items-center gap-1.5 rounded-full bg-[#ffd875] hover:bg-[#ffe28d] px-3 sm:px-4 text-black text-xs font-bold transition-all shadow-[0_2px_10px_rgba(255,216,117,0.3)]"
+                className="flex h-[38px] sm:h-[42px] items-center gap-1.5 rounded-full bg-[#ffd875] hover:bg-[#ffe28d] px-3 sm:px-4 text-black text-sm font-bold transition-all shadow-[0_2px_10px_rgba(255,216,117,0.3)]"
               >
                 <UserCircle size={15} />
                 <span>Đăng Nhập</span>
