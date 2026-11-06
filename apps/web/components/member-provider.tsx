@@ -163,7 +163,7 @@ function MemberLibraryModal({
             <X size={18} />
           </button>
           <p className="mb-2 text-[10px] font-black uppercase tracking-[0.22em] text-[#ffd875]">
-            Thành viên RoPhim
+            Thành viên Phim Lậu
           </p>
           <h2 className="mb-5 text-2xl font-black uppercase tracking-tight text-white">
             {title}
@@ -175,7 +175,7 @@ function MemberLibraryModal({
             </div>
           ) : items.length === 0 ? (
             <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-6 text-sm leading-relaxed text-white/45">
-              Chưa có dữ liệu. Hãy yêu thích phim hoặc xem phim để RoPhim lưu
+              Chưa có dữ liệu. Hãy yêu thích phim hoặc xem phim để Phim Lậu lưu
               lại cho bạn.
             </div>
           ) : (
@@ -269,7 +269,7 @@ function MemberAuthModal({
           </button>
 
           <p className="mb-2 text-[10px] font-black uppercase tracking-[0.22em] text-[#ffd875]">
-            Thành viên RoPhim
+            Thành viên Phim Lậu
           </p>
           <h2 className="mb-2 text-2xl font-black uppercase tracking-tight text-white">
             {isRegister ? "Tạo tài khoản" : "Đăng nhập"}
@@ -325,7 +325,7 @@ function MemberAuthModal({
                 ? "Đang xử lý..."
                 : isRegister
                   ? "Gia nhập"
-                  : "Vào RoPhim"}
+                  : "Vào Phim Lậu"}
             </button>
           </form>
 
