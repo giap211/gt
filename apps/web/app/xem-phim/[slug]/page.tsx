@@ -157,7 +157,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     }, 2500);
 
     return () => window.clearTimeout(timeoutId);
-  }, [user, movie, currentEpisode, resumeAt, tmdbRuntimeSeconds]);
+  }, [user, movie, currentEpisode, resumeAt]);
 
   const handlePlaybackProgress = useCallback((seconds: number, durationSeconds: number) => {
     if (!user || !movie || !currentEpisode) return;
@@ -173,7 +173,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       progressSeconds: Math.floor(seconds),
       totalDurationSeconds: Math.floor(durationSeconds > 0 ? durationSeconds : 0),
     }).catch(() => undefined);
-  }, [user, movie, currentEpisode, tmdbRuntimeSeconds]);
+  }, [user, movie, currentEpisode]);
   const handleShare = async () => {
     try {
       if (navigator.clipboard) {
