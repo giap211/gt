@@ -419,7 +419,7 @@ export const VideoPlayer = ({
       <div className="w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
         <iframe
           src={url}
-          title={title || "RoPhim Player"}
+          title={title || "Phim Lậu Player"}
           className="w-full h-full border-0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
