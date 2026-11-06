@@ -616,17 +616,17 @@ function TabContent({
 
     return (
       <div className="w-full">
-        <h2 className="mb-5 text-2xl font-semibold leading-tight text-white sm:text-[30px]">
+        <h2 className="mb-4 text-xl font-semibold leading-tight text-white sm:text-[26px]">
           Các bản chiếu
         </h2>
 
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-3 flex flex-wrap gap-2">
           {episodes.length > 0 ? episodes.map((version, idx) => (
             <button
               key={`${version.server_name}-${idx}`}
               type="button"
               onClick={() => setSelectedServer(idx)}
-              className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all sm:text-base ${
+              className={`rounded-lg border px-2.5 py-1.5 text-[13px] font-medium transition-all sm:text-sm ${
                 selectedServer === idx
                   ? "border-[#ffd15a] bg-[#202331] text-[#ffd15a] shadow-[0_0_14px_rgba(255,209,90,0.12)]"
                   : "border-white/15 bg-[#202331] text-white/85 hover:border-white/30"
@@ -635,7 +635,7 @@ function TabContent({
               {version.server_name || `Bản chiếu ${idx + 1}`}
             </button>
           )) : (
-            <span className="rounded-lg border border-[#ffd15a] bg-[#202331] px-3 py-2 text-sm font-medium text-[#ffd15a] sm:text-base">
+            <span className="rounded-lg border border-[#ffd15a] bg-[#202331] px-2.5 py-1.5 text-[13px] font-medium text-[#ffd15a] sm:text-sm">
               Vietsub 1
             </span>
           )}
@@ -643,7 +643,7 @@ function TabContent({
 
         <Link
           href={versionHref}
-          className="group relative flex min-h-[176px] w-full items-center overflow-hidden rounded-2xl border border-white/[0.06] bg-[#626474] transition-colors hover:border-[#ffd15a]/40 sm:min-h-[196px]"
+          className="group relative flex min-h-[148px] w-full items-center overflow-hidden rounded-xl border border-white/[0.06] bg-[#626474] transition-colors hover:border-[#ffd15a]/40 sm:min-h-[164px]"
         >
           <div className="absolute inset-y-0 right-0 w-[40%] sm:w-[32%]">
             <Image
@@ -659,21 +659,21 @@ function TabContent({
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-r from-[#626474] via-[#626474]/90 via-[54%] to-transparent" />
-          <div className="relative z-10 flex w-full flex-col items-start p-5 sm:p-6">
-            <div className="mb-3 flex items-center gap-2.5 text-white">
+          <div className="relative z-10 flex w-full flex-col items-start p-4 sm:p-5">
+            <div className="mb-2 flex items-center gap-2 text-white">
               <MessageCircle
-                size={29}
+                size={24}
                 strokeWidth={2.5}
                 fill="#6675ee"
                 color="#6675ee"
                 className="shrink-0 drop-shadow-sm"
               />
-              <span className="text-base font-medium sm:text-lg">{versionName}</span>
+              <span className="text-sm font-medium sm:text-base">{versionName}</span>
             </div>
-            <p className="max-w-[72%] text-xl font-bold leading-snug text-white sm:text-2xl">
+            <p className="max-w-[72%] text-lg font-bold leading-snug text-white sm:text-xl">
               {movie.name}
             </p>
-            <span className="mt-4 inline-flex items-center rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-[#171923] shadow-sm transition-colors group-hover:bg-[#ffd15a]">
+            <span className="mt-3 inline-flex items-center rounded-md bg-white px-3.5 py-2 text-xs font-semibold text-[#171923] shadow-sm transition-colors group-hover:bg-[#ffd15a]">
               Xem bản này
             </span>
           </div>
