@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, use } from "react";
+import { useEffect, useState, useRef, useCallback, Suspense, use } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Play,
@@ -61,6 +61,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [isCinemaMode, setIsCinemaMode] = useState(false);
   const [copiedToast, setCopiedToast] = useState(false);
   const { user } = useMember();
+  const lastHistorySaveRef = useRef(0);
+  const resumeAt = Math.max(0, Number(searchParams.get("at") || 0));
 
   const tapParam = searchParams.get("tap");
 
@@ -135,14 +137,29 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           movieTitle: movie.name,
           posterUrl: movie.poster_url,
           episodeName: currentEpisode.name,
-          progressSeconds: 0,
+          episodeSlug: currentEpisode.slug,
+          progressSeconds: resumeAt,
         })
         .catch(() => undefined);
     }, 2500);
 
     return () => window.clearTimeout(timeoutId);
-  }, [user, movie, currentEpisode]);
+  }, [user, movie, currentEpisode, resumeAt]);
 
+  const handlePlaybackProgress = useCallback((seconds: number) => {
+    if (!user || !movie || !currentEpisode) return;
+    const now = Date.now();
+    if (now - lastHistorySaveRef.current < 10000) return;
+    lastHistorySaveRef.current = now;
+    void memberClient.saveHistory({
+      movieSlug: movie.slug,
+      movieTitle: movie.name,
+      posterUrl: movie.poster_url,
+      episodeName: currentEpisode.name,
+      episodeSlug: currentEpisode.slug,
+      progressSeconds: Math.floor(seconds),
+    }).catch(() => undefined);
+  }, [user, movie, currentEpisode]);
   const handleShare = async () => {
     try {
       if (navigator.clipboard) {
@@ -294,6 +311,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   url={currentEpisode.url}
                   poster={movie.thumb_url}
                   title={`${movie.name} - ${formatEpisodeName(currentEpisode.name)}`}
+                  startAtSeconds={resumeAt}
+                  onProgress={handlePlaybackProgress}
                 />
               )}
             </div>
