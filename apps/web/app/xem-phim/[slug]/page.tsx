@@ -129,7 +129,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     setIntroSegment(null);
     if (!movie?.tmdb?.id || !currentEpisode) return;
 
-    const isSeries = movie.type === "series" || movie.type === "tvshows";
+    const isSeries = movie.tmdb?.type === "tv" || movie.type === "series" || movie.type === "tvshows";
     let season = 1;
     let episodeNumber = 0;
     const namedEpisode = currentEpisode.name.match(/s(\d{1,2})\s*e(\d{1,3})/i);
