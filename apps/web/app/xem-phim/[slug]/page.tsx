@@ -129,12 +129,18 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     setIntroSegment(null);
     if (!movie?.tmdb?.id || !currentEpisode) return;
 
-    const isSeries = movie.tmdb?.type === "tv" || movie.type === "series" || movie.type === "tvshows";
     let season = 1;
     let episodeNumber = 0;
     const namedEpisode = currentEpisode.name.match(/s(\d{1,2})\s*e(\d{1,3})/i);
     const simpleEpisode = currentEpisode.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) ||
       currentEpisode.name.match(/^0*(\d+)$/);
+    // Some OPhim entries omit or mislabel tmdb.type. A numbered episode name
+    // is a reliable fallback for identifying a TV episode.
+    const isSeries =
+      movie.tmdb?.type?.toLowerCase() === "tv" ||
+      movie.type === "series" ||
+      movie.type === "tvshows" ||
+      Boolean(namedEpisode || simpleEpisode);
     if (namedEpisode) {
       season = Number(namedEpisode[1]);
       episodeNumber = Number(namedEpisode[2]);
