@@ -59,6 +59,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [currentServer, setCurrentServer] = useState(0);
   const [isCinemaMode, setIsCinemaMode] = useState(false);
   const [introSegment, setIntroSegment] = useState<{ startSeconds: number; endSeconds: number } | null>(null);
+  const [introDebugStatus, setIntroDebugStatus] = useState("Chưa kiểm tra");
   const [copiedToast, setCopiedToast] = useState(false);
   const { user } = useMember();
   const lastHistorySaveRef = useRef(0);
@@ -127,7 +128,10 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   useEffect(() => {
     let cancelled = false;
     setIntroSegment(null);
-    if (!movie?.tmdb?.id || !currentEpisode) return;
+    setIntroDebugStatus("Đang kiểm tra dữ liệu phim...");
+    if (!movie) { setIntroDebugStatus("Chưa tải được thông tin phim"); return; }
+    if (!movie.tmdb?.id) { setIntroDebugStatus("DỪNG: phim không có TMDB ID"); return; }
+    if (!currentEpisode) { setIntroDebugStatus("DỪNG: chưa xác định tập đang xem"); return; }
 
     let season = 1;
     let episodeNumber = 0;
@@ -148,7 +152,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       episodeNumber = Number(simpleEpisode[1]);
     }
 
-    if (isSeries && (!episodeNumber || !Number.isInteger(episodeNumber))) return;
+    if (isSeries && (!episodeNumber || !Number.isInteger(episodeNumber))) { setIntroDebugStatus(`DỪNG: không đọc được số tập từ tên “${currentEpisode.name}”`); return; }
+    setIntroDebugStatus(`Đang gọi API · TMDB ${movie.tmdb.id} · ${isSeries ? `TV S${season}E${episodeNumber}` : "Movie"}`);
 
     const params = new URLSearchParams({
       tmdbId: String(movie.tmdb.id),
@@ -168,13 +173,17 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
 
     fetch(`/api/skip-intro?${params.toString()}`)
       .then(async (response) => {
-        const data = response.ok ? await response.json() : null;
+        const data = await response.json().catch(() => null);
         console.debug("[SkipIntro][page-response]", {
           status: response.status,
           ok: response.ok,
           data,
           cancelled,
         });
+        if (!cancelled) {
+          const detail = data?.reason ? ` · ${data.reason}` : "";
+          setIntroDebugStatus(`API HTTP ${response.status}${detail}`);
+        }
         return data;
       })
       .then((data) => {
@@ -188,11 +197,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             endSeconds: data.endSeconds,
           });
           setIntroSegment({ startSeconds: data.startSeconds, endSeconds: data.endSeconds });
+          setIntroDebugStatus(`ĐÃ NHẬN ${data.startSeconds}s → ${data.endSeconds}s`);
         } else {
           console.debug("[SkipIntro][page-invalid-range]", data);
         }
       })
-      .catch((error) => console.error("[SkipIntro][page-error]", error));
+      .catch((error) => { console.error("[SkipIntro][page-error]", error); if (!cancelled) setIntroDebugStatus(`LỖI FETCH: ${String(error)}`); });
 
     return () => { cancelled = true; };
   }, [movie, currentEpisode]);
@@ -379,6 +389,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   startAtSeconds={resumeAt}
                   introStartSeconds={introSegment?.startSeconds}
                   introEndSeconds={introSegment?.endSeconds}
+                  introDebugStatus={introDebugStatus}
                   onProgress={handlePlaybackProgress}
                 />
               )}

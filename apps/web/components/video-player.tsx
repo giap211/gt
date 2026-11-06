@@ -18,6 +18,7 @@ interface VideoPlayerProps {
   startAtSeconds?: number;
   introStartSeconds?: number;
   introEndSeconds?: number;
+  introDebugStatus?: string;
   onProgress?: (seconds: number, durationSeconds: number) => void;
 }
 
@@ -29,6 +30,7 @@ export const VideoPlayer = ({
   startAtSeconds = 0,
   introStartSeconds,
   introEndSeconds,
+  introDebugStatus = "Chưa có trạng thái API",
   onProgress,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
@@ -665,6 +667,7 @@ export const VideoPlayer = ({
           <span className="text-white/60">{isEmbed ? "EMBED" : isHlsStream ? "HLS" : "VIDEO"}</span>
         </div>
         <div>API intro: <b>{typeof introStartSeconds === "number" && typeof introEndSeconds === "number" ? "ĐÃ NHẬN" : "CHƯA NHẬN"}</b></div>
+        <div className="break-words text-cyan-100">Nguồn: {introDebugStatus}</div>
         <div>Mốc: {typeof introStartSeconds === "number" ? introStartSeconds.toFixed(2) : "null"}s → {typeof introEndSeconds === "number" ? introEndSeconds.toFixed(2) : "null"}s</div>
         <div>Thời gian video: {debugCurrentTime === null ? "chưa có timeupdate" : `${debugCurrentTime.toFixed(2)}s`}</div>
         <div>Trạng thái: {debugVideoState}</div>
