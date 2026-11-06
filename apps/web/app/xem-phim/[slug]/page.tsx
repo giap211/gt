@@ -60,6 +60,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [currentServer, setCurrentServer] = useState(0);
   const [isCinemaMode, setIsCinemaMode] = useState(false);
   const [copiedToast, setCopiedToast] = useState(false);
+  const [tmdbRuntimeSeconds, setTmdbRuntimeSeconds] = useState(0);
   const { user } = useMember();
   const lastHistorySaveRef = useRef(0);
   const resumeAt = Math.max(0, Number(searchParams.get("at") || 0));
@@ -140,6 +141,32 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   }, [slug, tapParam]);
 
   useEffect(() => {
+    const tmdbId = String(movie?.tmdb?.id || "").trim();
+    if (!tmdbId || !/^\\d+$/.test(tmdbId)) {
+      setTmdbRuntimeSeconds(0);
+      return;
+    }
+
+    let cancelled = false;
+    const tmdbType = movie?.tmdb?.type === "tv" ? "tv" : "movie";
+    fetch(`/api/tmdb-runtime?id=${encodeURIComponent(tmdbId)}&type=${tmdbType}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data: { runtimeSeconds?: number } | null) => {
+        if (!cancelled) {
+          const runtime = Number(data?.runtimeSeconds || 0);
+          setTmdbRuntimeSeconds(Number.isFinite(runtime) && runtime > 0 ? runtime : 0);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setTmdbRuntimeSeconds(0);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [movie?.tmdb?.id, movie?.tmdb?.type]);
+
+  useEffect(() => {
     if (!user || !movie || !currentEpisode) return;
 
     const timeoutId = window.setTimeout(() => {
@@ -151,12 +178,13 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           episodeName: currentEpisode.name,
           episodeSlug: currentEpisode.slug,
           progressSeconds: resumeAt,
+          totalDurationSeconds: tmdbRuntimeSeconds,
         })
         .catch(() => undefined);
     }, 2500);
 
     return () => window.clearTimeout(timeoutId);
-  }, [user, movie, currentEpisode, resumeAt]);
+  }, [user, movie, currentEpisode, resumeAt, tmdbRuntimeSeconds]);
 
   const handlePlaybackProgress = useCallback((seconds: number, durationSeconds: number) => {
     if (!user || !movie || !currentEpisode) return;
@@ -170,9 +198,9 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       episodeName: currentEpisode.name,
       episodeSlug: currentEpisode.slug,
       progressSeconds: Math.floor(seconds),
-      totalDurationSeconds: Math.floor(durationSeconds || 0),
+      totalDurationSeconds: Math.floor(durationSeconds > 0 ? durationSeconds : tmdbRuntimeSeconds),
     }).catch(() => undefined);
-  }, [user, movie, currentEpisode]);
+  }, [user, movie, currentEpisode, tmdbRuntimeSeconds]);
   const handleShare = async () => {
     try {
       if (navigator.clipboard) {
