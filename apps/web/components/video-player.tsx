@@ -14,6 +14,8 @@ interface VideoPlayerProps {
   poster?: string;
   title?: string;
   onReady?: (art: Artplayer) => void;
+  startAtSeconds?: number;
+  onProgress?: (seconds: number) => void;
 }
 
 export const VideoPlayer = ({
@@ -21,6 +23,8 @@ export const VideoPlayer = ({
   poster,
   title,
   onReady,
+  startAtSeconds = 0,
+  onProgress,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
 
@@ -258,6 +262,27 @@ export const VideoPlayer = ({
         },
       });
 
+      if (art) {
+        const video = art.video as HTMLVideoElement;
+        const restorePosition = () => {
+          if (startAtSeconds > 0 && Number.isFinite(video.duration)) {
+            video.currentTime = Math.min(startAtSeconds, Math.max(0, video.duration - 2));
+          }
+        };
+        const reportProgress = () => {
+          if (!video.paused && Number.isFinite(video.currentTime)) onProgress?.(video.currentTime);
+        };
+        video.addEventListener("loadedmetadata", restorePosition, { once: true });
+        if (video.readyState >= 1) restorePosition();
+        video.addEventListener("timeupdate", reportProgress);
+        const previousCleanup = (art as any).__seekCleanup as (() => void) | undefined;
+        (art as any).__seekCleanup = () => {
+          video.removeEventListener("loadedmetadata", restorePosition);
+          video.removeEventListener("timeupdate", reportProgress);
+          previousCleanup?.();
+        };
+      }
+
       if (onReady && art) {
         onReady(art);
       }
@@ -412,7 +437,7 @@ export const VideoPlayer = ({
           .forEach((el) => el.remove());
       }
     };
-  }, [url, poster, title, onReady, isEmbed]);
+  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress]);
 
   if (isEmbed) {
     return (
