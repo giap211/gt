@@ -615,24 +615,27 @@ function TabContent({
       : `/xem-phim/${movie.slug}`;
 
     return (
-      <div>
-        <h2 className="text-[17px]] font-semibold mb-6">Các bản chiếu</h2>
-        <div className="flex flex-wrap gap-2 mb-3">
+      <div className="w-full">
+        <h2 className="mb-8 text-3xl font-semibold leading-tight text-white sm:text-[36px]">
+          Các bản chiếu
+        </h2>
+
+        <div className="mb-6 flex flex-wrap gap-3">
           {episodes.length > 0 ? episodes.map((version, idx) => (
             <button
               key={`${version.server_name}-${idx}`}
               type="button"
               onClick={() => setSelectedServer(idx)}
-              className={`rounded-xl border px-3.5 py-2 text-sm font-medium transition-all ${
+              className={`rounded-xl border px-4 py-3 text-base font-medium transition-all sm:text-lg ${
                 selectedServer === idx
-                  ? "border-[#ffd875] bg-[#202331] text-[#ffd875] shadow-[0_0_14px_rgba(255,216,117,0.12)]"
+                  ? "border-[#ffd15a] bg-[#202331] text-[#ffd15a] shadow-[0_0_14px_rgba(255,209,90,0.12)]"
                   : "border-white/15 bg-[#202331] text-white/85 hover:border-white/30"
               }`}
             >
               {version.server_name || `Bản chiếu ${idx + 1}`}
             </button>
           )) : (
-            <span className="rounded-xl border border-[#ffd875] bg-[#202331] px-3.5 py-2 text-sm font-medium text-[#ffd875]">
+            <span className="rounded-xl border border-[#ffd15a] bg-[#202331] px-4 py-3 text-base font-medium text-[#ffd15a] sm:text-lg">
               Vietsub 1
             </span>
           )}
@@ -640,29 +643,33 @@ function TabContent({
 
         <Link
           href={versionHref}
-          className="group relative flex min-h-[190px] max-w-2xl items-center overflow-hidden rounded-[22px] border border-white/10 bg-[#626474] transition-colors hover:border-[#ffd875]/40 sm:min-h-[205px]"
+          className="group relative flex min-h-[220px] w-full items-center overflow-hidden rounded-[24px] border border-white/[0.06] bg-[#626474] transition-colors hover:border-[#ffd15a]/40 sm:min-h-[240px]"
         >
-          <div className="absolute inset-0">
+          <div className="absolute inset-y-0 right-0 w-[42%] sm:w-[34%]">
             <Image
               src={movie.thumb_url || movie.poster_url}
               alt=""
               fill
-              sizes="640px"
-              className="object-cover object-center opacity-55 transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 640px) 42vw, 34vw"
+              className="object-cover object-[center_25%] transition-transform duration-500 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#626474] via-[#626474]/95 to-[#626474]/35" />
           </div>
-          <div className="relative z-10 flex w-full flex-col items-start p-5 sm:p-7">
-            <div className="mb-3 flex items-center gap-2 text-white">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#6675ee] text-lg shadow-sm">
-                ▰
-              </span>
-              <span className="text-base font-medium">{versionName}</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#626474] via-[#626474]/95 via-[58%] to-[#626474]/5" />
+          <div className="relative z-10 flex w-full flex-col items-start p-6 sm:p-8">
+            <div className="mb-4 flex items-center gap-3 text-white">
+              <MessageCircle
+                size={38}
+                strokeWidth={2.5}
+                fill="#6675ee"
+                color="#6675ee"
+                className="shrink-0 drop-shadow-sm"
+              />
+              <span className="text-xl font-medium sm:text-2xl">{versionName}</span>
             </div>
-            <p className="max-w-[75%] text-xl font-bold leading-snug text-white sm:text-2xl">
+            <p className="max-w-[78%] text-2xl font-bold leading-snug text-white sm:text-[30px]">
               {movie.name}
             </p>
-            <span className="mt-5 inline-flex items-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-[#171923] shadow-sm transition-colors group-hover:bg-[#ffd875]">
+            <span className="mt-6 inline-flex items-center rounded-lg bg-white px-6 py-3.5 text-lg font-semibold text-[#171923] shadow-sm transition-colors group-hover:bg-[#ffd15a]">
               Xem bản này
             </span>
           </div>
