@@ -303,7 +303,7 @@ export const VideoPlayer = ({
         const centerPlay = art.template.$state as HTMLElement;
 
         const configureResumeChoice = () => {
-          const panel = player.querySelector(".art-auto-playback") as HTMLElement | null;
+          const panel = player.querySelector(".art-layer-auto-playback") as HTMLElement | null;
           if (!panel) return;
 
           const lastSeen = panel.querySelector(".art-auto-playback-last") as HTMLElement | null;
