@@ -12,6 +12,8 @@ interface MovieCardProps {
   thumbUrl?: string;
   slug: string;
   href?: string;
+  progressSeconds?: number;
+  totalDurationSeconds?: number;
   year?: string | number;
   quality?: string;
   episodeCurrent?: string;
@@ -23,6 +25,16 @@ interface MovieCardProps {
   /** horizontal (Phim Lậu home) vs vertical (grids) */
   variant?: "horizontal" | "vertical";
 }
+
+const formatPlaybackTime = (value: number) => {
+  const seconds = Math.max(0, Math.floor(value));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remaining = seconds % 60;
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`
+    : `${minutes}:${String(remaining).padStart(2, "0")}`;
+};
 
 const PLACEHOLDER =
   "https://placehold.co/640x360/1a1c28/ffffff?text=No+Image";
@@ -89,6 +101,8 @@ export const MovieCard = ({
   thumbUrl,
   slug,
   href,
+  progressSeconds,
+  totalDurationSeconds,
   quality = "HD",
   language,
   episodeCurrent,
@@ -162,7 +176,25 @@ export const MovieCard = ({
             isNavigating ? "opacity-100" : "opacity-0 group-hover:opacity-100"
           }`}
         />
+
+        {typeof progressSeconds === "number" && totalDurationSeconds && totalDurationSeconds > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 z-30 h-[5px] bg-white/35">
+            <div
+              className="relative h-full bg-[#ffd875] shadow-[0_0_8px_rgba(255,216,117,0.65)]"
+              style={{ width: `${Math.min(100, Math.max(0, (progressSeconds / totalDurationSeconds) * 100))}%` }}
+            >
+              <span className="absolute -right-[4px] -top-[2px] h-[9px] w-[9px] rounded-full border-2 border-[#ffd875] bg-white shadow-md" />
+            </div>
+          </div>
+        )}
       </Link>
+
+      {typeof progressSeconds === "number" && totalDurationSeconds && totalDurationSeconds > 0 && (
+        <div className="mt-1 flex items-center justify-between gap-2 px-0.5 text-[9px] font-semibold tabular-nums text-white/50">
+          <span>{formatPlaybackTime(progressSeconds)} / {formatPlaybackTime(totalDurationSeconds)}</span>
+          <span className="text-[#ffd875]">{Math.min(100, Math.round((progressSeconds / totalDurationSeconds) * 100))}%</span>
+        </div>
+      )}
 
       {!hideInfo && (
         <div className="mt-2 px-0.5">
