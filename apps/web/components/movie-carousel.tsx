@@ -119,11 +119,11 @@ export const MovieCarousel = ({
                   {layout === "ranked" ? (
                     <div className="group/ranked flex h-full flex-col">
                       <div
-                      className="relative overflow-hidden rounded-xl"
+                      className="relative overflow-hidden"
                       style={{
                         clipPath: index % 2 === 0
-                          ? "polygon(0 7%, 100% 0, 100% 100%, 0 100%)"
-                          : "polygon(0 0, 100% 7%, 100% 100%, 0 100%)",
+                          ? "polygon(0 8%, 0.3% 5%, 1.2% 2.8%, 2.8% 1%, 4.8% 0, 95% 0, 97.2% 0.5%, 98.8% 2%, 99.7% 4%, 100% 6%, 100% 94%, 99.5% 96.5%, 98% 98.5%, 96% 100%, 4% 100%, 2% 99%, 0.7% 97%, 0 94%)"
+                          : "polygon(0 6%, 0.5% 4%, 2% 2%, 4% 0.5%, 6% 0, 96% 0, 98% 1%, 99.2% 3%, 100% 6%, 100% 92%, 99.5% 95%, 98% 98%, 96% 100%, 4% 100%, 2% 99%, 0.5% 97%, 0 94%)",
                       }}
                     >
                       <MovieCard {...movie} hideInfo variant="vertical" />
