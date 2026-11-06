@@ -118,9 +118,19 @@ export const MovieCarousel = ({
                 <SwiperSlide key={movie.id} className="h-auto">
                   {layout === "ranked" ? (
                     <div className="group/ranked flex h-full flex-col">
-                      <div className="[clip-path:polygon(4%_0,96%_0,100%_4%,100%_96%,96%_100%,4%_100%,0_96%,0_4%)]">
-                        <MovieCard {...movie} hideInfo variant="vertical" />
-                      </div>
+                      <div
+                      className="relative overflow-hidden rounded-xl"
+                      style={{
+                        clipPath: index % 2 === 0
+                          ? "polygon(0 7%, 100% 0, 100% 100%, 0 100%)"
+                          : "polygon(0 0, 100% 7%, 100% 100%, 0 100%)",
+                      }}
+                    >
+                      <MovieCard {...movie} hideInfo variant="vertical" />
+                      <span className="absolute left-2 top-2 z-30 rounded-md bg-[#3989ed] px-2 py-1 text-[10px] md:text-xs font-bold text-white shadow-md pointer-events-none">
+                        Song ngữ
+                      </span>
+                    </div>
                       <div className="mt-1 flex items-start gap-2">
                         <span className="shrink-0 text-3xl md:text-4xl font-black italic leading-none text-[#f5c451] drop-shadow-[0_2px_8px_rgba(245,196,81,0.2)]">
                           {index + 1}
