@@ -24,6 +24,7 @@ interface MovieCarouselProps {
     posterUrl: string;
     thumbUrl?: string;
     slug: string;
+    href?: string;
     year?: string | number;
     quality?: string;
     episodeCurrent?: string;
