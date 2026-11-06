@@ -156,15 +156,43 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       ...(isSeries ? { season: String(season), episode: String(episodeNumber) } : {}),
     });
 
+    console.debug("[SkipIntro][page-request]", {
+      movie: movie.name,
+      episodeName: currentEpisode.name,
+      tmdbId: movie.tmdb.id,
+      type: isSeries ? "tv" : "movie",
+      season,
+      episode: episodeNumber,
+      query: params.toString(),
+    });
+
     fetch(`/api/skip-intro?${params.toString()}`)
-      .then((response) => response.ok ? response.json() : null)
+      .then(async (response) => {
+        const data = response.ok ? await response.json() : null;
+        console.debug("[SkipIntro][page-response]", {
+          status: response.status,
+          ok: response.ok,
+          data,
+          cancelled,
+        });
+        return data;
+      })
       .then((data) => {
-        if (cancelled || !data || !Number.isFinite(data.startSeconds) || !Number.isFinite(data.endSeconds)) return;
+        if (cancelled || !data || !Number.isFinite(data.startSeconds) || !Number.isFinite(data.endSeconds)) {
+          console.debug("[SkipIntro][page-rejected]", { cancelled, data });
+          return;
+        }
         if (data.endSeconds > data.startSeconds) {
+          console.debug("[SkipIntro][page-set-segment]", {
+            startSeconds: data.startSeconds,
+            endSeconds: data.endSeconds,
+          });
           setIntroSegment({ startSeconds: data.startSeconds, endSeconds: data.endSeconds });
+        } else {
+          console.debug("[SkipIntro][page-invalid-range]", data);
         }
       })
-      .catch(() => undefined);
+      .catch((error) => console.error("[SkipIntro][page-error]", error));
 
     return () => { cancelled = true; };
   }, [movie, currentEpisode]);

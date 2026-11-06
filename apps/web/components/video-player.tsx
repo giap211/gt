@@ -43,6 +43,10 @@ export const VideoPlayer = ({
       startSeconds: introStartSeconds,
       endSeconds: introEndSeconds,
     };
+    console.debug("[SkipIntro][player-props]", {
+      introStartSeconds,
+      introEndSeconds,
+    });
   }, [introStartSeconds, introEndSeconds]);
 
   // Direct HLS streams must always use Artplayer, even if their URL contains
@@ -442,11 +446,22 @@ export const VideoPlayer = ({
             Number.isFinite(intro.startSeconds) &&
             Number.isFinite(intro.endSeconds) &&
             intro.endSeconds > intro.startSeconds;
-          setShowSkipIntro(
+          const inIntroRange =
             hasIntro &&
             video.currentTime >= intro.startSeconds! &&
-            video.currentTime < intro.endSeconds!
-          );
+            video.currentTime < intro.endSeconds!;
+          if (inIntroRange && Math.floor(video.currentTime) % 2 === 0) {
+            console.debug("[SkipIntro][player-timeupdate]", {
+              currentTime: Number(video.currentTime.toFixed(2)),
+              startSeconds: intro.startSeconds,
+              endSeconds: intro.endSeconds,
+              hasIntro,
+              inIntroRange,
+              showResumeChoice,
+              buttonShouldRender: inIntroRange && !showResumeChoice,
+            });
+          }
+          setShowSkipIntro(inIntroRange);
           if (!video.paused && Number.isFinite(video.currentTime)) {
             const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
               ? video.duration
