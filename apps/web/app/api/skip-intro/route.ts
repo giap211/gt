@@ -27,13 +27,23 @@ async function resolveMalIdByTitle(
   url.searchParams.set("limit", "10");
   url.searchParams.set("sfw", "true");
 
-  const response = await fetch(url, {
-    headers: { Accept: "application/json" },
-    next: { revalidate: 86400 },
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: { Accept: "application/json" },
+      next: { revalidate: 86400 },
+    });
+  } catch {
+    return { id: null, reason: "jikan-network-error" };
+  }
   if (!response.ok) return { id: null, reason: `jikan-http-${response.status}` };
 
-  const data = await response.json() as { data?: JikanAnime[] };
+  let data: { data?: JikanAnime[] };
+  try {
+    data = await response.json() as { data?: JikanAnime[] };
+  } catch {
+    return { id: null, reason: "jikan-invalid-json" };
+  }
   const wanted = normalizeTitle(title);
   const match = (data.data || []).find((anime) => {
     const names = [
@@ -212,15 +222,25 @@ export async function GET(request: Request) {
       aniUrl.searchParams.append("types[]", "op");
       aniUrl.searchParams.append("types[]", "mixed-op");
       aniUrl.searchParams.set("episodeLength", "0");
-      const aniResponse = await fetch(aniUrl, {
-        headers: { Accept: "application/json" },
-        next: { revalidate },
-      });
+      let aniResponse: Response;
+      try {
+        aniResponse = await fetch(aniUrl, {
+          headers: { Accept: "application/json" },
+          next: { revalidate },
+        });
+      } catch {
+        return emptyResult("aniskip-network-error");
+      }
       if (!aniResponse.ok) return emptyResult("aniskip-http-error", aniResponse.status);
-      const aniData = await aniResponse.json() as {
+      let aniData: {
         found?: boolean;
         results?: Array<{ interval?: { startTime?: number; endTime?: number }; skipType?: string }>;
       };
+      try {
+        aniData = await aniResponse.json();
+      } catch {
+        return emptyResult("aniskip-invalid-json");
+      }
       const opening = (aniData.results || []).find((item) =>
         (item.skipType === "op" || item.skipType === "mixed-op") &&
         typeof item.interval?.startTime === "number" &&
@@ -308,6 +328,6 @@ export async function GET(request: Request) {
       },
     );
   } catch {
-    return emptyResult(isAnime && type === "tv" ? "aniskip-request-failed" : "skipdb-request-failed");
+    return emptyResult(isAnime && type === "tv" ? "anime-unexpected-error" : "skipdb-request-failed");
   }
 }
