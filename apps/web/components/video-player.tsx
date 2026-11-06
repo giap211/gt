@@ -62,6 +62,8 @@ export const VideoPlayer = ({
 
   const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [debugCurrentTime, setDebugCurrentTime] = useState<number | null>(null);
+  const [debugVideoState, setDebugVideoState] = useState("Đang chờ trình phát");
 
   useEffect(() => {
     setShowResumeChoice(startAtSeconds > 0 && !isEmbed);
@@ -440,6 +442,10 @@ export const VideoPlayer = ({
         const video = art.video as HTMLVideoElement;
         const reportProgress = () => {
           const intro = introSegmentRef.current;
+          setDebugCurrentTime(Number(video.currentTime.toFixed(2)));
+          setDebugVideoState(
+            `${video.paused ? "Đang tạm dừng" : "Đang phát"} · readyState ${video.readyState} · ${video.networkState === 1 ? "có nguồn" : `networkState ${video.networkState}`}`,
+          );
           const hasIntro =
             typeof intro.startSeconds === "number" &&
             typeof intro.endSeconds === "number" &&
@@ -653,6 +659,19 @@ export const VideoPlayer = ({
   return (
     <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10 ${showResumeChoice ? "[&_.art-state]:!hidden [&_.art-controls]:!hidden [&_.art-bottom]:!hidden" : ""}`}>
       <div ref={artRef} className="w-full h-full" />
+      <div className="absolute left-2 top-2 z-40 max-w-[min(92%,420px)] rounded-lg border border-cyan-300/40 bg-black/90 p-2.5 text-[10px] leading-relaxed text-white shadow-xl sm:left-3 sm:top-3 sm:text-xs">
+        <div className="mb-1 flex items-center justify-between gap-3">
+          <strong className="text-cyan-300">DEBUG SKIP INTRO</strong>
+          <span className="text-white/60">{isEmbed ? "EMBED" : isHlsStream ? "HLS" : "VIDEO"}</span>
+        </div>
+        <div>API intro: <b>{typeof introStartSeconds === "number" && typeof introEndSeconds === "number" ? "ĐÃ NHẬN" : "CHƯA NHẬN"}</b></div>
+        <div>Mốc: {typeof introStartSeconds === "number" ? introStartSeconds.toFixed(2) : "null"}s → {typeof introEndSeconds === "number" ? introEndSeconds.toFixed(2) : "null"}s</div>
+        <div>Thời gian video: {debugCurrentTime === null ? "chưa có timeupdate" : `${debugCurrentTime.toFixed(2)}s`}</div>
+        <div>Trạng thái: {debugVideoState}</div>
+        <div>Trong đoạn intro: <b>{showSkipIntro ? "CÓ" : "KHÔNG"}</b></div>
+        <div>Resume overlay: <b>{showResumeChoice ? "ĐANG HIỆN" : "TẮT"}</b></div>
+        <div>Nút cần hiện: <b className={showSkipIntro && !showResumeChoice ? "text-green-300" : "text-amber-300"}>{showSkipIntro && !showResumeChoice ? "CÓ" : "KHÔNG"}</b></div>
+      </div>
       {showSkipIntro && !showResumeChoice && (
         <button
           type="button"
