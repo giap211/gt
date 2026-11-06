@@ -94,22 +94,34 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           const merged = [...ophimServers, ...vsmovServers];
           setEpisodes(merged);
 
-          const firstServer = merged[0];
-          if (
-            firstServer &&
-            firstServer.server_data &&
-            firstServer.server_data.length > 0
-          ) {
-            const ep = tapParam
-              ? firstServer.server_data.find((e) => e.slug === tapParam) ||
-                firstServer.server_data[0]
-              : firstServer.server_data[0];
+          // Khôi phục đúng server chứa tập đã lưu, không mặc định server đầu tiên.
+          const matchedServerIndex = tapParam
+            ? merged.findIndex((server) =>
+                server.server_data?.some((episode) => episode.slug === tapParam),
+              )
+            : -1;
+          const selectedServerIndex = matchedServerIndex >= 0
+            ? matchedServerIndex
+            : 0;
+          setCurrentServer(selectedServerIndex);
+
+          const selectedServer = merged[selectedServerIndex];
+          const serverEpisodes = selectedServer?.server_data || [];
+          if (serverEpisodes.length > 0) {
+            const ep = (tapParam
+              ? serverEpisodes.find((episode) => episode.slug === tapParam)
+              : undefined) || serverEpisodes[0];
 
             if (ep) {
+              const isVsmov = (selectedServer?.server_name || "")
+                .toUpperCase()
+                .includes("VSMOV");
               setCurrentEpisode({
                 name: ep.name,
                 slug: ep.slug,
-                url: ep.link_m3u8 || ep.link_embed,
+                url: isVsmov
+                  ? ep.link_embed || ep.link_m3u8
+                  : ep.link_m3u8 || ep.link_embed,
               });
             }
           }
