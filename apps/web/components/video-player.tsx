@@ -47,14 +47,14 @@ export const VideoPlayer = ({
 
   // Direct HLS streams must always use Artplayer, even if their URL contains
   // words such as "video" or "embed" in a path or query parameter.
-  const isHlsStream = /\\.m3u8(?:$|[?#])/i.test(url);
+  const isHlsStream = /\.m3u8(?:$|[?#])/i.test(url);
   const isEmbed =
     !isHlsStream &&
     typeof url === "string" &&
-    (/\\/player\\/(?:\\?|$)/i.test(url) ||
+    (/\/player\/(?:\?|$)/i.test(url) ||
       /\\/embed(?:\\/|\\?|$)/i.test(url) ||
-      /youtube\\.com|youtu\\.be/i.test(url) ||
-      /streamvsmov\\.com|vsmov\\.com\\/video/i.test(url));
+      /youtube\.com|youtu\.be/i.test(url) ||
+      /streamvsmov\.com|vsmov\.com\/video/i.test(url));
 
   const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
