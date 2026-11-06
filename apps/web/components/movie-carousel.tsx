@@ -27,6 +27,7 @@ interface MovieCarouselProps {
     href?: string;
     progressSeconds?: number;
     totalDurationSeconds?: number;
+    simulateProgressWhenEmpty?: boolean;
     year?: string | number;
     quality?: string;
     episodeCurrent?: string;
