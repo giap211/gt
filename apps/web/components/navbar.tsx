@@ -448,7 +448,7 @@ export const Navbar = () => {
                       className="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-xs text-white/70 hover:bg-white/[0.08] hover:text-[#ffd875] transition-colors"
                     >
                       <Clock3 size={13} className="text-[#ffd875]" />
-                      Lịch sử xem phim
+                      Phim đang xem
                     </button>
                     <button
                       onClick={() => {
