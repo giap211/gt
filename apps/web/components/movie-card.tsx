@@ -19,7 +19,7 @@ interface MovieCardProps {
   hideInfo?: boolean;
   view?: number;
   rating?: number | string;
-  /** horizontal (RoPhim home) vs vertical (grids) */
+  /** horizontal (Phim Lậu home) vs vertical (grids) */
   variant?: "horizontal" | "vertical";
 }
 
