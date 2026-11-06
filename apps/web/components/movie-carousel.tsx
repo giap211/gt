@@ -118,14 +118,19 @@ export const MovieCarousel = ({
                 <SwiperSlide key={movie.id} className="h-auto">
                   {layout === "ranked" ? (
                     <div className="group/ranked flex h-full flex-col">
+                      <svg aria-hidden="true" className="absolute h-0 w-0" focusable="false">
+                        <defs>
+                          <clipPath id={`cinema-poster-clip-${index}`} clipPathUnits="objectBoundingBox">
+                            <path d={index % 2 === 0
+                              ? "M 0 0.075 C 0 0.035 0.035 0 0.075 0 L 0.94 0 C 0.975 0 1 0.025 1 0.06 L 1 0.94 C 1 0.975 0.975 1 0.94 1 L 0.06 1 C 0.025 1 0 0.975 0 0.94 Z"
+                              : "M 0 0.06 C 0 0.025 0.025 0 0.06 0 L 0.925 0 C 0.965 0 1 0.035 1 0.075 L 1 0.94 C 1 0.975 0.975 1 0.94 1 L 0.06 1 C 0.025 1 0 0.975 0 0.94 Z"} />
+                          </clipPath>
+                        </defs>
+                      </svg>
                       <div
-                      className="relative overflow-hidden"
-                      style={{
-                        clipPath: index % 2 === 0
-                          ? "polygon(0 8%, 0.3% 5%, 1.2% 2.8%, 2.8% 1%, 4.8% 0, 95% 0, 97.2% 0.5%, 98.8% 2%, 99.7% 4%, 100% 6%, 100% 94%, 99.5% 96.5%, 98% 98.5%, 96% 100%, 4% 100%, 2% 99%, 0.7% 97%, 0 94%)"
-                          : "polygon(0 6%, 0.5% 4%, 2% 2%, 4% 0.5%, 6% 0, 96% 0, 98% 1%, 99.2% 3%, 100% 6%, 100% 92%, 99.5% 95%, 98% 98%, 96% 100%, 4% 100%, 2% 99%, 0.5% 97%, 0 94%)",
-                      }}
-                    >
+                        className="relative overflow-hidden rounded-xl"
+                        style={{ clipPath: `url(#cinema-poster-clip-${index})` }}
+                      >
                       <MovieCard {...movie} hideInfo variant="vertical" />
                       <span className="absolute left-2 top-2 z-30 rounded-md bg-[#3989ed] px-2 py-1 text-[10px] md:text-xs font-bold text-white shadow-md pointer-events-none">
                         Song ngữ
