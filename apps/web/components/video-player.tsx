@@ -435,14 +435,7 @@ export const VideoPlayer = ({
       if (art) {
         const video = art.video as HTMLVideoElement;
         const reportProgress = () => {
-          const { startSeconds, endSeconds } = introSegmentRef.current;
-          const hasIntro = Number.isFinite(startSeconds) && Number.isFinite(endSeconds) &&
-            Number(endSeconds) > Number(startSeconds);
-          setShowSkipIntro(
-            hasIntro &&
-            video.currentTime >= Number(startSeconds) &&
-            video.currentTime < Number(endSeconds)
-          );
+          setShowSkipIntro(video.currentTime >= 30 && video.currentTime < 90);
           if (!video.paused && Number.isFinite(video.currentTime)) {
             const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
               ? video.duration
