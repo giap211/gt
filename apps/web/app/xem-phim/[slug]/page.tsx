@@ -178,7 +178,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           episodeName: currentEpisode.name,
           episodeSlug: currentEpisode.slug,
           progressSeconds: resumeAt,
-          totalDurationSeconds: tmdbRuntimeSeconds,
+          totalDurationSeconds: 0,
         })
         .catch(() => undefined);
     }, 2500);
@@ -198,7 +198,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       episodeName: currentEpisode.name,
       episodeSlug: currentEpisode.slug,
       progressSeconds: Math.floor(seconds),
-      totalDurationSeconds: Math.floor(durationSeconds > 0 ? durationSeconds : tmdbRuntimeSeconds),
+      totalDurationSeconds: Math.floor(durationSeconds > 0 ? durationSeconds : 0),
     }).catch(() => undefined);
   }, [user, movie, currentEpisode, tmdbRuntimeSeconds]);
   const handleShare = async () => {
