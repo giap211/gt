@@ -165,13 +165,14 @@ export const VideoPlayer = ({
             tooltip: "Hiển thị thông tin kiểm tra Skip Intro trên trình phát",
             switch: showDebug,
             onSwitch: (item: { switch?: boolean }) => {
-              const enabled = Boolean(item.switch);
+              const enabled = !item.switch;
               setShowDebug(enabled);
               try {
                 window.localStorage.setItem("player-skip-intro-debug", enabled ? "on" : "off");
               } catch {
                 // Bỏ qua nếu trình duyệt không cho phép lưu cài đặt.
               }
+              return enabled;
             },
           },
         ],
