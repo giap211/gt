@@ -49,41 +49,60 @@ async function resolveTmdbIdByTitle(
   title: string,
   year: number,
   type: "tv" | "movie",
-): Promise<string | null> {
+): Promise<{ id: string | null; reason?: string }> {
   const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
   const apiKey = process.env.TMDB_API_KEY;
-  if ((!accessToken && !apiKey) || !title.trim()) return null;
+  if (!accessToken && !apiKey) return { id: null, reason: "tmdb-credentials-missing" };
+  if (!title.trim()) return { id: null, reason: "tmdb-title-empty" };
 
-  const url = new URL(`https://api.themoviedb.org/3/search/${type}`);
-  url.searchParams.set("query", title);
-  url.searchParams.set("include_adult", "false");
-  url.searchParams.set("language", "en-US");
-  if (year >= 1800 && year <= 2100) {
-    url.searchParams.set(type === "tv" ? "first_air_date_year" : "year", String(year));
+  // OPhim sometimes appends season labels to the original title.
+  const cleanedTitle = title
+    .replace(/\\s*[([（]\\s*(?:season|series|phần|part|s)\\s*\\d+\\s*[)\\]）]\\s*$/i, "")
+    .replace(/\\s+(?:season|series|phần|part)\\s*\\d+\\s*$/i, "")
+    .trim();
+  const queries = [...new Set([cleanedTitle, title].filter(Boolean))];
+  const wantedTitles = new Set(queries.map(normalizeTitle));
+  let lastStatus: number | undefined;
+
+  for (const query of queries) {
+    // Retry without the supplied year in case OPhim metadata is inaccurate.
+    for (const useYear of [true, false]) {
+      const url = new URL(`https://api.themoviedb.org/3/search/${type}`);
+      url.searchParams.set("query", query);
+      url.searchParams.set("include_adult", "false");
+      url.searchParams.set("language", "en-US");
+      if (useYear && year >= 1800 && year <= 2100) {
+        url.searchParams.set(type === "tv" ? "first_air_date_year" : "year", String(year));
+      }
+      if (!accessToken && apiKey) url.searchParams.set("api_key", apiKey);
+
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        next: { revalidate: 86400 },
+      });
+      if (!response.ok) {
+        lastStatus = response.status;
+        continue;
+      }
+
+      const data = (await response.json()) as { results?: TmdbSearchResult[] };
+      const match = (data.results || []).find((item) => {
+        const names = type === "tv"
+          ? [item.name, item.original_name]
+          : [item.title, item.original_title];
+        return names.some((name) => name && wantedTitles.has(normalizeTitle(name)));
+      });
+      if (match?.id) return { id: String(match.id) };
+    }
   }
-  if (!accessToken && apiKey) url.searchParams.set("api_key", apiKey);
 
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-    },
-    next: { revalidate: 86400 },
-  });
-  if (!response.ok) return null;
-
-  const data = (await response.json()) as { results?: TmdbSearchResult[] };
-  const wanted = normalizeTitle(title);
-  const match = (data.results || []).find((item) => {
-    const names = type === "tv" ? [item.name, item.original_name] : [item.title, item.original_title];
-    const exactTitle = names.some((name) => name && normalizeTitle(name) === wanted);
-    const date = type === "tv" ? item.first_air_date : item.release_date;
-    const resultYear = date ? Number(date.slice(0, 4)) : 0;
-    return exactTitle && (!year || !resultYear || resultYear === year);
-  });
-  return match?.id ? String(match.id) : null;
+  return lastStatus
+    ? { id: null, reason: `tmdb-search-http-${lastStatus}` }
+    : { id: null, reason: "tmdb-title-not-found" };
 }
-
 async function resolveImdbId(tmdbId: string, type: "tv" | "movie") {
   const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
   const apiKey = process.env.TMDB_API_KEY;
@@ -137,8 +156,8 @@ export async function GET(request: Request) {
     // If OPhim omitted the ID, require an exact title and year match from TMDB.
     if (!tmdbId) {
       const resolved = await resolveTmdbIdByTitle(title, year, type);
-      if (!resolved) return emptyResult("tmdb-title-not-found");
-      tmdbId = resolved;
+      if (!resolved.id) return emptyResult(resolved.reason || "tmdb-title-not-found");
+      tmdbId = resolved.id;
     }
 
     // SkipDB is keyed by IMDb ID, so resolve it from the TMDB ID.
