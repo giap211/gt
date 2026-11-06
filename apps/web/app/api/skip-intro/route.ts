@@ -57,8 +57,8 @@ async function resolveTmdbIdByTitle(
 
   // OPhim sometimes appends season labels to the original title.
   const cleanedTitle = title
-    .replace(/\\s*[([（]\\s*(?:season|series|phần|part|s)\\s*\\d+\\s*[)\\]）]\\s*$/i, "")
-    .replace(/\\s+(?:season|series|phần|part)\\s*\\d+\\s*$/i, "")
+    .replace(/\s*[\(\[]?\s*(?:season|series|phần|part|s)\s*\d+\s*[\)\]]?\s*$/i, "")
+    .replace(/\s+(?:season|series|phần|part)\s*\d+\s*$/i, "")
     .trim();
   const queries = [...new Set([cleanedTitle, title].filter(Boolean))];
   const wantedTitles = new Set(queries.map(normalizeTitle));
