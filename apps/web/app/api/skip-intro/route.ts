@@ -140,7 +140,7 @@ export async function GET(request: Request) {
   const episode = Number(searchParams.get("episode") || 0);
 
   if (
-    (tmdbId && !/^\\d+$/.test(tmdbId)) ||
+    (tmdbId && !/^\d+$/.test(tmdbId)) ||
     (!tmdbId && (!title || (year !== 0 && (!Number.isInteger(year) || year < 1800 || year > 2100)))) ||
     (type === "tv" &&
       (!Number.isInteger(season) || season < 1 ||
