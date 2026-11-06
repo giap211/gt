@@ -6,29 +6,45 @@ import { useMember } from "@/components/member-provider";
 import { memberClient, type WatchHistoryItem } from "@/lib/member-client";
 import { getMovieDetail } from "@/lib/ophim-client";
 
+const parseRuntimeSeconds = (value?: string): number => {
+  if (!value) return 0;
+  const text = value.toLowerCase().trim();
+  const hours = Number(text.match(/(\\d+(?:\\.\\d+)?)\\s*(?:giờ|hours?|hrs?|h)\\b/)?.[1] || 0);
+  const minutes = Number(text.match(/(\\d+(?:\\.\\d+)?)\\s*(?:phút|minutes?|mins?|m)\\b/)?.[1] || 0);
+  if (hours > 0 || minutes > 0) return Math.round((hours * 60 + minutes) * 60);
+  const plainMinutes = text.match(/^(\\d+(?:\\.\\d+)?)\\s*(?:p|phút)?$/);
+  return plainMinutes ? Math.round(Number(plainMinutes[1]) * 60) : 0;
+};
+
 export function ContinueWatchingSection() {
   const { user, loading: memberLoading } = useMember();
-  const [items, setItems] = useState<WatchHistoryItem[]>([]);
+  const [items, setItems] = useState<WatchHistoryItem            const detail = await getMovieDetail(item.movieSlug);
+            const movie = detail?.movie;
+            if (!movie) return item;
 
-  useEffect(() => {
-    if (!user) {
-      setItems([]);
-      return;
-    }
+            // Use the source movie type to select the correct TMDB endpoint.
+            const type = movie.type === "series" || movie.type === "tvshows"
+              ? "tv"
+              : movie.type === "single"
+                ? "movie"
+                : movie.tmdb?.type === "tv" ? "tv" : "movie";
+            const tmdbId = String(movie.tmdb?.id || "").trim();
 
-    let cancelled = false;
-    memberClient.history()
-      .then(async (result) => {
-        const historyItems = result.items || [];
-        if (cancelled) return;
-        setItems(historyItems);
+            if (tmdbId && /^\\d+$/.test(tmdbId)) {
+              const response = await fetch(`/api/tmdb-runtime?id=${encodeURIComponent(tmdbId)}&type=${type}`);
+              if (response.ok) {
+                const data = await response.json() as { runtimeSeconds?: number };
+                const runtime = Number(data.runtimeSeconds || 0);
+                if (runtime > 0) return { ...item, totalDurationSeconds: runtime };
+              }
+            }
 
-        // TMDB runtime is used only to draw the homepage's illustrative progress bar.
-        const runtimeItems = await Promise.all(historyItems.slice(0, 20).map(async (item) => {
-          if (Number(item.totalDurationSeconds) > 0) return item;
-          try {
-            const detail = await getMovieDetail(item.movieSlug);
-            const tmdbId = String(detail?.movie?.tmdb?.id || "").trim();
+            // Display-only fallback; this value is never saved to watch history.
+            const fallbackRuntime = parseRuntimeSeconds(movie.time);
+            return fallbackRuntime > 0
+              ? { ...item, totalDurationSeconds: fallbackRuntime }
+              : item;
+?.movie?.tmdb?.id || "").trim();
             if (!tmdbId || !/^\d+$/.test(tmdbId)) return item;
             const type = detail?.movie?.tmdb?.type === "tv" ? "tv" : "movie";
             const response = await fetch(`/api/tmdb-runtime?id=${encodeURIComponent(tmdbId)}&type=${type}`);
