@@ -16,6 +16,8 @@ interface VideoPlayerProps {
   title?: string;
   onReady?: (art: Artplayer) => void;
   startAtSeconds?: number;
+  introStartSeconds?: number;
+  introEndSeconds?: number;
   onProgress?: (seconds: number, durationSeconds: number) => void;
 }
 
@@ -25,6 +27,8 @@ export const VideoPlayer = ({
   title,
   onReady,
   startAtSeconds = 0,
+  introStartSeconds,
+  introEndSeconds,
   onProgress,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
@@ -40,6 +44,7 @@ export const VideoPlayer = ({
       url.includes("embed"));
 
   const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
+  const [showSkipIntro, setShowSkipIntro] = useState(false);
 
   useEffect(() => {
     setShowResumeChoice(startAtSeconds > 0 && !isEmbed);
@@ -417,6 +422,13 @@ export const VideoPlayer = ({
       if (art) {
         const video = art.video as HTMLVideoElement;
         const reportProgress = () => {
+          const hasIntro = Number.isFinite(introStartSeconds) && Number.isFinite(introEndSeconds) &&
+            Number(introEndSeconds) > Number(introStartSeconds);
+          setShowSkipIntro(
+            hasIntro &&
+            video.currentTime >= Number(introStartSeconds) &&
+            video.currentTime < Number(introEndSeconds)
+          );
           if (!video.paused && Number.isFinite(video.currentTime)) {
             const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
               ? video.duration
@@ -589,7 +601,7 @@ export const VideoPlayer = ({
           .forEach((el) => el.remove());
       }
     };
-  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress]);
+  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, introStartSeconds, introEndSeconds]);
 
   if (isEmbed) {
     return (
@@ -608,6 +620,22 @@ export const VideoPlayer = ({
   return (
     <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10 ${showResumeChoice ? "[&_.art-state]:!hidden [&_.art-controls]:!hidden [&_.art-bottom]:!hidden" : ""}`}>
       <div ref={artRef} className="w-full h-full" />
+      {showSkipIntro && !showResumeChoice && (
+        <button
+          type="button"
+          onClick={() => {
+            const video = artRef.current?.querySelector("video");
+            if (!video || !Number.isFinite(introEndSeconds)) return;
+            video.currentTime = Number(introEndSeconds);
+            video.play().catch(() => {});
+            setShowSkipIntro(false);
+          }}
+          className="absolute right-4 bottom-16 sm:bottom-20 z-30 inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/75 px-4 py-2.5 text-sm font-bold text-white shadow-xl backdrop-blur-md transition hover:bg-black/90"
+        >
+          <span>Bỏ qua giới thiệu</span>
+          <span aria-hidden="true">»</span>
+        </button>
+      )}
       {showResumeChoice && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/65 backdrop-blur-sm">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 px-4">
