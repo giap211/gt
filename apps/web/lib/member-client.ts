@@ -261,7 +261,7 @@ export const memberClient = {
       const currentUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, {
         id: "usr_guest",
         email: "khach@rophim.net",
-        name: "Thành viên RoPhim",
+        name: "Thành viên Phim Lậu",
       });
       const newComment: CommentItem = {
         id: `cmt_${Date.now().toString(36)}`,
@@ -271,7 +271,7 @@ export const memberClient = {
         createdAt: new Date().toISOString(),
         user: {
           id: currentUser?.id || "usr_guest",
-          name: currentUser?.name || "Thành viên RoPhim",
+          name: currentUser?.name || "Thành viên Phim Lậu",
         },
       };
       const all = getLocalItem<CommentItem[]>(STORAGE_KEYS.COMMENTS, []);
