@@ -32,16 +32,29 @@ export const VideoPlayer = ({
   onProgress,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
+  const introSegmentRef = useRef({
+    startSeconds: introStartSeconds,
+    endSeconds: introEndSeconds,
+  });
 
+  // Keep intro timing current without rebuilding Artplayer when the API responds.
+  useEffect(() => {
+    introSegmentRef.current = {
+      startSeconds: introStartSeconds,
+      endSeconds: introEndSeconds,
+    };
+  }, [introStartSeconds, introEndSeconds]);
+
+  // Direct HLS streams must always use Artplayer, even if their URL contains
+  // words such as "video" or "embed" in a path or query parameter.
+  const isHlsStream = /\\.m3u8(?:$|[?#])/i.test(url);
   const isEmbed =
+    !isHlsStream &&
     typeof url === "string" &&
-    (url.includes("/player/?url=") ||
-      url.includes("/embed/") ||
-      url.includes("youtube.com") ||
-      url.includes("streamvsmov.com") ||
-      url.includes("vsmov.com/video") ||
-      url.includes("/video/") ||
-      url.includes("embed"));
+    (/\\/player\\/(?:\\?|$)/i.test(url) ||
+      /\\/embed(?:\\/|\\?|$)/i.test(url) ||
+      /youtube\\.com|youtu\\.be/i.test(url) ||
+      /streamvsmov\\.com|vsmov\\.com\\/video/i.test(url));
 
   const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
@@ -422,12 +435,13 @@ export const VideoPlayer = ({
       if (art) {
         const video = art.video as HTMLVideoElement;
         const reportProgress = () => {
-          const hasIntro = Number.isFinite(introStartSeconds) && Number.isFinite(introEndSeconds) &&
-            Number(introEndSeconds) > Number(introStartSeconds);
+          const { startSeconds, endSeconds } = introSegmentRef.current;
+          const hasIntro = Number.isFinite(startSeconds) && Number.isFinite(endSeconds) &&
+            Number(endSeconds) > Number(startSeconds);
           setShowSkipIntro(
             hasIntro &&
-            video.currentTime >= Number(introStartSeconds) &&
-            video.currentTime < Number(introEndSeconds)
+            video.currentTime >= Number(startSeconds) &&
+            video.currentTime < Number(endSeconds)
           );
           if (!video.paused && Number.isFinite(video.currentTime)) {
             const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
@@ -601,7 +615,7 @@ export const VideoPlayer = ({
           .forEach((el) => el.remove());
       }
     };
-  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, introStartSeconds, introEndSeconds]);
+  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress]);
 
   if (isEmbed) {
     return (
