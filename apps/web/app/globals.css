@@ -11,11 +11,11 @@
   --font-sans: 'Be Vietnam Pro';
   --background: #0b0d14;
   --foreground: #ffffff;
-  --rophim-primary: #f0c24d;
+  --phim-lau-primary: #f0c24d;
   /* Updated to match screenshot yellow */
   --accent-pink: #d946ef;
 
-  /* Rophim Brand Colors */
+  /* Phim Lậu Brand Colors */
   --primary-color: #ffd875;
   --primary-color-hover: #ffde8a;
   --primary-text: #ffd875;
@@ -40,7 +40,7 @@
   /* Component Specific */
   --h-shadow: 0 2px 3px rgba(0, 0, 0, 0.4);
   --shadow-large: 0 0 20px 20px rgba(0, 0, 0, 0.1);
-  --rophim-glow: 0 0 15px 2px rgba(255, 216, 117, 0.3);
+  --phim-lau-glow: 0 0 15px 2px rgba(255, 216, 117, 0.3);
 }
 
 /* 100% Fidelity Hardening */
@@ -85,11 +85,11 @@
 }
 
 .search-bar-glow:focus-within {
-  box-shadow: var(--rophim-glow);
+  box-shadow: var(--phim-lau-glow);
   border-color: #ffd875aa !important;
 }
 
-/* Shrink-to-Border Effect (RoPhim Original) */
+/* Shrink-to-Border Effect (Phim Lậu Original) */
 .premium-border-container {
   background-color: #ffd875;
   transition: all 0.3s ease;
