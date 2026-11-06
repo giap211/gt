@@ -155,10 +155,10 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     const titleForLookup = (movie.origin_name || movie.name || "").trim();
     const tmdbId = movie.tmdb?.id ? String(movie.tmdb.id) : "";
     // Use AniSkip for Japanese animation series; other titles continue using SkipDB.
-    const hasAnimationCategory = movie.category?.some((category) =>
+    const hasAnimationCategory = movie.type === "hoathinh" || (movie.category?.some((category) =>
       category.slug?.toLowerCase() === "hoat-hinh" ||
       /hoạt hình|animation|anime/i.test(category.name || "")
-    ) ?? false;
+    ) ?? false);
     const hasJapaneseOrigin = movie.country?.some((country) =>
       country.slug?.toLowerCase() === "nhat-ban" ||
       /nhật bản|japan/i.test(country.name || "")
@@ -213,7 +213,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             endSeconds: data.endSeconds,
           });
           setIntroSegment({ startSeconds: data.startSeconds, endSeconds: data.endSeconds });
-          setIntroDebugStatus(`ĐÃ NHẬN ${data.startSeconds}s → ${data.endSeconds}s`);
+          setIntroDebugStatus(`ĐÃ NHẬN · ${data.source || (data.resolvedTmdbId ? "SkipDB" : "API")} · ${data.startSeconds}s → ${data.endSeconds}s`);
         } else {
           console.debug("[SkipIntro][page-invalid-range]", data);
         }

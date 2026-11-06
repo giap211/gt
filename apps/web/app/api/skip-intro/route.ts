@@ -296,6 +296,7 @@ export async function GET(request: Request) {
         startSeconds,
         endSeconds,
         reason: null,
+        source: "SkipDB",
         resolvedTmdbId: tmdbId,
         confidence: intro.confidence ?? null,
         match: intro.match ?? null,
@@ -307,6 +308,6 @@ export async function GET(request: Request) {
       },
     );
   } catch {
-    return emptyResult("skipdb-request-failed");
+    return emptyResult(isAnime && type === "tv" ? "aniskip-request-failed" : "skipdb-request-failed");
   }
 }
