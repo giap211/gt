@@ -16,6 +16,7 @@ interface MovieCarouselProps {
   viewMoreLink?: string;
   /** gradient text color for title like RoPhim */
   titleGradient?: string;
+  layout?: "standard" | "ranked";
   items: {
     id: string;
     title: string;
@@ -38,6 +39,7 @@ export const MovieCarousel = ({
   viewMoreLink,
   titleGradient = "linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)",
   items,
+  layout = "standard",
 }: MovieCarouselProps) => {
   const navigationPrevRef = useRef<HTMLButtonElement | null>(null);
   const navigationNextRef = useRef<HTMLButtonElement | null>(null);
@@ -47,12 +49,10 @@ export const MovieCarousel = ({
   return (
     <section className="w-full relative py-3 md:py-5">
       <div className="container mx-auto px-3 md:px-6">
-        {/* RoPhim layout: title left + carousel right on desktop */}
-        <div className="flex flex-col md:flex-row md:items-stretch gap-3 md:gap-5">
-          {/* Left intro */}
-          <div className="md:w-[160px] lg:w-[180px] shrink-0 flex flex-col justify-center">
+        <div className={layout === "ranked" ? "flex flex-col gap-3" : "flex flex-col md:flex-row md:items-stretch gap-3 md:gap-5"}>
+          <div className={layout === "ranked" ? "flex items-center justify-between gap-3" : "md:w-[160px] lg:w-[180px] shrink-0 flex flex-col justify-center"}>
             <h2
-              className="text-xl md:text-2xl font-bold leading-tight mb-1"
+              className={`text-xl md:text-2xl font-bold leading-tight mb-1 ${layout === "ranked" ? "md:text-2xl" : ""}`}
               style={{
                 backgroundImage: titleGradient,
                 WebkitBackgroundClip: "text",
@@ -93,7 +93,7 @@ export const MovieCarousel = ({
             <Swiper
               modules={[Navigation]}
               spaceBetween={10}
-              slidesPerView={1.6}
+              slidesPerView={layout === "ranked" ? 2.65 : 1.6}
               navigation={{
                 prevEl: navigationPrevRef.current,
                 nextEl: navigationNextRef.current,
@@ -106,17 +106,36 @@ export const MovieCarousel = ({
                 }
               }}
               breakpoints={{
-                480: { slidesPerView: 2.1, spaceBetween: 10 },
-                768: { slidesPerView: 2.6, spaceBetween: 12 },
-                1024: { slidesPerView: 3.4, spaceBetween: 12 },
-                1280: { slidesPerView: 4.1, spaceBetween: 12 },
-                1536: { slidesPerView: 4.4, spaceBetween: 14 },
+                480: { slidesPerView: layout === "ranked" ? 3.1 : 2.1, spaceBetween: 10 },
+                768: { slidesPerView: layout === "ranked" ? 4.2 : 2.6, spaceBetween: 12 },
+                1024: { slidesPerView: layout === "ranked" ? 5.2 : 3.4, spaceBetween: 12 },
+                1280: { slidesPerView: layout === "ranked" ? 6.2 : 4.1, spaceBetween: 12 },
+                1536: { slidesPerView: layout === "ranked" ? 6.5 : 4.4, spaceBetween: 14 },
               }}
               className="w-full !overflow-hidden"
             >
-              {items.map((movie) => (
+              {items.map((movie, index) => (
                 <SwiperSlide key={movie.id} className="h-auto">
-                  <MovieCard {...movie} variant="horizontal" />
+                  {layout === "ranked" ? (
+                    <div className="group/ranked flex h-full flex-col">
+                      <MovieCard {...movie} hideInfo variant="vertical" />
+                      <div className="mt-1 flex items-start gap-2">
+                        <span className="shrink-0 text-3xl md:text-4xl font-black italic leading-none text-[#f5c451] drop-shadow-[0_2px_8px_rgba(245,196,81,0.2)]">
+                          {index + 1}
+                        </span>
+                        <div className="min-w-0 pt-0.5">
+                          <Link href={`/phim/${movie.slug}`} className="block text-[11px] md:text-[13px] font-semibold leading-snug text-white line-clamp-2 transition-colors group-hover/ranked:text-[#ffd875]">
+                            {movie.title}
+                          </Link>
+                          {movie.originalTitle && movie.originalTitle !== movie.title && (
+                            <p className="mt-0.5 text-[10px] text-white/40 line-clamp-1">{movie.originalTitle}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <MovieCard {...movie} variant="horizontal" />
+                  )}
                 </SwiperSlide>
               ))}
             </Swiper>
