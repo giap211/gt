@@ -6,6 +6,52 @@ type TmdbExternalIds = {
   imdb_id?: string | null;
 };
 
+type JikanAnime = {
+  mal_id?: number;
+  year?: number | null;
+  title?: string;
+  title_english?: string | null;
+  title_japanese?: string | null;
+  titles?: Array<{ title?: string }>;
+};
+
+async function resolveMalIdByTitle(
+  title: string,
+  year: number,
+): Promise<{ id: string | null; reason?: string }> {
+  if (!title.trim()) return { id: null, reason: "anime-title-empty" };
+
+  const url = new URL("https://api.jikan.moe/v4/anime");
+  url.searchParams.set("q", title);
+  url.searchParams.set("type", "tv");
+  url.searchParams.set("limit", "10");
+  url.searchParams.set("sfw", "true");
+
+  const response = await fetch(url, {
+    headers: { Accept: "application/json" },
+    next: { revalidate: 86400 },
+  });
+  if (!response.ok) return { id: null, reason: `jikan-http-${response.status}` };
+
+  const data = await response.json() as { data?: JikanAnime[] };
+  const wanted = normalizeTitle(title);
+  const match = (data.data || []).find((anime) => {
+    const names = [
+      anime.title,
+      anime.title_english,
+      anime.title_japanese,
+      ...(anime.titles || []).map((item) => item.title),
+    ].filter((name): name is string => Boolean(name));
+    const exactTitleMatch = names.some((name) => normalizeTitle(name) === wanted);
+    const yearMatches = !year || !anime.year || Math.abs(anime.year - year) <= 1;
+    return exactTitleMatch && yearMatches && Number.isInteger(anime.mal_id);
+  });
+
+  return match?.mal_id
+    ? { id: String(match.mal_id) }
+    : { id: null, reason: "anime-mal-id-not-found" };
+}
+
 type SkipDbSegment = {
   start_ms?: number | null;
   end_ms?: number | null;
@@ -138,7 +184,9 @@ export async function GET(request: Request) {
   const type = searchParams.get("type") === "tv" ? "tv" : "movie";
   const season = Number(searchParams.get("season") || 1);
   const episode = Number(searchParams.get("episode") || 0);
-  const malId = (searchParams.get("malId") || "").trim();
+  const isAnime = searchParams.get("anime") === "1";
+  const animeTitle = (searchParams.get("animeTitle") || "").trim().slice(0, 120);
+  const animeYear = Number(searchParams.get("animeYear") || year || 0);
 
   if (
     (tmdbId && !/^\d+$/.test(tmdbId)) ||
@@ -154,10 +202,13 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Temporary AniSkip test for Boruto: Naruto Next Generations (MAL 34566).
-    // episodeLength=0 requests timestamps without filtering by a specific encode duration.
-    if (malId === "34566" && type === "tv") {
-      const aniUrl = new URL(`https://api.aniskip.com/v2/skip-times/${malId}/${episode}`);
+    // Japanese anime series use AniSkip; all other titles continue through SkipDB.
+    if (isAnime && type === "tv") {
+      const resolvedMal = await resolveMalIdByTitle(animeTitle || title, animeYear);
+      if (!resolvedMal.id) return emptyResult(resolvedMal.reason || "anime-mal-id-not-found");
+
+      // episodeLength=0 avoids filtering against a potentially different video encode.
+      const aniUrl = new URL(`https://api.aniskip.com/v2/skip-times/${resolvedMal.id}/${episode}`);
       aniUrl.searchParams.append("types[]", "op");
       aniUrl.searchParams.append("types[]", "mixed-op");
       aniUrl.searchParams.set("episodeLength", "0");
@@ -182,7 +233,7 @@ export async function GET(request: Request) {
         endSeconds: opening.interval.endTime,
         reason: null,
         source: "AniSkip",
-        malId,
+        malId: resolvedMal.id,
         skipType: opening.skipType,
       }, {
         headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },

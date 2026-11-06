@@ -154,11 +154,23 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     if (isSeries && (!episodeNumber || !Number.isInteger(episodeNumber))) { setIntroDebugStatus(`DỪNG: không đọc được số tập từ tên “${currentEpisode.name}”`); return; }
     const titleForLookup = (movie.origin_name || movie.name || "").trim();
     const tmdbId = movie.tmdb?.id ? String(movie.tmdb.id) : "";
-    // Limit the temporary AniSkip test to Boruto episode 2 only.
-    const testAniSkip = slug === "boruto-naruto-hau-sinh-kha-uy" && isSeries && episodeNumber === 2;
-    setIntroDebugStatus(`Đang gọi API · ${testAniSkip ? "AniSkip MAL 34566" : (tmdbId ? `TMDB ${tmdbId}` : "Tìm TMDB theo tên")} · ${isSeries ? `TV S${season}E${episodeNumber}` : "Movie"}`);
+    // Use AniSkip for Japanese animation series; other titles continue using SkipDB.
+    const hasAnimationCategory = movie.category?.some((category) =>
+      category.slug?.toLowerCase() === "hoat-hinh" ||
+      /hoạt hình|animation|anime/i.test(category.name || "")
+    ) ?? false;
+    const hasJapaneseOrigin = movie.country?.some((country) =>
+      country.slug?.toLowerCase() === "nhat-ban" ||
+      /nhật bản|japan/i.test(country.name || "")
+    ) ?? false;
+    const useAniSkip = hasAnimationCategory && hasJapaneseOrigin && isSeries;
+    setIntroDebugStatus(`Đang gọi API · ${useAniSkip ? "AniSkip (anime)" : (tmdbId ? `TMDB ${tmdbId}` : "Tìm TMDB theo tên")} · ${isSeries ? `TV S${season}E${episodeNumber}` : "Movie"}`);
     const params = new URLSearchParams({
-      ...(testAniSkip ? { malId: "34566" } : {}),
+      ...(useAniSkip ? {
+        anime: "1",
+        animeTitle: titleForLookup,
+        animeYear: String(movie.year || ""),
+      } : {}),
       ...(tmdbId ? { tmdbId } : { title: titleForLookup, year: String(movie.year || "") }),
       type: isSeries ? "tv" : "movie",
       ...(isSeries ? { season: String(season), episode: String(episodeNumber) } : {}),
