@@ -338,8 +338,8 @@ export const Navbar = () => {
 
               {/* Live Search Modal Dropdown */}
               {showLiveSearch && searchQuery.trim().length >= 2 && (
-                <div className="absolute top-full right-0 mt-2.5 w-[min(92vw,360px)] bg-[#10121a]/98 border border-white/10 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] backdrop-blur-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="p-3 border-b border-white/[0.06] flex items-center justify-between">
+                <div className="absolute top-full right-0 mt-2.5 w-[min(80vw,320px)] sm:w-[min(92vw,360px)] max-h-[min(58vh,420px)] bg-[#090b12] border border-white/15 rounded-xl sm:rounded-2xl shadow-[0_24px_70px_rgba(0,0,0,0.98)] ring-1 ring-black/70 overflow-hidden z-[60] animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-2.5 py-2 sm:p-3 border-b border-white/10 bg-[#111521] flex items-center justify-between">
                     <span className="text-[11px] font-semibold text-[#ffd875] flex items-center gap-1.5">
                       <Film size={12} />
                       Kết quả gợi ý
@@ -349,29 +349,29 @@ export const Navbar = () => {
                     )}
                   </div>
 
-                  <div className="max-h-[300px] overflow-y-auto custom-scrollbar p-1.5 space-y-1">
+                  <div className="max-h-[min(48vh,340px)] overflow-y-auto overscroll-contain custom-scrollbar p-1 sm:p-1.5 space-y-0.5 sm:space-y-1">
                     {searchResults.length > 0 ? (
                       searchResults.map((item) => (
                         <Link
                           key={item._id}
                           href={`/phim/${item.slug}`}
                           onClick={() => setShowLiveSearch(false)}
-                          className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/[0.08] transition-all group"
+                          className="flex items-center gap-2 sm:gap-2.5 p-1.5 sm:p-2 rounded-lg sm:rounded-xl hover:bg-white/[0.08] transition-all group"
                         >
-                          <div className="relative w-10 h-13 rounded-lg overflow-hidden bg-black/50 shrink-0 border border-white/10">
+                          <div className="relative w-9 h-12 sm:w-10 sm:h-13 rounded-md sm:rounded-lg overflow-hidden bg-black/50 shrink-0 border border-white/10">
                             <Image
                               src={item.poster_url}
                               alt={item.name}
                               fill
-                              sizes="40px"
+                              sizes="(max-width: 640px) 36px, 40px"
                               className="object-cover group-hover:scale-105 transition-transform"
                             />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-semibold text-white truncate group-hover:text-[#ffd875] transition-colors">
+                            <h4 className="text-[11px] sm:text-xs font-semibold text-white line-clamp-2 leading-snug group-hover:text-[#ffd875] transition-colors">
                               {item.name}
                             </h4>
-                            <p className="text-[10px] text-white/40 truncate mt-0.5">
+                            <p className="text-[9px] sm:text-[10px] text-white/55 truncate mt-0.5">
                               {item.origin_name}
                             </p>
                             <div className="flex items-center gap-1.5 mt-1">
@@ -395,7 +395,7 @@ export const Navbar = () => {
                   <Link
                     href={`/tim-kiem?keyword=${encodeURIComponent(searchQuery.trim())}`}
                     onClick={() => setShowLiveSearch(false)}
-                    className="block p-2.5 text-center bg-white/[0.03] hover:bg-[#ffd875] text-[11px] font-bold text-white hover:text-black transition-all border-t border-white/[0.06]"
+                    className="block px-2 py-2 sm:p-2.5 text-center bg-[#111521] hover:bg-[#ffd875] text-[10px] sm:text-[11px] font-bold text-white hover:text-black transition-all border-t border-white/10"
                   >
                     Xem tất cả kết quả &rarr;
                   </Link>
