@@ -15,6 +15,53 @@ type JikanAnime = {
   titles?: Array<{ title?: string }>;
 };
 
+async function resolveMalIdByAniList(
+  title: string,
+  year: number,
+): Promise<{ id: string | null; reason?: string }> {
+  const query = `
+    query ($search: String) {
+      Media(search: $search, type: ANIME, format_in: [TV, TV_SHORT]) {
+        idMal
+        startDate { year }
+        title { romaji english native }
+        synonyms
+      }
+    }
+  `;
+  try {
+    const response = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ query, variables: { search: title } }),
+    });
+    if (!response.ok) return { id: null, reason: `anilist-http-${response.status}` };
+    const payload = await response.json() as {
+      data?: { Media?: {
+        idMal?: number | null;
+        startDate?: { year?: number | null };
+        title?: { romaji?: string | null; english?: string | null; native?: string | null };
+        synonyms?: string[];
+      } | null };
+    };
+    const anime = payload.data?.Media;
+    if (!anime || !Number.isInteger(anime.idMal)) {
+      return { id: null, reason: "anilist-mal-id-not-found" };
+    }
+    const names = [
+      anime.title?.romaji, anime.title?.english, anime.title?.native,
+      ...(anime.synonyms || []),
+    ].filter((name): name is string => Boolean(name));
+    const exactMatch = names.some((name) => normalizeTitle(name) === normalizeTitle(title));
+    const yearMatches = !year || !anime.startDate?.year ||
+      Math.abs(anime.startDate.year - year) <= 1;
+    if (!exactMatch || !yearMatches) return { id: null, reason: "anilist-title-mismatch" };
+    return { id: String(anime.idMal) };
+  } catch {
+    return { id: null, reason: "anilist-network-error" };
+  }
+}
+
 async function resolveMalIdByTitle(
   title: string,
   year: number,
@@ -34,9 +81,16 @@ async function resolveMalIdByTitle(
       next: { revalidate: 86400 },
     });
   } catch {
-    return { id: null, reason: "jikan-network-error" };
+    const fallback = await resolveMalIdByAniList(title, year);
+    return fallback.id ? fallback : { id: null, reason: fallback.reason || "anime-id-resolution-failed" };
   }
-  if (!response.ok) return { id: null, reason: `jikan-http-${response.status}` };
+  if (!response.ok) {
+    if (response.status === 429 || response.status >= 500) {
+      const fallback = await resolveMalIdByAniList(title, year);
+      if (fallback.id) return fallback;
+    }
+    return { id: null, reason: `jikan-http-${response.status}` };
+  }
 
   let data: { data?: JikanAnime[] };
   try {
