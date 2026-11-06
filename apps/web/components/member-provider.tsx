@@ -301,7 +301,7 @@ function MemberAuthModal({
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
+                className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
                 placeholder="Tên hiển thị"
                 autoComplete="name"
                 required
@@ -310,7 +310,7 @@ function MemberAuthModal({
             <input
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
+              className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
               placeholder="Email"
               type="email"
               autoComplete="email"
@@ -319,7 +319,7 @@ function MemberAuthModal({
             <input
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
+              className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
               placeholder="Mật khẩu"
               type="password"
               autoComplete={isRegister ? "new-password" : "current-password"}
