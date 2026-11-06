@@ -97,7 +97,8 @@ model WatchHistory {
   movieTitle      String
   posterUrl       String?
   episodeName     String
-  progressSeconds Int      @default(0)
+  progressSeconds       Int      @default(0)
+  totalDurationSeconds  Int      @default(0)
   updatedAt       DateTime @updatedAt
   createdAt       DateTime @default(now())
 
