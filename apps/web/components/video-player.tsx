@@ -47,6 +47,7 @@ export const VideoPlayer = ({
     let stallWatchTimer: ReturnType<typeof setInterval> | null = null;
     let lastTime = 0;
     let stuckCount = 0;
+    let restorePlaybackPosition: (() => void) | null = null;
 
     const clearTimers = () => {
       if (seekWatchTimer) {
@@ -109,7 +110,7 @@ export const VideoPlayer = ({
         mutex: true,
         backdrop: true,
         playsInline: true,
-        autoPlayback: true,
+        autoPlayback: startAtSeconds <= 0,
         airplay: true,
         theme: "#ffd875",
         moreVideoAttr: {},
@@ -154,6 +155,8 @@ export const VideoPlayer = ({
               hls.attachMedia(video);
 
               hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                // HLS có thể chỉ xác định duration sau khi manifest được phân tích.
+                restorePlaybackPosition?.();
                 video.play().catch(() => {});
               });
 
@@ -264,20 +267,48 @@ export const VideoPlayer = ({
 
       if (art) {
         const video = art.video as HTMLVideoElement;
+        let positionRestored = startAtSeconds <= 0;
+
         const restorePosition = () => {
-          if (startAtSeconds > 0 && Number.isFinite(video.duration)) {
-            video.currentTime = Math.min(startAtSeconds, Math.max(0, video.duration - 2));
+          if (positionRestored || startAtSeconds <= 0) return;
+          if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+
+          const target = Math.min(
+            startAtSeconds,
+            Math.max(0, video.duration - 2),
+          );
+
+          try {
+            // Đặt vị trí sau khi metadata/manifest đã sẵn sàng.
+            video.currentTime = target;
+            const hls = (art as any)?.hls as Hls | undefined;
+            hls?.startLoad(target);
+            positionRestored = true;
+            art!.notice.show = "Tiếp tục từ vị trí đã xem";
+          } catch {
+            // Chờ sự kiện sẵn sàng tiếp theo rồi thử lại.
           }
         };
+
+        restorePlaybackPosition = restorePosition;
         const reportProgress = () => {
-          if (!video.paused && Number.isFinite(video.currentTime)) onProgress?.(video.currentTime);
+          if (!video.paused && Number.isFinite(video.currentTime)) {
+            onProgress?.(video.currentTime);
+          }
         };
-        video.addEventListener("loadedmetadata", restorePosition, { once: true });
+
+        video.addEventListener("loadedmetadata", restorePosition);
+        video.addEventListener("durationchange", restorePosition);
+        video.addEventListener("canplay", restorePosition);
         if (video.readyState >= 1) restorePosition();
         video.addEventListener("timeupdate", reportProgress);
+
         const previousCleanup = (art as any).__seekCleanup as (() => void) | undefined;
         (art as any).__seekCleanup = () => {
+          restorePlaybackPosition = null;
           video.removeEventListener("loadedmetadata", restorePosition);
+          video.removeEventListener("durationchange", restorePosition);
+          video.removeEventListener("canplay", restorePosition);
           video.removeEventListener("timeupdate", reportProgress);
           previousCleanup?.();
         };
