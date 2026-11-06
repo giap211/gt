@@ -130,7 +130,6 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     setIntroSegment(null);
     setIntroDebugStatus("Đang kiểm tra dữ liệu phim...");
     if (!movie) { setIntroDebugStatus("Chưa tải được thông tin phim"); return; }
-    if (!movie.tmdb?.id) { setIntroDebugStatus("DỪNG: phim không có TMDB ID"); return; }
     if (!currentEpisode) { setIntroDebugStatus("DỪNG: chưa xác định tập đang xem"); return; }
 
     let season = 1;
@@ -153,10 +152,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     }
 
     if (isSeries && (!episodeNumber || !Number.isInteger(episodeNumber))) { setIntroDebugStatus(`DỪNG: không đọc được số tập từ tên “${currentEpisode.name}”`); return; }
-    setIntroDebugStatus(`Đang gọi API · TMDB ${movie.tmdb.id} · ${isSeries ? `TV S${season}E${episodeNumber}` : "Movie"}`);
+    const titleForLookup = (movie.origin_name || movie.name || "").trim();
+    const tmdbId = movie.tmdb?.id ? String(movie.tmdb.id) : "";
+    setIntroDebugStatus(`Đang gọi API · ${tmdbId ? `TMDB ${tmdbId}` : "Tìm TMDB theo tên"} · ${isSeries ? `TV S${season}E${episodeNumber}` : "Movie"}`);
 
     const params = new URLSearchParams({
-      tmdbId: String(movie.tmdb.id),
+      ...(tmdbId ? { tmdbId } : { title: titleForLookup, year: String(movie.year || "") }),
       type: isSeries ? "tv" : "movie",
       ...(isSeries ? { season: String(season), episode: String(episodeNumber) } : {}),
     });
@@ -164,13 +165,13 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     console.debug("[SkipIntro][page-request]", {
       movie: movie.name,
       episodeName: currentEpisode.name,
-      tmdbId: movie.tmdb.id,
+      tmdbId: tmdbId || null,
+      titleForLookup,
       type: isSeries ? "tv" : "movie",
       season,
       episode: episodeNumber,
       query: params.toString(),
     });
-
     fetch(`/api/skip-intro?${params.toString()}`)
       .then(async (response) => {
         const data = await response.json().catch(() => null);
@@ -182,7 +183,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         });
         if (!cancelled) {
           const detail = data?.reason ? ` · ${data.reason}` : "";
-          setIntroDebugStatus(`API HTTP ${response.status}${detail}`);
+          const resolved = data?.resolvedTmdbId ? ` · TMDB ${data.resolvedTmdbId}` : "";
+          setIntroDebugStatus(`API HTTP ${response.status}${resolved}${detail}`);
         }
         return data;
       })

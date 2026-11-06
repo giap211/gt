@@ -30,6 +30,60 @@ function emptyResult(reason: string, upstreamStatus?: number) {
   });
 }
 
+type TmdbSearchResult = {
+  id: number;
+  name?: string;
+  original_name?: string;
+  title?: string;
+  original_title?: string;
+  first_air_date?: string;
+  release_date?: string;
+};
+
+function normalizeTitle(value: string) {
+  return value.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+async function resolveTmdbIdByTitle(
+  title: string,
+  year: number,
+  type: "tv" | "movie",
+): Promise<string | null> {
+  const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
+  const apiKey = process.env.TMDB_API_KEY;
+  if ((!accessToken && !apiKey) || !title.trim()) return null;
+
+  const url = new URL(`https://api.themoviedb.org/3/search/${type}`);
+  url.searchParams.set("query", title);
+  url.searchParams.set("include_adult", "false");
+  url.searchParams.set("language", "en-US");
+  if (year >= 1800 && year <= 2100) {
+    url.searchParams.set(type === "tv" ? "first_air_date_year" : "year", String(year));
+  }
+  if (!accessToken && apiKey) url.searchParams.set("api_key", apiKey);
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    next: { revalidate: 86400 },
+  });
+  if (!response.ok) return null;
+
+  const data = (await response.json()) as { results?: TmdbSearchResult[] };
+  const wanted = normalizeTitle(title);
+  const match = (data.results || []).find((item) => {
+    const names = type === "tv" ? [item.name, item.original_name] : [item.title, item.original_title];
+    const exactTitle = names.some((name) => name && normalizeTitle(name) === wanted);
+    const date = type === "tv" ? item.first_air_date : item.release_date;
+    const resultYear = date ? Number(date.slice(0, 4)) : 0;
+    return exactTitle && (!year || !resultYear || resultYear === year);
+  });
+  return match?.id ? String(match.id) : null;
+}
+
 async function resolveImdbId(tmdbId: string, type: "tv" | "movie") {
   const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
   const apiKey = process.env.TMDB_API_KEY;
@@ -59,18 +113,19 @@ async function resolveImdbId(tmdbId: string, type: "tv" | "movie") {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const tmdbId = (searchParams.get("tmdbId") || "").trim();
+  let tmdbId = (searchParams.get("tmdbId") || "").trim();
+  const title = (searchParams.get("title") || "").trim().slice(0, 120);
+  const year = Number(searchParams.get("year") || 0);
   const type = searchParams.get("type") === "tv" ? "tv" : "movie";
   const season = Number(searchParams.get("season") || 1);
   const episode = Number(searchParams.get("episode") || 0);
 
   if (
-    !/^\d+$/.test(tmdbId) ||
+    (tmdbId && !/^\\d+$/.test(tmdbId)) ||
+    (!tmdbId && (!title || (year !== 0 && (!Number.isInteger(year) || year < 1800 || year > 2100)))) ||
     (type === "tv" &&
-      (!Number.isInteger(season) ||
-        season < 1 ||
-        !Number.isInteger(episode) ||
-        episode < 1))
+      (!Number.isInteger(season) || season < 1 ||
+        !Number.isInteger(episode) || episode < 1))
   ) {
     return NextResponse.json(
       { startSeconds: null, endSeconds: null, reason: "invalid-parameters" },
@@ -79,7 +134,14 @@ export async function GET(request: Request) {
   }
 
   try {
-    // SkipDB is keyed by IMDb ID, so resolve it from the existing TMDB ID.
+    // If OPhim omitted the ID, require an exact title and year match from TMDB.
+    if (!tmdbId) {
+      const resolved = await resolveTmdbIdByTitle(title, year, type);
+      if (!resolved) return emptyResult("tmdb-title-not-found");
+      tmdbId = resolved;
+    }
+
+    // SkipDB is keyed by IMDb ID, so resolve it from the TMDB ID.
     const imdbId = await resolveImdbId(tmdbId, type);
     if (!imdbId) return emptyResult("imdb-id-not-found");
 
@@ -128,6 +190,7 @@ export async function GET(request: Request) {
         startSeconds,
         endSeconds,
         reason: null,
+        resolvedTmdbId: tmdbId,
         confidence: intro.confidence ?? null,
         match: intro.match ?? null,
       },
