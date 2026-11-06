@@ -142,7 +142,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
 
   useEffect(() => {
     const tmdbId = String(movie?.tmdb?.id || "").trim();
-    if (!tmdbId || !/^\\d+$/.test(tmdbId)) {
+    if (!tmdbId || !/^\d+$/.test(tmdbId)) {
       setTmdbRuntimeSeconds(0);
       return;
     }
