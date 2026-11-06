@@ -298,6 +298,102 @@ export const VideoPlayer = ({
       });
 
       if (art) {
+        const player = art.template.$player as HTMLElement;
+        const resumePanel = player.querySelector(".art-auto-playback") as HTMLElement | null;
+        const centerPlay = art.template.$state as HTMLElement;
+        let resumeObserver: MutationObserver | null = null;
+
+        const configureResumeChoice = () => {
+          const panel = player.querySelector(".art-auto-playback") as HTMLElement | null;
+          if (!panel) return;
+
+          const lastSeen = panel.querySelector(".art-auto-playback-last") as HTMLElement | null;
+          const jumpButton = panel.querySelector(".art-auto-playback-jump") as HTMLElement | null;
+          const closeButton = panel.querySelector(".art-auto-playback-close") as HTMLElement | null;
+          if (!jumpButton) return;
+
+          if (lastSeen) lastSeen.style.display = "none";
+          if (closeButton) closeButton.style.display = "none";
+
+          let startButton = panel.querySelector(".art-auto-playback-start") as HTMLButtonElement | null;
+          if (!startButton) {
+            startButton = document.createElement("button");
+            startButton.type = "button";
+            startButton.className = "art-auto-playback-start";
+            startButton.textContent = "Phát từ đầu";
+            startButton.addEventListener("click", (event) => {
+              event.stopPropagation();
+              if (!art) return;
+              art.seek = 0;
+              art.play().catch(() => {});
+              (art.template.$poster as HTMLElement).style.display = "none";
+              panel.style.display = "none";
+            });
+            panel.insertBefore(startButton, jumpButton);
+          }
+
+          Object.assign(panel.style, {
+            left: "50%",
+            right: "auto",
+            top: "50%",
+            bottom: "auto",
+            transform: "translate(-50%, -50%)",
+            display: getComputedStyle(panel).display === "none" ? "none" : "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
+            flexWrap: "nowrap",
+            gap: "10px",
+            width: "max-content",
+            maxWidth: "calc(100% - 20px)",
+            padding: "0",
+            border: "0",
+            background: "transparent",
+            zIndex: "30",
+          });
+
+          for (const button of [startButton, jumpButton]) {
+            Object.assign(button.style, {
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              whiteSpace: "nowrap",
+              minHeight: "42px",
+              padding: "0 16px",
+              borderRadius: "9999px",
+              fontSize: "14px",
+              fontWeight: "700",
+              lineHeight: "1",
+              cursor: "pointer",
+              border: "1px solid rgba(255,255,255,.24)",
+            });
+          }
+          Object.assign(startButton.style, {
+            color: "#fff",
+            background: "rgba(255,255,255,.16)",
+          });
+          jumpButton.textContent = "Tiếp tục xem";
+          Object.assign(jumpButton.style, {
+            color: "#111",
+            background: "#ffd875",
+            borderColor: "#ffd875",
+          });
+
+          const syncCenterPlay = () => {
+            const visible = getComputedStyle(panel).display !== "none";
+            centerPlay.style.display = visible ? "none" : "";
+          };
+          syncCenterPlay();
+          resumeObserver?.disconnect();
+          resumeObserver = new MutationObserver(syncCenterPlay);
+          resumeObserver.observe(panel, { attributes: true, attributeFilter: ["style"] });
+        };
+
+        art.on("ready", configureResumeChoice);
+        art.on("restart", configureResumeChoice);
+      }
+
+      if (art) {
         const video = art.video as HTMLVideoElement;
         const reportProgress = () => {
           if (!video.paused && Number.isFinite(video.currentTime)) {
@@ -423,6 +519,7 @@ export const VideoPlayer = ({
 
     return () => {
       clearTimers();
+      resumeObserver?.disconnect();
 
       try {
         const cleanup = (art as any)?.__seekCleanup;
