@@ -35,6 +35,7 @@ export interface WatchHistoryItem {
   movieTitle: string;
   posterUrl?: string;
   episodeName: string;
+  episodeSlug?: string;
   progressSeconds: number;
   updatedAt: string;
 }
@@ -282,7 +283,7 @@ export const memberClient = {
   },
 
   async saveHistory(
-    input: MoviePayload & { episodeName: string; progressSeconds?: number },
+    input: MoviePayload & { episodeName: string; episodeSlug?: string; progressSeconds?: number },
   ): Promise<{ item: unknown }> {
     try {
       return await request<{ item: unknown }>("/member/history", {
@@ -298,6 +299,7 @@ export const memberClient = {
         movieTitle: input.movieTitle,
         posterUrl: input.posterUrl,
         episodeName: input.episodeName,
+        episodeSlug: input.episodeSlug,
         progressSeconds: input.progressSeconds || 0,
         updatedAt: new Date().toISOString(),
       };
