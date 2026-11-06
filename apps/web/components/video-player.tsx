@@ -379,13 +379,32 @@ export const VideoPlayer = ({
           });
 
           const syncCenterPlay = () => {
-            const visible = getComputedStyle(panel).display !== "none";
-            centerPlay.style.display = visible ? "none" : "";
+            const activePanel = player.querySelector(".art-layer-auto-playback") as HTMLElement | null;
+            const visible = !!activePanel && getComputedStyle(activePanel).display !== "none";
+            if (visible) {
+              // Remove Artplayer's original circular play overlay while the
+              // start/resume choices are being shown.
+              centerPlay.style.setProperty("display", "none", "important");
+              centerPlay.style.setProperty("visibility", "hidden", "important");
+              centerPlay.style.setProperty("pointer-events", "none", "important");
+            } else {
+              centerPlay.style.removeProperty("display");
+              centerPlay.style.removeProperty("visibility");
+              centerPlay.style.removeProperty("pointer-events");
+            }
           };
           syncCenterPlay();
           resumeObserver?.disconnect();
-          resumeObserver = new MutationObserver(syncCenterPlay);
-          resumeObserver.observe(panel, { attributes: true, attributeFilter: ["style"] });
+          resumeObserver = new MutationObserver(() => {
+            configureResumeChoice();
+            syncCenterPlay();
+          });
+          resumeObserver.observe(player, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ["style", "class"],
+          });
         };
 
         art.on("ready", configureResumeChoice);
