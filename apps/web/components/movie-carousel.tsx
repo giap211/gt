@@ -25,6 +25,8 @@ interface MovieCarouselProps {
     thumbUrl?: string;
     slug: string;
     href?: string;
+    progressSeconds?: number;
+    totalDurationSeconds?: number;
     year?: string | number;
     quality?: string;
     episodeCurrent?: string;
