@@ -25,7 +25,6 @@ import { memberClient } from "@/lib/member-client";
 import {
   getMovieDetail,
   getLatestMovies,
-  getVSMovEpisodes,
   type DetailMovie,
   type Episode,
   type ListMovie,
@@ -69,29 +68,19 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [movieRes, latestRes, vsmovEpisodes] = await Promise.all([
+        const [movieRes, latestRes] = await Promise.all([
           getMovieDetail(slug),
           getLatestMovies(1),
-          getVSMovEpisodes(slug),
         ]);
 
         if (movieRes && movieRes.status) {
           setMovie(movieRes.movie);
 
-          // SV1 = Ophim, SV2+ = VSMOV (nếu có)
-          const ophimServers = (movieRes.episodes || []).map((s, i) => ({
-            ...s,
-            server_name: s.server_name || `Ophim #${i + 1}`,
+          // Chỉ sử dụng các server Ophim và hiển thị tên thống nhất SV 1, SV 2...
+          const merged = (movieRes.episodes || []).map((server, i) => ({
+            ...server,
+            server_name: `SV ${i + 1}`,
           }));
-
-          const vsmovServers = (vsmovEpisodes || []).map((s, i) => ({
-            ...s,
-            server_name: s.server_name?.includes("VSMOV")
-              ? s.server_name
-              : `VSMOV ${s.server_name || `#${i + 1}`}`,
-          }));
-
-          const merged = [...ophimServers, ...vsmovServers];
           setEpisodes(merged);
 
           // Khôi phục đúng server chứa tập đã lưu, không mặc định server đầu tiên.
@@ -113,15 +102,10 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
               : undefined) || serverEpisodes[0];
 
             if (ep) {
-              const isVsmov = (selectedServer?.server_name || "")
-                .toUpperCase()
-                .includes("VSMOV");
               setCurrentEpisode({
                 name: ep.name,
                 slug: ep.slug,
-                url: isVsmov
-                  ? ep.link_embed || ep.link_m3u8
-                  : ep.link_m3u8 || ep.link_embed,
+                url: ep.link_m3u8 || ep.link_embed,
               });
             }
           }
@@ -201,17 +185,10 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
 
     if (!matched) return;
 
-    const isVsmov = (episodes[serverIndex]?.server_name || "")
-      .toUpperCase()
-      .includes("VSMOV");
-
     setCurrentEpisode({
       name: matched.name,
       slug: matched.slug,
-      // VSMOV: chỉ dùng embed; Ophim: m3u8 trước
-      url: isVsmov
-        ? matched.link_embed || matched.link_m3u8
-        : matched.link_m3u8 || matched.link_embed,
+      url: matched.link_m3u8 || matched.link_embed,
     });
   };
 
@@ -550,9 +527,7 @@ function EpisodeList({
                     : "bg-white/5 text-white/40 hover:text-white"
                 }`}
               >
-                {server.server_name?.toUpperCase().includes("VSMOV")
-  ? "VSMOV"
-  : `Ophim ${i + 1}`}
+                { `SV ${i + 1}` }
               </button>
             ))}
           </div>
