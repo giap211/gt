@@ -37,6 +37,7 @@ export interface WatchHistoryItem {
   episodeName: string;
   episodeSlug?: string;
   progressSeconds: number;
+  totalDurationSeconds?: number;
   updatedAt: string;
 }
 
@@ -283,7 +284,7 @@ export const memberClient = {
   },
 
   async saveHistory(
-    input: MoviePayload & { episodeName: string; episodeSlug?: string; progressSeconds?: number },
+    input: MoviePayload & { episodeName: string; episodeSlug?: string; progressSeconds?: number; totalDurationSeconds?: number },
   ): Promise<{ item: unknown }> {
     try {
       return await request<{ item: unknown }>("/member/history", {
@@ -301,6 +302,7 @@ export const memberClient = {
         episodeName: input.episodeName,
         episodeSlug: input.episodeSlug,
         progressSeconds: input.progressSeconds || 0,
+        totalDurationSeconds: input.totalDurationSeconds || 0,
         updatedAt: new Date().toISOString(),
       };
       if (index >= 0) {
