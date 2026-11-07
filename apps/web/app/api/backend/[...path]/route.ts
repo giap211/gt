@@ -33,7 +33,7 @@ async function proxyBackend(request: NextRequest, context: RouteContext) {
     
     // 3-second timeout controller so requests never hang indefinitely
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     const upstreamResponse = await fetch(targetUrl, {
       method: request.method,
