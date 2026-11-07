@@ -601,7 +601,7 @@ function TabContent({
             {currentServerData.map((ep) => (
               <Link
                 key={ep.slug || ep.name}
-                href={`/xem-phim/${movie.slug}?tap=${encodeURIComponent(ep.slug || ep.name)}`}
+                href={`/xem-phim/${movie.slug}?sv=${selectedServer}&tap=${encodeURIComponent(ep.slug || ep.name)}`}
                 className="flex items-center justify-center gap-1 py-2.5 px-2 rounded-lg bg-[#1c1e2a] border border-white/5 text-[13px] text-white/75 hover:bg-[#ffd875]/10 hover:border-[#ffd875]/30 hover:text-[#ffd875]"
               >
                 <Play size={11} className="opacity-40" />
