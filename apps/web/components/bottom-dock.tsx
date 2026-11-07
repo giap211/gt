@@ -111,7 +111,7 @@ export function BottomDock() {
     <>
       <style jsx global>{`
         @media (max-width: 1023px) {
-          html[data-mobile-theme="light"] body { background: #f4f6fb !important; color: #252a36 !important; }
+          html[data-mobile-theme="light"] body { background: #eef1f5 !important; color: #252a36 !important; }
           html[data-mobile-theme="light"] body [class~="text-white"],
           html[data-mobile-theme="light"] body [class~="text-white/90"],
           html[data-mobile-theme="light"] body [class~="text-white/85"],
@@ -128,7 +128,7 @@ export function BottomDock() {
           html[data-mobile-theme="light"] body [class~="text-white/30"] { color: #687184 !important; }
           html[data-mobile-theme="light"] body [class*="bg-[#0"],
           html[data-mobile-theme="light"] body [class*="bg-[#1"],
-          html[data-mobile-theme="light"] body [class*="bg-[#2"] { background-color: #fff !important; }
+          html[data-mobile-theme="light"] body [class*="bg-[#2"] { background-color: #eef1f5 !important; }
           html[data-mobile-theme="light"] body [class*="border-white/"] { border-color: rgba(40,48,65,.14) !important; }
           html[data-mobile-theme="light"] header.fixed {
             background: rgba(250,251,255,.9) !important; border-color: rgba(40,48,65,.12) !important;
@@ -149,19 +149,23 @@ export function BottomDock() {
             background: rgba(255,255,255,.95) !important; border-color: rgba(40,48,65,.15) !important;
           }
           html[data-mobile-theme="light"] body .mobile-account-sheet button { color: #303746; }
-          html[data-mobile-theme="light"] body .mobile-search-overlay { background: #f4f6fb !important; }
+          html[data-mobile-theme="light"] body .mobile-search-overlay { background: #eef1f5 !important; }
 
           /* Home hero: fade into the same light surface used by the content below. */
           html[data-mobile-theme="light"] body main > section:first-child {
-            background: #f4f6fb !important;
+            background: #eef1f5 !important;
           }
-          html[data-mobile-theme="light"] body main > section:first-child > div:nth-child(2) {
+          /* Only recolor the fade overlay inside each hero slide, never the six film thumbnails. */
+          html[data-mobile-theme="light"] body main > section:first-child .swiper-slide > div.pointer-events-none {
             background: linear-gradient(
               to bottom,
-              rgba(244,246,251,0) 0%,
-              rgba(244,246,251,.76) 52%,
-              #f4f6fb 100%
+              rgba(238,241,245,0) 0%,
+              rgba(238,241,245,.76) 52%,
+              #eef1f5 100%
             ) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-cast-slider .swiper-slide > div {
+            background-color: #292c38 !important;
           }
 
           /* Give the topic heading a deliberate hierarchy in light mode. */
