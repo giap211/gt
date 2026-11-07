@@ -269,7 +269,8 @@ export const memberClient = {
     } catch {
       const currentUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, {
         id: "usr_guest",
-        email: "khach@rophim.net",
+        username: "khach",
+        email: "",
         name: "Thành viên Phim Lậu",
       });
       const newComment: CommentItem = {
