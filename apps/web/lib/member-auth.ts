@@ -1,5 +1,5 @@
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { get, head, put } from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 import type { NextRequest, NextResponse } from "next/server";
 
 export const MEMBER_SESSION_COOKIE = "gt_member_session";
