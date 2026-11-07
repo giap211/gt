@@ -634,6 +634,7 @@ async function findNguonCMovieSlug(movie: Pick<DetailMovie, "name" | "origin_nam
   type NguonCSearchItem = {
     name?: string;
     origin_name?: string;
+    original_name?: string;
     slug?: string;
     year?: number | string;
   };
@@ -664,7 +665,8 @@ async function findNguonCMovieSlug(movie: Pick<DetailMovie, "name" | "origin_nam
 
   for (const item of results.flat()) {
     if (!item.slug) continue;
-    const candidateTitles = [item.name, item.origin_name]
+    // NguonC dùng original_name; một số phiên bản/nguồn có thể trả origin_name.
+    const candidateTitles = [item.name, item.original_name, item.origin_name]
       .filter((value): value is string => Boolean(value))
       .map(normalizeNguonCTitle);
     if (!candidateTitles.some((title) => expectedTitles.has(title))) continue;
