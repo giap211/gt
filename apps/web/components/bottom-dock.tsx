@@ -38,6 +38,7 @@ export function BottomDock() {
   const isHome = pathname === "/";
   const isSeries = pathname.startsWith("/danh-sach/phim-bo");
   const isSingle = pathname.startsWith("/danh-sach/phim-le");
+  const isWatchPage = pathname.startsWith("/xem-phim/");
 
   useEffect(() => {
     setSearchOpen(false);
@@ -113,6 +114,8 @@ export function BottomDock() {
     setSearchOpen(false);
     router.push(`/tim-kiem?keyword=${encodeURIComponent(q)}`);
   };
+
+  if (isWatchPage) return null;
 
   return (
     <>
