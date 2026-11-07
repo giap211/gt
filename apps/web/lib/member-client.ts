@@ -132,8 +132,11 @@ export const memberClient = {
       method: "POST",
       body: JSON.stringify(input),
     });
+    const previousUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
     setLocalItem(STORAGE_KEYS.USER, res.user);
-    await this.syncLocalHistoryToAccount(res.user.email);
+    if (previousUser?.email.toLowerCase() === res.user.email.toLowerCase()) {
+      await this.syncLocalHistoryToAccount(res.user.email);
+    }
     return res;
   },
 
