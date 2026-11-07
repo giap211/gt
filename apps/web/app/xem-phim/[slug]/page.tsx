@@ -13,6 +13,9 @@ import {
   SkipBack,
   SkipForward,
   Check,
+  ChevronDown,
+  MonitorPlay,
+  Subtitles,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -431,7 +434,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const suggestedMovies = transformListMovies(latestMovies);
 
   return (
-    <main className="min-h-screen bg-[#0b0d14] text-white pt-20 overflow-x-hidden relative">
+    <main className="min-h-screen bg-[#07090e] text-white pt-16 md:pt-20 overflow-x-hidden relative">
       {isCinemaMode && (
         <div
           onClick={() => setIsCinemaMode(false)}
@@ -440,26 +443,19 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         />
       )}
 
-      <div className="container mx-auto px-4 lg:px-12 py-6">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <div className="flex items-center gap-2 text-[11px] font-bold text-white/40 uppercase tracking-widest">
-            <Link href="/" className="hover:text-white transition-colors">
-              Phim Lậu
+      <div className="container mx-auto px-0 sm:px-4 lg:px-12 py-2 sm:py-6">
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-0 mb-3 sm:mb-4">
+          <div className="min-w-0">
+            <Link href={`/phim/${movie.slug}`} className="text-[10px] sm:text-[11px] font-semibold text-white/45 hover:text-white transition-colors">
+              ‹  QUAY LẠI THÔNG TIN PHIM
             </Link>
-            <span>/</span>
-            <Link
-              href={`/phim/${movie.slug}`}
-              className="hover:text-white transition-colors max-w-[200px] truncate"
-            >
-              {movie.name}
-            </Link>
-            <span>/</span>
-            <span className="text-[#ffd875]">
-              {formatEpisodeName(currentEpisode?.name || "Full")}
-            </span>
+            <div className="mt-1 flex items-center gap-2 min-w-0">
+              <h1 className="text-sm sm:text-base font-bold truncate">{movie.name}</h1>
+              <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/65">{formatEpisodeName(currentEpisode?.name || "Full")}</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setIsCinemaMode(!isCinemaMode)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
@@ -486,10 +482,10 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           </div>
         </div>
 
-        <div className="flex flex-col xl:flex-row gap-8">
+        <div className="flex flex-col xl:flex-row gap-5 sm:gap-8">
           <div className="flex-1 min-w-0">
             <div
-              className={`relative mb-4 transition-all duration-300 ${
+              className={`relative mb-3 sm:mb-4 mx-0 sm:mx-0 transition-all duration-300 ${
                 isCinemaMode ? "z-40 shadow-[0_0_80px_rgba(0,0,0,0.9)]" : ""
               }`}
             >
@@ -507,9 +503,9 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
               )}
             </div>
 
-            <div className="bg-[#191b24] p-4 sm:p-5 rounded-2xl border border-white/5 flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="mx-4 sm:mx-0 bg-gradient-to-br from-white/[0.10] to-white/[0.035] backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4 mb-5 sm:mb-6 shadow-[0_12px_45px_rgba(0,0,0,.18)]">
               <div className="min-w-0">
-                <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight truncate">
+                <h2 className="text-base sm:text-xl font-bold tracking-tight truncate">
                   {movie.name}{" "}
                   <span className="text-[#ffd875]">
                     — {formatEpisodeName(currentEpisode?.name)}
@@ -563,7 +559,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
               </div>
             </div>
 
-            <div className="xl:hidden mb-8 space-y-6">
+            <div className="xl:hidden mb-7 px-4 sm:px-0 space-y-6">
               <EpisodeList
                 episodes={episodes}
                 currentEpisode={currentEpisode}
@@ -573,7 +569,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
               />
             </div>
 
-            <div className="bg-[#191b24] p-6 sm:p-8 rounded-2xl border border-white/5 relative overflow-hidden group mb-8">
+            <div className="mx-4 sm:mx-0 bg-white/[0.045] p-5 sm:p-8 rounded-2xl border border-white/[0.08] relative overflow-hidden group mb-8">
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Play size={120} className="text-white fill-white" />
               </div>
@@ -622,7 +618,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             />
           </div>
 
-          <div className="w-full xl:w-[380px] space-y-8 flex-shrink-0">
+          <div className="hidden xl:block w-full xl:w-[380px] space-y-8 flex-shrink-0">
             <div className="hidden xl:block">
               <EpisodeList
                 episodes={episodes}
@@ -680,7 +676,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           </div>
         </div>
 
-        <div className="mt-16">
+        <div className="mt-10 sm:mt-16 px-4 sm:px-0">
           <MovieCarousel title="Có thể bạn quan tâm" items={suggestedMovies} />
         </div>
       </div>
@@ -705,25 +701,25 @@ function EpisodeList({
 }: EpisodeListProps) {
   if (!episodes || episodes.length === 0) return null;
 
+  const activeEpisodes = episodes[currentServer]?.server_data || [];
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <List className="text-[#ffd875]" size={18} />
-          <h3 className="text-sm font-black uppercase tracking-widest">
-            Danh sách tập
+    <section className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] uppercase tracking-[.22em] text-white/35 font-semibold">Tiếp tục hành trình</p>
+          <h3 className="mt-1 flex items-center gap-2 text-base font-bold tracking-tight">
+            <List className="text-white/75" size={17} /> Danh sách tập
+            <span className="text-xs font-medium text-white/35">{activeEpisodes.length} tập</span>
           </h3>
         </div>
         {episodes.length > 1 && (
-          <div className="flex gap-2">
+          <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] p-1">
             {episodes.map((server, i) => (
               <button
                 key={`${server.server_name}-${i}`}
                 onClick={() => onServerChange(i)}
-                className={`px-3 py-1.5 rounded text-[9px] font-black uppercase tracking-widest transition-all ${
-                  currentServer === i
-                    ? "bg-[#ffd875] text-black shadow-[0_0_15px_rgba(255,216,117,0.3)]"
-                    : "bg-white/5 text-white/40 hover:text-white"
+                className={`rounded-full px-3 py-2 text-[10px] font-semibold transition-all ${
+                  currentServer === i ? "bg-white text-[#10131a] shadow-lg" : "text-white/55 hover:text-white"
                 }`}
               >
                 {server.server_name}
@@ -733,24 +729,34 @@ function EpisodeList({
         )}
       </div>
 
-      <div className="bg-[#191b24] p-4 rounded-2xl border border-white/5 max-h-[400px] overflow-y-auto custom-scrollbar">
-        <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-5 xl:grid-cols-4 gap-2.5">
-          {episodes[currentServer]?.server_data.map((ep: ServerData) => (
+      <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:grid xl:grid-cols-2 xl:overflow-y-auto xl:max-h-[520px] xl:overflow-x-hidden">
+        {activeEpisodes.map((ep: ServerData, index: number) => {
+          const active = currentEpisode?.name === ep.name;
+          return (
             <Link
               key={ep.slug}
               href={`/xem-phim/${slug}?tap=${ep.slug}&sv=${currentServer}`}
-              className={`h-11 flex items-center justify-center rounded-xl text-xs font-black transition-all border ${
-                currentEpisode?.name === ep.name
-                  ? "bg-[#ffd875] text-black border-[#ffd875] shadow-[0_0_15px_rgba(255,216,117,0.2)]"
-                  : "bg-white/5 text-white/50 border-white/5 hover:border-[#ffd875]/40 hover:text-[#ffd875]"
+              className={`group relative flex w-[142px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border text-left transition-all xl:w-auto ${
+                active ? "border-white/75 bg-white/[0.12] shadow-[0_8px_28px_rgba(255,255,255,.08)]" : "border-white/[0.08] bg-white/[0.045] hover:border-white/25"
               }`}
             >
-              {formatEpisodeName(ep.name)}
+              <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-white/15 to-white/[0.025]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-3xl font-light text-white/20">{String(index + 1).padStart(2, "0")}</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                {active && <span className="absolute left-2 top-2 rounded-full bg-white px-2 py-1 text-[9px] font-bold text-black">ĐANG XEM</span>}
+                <span className="absolute bottom-2 right-2 rounded bg-black/55 px-1.5 py-0.5 text-[9px] text-white/80">Tập {index + 1}</span>
+              </div>
+              <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+                <span className={`truncate text-xs font-semibold ${active ? "text-white" : "text-white/65"}`}>{formatEpisodeName(ep.name)}</span>
+                {active ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white shadow-[0_0_8px_white]" /> : <Play size={12} className="shrink-0 text-white/35" />}
+              </div>
             </Link>
-          ))}
-        </div>
+          );
+        })}
       </div>
-    </div>
+    </section>
   );
 }
 
