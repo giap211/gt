@@ -150,6 +150,46 @@ export function BottomDock() {
           }
           html[data-mobile-theme="light"] body .mobile-account-sheet button { color: #303746; }
           html[data-mobile-theme="light"] body .mobile-search-overlay { background: #f4f6fb !important; }
+
+          /* Home hero: fade into the same light surface used by the content below. */
+          html[data-mobile-theme="light"] body main > section:first-child {
+            background: #f4f6fb !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child > div:nth-child(2) {
+            background: linear-gradient(
+              to bottom,
+              rgba(244,246,251,0) 0%,
+              rgba(244,246,251,.76) 52%,
+              #f4f6fb 100%
+            ) !important;
+          }
+
+          /* Give the topic heading a deliberate hierarchy in light mode. */
+          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) h2 {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #263247 !important;
+            letter-spacing: -.01em;
+          }
+          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) h2::before {
+            content: "";
+            display: inline-block;
+            width: 3px;
+            height: 17px;
+            flex: 0 0 3px;
+            border-radius: 99px;
+            background: linear-gradient(180deg, #e8b94f, #d99a25);
+            box-shadow: 0 2px 8px rgba(217,154,37,.2);
+          }
+          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a {
+            border: 1px solid rgba(255,255,255,.42);
+            box-shadow: 0 5px 14px rgba(31,41,61,.12), inset 0 1px 0 rgba(255,255,255,.18);
+          }
+          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a span {
+            color: #fff !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,.22);
+          }
         }
       `}</style>
 
