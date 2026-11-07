@@ -11,8 +11,24 @@ type SearchItem = {
   year?: string | number;
 };
 
+function repairMojibake(value: unknown): string {
+  const text = String(value || "");
+  if (!/[ÃÂÄÅáº]/.test(text)) return text;
+  try {
+    return Buffer.from(text, "latin1").toString("utf8");
+  } catch {
+    return text;
+  }
+}
+
+function titlesMatch(a: string, b: string): boolean {
+  if (!a || !b) return false;
+  if (a === b) return true;
+  return (a.length >= 5 && b.includes(a)) || (b.length >= 5 && a.includes(b));
+}
+
 function normalizeTitle(value: unknown): string {
-  return String(value || "")
+  return repairMojibake(value)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/gi, "d")
