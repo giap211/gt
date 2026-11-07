@@ -13,6 +13,9 @@ import {
   X,
   Loader2,
   Film,
+  Bookmark,
+  Clock3,
+  LogOut,
 } from "lucide-react";
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
@@ -20,9 +23,10 @@ import { searchMovies, type ListMovie } from "@/lib/ophim-client";
 export function BottomDock() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, openAuth, openLibrary } = useMember();
+  const { user, openAuth, openLibrary, logout } = useMember();
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ListMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -71,10 +75,13 @@ export function BottomDock() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const handleAccount = () => {
-    if (user) openLibrary("favorites");
-    else openAuth();
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const handleDockNavigation = (event: React.MouseEvent<HTMLAnchorElement>, active: boolean) => {
+    if (active) { event.preventDefault(); scrollToTop(); }
   };
+
+  const handleAccount = () => setAccountOpen(true);
 
   const submitSearch = () => {
     const q = query.trim();
@@ -113,7 +120,7 @@ export function BottomDock() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Tìm phim, diễn viên..."
-                className="w-full h-11 rounded-full bg-white/[0.08] border border-white/10 pl-10 pr-10 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#ffd875]/50"
+                className="w-full h-11 rounded-full bg-white/[0.08] border border-white/10 pl-10 pr-10 text-base text-white outline-none placeholder:text-white/35 focus:border-[#ffd875]/50"
               />
               {query && (
                 <button
@@ -217,11 +224,35 @@ export function BottomDock() {
         </div>
       )}
 
+      {/* Account menu overlay */}
+      {accountOpen && (
+        <div className="lg:hidden fixed inset-0 z-[95] flex items-end justify-center bg-black/65 px-4 pb-[calc(env(safe-area-inset-bottom)+92px)] backdrop-blur-md" onClick={() => setAccountOpen(false)}>
+          <div className="w-full max-w-sm overflow-hidden rounded-[26px] border border-white/20 bg-[#171923]/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl" style={{ WebkitBackdropFilter: "blur(30px) saturate(170%)" }} onClick={(event) => event.stopPropagation()}>
+            <div className="mb-3 flex items-center justify-between border-b border-white/10 px-1 pb-3">
+              <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ffd875]">Tài khoản</p><p className="mt-1 truncate text-sm font-semibold text-white">{user ? user.username : "Chào mừng bạn"}</p></div>
+              <button type="button" onClick={() => setAccountOpen(false)} aria-label="Đóng menu tài khoản" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70"><X size={18} /></button>
+            </div>
+            {user ? (
+              <div className="space-y-1">
+                <button type="button" onClick={() => { setAccountOpen(false); openLibrary("favorites"); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm text-white/85 active:bg-white/10"><Bookmark size={18} className="text-[#ffd875]" /> Tủ phim của tôi</button>
+                <button type="button" onClick={() => { setAccountOpen(false); openLibrary("history"); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm text-white/85 active:bg-white/10"><Clock3 size={18} className="text-[#ffd875]" /> Phim đang xem</button>
+                <button type="button" onClick={async () => { setAccountOpen(false); await logout(); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm text-red-300 active:bg-white/10"><LogOut size={18} /> Đăng xuất</button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => { setAccountOpen(false); openAuth("login"); }} className="rounded-full bg-[#ffd875] px-3 py-3 text-sm font-bold text-black">Đăng nhập</button>
+                <button type="button" onClick={() => { setAccountOpen(false); openAuth("register"); }} className="rounded-full border border-white/20 bg-white/10 px-3 py-3 text-sm font-bold text-white">Đăng ký</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Bottom dock */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-3 pb-2.5 pt-1">
           <nav
-            className="pointer-events-auto grid grid-cols-5 items-end rounded-[26px] px-1.5 pt-1.5 pb-1.5
+            className="pointer-events-auto grid grid-cols-5 items-center rounded-[26px] px-1.5 py-2
               bg-white/[0.1] border border-white/20
               shadow-[0_8px_36px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.22)]
               backdrop-blur-2xl"
@@ -249,7 +280,8 @@ export function BottomDock() {
             {/* Series */}
             <Link
               href="/danh-sach/phim-bo"
-              className="flex flex-col items-center justify-end gap-0.5 py-1.5"
+              onClick={(event) => handleDockNavigation(event, isSeries)}
+              className="flex flex-col items-center justify-center gap-0.5 py-1"
             >
               <Tv
                 size={22}
@@ -269,7 +301,7 @@ export function BottomDock() {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="flex flex-col items-center justify-end gap-0.5 py-1.5"
+              className="flex h-full flex-col items-center justify-center py-1"
               aria-label="Tìm kiếm"
             >
               <div
@@ -281,15 +313,13 @@ export function BottomDock() {
               >
                 <Search size={24} strokeWidth={2.2} className="text-white" />
               </div>
-              <span className="mt-1 text-[10px] font-semibold text-white/55">
-                Tìm kiếm
-              </span>
             </button>
 
             {/* Movies */}
             <Link
               href="/danh-sach/phim-le"
-              className="flex flex-col items-center justify-end gap-0.5 py-1.5"
+              onClick={(event) => handleDockNavigation(event, isSingle)}
+              className="flex flex-col items-center justify-center gap-0.5 py-1"
             >
               <Clapperboard
                 size={22}
@@ -309,7 +339,7 @@ export function BottomDock() {
             <button
               type="button"
               onClick={handleAccount}
-              className="flex flex-col items-center justify-end gap-0.5 py-1.5"
+              className="flex flex-col items-center justify-center gap-0.5 py-1"
             >
               <UserCircle
                 size={22}
