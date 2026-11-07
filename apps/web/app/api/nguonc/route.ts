@@ -38,20 +38,35 @@ function normalizeTitle(value: unknown): string {
     .replace(/\s+/g, " ");
 }
 
-async function fetchJson(url: string): Promise<{ ok: boolean; status: number; data: any }> {
+async function fetchJson(url: string): Promise<{ ok: boolean; status: number; data: any; error?: string }> {
   try {
     const response = await fetch(url, {
       cache: "no-store",
+      redirect: "follow",
       headers: {
-        Accept: "application/json",
-        "User-Agent": "Mozilla/5.0 GiapTran/1.0",
+        Accept: "application/json, text/plain, */*",
+        "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        Referer: "https://phim.nguonc.com/",
+        Origin: "https://phim.nguonc.com",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
       },
       signal: AbortSignal.timeout(12000),
     });
-    if (!response.ok) return { ok: false, status: response.status, data: null };
-    return { ok: true, status: response.status, data: await response.json() };
-  } catch {
-    return { ok: false, status: 0, data: null };
+    const contentType = response.headers.get("content-type") || "";
+    const body = await response.text();
+    if (!response.ok) {
+      return { ok: false, status: response.status, data: null, error: body.slice(0, 500) };
+    }
+    try {
+      return { ok: true, status: response.status, data: JSON.parse(body) };
+    } catch {
+      return { ok: false, status: response.status, data: null, error: "Invalid JSON (" + contentType + "): " + body.slice(0, 300) };
+    }
+  } catch (error) {
+    return { ok: false, status: 0, data: null, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -136,6 +151,7 @@ export async function GET(request: NextRequest) {
       searchPayloadKeys: searchResponses.map((result) =>
         result.data && typeof result.data === "object" ? Object.keys(result.data) : [],
       ),
+      searchErrors: searchResponses.map((result) => result.error || null),
     });
   }
 
