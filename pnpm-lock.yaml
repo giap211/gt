@@ -98,6 +98,9 @@ importers:
 
   apps/web:
     dependencies:
+      "@rophim/database":
+        specifier: workspace:*
+        version: link:../../packages/database
       "@repo/ui":
         specifier: workspace:*
         version: link:../../packages/ui
