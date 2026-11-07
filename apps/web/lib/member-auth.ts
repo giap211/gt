@@ -225,7 +225,7 @@ export function verifyPassword(password: string, stored: string): boolean {
 }
 
 export function validUsername(username: string) {
-  return /^[a-z0-9_.-]{3,24}$/.test(username);
+  return /^[\p{L}\p{N}@]{3,20}$/u.test(username);
 }
 
 export async function createMemberSession(userId: string): Promise<string> {
