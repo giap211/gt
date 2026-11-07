@@ -135,7 +135,11 @@ export const memberClient = {
     const previousUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
     setLocalItem(STORAGE_KEYS.USER, res.user);
     if (previousUser?.email.toLowerCase() === res.user.email.toLowerCase()) {
-      await this.syncLocalHistoryToAccount(res.user.email);
+      try {
+        await this.syncLocalHistoryToAccount(res.user.email);
+      } catch (error) {
+        console.warn("[Member] Chưa thể đồng bộ lịch sử xem cũ:", error);
+      }
     }
     return res;
   },
