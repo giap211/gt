@@ -701,9 +701,13 @@ function EpisodeList({
               }`}
             >
               <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-white/15 to-white/[0.025]">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-3xl font-light text-white/20">{String(index + 1).padStart(2, "0")}</span>
-                </div>
+                {stillUrl ? (
+                  <Image src={stillUrl} alt={formatEpisodeName(ep.name)} fill sizes="(max-width: 1280px) 142px, 180px" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-3xl font-light text-white/20">{String(index + 1).padStart(2, "0")}</span>
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                 {active && <span className="absolute left-2 top-2 rounded-full bg-white px-2 py-1 text-[9px] font-bold text-black">ĐANG XEM</span>}
                 <span className="absolute bottom-2 right-2 rounded bg-black/55 px-1.5 py-0.5 text-[9px] text-white/80">Tập {index + 1}</span>
