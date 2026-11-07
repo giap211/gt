@@ -157,21 +157,23 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     let cancelled = false;
     setTmdbRuntimeSeconds(0);
     setEpisodeStills({});
-    const namedEpisode = currentEpisode.name.match(/s(\d{1,2})\s*e(\d{1,3})/i);
-    const simpleEpisode = currentEpisode.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) ||
-      currentEpisode.name.match(/^0*(\d+)$/);
-      currentEpisode.name.match(/^0*(\\d+)$/);
+    const movieId = movie?.tmdb?.id;
+    const episodeName = currentEpisode?.name ?? "";
+    if (!movieId || !episodeName) return;
+    const namedEpisode = episodeName.match(/s(\d{1,2})\s*e(\d{1,3})/i);
+    const simpleEpisode = episodeName.match(/(?:tập|episode|ep)\s*0*(\d+)/i) ||
+      episodeName.match(/^0*(\d+)$/);
     const isSeries =
-      movie.tmdb?.type?.toLowerCase() === "tv" ||
-      movie.type === "series" ||
-      movie.type === "tvshows" ||
+      movie?.tmdb?.type?.toLowerCase() === "tv" ||
+      movie?.type === "series" ||
+      movie?.type === "tvshows" ||
       Boolean(namedEpisode || simpleEpisode);
     if (!isSeries) return;
     const season = namedEpisode ? Number(namedEpisode[1]) : 1;
     const episode = namedEpisode ? Number(namedEpisode[2]) : Number(simpleEpisode?.[1] || 0);
     if (!episode) return;
     const params = new URLSearchParams({
-      id: String(movie.tmdb.id),
+      id: String(movieId),
       type: "tv",
       season: String(season),
       episode: String(episode),
