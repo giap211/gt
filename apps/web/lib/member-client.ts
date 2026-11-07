@@ -30,6 +30,8 @@ export interface CommentItem {
   };
 }
 
+export const WATCH_HISTORY_UPDATED_EVENT = "gt:watch-history-updated";
+
 export interface WatchHistoryItem {
   id: string;
   movieSlug: string;
@@ -253,7 +255,7 @@ export const memberClient = {
   },
 
   async history(): Promise<{ items: WatchHistoryItem[] }> {
-    return await request<{ items: WatchHistoryItem[] }>("/api/member/history");
+    return await request<{ items: WatchHistoryItem[] }>("/api/member/history", { cache: "no-store" });
   },
 
   async comments(movieSlug: string): Promise<{ items: CommentItem[] }> {
@@ -301,11 +303,21 @@ export const memberClient = {
 
   async saveHistory(
     input: MoviePayload & { episodeName: string; episodeSlug?: string; progressSeconds?: number; totalDurationSeconds?: number },
-  ): Promise<{ item: unknown }> {
-    return await request<{ item: unknown }>("/api/member/history", {
+  ): Promise<{ item: WatchHistoryItem }> {
+    const result = await request<{ item: WatchHistoryItem }>("/api/member/history", {
       method: "POST",
       body: JSON.stringify(input),
     });
+
+    // Notify mounted screens immediately after the database confirms the save.
+    if (typeof window !== "undefined" && result.item) {
+      window.dispatchEvent(new CustomEvent<WatchHistoryItem>(
+        WATCH_HISTORY_UPDATED_EVENT,
+        { detail: result.item },
+      ));
+    }
+
+    return result;
   },
 };
 

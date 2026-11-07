@@ -32,7 +32,10 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getMemberFromRequest(request);
     if (!user) return NextResponse.json({ message: "Vui lòng đăng nhập để xem lịch sử." }, { status: 401 });
-    return NextResponse.json({ items: await getMemberHistory(user.id) });
+    return NextResponse.json(
+      { items: await getMemberHistory(user.id) },
+      { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" } },
+    );
   } catch (error) {
     console.error("[MemberHistory] load failed", error);
     return NextResponse.json({ message: "Không thể tải lịch sử xem phim." }, { status: 500 });

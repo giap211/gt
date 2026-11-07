@@ -1,33 +1,75 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { MovieCarousel } from "@/components/movie-carousel";
 import { useMember } from "@/components/member-provider";
-import { memberClient, type WatchHistoryItem } from "@/lib/member-client";
+import { memberClient, WATCH_HISTORY_UPDATED_EVENT, type WatchHistoryItem } from "@/lib/member-client";
 
 export function ContinueWatchingSection() {
   const { user, loading: memberLoading } = useMember();
+  const pathname = usePathname();
   const [items, setItems] = useState<WatchHistoryItem[]>([]);
+  const previousPath = useRef(pathname);
+
+  const refreshHistory = useCallback(async () => {
+    if (!user) return;
+    try {
+      const result = await memberClient.history();
+      setItems(result.items || []);
+    } catch {
+      // Keep the last successfully loaded history if the network is unavailable.
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) {
       setItems([]);
       return;
     }
+    void refreshHistory();
+  }, [user, refreshHistory]);
 
-    let cancelled = false;
-    memberClient.history()
-      .then((result) => {
-        if (!cancelled) setItems(result.items || []);
-      })
-      .catch(() => {
-        if (!cancelled) setItems([]);
-      });
+  useEffect(() => {
+    if (!user) return;
+
+    const handleHistoryUpdated = (event: Event) => {
+      const item = (event as CustomEvent<WatchHistoryItem>).detail;
+      if (!item?.movieSlug || !item.episodeName) return;
+      setItems((current) => [
+        item,
+        ...current.filter((existing) =>
+          existing.movieSlug !== item.movieSlug ||
+          existing.episodeName !== item.episodeName
+        ),
+      ].slice(0, 30));
+    };
+
+    const refreshWhenActive = () => {
+      if (pathname === "/" && document.visibilityState === "visible") {
+        void refreshHistory();
+      }
+    };
+
+    window.addEventListener(WATCH_HISTORY_UPDATED_EVENT, handleHistoryUpdated);
+    window.addEventListener("focus", refreshWhenActive);
+    document.addEventListener("visibilitychange", refreshWhenActive);
+
+    // When another device updates the account, reconcile from Neon while Home is open.
+    const intervalId = window.setInterval(refreshWhenActive, 15000);
+
+    if (pathname === "/" && previousPath.current !== "/") {
+      void refreshHistory();
+    }
+    previousPath.current = pathname;
 
     return () => {
-      cancelled = true;
+      window.removeEventListener(WATCH_HISTORY_UPDATED_EVENT, handleHistoryUpdated);
+      window.removeEventListener("focus", refreshWhenActive);
+      document.removeEventListener("visibilitychange", refreshWhenActive);
+      window.clearInterval(intervalId);
     };
-  }, [user]);
+  }, [user, pathname, refreshHistory]);
 
   if (memberLoading || !user || items.length === 0) return null;
 
