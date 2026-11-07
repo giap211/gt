@@ -13,6 +13,10 @@ import {
   SkipBack,
   SkipForward,
   Check,
+  Settings2,
+  X,
+  Gauge,
+  MonitorPlay,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -61,6 +65,52 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [introSegment, setIntroSegment] = useState<{ startSeconds: number; endSeconds: number } | null>(null);
   const [introDebugStatus, setIntroDebugStatus] = useState("Chưa kiểm tra");
   const [copiedToast, setCopiedToast] = useState(false);
+  const [overlayOpen, setOverlayOpen] = useState(false);
+  const [showPlayerChrome, setShowPlayerChrome] = useState(true);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [isLandscape, setIsLandscape] = useState(false);
+
+  useEffect(() => {
+    const updateOrientation = () => setIsLandscape(window.matchMedia("(orientation: landscape)").matches);
+    updateOrientation();
+    window.addEventListener("resize", updateOrientation);
+    window.addEventListener("orientationchange", updateOrientation);
+    return () => {
+      window.removeEventListener("resize", updateOrientation);
+      window.removeEventListener("orientationchange", updateOrientation);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (overlayOpen || !showPlayerChrome) return;
+    const timeout = window.setTimeout(() => setShowPlayerChrome(false), 3200);
+    return () => window.clearTimeout(timeout);
+  }, [overlayOpen, showPlayerChrome]);
+
+  const handlePlayerTap = () => setShowPlayerChrome((visible) => !visible);
+
+  const changePlaybackRate = (rate: number) => {
+    setPlaybackRate(rate);
+    document.querySelectorAll<HTMLVideoElement>(".watch-player-shell video").forEach((video) => {
+      video.playbackRate = rate;
+    });
+  };
+
+  const enterPlayerFullscreen = async () => {
+    const shell = document.querySelector(".watch-player-shell") as HTMLElement | null;
+    try {
+      if (!document.fullscreenElement && shell?.requestFullscreen) {
+        await shell.requestFullscreen();
+        const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> };
+        await orientation.lock?.("landscape").catch(() => undefined);
+      } else if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      }
+    } catch {
+      // iOS Safari có thể không hỗ trợ khóa xoay; người dùng vẫn xoay máy thủ công.
+    }
+  };
+
   const { user } = useMember();
   const lastHistorySaveRef = useRef(0);
   const latestProgressRef = useRef<{ seconds: number; durationSeconds: number } | null>(null);
@@ -446,326 +496,108 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const suggestedMovies = transformListMovies(latestMovies);
 
   return (
-    <main className="watch-page min-h-screen bg-[#07090e] text-white pt-16 md:pt-20 overflow-x-hidden relative">
+    <main className="watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white" onPointerDown={() => setShowPlayerChrome(true)}>
       <style jsx global>{`
-        @media (max-width: 1023px) {
-          html[data-mobile-theme="light"] .watch-page {
-            background: #eef1f5 !important;
-            color: #263247 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page > div,
-          html[data-mobile-theme="light"] .watch-page .watch-meta-card,
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list {
-            color: #263247;
-          }
-          html[data-mobile-theme="light"] .watch-page [class~="text-white"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/90"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/85"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/80"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/75"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/70"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/65"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/60"] {
-            color: #344258 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/55"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/50"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/45"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/40"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/35"],
-          html[data-mobile-theme="light"] .watch-page [class~="text-white/30"] {
-            color: #748096 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page [class*="border-white/"] {
-            border-color: rgba(54, 68, 91, .14) !important;
-          }
-          html[data-mobile-theme="light"] .watch-page [class*="bg-white/"] {
-            background-color: rgba(255,255,255,.72);
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-meta-card {
-            background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,250,253,.82)) !important;
-            border: 1px solid rgba(67,82,108,.13) !important;
-            box-shadow: 0 10px 32px rgba(40,55,80,.09), inset 0 1px 0 #fff !important;
-            -webkit-backdrop-filter: blur(22px) saturate(145%);
-            backdrop-filter: blur(22px) saturate(145%);
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-meta-card h2 {
-            color: #253249 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-meta-card h2 span {
-            color: #a97922 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-meta-card button {
-            border-color: rgba(54,68,91,.14) !important;
-            color: #35435a !important;
-            background: rgba(255,255,255,.78);
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-meta-card button[class*="bg-[#ffd875]"] {
-            background: #e9bd61 !important;
-            color: #241b0d !important;
-            border-color: #e9bd61 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list h3 {
-            color: #263247 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-episode-card {
-            background: rgba(255,255,255,.88) !important;
-            border-color: rgba(57,72,97,.13) !important;
-            box-shadow: 0 5px 18px rgba(35,49,73,.055);
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-episode-card[class*="border-white/75"] {
-            border-color: #d8a844 !important;
-            background: #fffaf0 !important;
-            box-shadow: 0 6px 20px rgba(190,145,55,.14) !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-episode-card .episode-card-title {
-            color: #344258 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-episode-card[class*="border-white/75"] .episode-card-title {
-            color: #8a641f !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-server-picker {
-            background: rgba(255,255,255,.8) !important;
-            border-color: rgba(54,68,91,.14) !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-server-picker button:not([class*="bg-white"]) {
-            color: #68758a !important;
-          }
-          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-server-picker button[class*="bg-white"] {
-            background: #e9bd61 !important;
-            color: #241b0d !important;
-          }
-          html[data-mobile-theme="light"] .watch-page > div > div:first-child a {
-            color: #778398 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page > div > div:first-child h1 {
-            color: #263247 !important;
-          }
-          html[data-mobile-theme="light"] .watch-page > div > div:first-child span {
-            background: #fff !important;
-            color: #647087 !important;
-            border: 1px solid rgba(54,68,91,.12);
-          }
-          /* Keep the actual video surface cinematic in both themes. */
-          html[data-mobile-theme="light"] .watch-page .artplayer-app {
-            background: #000 !important;
-            border-color: rgba(0,0,0,.18) !important;
-            box-shadow: 0 18px 44px rgba(24,35,54,.2) !important;
-          }
+        .watch-player-page { width:100vw; height:100dvh; }
+        .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
+        .watch-player-shell > div { width:100%; height:100%; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
+        .watch-player-shell .artplayer-app { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
+        .watch-player-shell iframe { width:100% !important; height:100% !important; }
+        .watch-player-top { position:absolute; z-index:50; top:max(14px,env(safe-area-inset-top)); left:max(16px,env(safe-area-inset-left)); right:max(16px,env(safe-area-inset-right)); display:flex; align-items:center; justify-content:space-between; pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
+        .watch-player-top > * { pointer-events:auto; }
+        .watch-player-glass { background:rgba(15,18,27,.58); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
+        .watch-player-menu { position:absolute; z-index:60; top:50%; right:max(18px,env(safe-area-inset-right)); transform:translateY(-50%); width:min(390px,42vw); max-height:min(82dvh,720px); overflow:auto; border-radius:28px; padding:18px; background:linear-gradient(145deg,rgba(28,32,44,.94),rgba(12,15,23,.9)); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.16); }
+        .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
+        .watch-player-menu button:active { transform:scale(.98); }
+        .watch-player-menu .active-choice { color:#171717; background:#ffd875; border-color:#ffd875; }
+        .watch-player-round { width:54px;height:54px;border-radius:999px;display:grid;place-items:center; }
+        .watch-player-hidden { opacity:0; pointer-events:none; transform:translateY(-8px); }
+        .watch-player-rotate-hint { display:none; }
+        @media (orientation:landscape) and (max-width:1023px) {
+          .watch-player-shell .artplayer-app { height:100dvh !important; }
         }
+        @media (orientation:portrait) and (max-width:1023px) {
+          .watch-player-shell > div { height:auto !important; aspect-ratio:16/9 !important; }
+          .watch-player-shell .artplayer-app { height:auto !important; aspect-ratio:16/9 !important; }
+          .watch-player-menu { top:auto; bottom:max(12px,env(safe-area-inset-bottom)); left:12px; right:12px; transform:none; width:auto; max-height:72dvh; border-radius:24px; }
+          .watch-player-rotate-hint { display:block; position:absolute; z-index:30; bottom:18px; left:50%; transform:translateX(-50%); white-space:nowrap; color:rgba(255,255,255,.65); font-size:11px; }
+        }
+        @media (min-width:1024px) { .watch-player-menu { right:32px; } }
       `}</style>
-      {isCinemaMode && (
-        <div
-          onClick={() => setIsCinemaMode(false)}
-          className="fixed inset-0 bg-black/95 z-30 transition-opacity duration-500 cursor-pointer"
-          title="Bấm để thoát chế độ rạp phim"
-        />
-      )}
 
-      <div className="container mx-auto px-0 sm:px-4 lg:px-12 py-2 sm:py-6">
-        <div className="flex items-center justify-between gap-3 px-4 sm:px-0 mb-3 sm:mb-4">
-          <div className="min-w-0">
-            <Link href={`/phim/${movie.slug}`} className="text-[10px] sm:text-[11px] font-semibold text-white/45 hover:text-white transition-colors">
-              ‹  QUAY LẠI THÔNG TIN PHIM
-            </Link>
-            <div className="mt-1 flex items-center gap-2 min-w-0">
-              <h1 className="text-sm sm:text-base font-bold truncate">{movie.name}</h1>
-              <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/65">{formatEpisodeName(currentEpisode?.name || "Full")}</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => setIsCinemaMode(!isCinemaMode)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
-                isCinemaMode
-                  ? "bg-[#ffd875] text-black border-[#ffd875]"
-                  : "bg-white/5 hover:bg-white/10 text-white/70 border-white/10"
-              }`}
-            >
-              {isCinemaMode ? <Sun size={13} /> : <Moon size={13} />}
-              <span>{isCinemaMode ? "Bật đèn" : "Tắt đèn"}</span>
-            </button>
-
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 text-xs font-bold text-white/70 hover:text-white transition-all relative"
-            >
-              {copiedToast ? (
-                <Check size={13} className="text-green-400" />
-              ) : (
-                <Share2 size={13} />
-              )}
-              <span>{copiedToast ? "Đã sao chép link!" : "Chia sẻ"}</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col xl:flex-row gap-5 sm:gap-8">
-          <div className="flex-1 min-w-0">
-            <div
-              className={`relative mb-3 sm:mb-4 mx-0 sm:mx-0 transition-all duration-300 ${
-                isCinemaMode ? "z-40 shadow-[0_0_80px_rgba(0,0,0,0.9)]" : ""
-              }`}
-            >
-              {currentEpisode?.url && (
-                <VideoPlayer
-                  url={currentEpisode.url}
-                  poster={movie.thumb_url}
-                  title={`${movie.name} - ${formatEpisodeName(currentEpisode.name)}`}
-                  startAtSeconds={resumeAt}
-                  introStartSeconds={introSegment?.startSeconds}
-                  introEndSeconds={introSegment?.endSeconds}
-                  introDebugStatus={introDebugStatus}
-                  onProgress={handlePlaybackProgress}
-                />
-              )}
-            </div>
-
-            <div className="watch-meta-card mx-4 sm:mx-0 bg-gradient-to-br from-white/[0.10] to-white/[0.035] backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4 mb-5 sm:mb-6 shadow-[0_12px_45px_rgba(0,0,0,.18)]">
-              <div className="min-w-0">
-                <h2 className="text-base sm:text-xl font-bold tracking-tight truncate">
-                  {movie.name}{" "}
-                  <span className="text-[#ffd875]">
-                    — {formatEpisodeName(currentEpisode?.name)}
-                  </span>
-                </h2>
-                <p className="text-xs text-white/40 mt-0.5 truncate">
-                  {movie.origin_name}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 sm:gap-3">
-                {prevEp && (
-                  <button
-                    onClick={() =>
-                      router.push(
-                        `/xem-phim/${movie.slug}?tap=${prevEp.slug}&sv=${currentServer}`,
-                      )
-                    }
-                    className="flex items-center gap-1 px-3.5 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-xs font-bold text-white/80 transition-all"
-                  >
-                    <SkipBack size={14} />
-                    <span className="hidden sm:inline">
-                      Tập trước ({formatEpisodeName(prevEp.name)})
-                    </span>
-                  </button>
-                )}
-
-                {nextEp && (
-                  <button
-                    onClick={() =>
-                      router.push(
-                        `/xem-phim/${movie.slug}?tap=${nextEp.slug}&sv=${currentServer}`,
-                      )
-                    }
-                    className="flex items-center gap-1 px-4 py-2 bg-[#ffd875] hover:brightness-110 text-black rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
-                  >
-                    <span>
-                      Tập tiếp ({formatEpisodeName(nextEp.name)})
-                    </span>
-                    <SkipForward size={14} />
-                  </button>
-                )}
-
-                <MemberMovieActions
-                  movie={{
-                    movieSlug: movie.slug,
-                    movieTitle: movie.name,
-                    posterUrl: movie.poster_url,
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="xl:hidden mb-7 px-4 sm:px-0 space-y-6">
-              <EpisodeList
-                episodes={episodes}
-                currentEpisode={currentEpisode}
-                slug={movie.slug}
-                currentServer={currentServer}
-                onServerChange={handleServerChange}
-                episodeStills={episodeStills}
-              />
-            </div>
-
-            <CommentsPanel
-              movie={{
-                movieSlug: movie.slug,
-                movieTitle: movie.name,
-                posterUrl: movie.poster_url,
-              }}
-            />
-          </div>
-
-          <div className="hidden xl:block w-full xl:w-[380px] space-y-8 flex-shrink-0">
-            <div className="hidden xl:block">
-              <EpisodeList
-                episodes={episodes}
-                currentEpisode={currentEpisode}
-                slug={movie.slug}
-                currentServer={currentServer}
-                onServerChange={handleServerChange}
-                episodeStills={episodeStills}
-              />
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
-                  <Zap className="text-[#ffd875] fill-[#ffd875]" size={16} />
-                  Thành viên xem nhiều
-                </h3>
-              </div>
-              <div className="space-y-4">
-                {suggestedMovies.slice(0, 6).map((m) => (
-                  <Link
-                    key={m.id}
-                    href={`/phim/${m.slug}`}
-                    className="flex gap-4 group cursor-pointer"
-                  >
-                    <div className="relative w-16 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-white/5">
-                      <Image
-                        src={m.posterUrl}
-                        alt={m.title}
-                        fill
-                        sizes="64px"
-                        className="object-cover transition-transform group-hover:scale-110"
-                      />
-                    </div>
-                    <div className="flex flex-col justify-center gap-1">
-                      <h4 className="text-xs font-black uppercase tracking-tight line-clamp-1 group-hover:text-[#ffd875] transition-colors">
-                        {m.title}
-                      </h4>
-                      <p className="text-[10px] font-bold text-white/30 uppercase">
-                        {m.year} • {m.quality}
-                      </p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star
-                          className="text-[#ffd875] fill-[#ffd875]"
-                          size={10}
-                        />
-                        <span className="text-[9px] font-black text-[#ffd875]">
-                          10.0
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-10 sm:mt-16 px-4 sm:px-0">
-          <MovieCarousel title="Có thể bạn quan tâm" items={suggestedMovies} />
-        </div>
+      <div className="watch-player-shell" onClick={handlePlayerTap}>
+        {currentEpisode?.url && (
+          <VideoPlayer
+            url={currentEpisode.url}
+            poster={movie.thumb_url}
+            title={`${movie.name} - ${formatEpisodeName(currentEpisode.name)}`}
+            startAtSeconds={resumeAt}
+            introStartSeconds={introSegment?.startSeconds}
+            introEndSeconds={introSegment?.endSeconds}
+            introDebugStatus={introDebugStatus}
+            onProgress={handlePlaybackProgress}
+          />
+        )}
       </div>
-    </main>
-  );
-}
 
-interface EpisodeListProps {
+      <div className={`watch-player-top ${!showPlayerChrome && !overlayOpen ? "watch-player-hidden" : ""}`}>
+        <div className="flex min-w-0 items-center gap-3 rounded-full px-4 py-2.5 watch-player-glass">
+          <Link href={`/phim/${movie.slug}`} aria-label="Quay lại phim" className="grid h-8 w-8 shrink-0 place-items-center rounded-full hover:bg-white/10">
+            <span className="text-2xl leading-none">‹</span>
+          </Link>
+          <div className="min-w-0">
+            <div className="truncate text-sm font-bold sm:text-base">{movie.name}</div>
+            <div className="truncate text-[10px] text-white/65 sm:text-xs">{formatEpisodeName(currentEpisode?.name || "Đang tải tập")}</div>
+          </div>
+        </div>
+        <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass hover:border-[#ffd875]/70">
+          {overlayOpen ? <X size={23}/> : <Settings2 size={23}/>}
+        </button>
+      </div>
+
+      {overlayOpen && (
+        <>
+          <button aria-label="Đóng bảng tùy chọn" onClick={() => setOverlayOpen(false)} className="absolute inset-0 z-40 bg-black/25" />
+          <section className="watch-player-menu">
+            <div className="mb-4 flex items-center justify-between">
+              <div><p className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/45">Đang phát</p><h2 className="mt-1 text-lg font-bold">{formatEpisodeName(currentEpisode?.name)}</h2></div>
+              <button onClick={() => setOverlayOpen(false)} className="grid h-9 w-9 place-items-center rounded-full bg-white/10"><X size={18}/></button>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between px-1 text-xs font-semibold text-white/55"><span className="flex items-center gap-2"><MonitorPlay size={15}/> Máy chủ</span><span>{episodes[currentServer]?.server_name || "SV 1"}</span></div>
+              <div className="flex flex-wrap gap-2">
+                {episodes.map((server, index) => <button key={`${server.server_name}-${index}`} onClick={() => handleServerChange(index)} className={`rounded-full border px-3.5 py-2 text-xs font-semibold ${currentServer === index ? "active-choice" : "border-white/15 bg-white/[.06] text-white/75"}`}>{server.server_name}</button>)}
+              </div>
+            </div>
+            <div className="my-4 h-px bg-white/10"/>
+            <div className="mb-2 flex items-center justify-between px-1"><span className="flex items-center gap-2 text-xs font-semibold text-white/55"><List size={15}/> Danh sách tập</span><span className="text-[10px] text-white/40">{currentServerEpisodes.length} tập</span></div>
+            <div className="grid max-h-[min(34dvh,300px)] grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3">
+              {currentServerEpisodes.map((episode, index) => {
+                const active = episode.slug === currentEpisode?.slug;
+                const match = episode.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) || episode.name.match(/^0*(\d+)$/);
+                const number = Number(match?.[1] || index + 1);
+                const still = episodeStills[number];
+                return <button key={episode.slug} onClick={() => { setOverlayOpen(false); router.push(`/xem-phim/${movie.slug}?tap=${episode.slug}&sv=${currentServer}`); }} className={`overflow-hidden rounded-xl border text-left ${active ? "border-[#ffd875] bg-[#ffd875]/10" : "border-white/10 bg-white/[.045]"}`}>
+                  <div className="relative aspect-video bg-white/5">{still && <Image src={still} alt={formatEpisodeName(episode.name)} fill sizes="160px" className="object-cover"/>}<div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"/><span className="absolute bottom-1.5 left-2 text-[10px] font-bold text-white">{formatEpisodeName(episode.name) || `Tập ${index + 1}`}</span>{active && <span className="absolute right-1.5 top-1.5 rounded-full bg-[#ffd875] px-1.5 py-0.5 text-[8px] font-black text-black">ĐANG XEM</span>}</div>
+                </button>;
+              })}
+            </div>
+            <div className="my-4 h-px bg-white/10"/>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => changePlaybackRate(playbackRate === 1 ? 1.25 : playbackRate === 1.25 ? 1.5 : playbackRate === 1.5 ? 2 : 1)} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[.06] px-3 py-3 text-xs"><span className="flex items-center gap-2 text-white/65"><Gauge size={15}/> Tốc độ</span><b>{playbackRate.toFixed(2).replace(/0$/, "")}x</b></button>
+              <button onClick={enterPlayerFullscreen} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[.06] px-3 py-3 text-xs"><span className="flex items-center gap-2 text-white/65"><MonitorPlay size={15}/> Toàn màn hình</span><b>⛶</b></button>
+            </div>
+            <p className="mt-3 text-[10px] leading-relaxed text-white/35">Chất lượng và phụ đề chọn trong cài đặt gốc của trình phát nếu máy chủ hỗ trợ.</p>
+            <div className="mt-4 flex gap-2">
+              <button disabled={!prevEp} onClick={() => prevEp && router.push(`/xem-phim/${movie.slug}?tap=${prevEp.slug}&sv=${currentServer}`)} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[.06] py-3 text-xs font-semibold disabled:opacity-30"><SkipBack size={14}/> Tập trước</button>
+              <button disabled={!nextEp} onClick={() => nextEp && router.push(`/xem-phim/${movie.slug}?tap=${nextEp.slug}&sv=${currentServer}`)} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#ffd875] py-3 text-xs font-bold text-black disabled:opacity-30">Tập tiếp <SkipForward size={14}/></button>
+            </div>
+          </section>
+        </>
+      )}
+      {!isLandscape && <div className="watch-player-rotate-hint">Xoay ngang điện thoại để xem toàn màn hình</div>}
+    </main>
+  );interface EpisodeListProps {
   episodes: Episode[];
   currentEpisode: { name: string; url: string } | null;
   slug: string;
