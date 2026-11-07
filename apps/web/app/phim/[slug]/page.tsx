@@ -386,21 +386,12 @@ export default function MovieDetailPage({
             )}
           </div>
 
-          <div className="grid grid-cols-4 gap-2 border-y border-white/10 py-4">
-            <MemberMovieActions movie={{ movieSlug: movie.slug, movieTitle: movie.name, posterUrl: movie.poster_url }} />
-            <button type="button" onClick={() => setShowInfo(true)} className="flex flex-col items-center gap-2 text-white/65">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl">☆</span>
-              <span className="text-[11px]">Đánh giá</span>
-            </button>
-            <button type="button" onClick={() => { if (navigator.share) void navigator.share({ title: movie.name, url: window.location.href }); else void navigator.clipboard?.writeText(window.location.href); }} className="flex flex-col items-center gap-2 text-white/65">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl">↗</span>
-              <span className="text-[11px]">Chia sẻ</span>
-            </button>
-            <button type="button" onClick={() => document.getElementById("movie-episodes")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="flex flex-col items-center gap-2 text-white/65">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl">↓</span>
-              <span className="text-[11px]">Danh sách tập</span>
-            </button>
-          </div>
+          <section aria-label="Thao tác phim" className="py-1">
+            <MemberMovieActions
+              variant="mobile"
+              movie={{ movieSlug: movie.slug, movieTitle: movie.name, posterUrl: movie.poster_url }}
+            />
+          </section>
 
           {movie.actor?.length > 0 && (
             <section>
