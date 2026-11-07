@@ -612,34 +612,137 @@ export const searchMovies = async (
 };
 
 
-/** Lấy server dự phòng NguonC qua API nội bộ để tránh CORS khi gọi từ Client Component. */
+/** Lấy server dự phòng NguonC trực tiếp từ trình duyệt; nếu không chạy ở browser thì dùng API nội bộ. */
 async function getNguonCEpisodes(
   movie: Pick<DetailMovie, "name" | "origin_name" | "original_name" | "year">,
 ): Promise<Episode[]> {
+  const names = [movie.original_name, movie.origin_name, movie.name]
+    .filter((value): value is string => Boolean(value?.trim()));
+  if (!names.length) return [];
+
+  const normalize = (value: unknown) =>
+    String(value || "")
+      .normalize("NFD")
+      .replace(/[\\u0300-\\u036f]/g, "")
+      .replace(/đ/gi, "d")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .replace(/\\s+/g, " ");
+  const expected = Array.from(new Set(names.map(normalize).filter(Boolean)));
+  const matches = (a: string, b: string) =>
+    a === b || (a.length >= 5 && b.includes(a)) || (b.length >= 5 && a.includes(b));
+
   try {
+    // getMovieDetail được gọi trong Client Component nên ưu tiên kết nối browser,
+    // nơi đã được người dùng kiểm tra HTTP 200/CORS thành công.
+    if (typeof window !== "undefined") {
+      const searchName = movie.name || movie.origin_name || movie.original_name || "";
+      const searchUrl =
+        "https://phim.nguonc.com/api/films/search?keyword=" +
+        encodeURIComponent(searchName) +
+        "&page=1";
+      const searchResponse = await fetch(searchUrl, {
+        method: "GET",
+        mode: "cors",
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      });
+      if (!searchResponse.ok) {
+        console.warn("[NguonC] Browser search HTTP:", searchResponse.status);
+        return [];
+      }
+
+      const searchPayload = await searchResponse.json();
+      const items = Array.isArray(searchPayload?.items)
+        ? searchPayload.items
+        : Array.isArray(searchPayload?.data?.items)
+          ? searchPayload.data.items
+          : [];
+      const candidates = items
+        .filter((item: any) => item?.slug)
+        .map((item: any) => {
+          const titles = [item.original_name, item.origin_name, item.name, item.slug]
+            .map(normalize)
+            .filter(Boolean);
+          const titleMatch = titles.some((candidate: string) =>
+            expected.some((wanted) => matches(candidate, wanted)),
+          );
+          const year = Number(item.year) || 0;
+          const yearMatch = !movie.year || !year || year === Number(movie.year);
+          const score =
+            (titleMatch ? 20 : 0) +
+            (expected.some((wanted) => titles.some((candidate: string) => candidate === wanted)) ? 10 : 0) +
+            (yearMatch ? 5 : -100);
+          return { item, score, titleMatch };
+        })
+        .filter((entry: any) => entry.titleMatch && entry.score > 0)
+        .sort((a: any, b: any) => b.score - a.score);
+
+      const selected = candidates[0]?.item;
+      if (!selected?.slug) {
+        console.warn("[NguonC] Không tìm thấy phim khớp trong kết quả browser:", items.length);
+        return [];
+      }
+
+      const detailResponse = await fetch(
+        "https://phim.nguonc.com/api/film/" + encodeURIComponent(selected.slug),
+        {
+          method: "GET",
+          mode: "cors",
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+        },
+      );
+      if (!detailResponse.ok) {
+        console.warn("[NguonC] Browser detail HTTP:", detailResponse.status);
+        return [];
+      }
+
+      const detailPayload = await detailResponse.json();
+      const detailMovie =
+        detailPayload?.movie ||
+        detailPayload?.data?.movie ||
+        detailPayload?.data ||
+        null;
+      const groups = Array.isArray(detailMovie?.episodes) ? detailMovie.episodes : [];
+      const serverData = groups.flatMap((group: any) =>
+        (Array.isArray(group?.items) ? group.items : []).flatMap((episode: any) => {
+          const embed = episode?.embed || episode?.link_embed || episode?.url || "";
+          const m3u8 = episode?.m3u8 || episode?.link_m3u8 || "";
+          if (!embed && !m3u8) return [];
+          const episodeSlug = String(episode?.slug || episode?.name || "tap-unknown");
+          return [{
+            name: String(episode?.name || episodeSlug),
+            slug: episodeSlug,
+            filename: String(episode?.name || ""),
+            link_embed: String(embed),
+            link_m3u8: String(m3u8),
+          }];
+        }),
+      );
+      const uniqueEpisodes = Array.from(
+        new Map(serverData.map((episode: ServerData) => [episode.slug, episode])).values(),
+      );
+      return uniqueEpisodes.length
+        ? [{ server_name: "Dự phòng NguonC", server_data: uniqueEpisodes }]
+        : [];
+    }
+
     const params = new URLSearchParams();
     if (movie.name) params.set("name", movie.name);
     if (movie.origin_name) params.set("origin_name", movie.origin_name);
     if (movie.original_name) params.set("original_name", movie.original_name);
     if (movie.year) params.set("year", String(movie.year));
-
     const response = await fetch(`/api/nguonc?${params.toString()}`, {
       cache: "no-store",
       headers: { Accept: "application/json" },
     });
-    if (!response.ok) {
-      console.warn("[NguonC] API nội bộ trả lỗi:", response.status);
-      return [];
-    }
-
-    const payload = await response.json() as { episodes?: Episode[]; reason?: string };
-    if (!Array.isArray(payload.episodes)) {
-      console.warn("[NguonC] Không có server dự phòng:", payload.reason || "unknown");
-      return [];
-    }
-    return payload.episodes;
+    if (!response.ok) return [];
+    const payload = await response.json() as { episodes?: Episode[] };
+    return Array.isArray(payload.episodes) ? payload.episodes : [];
   } catch (error) {
-    console.warn("[NguonC] Không gọi được API nội bộ:", error);
+    console.warn("[NguonC] Không tải được server dự phòng:", error);
     return [];
   }
 }
