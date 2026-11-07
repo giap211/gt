@@ -627,6 +627,9 @@ async function getNguonCEpisodes(slug: string): Promise<Episode[]> {
     const payload = (await response.json()) as {
       status?: string;
       movie?: {
+        category?: Array<{
+          list?: Array<{ name?: string; slug?: string }>;
+        }>;
         episodes?: Array<{
           items?: Array<{
             name?: string;
@@ -639,6 +642,16 @@ async function getNguonCEpisodes(slug: string): Promise<Episode[]> {
     if (payload.status !== "success" || !Array.isArray(payload.movie?.episodes)) {
       return [];
     }
+
+    // Tôn trọng phạm vi đã chọn: không nhập nội dung thuộc nhóm 18+.
+    const isAdultCategory = (payload.movie.category || []).some((group) =>
+      (group.list || []).some((category) =>
+        /18\s*\+|phim\s*18|người\s*lớn|adult/i.test(
+          `${category.name || ""} ${category.slug || ""}`,
+        ),
+      ),
+    );
+    if (isAdultCategory) return [];
 
     const serverData = payload.movie.episodes.flatMap((server) =>
       (server.items || [])
