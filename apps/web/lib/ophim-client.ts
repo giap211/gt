@@ -575,6 +575,67 @@ export const searchMovies = async (
   }
 };
 
+
+/** Lấy thêm luồng Thuyết minh từ OPhim v1 nếu API có cung cấp cho phim này. */
+async function getOPhimNarrationEpisodes(slug: string): Promise<Episode[]> {
+  try {
+    const response = await fetch(
+      `https://ophim1.com/v1/api/phim/${encodeURIComponent(slug)}`,
+      {
+        next: { revalidate: 1800 },
+        headers: { Accept: "application/json", "User-Agent": "PhimLau/1.0" },
+      },
+    );
+    if (!response.ok) return [];
+
+    const payload = (await response.json()) as {
+      movie?: { lang?: string };
+      episodes?: Array<{ server_name?: string; server_data?: Partial<ServerData>[] }>;
+      data?: {
+        item?: {
+          lang?: string;
+          episodes?: Array<{ server_name?: string; server_data?: Partial<ServerData>[] }>;
+        };
+        episodes?: Array<{ server_name?: string; server_data?: Partial<ServerData>[] }>;
+      };
+    };
+
+    const item = payload.data?.item;
+    const movieLang = String(item?.lang || payload.movie?.lang || "").toLowerCase();
+    const rawEpisodes = item?.episodes || payload.data?.episodes || payload.episodes || [];
+    const narrationServers = rawEpisodes.filter((server) => {
+      const serverName = String(server.server_name || "").toLowerCase();
+      return /thuyết\s*minh|thuyet\s*minh|lồng\s*tiếng|long\s*tieng/.test(serverName) ||
+        /thuyết\s*minh|thuyet\s*minh/.test(movieLang);
+    });
+
+    return narrationServers
+      .map((server, index) => {
+        const serverData = (server.server_data || [])
+          .filter((episode) => episode.link_embed || episode.link_m3u8)
+          .map((episode) => ({
+            name: episode.name || "",
+            slug: episode.slug || `tap-${episode.name || ""}`,
+            filename: episode.filename || episode.name || "",
+            link_embed: episode.link_embed || "",
+            link_m3u8: episode.link_m3u8 || "",
+          }));
+        if (!serverData.length) return null;
+        const sourceName = String(server.server_name || "").trim();
+        return {
+          server_name: sourceName
+            ? `Thuyết minh · OPhim ${sourceName}`
+            : `Thuyết minh · OPhim #${index + 1}`,
+          server_data: serverData,
+        } satisfies Episode;
+      })
+      .filter((server): server is Episode => server !== null);
+  } catch (error) {
+    console.warn("Không tải được server Thuyết minh OPhim:", error);
+    return [];
+  }
+}
+
 export const getMovieDetail = async (
   slug: string,
 ): Promise<MovieDetailResponse | null> => {
@@ -595,11 +656,27 @@ export const getMovieDetail = async (
     movie.poster_url = formatImageUrl(movie.poster_url);
     movie.thumb_url = formatImageUrl(movie.thumb_url || movie.poster_url);
 
+    const baseEpisodes = data.episodes || [];
+    const narrationEpisodes = await getOPhimNarrationEpisodes(slug);
+    const existingEpisodeUrls = new Set(
+      baseEpisodes.flatMap((server) =>
+        (server.server_data || []).map((episode) => episode.link_m3u8 || episode.link_embed).filter(Boolean),
+      ),
+    );
+    const uniqueNarrationEpisodes = narrationEpisodes
+      .map((server) => ({
+        ...server,
+        server_data: server.server_data.filter(
+          (episode) => !existingEpisodeUrls.has(episode.link_m3u8 || episode.link_embed),
+        ),
+      }))
+      .filter((server) => server.server_data.length > 0);
+
     return {
       status: true,
       msg: data.msg || data.message || "done",
       movie,
-      episodes: data.episodes || [],
+      episodes: [...baseEpisodes, ...uniqueNarrationEpisodes],
     };
   } catch (error) {
     console.error(`Error fetching movie detail [${slug}]:`, error);
