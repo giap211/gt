@@ -231,7 +231,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#0b0d14] text-white font-sans overflow-x-hidden">
       <HeroSlider movies={data.hero.slice(0, 6)} />
 
-      <div className="flex flex-col gap-0 pb-16 -mt-4 relative z-30">
+      <div className="flex flex-col gap-0 pb-16 relative z-30">
         <ContinueWatchingSection />
         {loading ? (
           <div className="flex flex-col items-center justify-center py-48 space-y-4">
