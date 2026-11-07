@@ -115,6 +115,8 @@ export const MovieCard = ({
       ? Math.round((totalDurationSeconds as number) * 0.18)
       : 0;
   const showProgressBar = hasRuntime && (hasRealProgress || simulateProgressWhenEmpty);
+  const episodeNumber = episodeCurrent?.trim().replace(/^(?:tập\s*)+/i, "");
+  const episodeLabel = episodeNumber ? `Tập ${episodeNumber}` : null;
 
   return (
     <div className="group relative w-full">
@@ -170,7 +172,7 @@ export const MovieCard = ({
 
       {showProgressBar && hasRealProgress && (
         <div className="mt-1 flex items-center justify-between gap-2 px-0.5 text-[9px] font-semibold tabular-nums text-white/50">
-          <span>{formatPlaybackTime(displayProgressSeconds)} / {formatPlaybackTime(totalDurationSeconds || 0)}</span>
+          <span className="min-w-0 truncate">{episodeLabel ? `${episodeLabel} · ` : ""}{formatPlaybackTime(displayProgressSeconds)} / {formatPlaybackTime(totalDurationSeconds || 0)}</span>
           <span className="text-[#ffd875]">{Math.min(100, Math.round((displayProgressSeconds / (totalDurationSeconds || 1)) * 100))}%</span>
         </div>
       )}
