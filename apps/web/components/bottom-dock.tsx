@@ -368,11 +368,7 @@ export function BottomDock() {
               aria-label="Tìm kiếm"
             >
               <div
-                className="flex h-[44px] w-[44px] items-center justify-center rounded-full
-                  bg-gradient-to-br from-white/25 to-white/10
-                  border border-white/35
-                  shadow-[0_6px_20px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.45)]
-                  backdrop-blur-md active:scale-90 transition-transform"
+                className="flex h-[44px] w-[44px] items-center justify-center rounded-full bg-gradient-to-br from-white/25 to-white/10 border border-white/35 shadow-[0_6px_20px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.45)] backdrop-blur-md active:scale-90 transition-transform"
               >
                 <Search size={24} strokeWidth={2.2} className="text-white" />
               </div>
