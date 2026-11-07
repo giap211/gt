@@ -21,7 +21,7 @@
     "nextjs-toploader": "^3.9.17",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "swiper": "^12.1.2",
+    "swiper": "^14.4.0",
     "tailwind-merge": "^3.4.0",
     "@vercel/blob": "^2.3.1",
     "@rophim/database": "workspace:*"
