@@ -446,7 +446,114 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const suggestedMovies = transformListMovies(latestMovies);
 
   return (
-    <main className="min-h-screen bg-[#07090e] text-white pt-16 md:pt-20 overflow-x-hidden relative">
+    <main className="watch-page min-h-screen bg-[#07090e] text-white pt-16 md:pt-20 overflow-x-hidden relative">
+      <style jsx global>{`
+        @media (max-width: 1023px) {
+          html[data-mobile-theme="light"] .watch-page {
+            background: #eef1f5 !important;
+            color: #263247 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page > div,
+          html[data-mobile-theme="light"] .watch-page .watch-meta-card,
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list {
+            color: #263247;
+          }
+          html[data-mobile-theme="light"] .watch-page [class~="text-white"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/90"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/85"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/80"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/75"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/70"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/65"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/60"] {
+            color: #344258 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/55"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/50"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/45"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/40"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/35"],
+          html[data-mobile-theme="light"] .watch-page [class~="text-white/30"] {
+            color: #748096 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page [class*="border-white/"] {
+            border-color: rgba(54, 68, 91, .14) !important;
+          }
+          html[data-mobile-theme="light"] .watch-page [class*="bg-white/"] {
+            background-color: rgba(255,255,255,.72);
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-meta-card {
+            background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,250,253,.82)) !important;
+            border: 1px solid rgba(67,82,108,.13) !important;
+            box-shadow: 0 10px 32px rgba(40,55,80,.09), inset 0 1px 0 #fff !important;
+            -webkit-backdrop-filter: blur(22px) saturate(145%);
+            backdrop-filter: blur(22px) saturate(145%);
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-meta-card h2 {
+            color: #253249 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-meta-card h2 span {
+            color: #a97922 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-meta-card button {
+            border-color: rgba(54,68,91,.14) !important;
+            color: #35435a !important;
+            background: rgba(255,255,255,.78);
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-meta-card button[class*="bg-[#ffd875]"] {
+            background: #e9bd61 !important;
+            color: #241b0d !important;
+            border-color: #e9bd61 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list h3 {
+            color: #263247 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-episode-card {
+            background: rgba(255,255,255,.88) !important;
+            border-color: rgba(57,72,97,.13) !important;
+            box-shadow: 0 5px 18px rgba(35,49,73,.055);
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-episode-card[class*="border-white/75"] {
+            border-color: #d8a844 !important;
+            background: #fffaf0 !important;
+            box-shadow: 0 6px 20px rgba(190,145,55,.14) !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-episode-card .episode-card-title {
+            color: #344258 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-episode-card[class*="border-white/75"] .episode-card-title {
+            color: #8a641f !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-server-picker {
+            background: rgba(255,255,255,.8) !important;
+            border-color: rgba(54,68,91,.14) !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-server-picker button:not([class*="bg-white"]) {
+            color: #68758a !important;
+          }
+          html[data-mobile-theme="light"] .watch-page .watch-episode-list .watch-server-picker button[class*="bg-white"] {
+            background: #e9bd61 !important;
+            color: #241b0d !important;
+          }
+          html[data-mobile-theme="light"] .watch-page > div > div:first-child a {
+            color: #778398 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page > div > div:first-child h1 {
+            color: #263247 !important;
+          }
+          html[data-mobile-theme="light"] .watch-page > div > div:first-child span {
+            background: #fff !important;
+            color: #647087 !important;
+            border: 1px solid rgba(54,68,91,.12);
+          }
+          /* Keep the actual video surface cinematic in both themes. */
+          html[data-mobile-theme="light"] .watch-page .artplayer-app {
+            background: #000 !important;
+            border-color: rgba(0,0,0,.18) !important;
+            box-shadow: 0 18px 44px rgba(24,35,54,.2) !important;
+          }
+        }
+      `}</style>
       {isCinemaMode && (
         <div
           onClick={() => setIsCinemaMode(false)}
@@ -515,7 +622,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
               )}
             </div>
 
-            <div className="mx-4 sm:mx-0 bg-gradient-to-br from-white/[0.10] to-white/[0.035] backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4 mb-5 sm:mb-6 shadow-[0_12px_45px_rgba(0,0,0,.18)]">
+            <div className="watch-meta-card mx-4 sm:mx-0 bg-gradient-to-br from-white/[0.10] to-white/[0.035] backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4 mb-5 sm:mb-6 shadow-[0_12px_45px_rgba(0,0,0,.18)]">
               <div className="min-w-0">
                 <h2 className="text-base sm:text-xl font-bold tracking-tight truncate">
                   {movie.name}{" "}
@@ -679,7 +786,7 @@ function EpisodeList({
 
   const activeEpisodes = episodes[currentServer]?.server_data || [];
   return (
-    <section className="space-y-4">
+    <section className="watch-episode-list space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-[10px] uppercase tracking-[.22em] text-white/35 font-semibold">Tiếp tục hành trình</p>
@@ -689,7 +796,7 @@ function EpisodeList({
           </h3>
         </div>
         {episodes.length > 1 && (
-          <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] p-1">
+          <div className="watch-server-picker flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] p-1">
             {episodes.map((server, i) => (
               <button
                 key={`${server.server_name}-${i}`}
@@ -715,7 +822,7 @@ function EpisodeList({
             <Link
               key={ep.slug}
               href={`/xem-phim/${slug}?tap=${ep.slug}&sv=${currentServer}`}
-              className={`group relative flex w-[142px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border text-left transition-all xl:w-auto ${
+              className={`watch-episode-card group relative flex w-[142px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border text-left transition-all xl:w-auto ${
                 active ? "border-white/75 bg-white/[0.12] shadow-[0_8px_28px_rgba(255,255,255,.08)]" : "border-white/[0.08] bg-white/[0.045] hover:border-white/25"
               }`}
             >
@@ -732,7 +839,7 @@ function EpisodeList({
                 <span className="absolute bottom-2 right-2 rounded bg-black/55 px-1.5 py-0.5 text-[9px] text-white/80">Tập {index + 1}</span>
               </div>
               <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-                <span className={`truncate text-xs font-semibold ${active ? "text-white" : "text-white/65"}`}>{formatEpisodeName(ep.name)}</span>
+                <span className={`episode-card-title truncate text-xs font-semibold ${active ? "text-white" : "text-white/65"}`}>{formatEpisodeName(ep.name)}</span>
                 {active ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white shadow-[0_0_8px_white]" /> : <Play size={12} className="shrink-0 text-white/35" />}
               </div>
             </Link>
