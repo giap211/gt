@@ -614,12 +614,12 @@ export const searchMovies = async (
 function normalizeNguonCTitle(value: string): string {
   return value
     .normalize("NFD")
-    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/gi, "d")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim()
-    .replace(/\\s+/g, " ");
+    .replace(/\s+/g, " ");
 }
 
 /** Tìm phim trên NguonC bằng tên/tên gốc và năm, không phụ thuộc slug của PhimAPI. */
