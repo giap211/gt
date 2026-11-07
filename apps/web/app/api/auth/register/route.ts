@@ -1,0 +1,58 @@
+import { NextRequest, NextResponse } from "next/server";
+import {
+  attachMemberCookie,
+  createMemberSession,
+  hashPassword,
+  normalizeUsername,
+  publicMember,
+  validUsername,
+} from "@/lib/member-auth";
+import { prisma } from "@/lib/prisma";
+
+export const runtime = "nodejs";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const username = normalizeUsername(body.username);
+    const password = typeof body.password === "string" ? body.password : "";
+
+    if (!validUsername(username)) {
+      return NextResponse.json(
+        { message: "Tên tài khoản phải có 3–24 ký tự, chỉ gồm chữ thường, số, dấu chấm, gạch ngang hoặc gạch dưới." },
+        { status: 400 },
+      );
+    }
+    if (password.length < 8 || password.length > 128) {
+      return NextResponse.json(
+        { message: "Mật khẩu phải có từ 8 đến 128 ký tự." },
+        { status: 400 },
+      );
+    }
+
+    const email = `${username}@accounts.giaptran.local`;
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        name: username,
+        passwordHash: hashPassword(password),
+      },
+    });
+    const token = await createMemberSession(user.id);
+    const response = NextResponse.json({ user: publicMember(user) }, { status: 201 });
+    attachMemberCookie(response, token);
+    return response;
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json({ message: "Tên tài khoản này đã được sử dụng." }, { status: 409 });
+    }
+    console.error("[MemberAuth] register failed", error);
+    return NextResponse.json({ message: "Không thể tạo tài khoản lúc này. Vui lòng thử lại." }, { status: 500 });
+  }
+}
