@@ -507,7 +507,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   <span className="text-[#ffd875]">
                     — {formatEpisodeName(currentEpisode?.name)}
                   </span>
-                </h1>
+                </h2>
                 <p className="text-xs text-white/40 mt-0.5 truncate">
                   {movie.origin_name}
                 </p>
