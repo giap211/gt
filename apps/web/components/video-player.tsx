@@ -508,13 +508,6 @@ export const VideoPlayer = ({
           const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
             ? video.duration
             : knownDurationSeconds;
-          onProgress?.(video.currentTime, mediaDuration);
-        };
-        const reportFinalProgress = () => {
-          if (!Number.isFinite(video.currentTime)) return;
-          const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
-            ? video.duration
-            : knownDurationSeconds;
           onProgress?.(video.currentTime, mediaDuration, true);
         };
         video.addEventListener("timeupdate", reportProgress);
