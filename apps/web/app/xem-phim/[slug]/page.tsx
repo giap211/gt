@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, Suspense, use, type MouseEvent } from "react";
+import { useEffect, useState, useRef, useCallback, Suspense, use } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Play,
@@ -74,17 +74,11 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     return () => window.clearTimeout(timeout);
   }, [overlayOpen, showPlayerChrome]);
 
-  const handlePlayerTap = (event: MouseEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLElement | null;
-    // Không bật/tắt thanh chrome khi người xem thao tác với điều khiển của Artplayer.
-    if (target?.closest("button, a, input, .art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, .art-volume, .art-contextmenu")) return;
-    // Chạm trực tiếp vùng video/iframe phải hiện lại tên phim và thông tin tập.
-    if (target?.closest("video, iframe, .artplayer-app")) {
-      setShowPlayerChrome(true);
-      return;
-    }
-    setShowPlayerChrome((visible) => !visible);
-  };
+  const handlePlayerInteraction = useCallback(() => {
+    // Chạm vào player luôn gọi lại tiêu đề; không toggle khiến tiêu đề biến mất
+    // ngay ở lần chạm đầu tiên khi nó đang hiển thị.
+    setShowPlayerChrome(true);
+  }, []);
 
   const changePlaybackRate = (rate: number) => {
     setPlaybackRate(rate);
@@ -555,7 +549,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         @media (min-width:1024px) { .watch-player-menu { right:32px; } }
       `}</style>
 
-      <div className="watch-player-shell" onClick={handlePlayerTap}>
+      <div
+        className="watch-player-shell"
+        onClick={handlePlayerInteraction}
+        onPointerDownCapture={handlePlayerInteraction}
+        onFocusCapture={handlePlayerInteraction}
+      >
         {currentEpisode?.url && (
           <VideoPlayer
             url={currentEpisode.url}
@@ -566,6 +565,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             introEndSeconds={introSegment?.endSeconds}
             introDebugStatus={introDebugStatus}
             onProgress={handlePlaybackProgress}
+            onUserInteraction={handlePlayerInteraction}
           />
         )}
       </div>
