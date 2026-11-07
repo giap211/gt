@@ -64,7 +64,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const { user } = useMember();
   const lastHistorySaveRef = useRef(0);
   const latestProgressRef = useRef<{ seconds: number; durationSeconds: number } | null>(null);
-  const [tmdbRuntimeSeconds, setTmdbRuntimeSeconds] = useState(0);\n  const [episodeStills, setEpisodeStills] = useState<Record<number, string>>({});
+  const [tmdbRuntimeSeconds, setTmdbRuntimeSeconds] = useState(0);
+  const [episodeStills, setEpisodeStills] = useState<Record<number, string>>({});
   const resumeAt = Math.max(0, Number(searchParams.get("at") || 0));
 
   const tapParam = searchParams.get("tap");
