@@ -288,7 +288,7 @@ export default function MovieDetailPage({
   return (
     <main className="min-h-screen bg-[#0f111a] text-white">
       {/* HERO — shorter + lighter overlay so image shows */}
-      <div className="movie-detail-hero relative w-full h-[220px] md:h-[340px] lg:h-[420px]">
+      <div className="movie-detail-hero relative hidden w-full h-[420px] lg:block">
         <Image
           src={heroSrc}
           alt={movie.name}
