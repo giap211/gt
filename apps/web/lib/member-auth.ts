@@ -113,7 +113,8 @@ export async function saveMemberHistory(userId: string, input: Omit<StoredHistor
   return mutateStore((store) => {
     const now = new Date().toISOString();
     const index = store.history.findIndex((h) => h.userId === userId && h.movieSlug === input.movieSlug && h.episodeName === input.episodeName);
-    const item: StoredHistory = { ...input, id: index >= 0 ? store.history[index]?.id ?? randomBytes(12).toString("hex"), userId, updatedAt: now };
+    const existingItem = index >= 0 ? store.history[index] : undefined;
+    const item: StoredHistory = { ...input, id: existingItem?.id ?? randomBytes(12).toString("hex"), userId, updatedAt: now };
     if (index >= 0) store.history[index] = item; else store.history.unshift(item);
     store.history = store.history.filter((h) => h.userId !== userId || h.id === item.id || Date.now() - Date.parse(h.updatedAt) < 180 * 86400000);
     return item;
