@@ -30,6 +30,8 @@ export interface ListMovie {
 }
 
 export interface DetailMovie extends ListMovie {
+  /** Tên gốc bổ sung nếu API trả về trường original_name. */
+  original_name?: string;
   content: string;
   type: "series" | "single" | "hoathinh" | "tvshows";
   status: "completed" | "ongoing" | "trailer";
@@ -623,12 +625,18 @@ function normalizeNguonCTitle(value: string): string {
 }
 
 /** Tìm phim trên NguonC bằng tên/tên gốc và năm, không phụ thuộc slug của PhimAPI. */
-async function findNguonCMovieSlug(movie: Pick<DetailMovie, "name" | "origin_name" | "year">): Promise<string | null> {
+async function findNguonCMovieSlug(movie: Pick<DetailMovie, "name" | "origin_name" | "original_name" | "year">): Promise<string | null> {
+  // Thu thập tất cả biến thể tên từ PhimAPI/OPhim: tên hiển thị và tên gốc.
   const titles = Array.from(new Set(
-    [movie.name, movie.origin_name]
+    [movie.original_name, movie.origin_name, movie.name]
       .map((title) => String(title || "").trim())
       .filter((title) => title.length >= 2),
   ));
+  const sourceOriginalTitles = new Set(
+    [movie.original_name, movie.origin_name]
+      .map((title) => normalizeNguonCTitle(String(title || "")))
+      .filter(Boolean),
+  );
   if (!titles.length) return null;
 
   type NguonCSearchItem = {
@@ -666,16 +674,24 @@ async function findNguonCMovieSlug(movie: Pick<DetailMovie, "name" | "origin_nam
   for (const item of results.flat()) {
     if (!item.slug) continue;
     // NguonC dùng original_name; một số phiên bản/nguồn có thể trả origin_name.
-    const candidateTitles = [item.name, item.original_name, item.origin_name]
+    const candidateOriginalTitles = [item.original_name, item.origin_name]
       .filter((value): value is string => Boolean(value))
-      .map(normalizeNguonCTitle);
-    if (!candidateTitles.some((title) => expectedTitles.has(title))) continue;
+      .map(normalizeNguonCTitle)
+      .filter(Boolean);
+    const candidateTitles = [item.original_name, item.origin_name, item.name]
+      .filter((value): value is string => Boolean(value))
+      .map(normalizeNguonCTitle)
+      .filter(Boolean);
+
+    // Ưu tiên tên gốc của nguồn này khớp tên gốc của nguồn kia.
+    const originalNameMatch = candidateOriginalTitles.some((title) => sourceOriginalTitles.has(title));
+    const titleMatch = candidateTitles.some((title) => expectedTitles.has(title));
+    if (!originalNameMatch && !titleMatch) continue;
 
     const candidateYear = Number(item.year) || 0;
     if (expectedYear && candidateYear && candidateYear !== expectedYear) continue;
 
-    const titleMatch = candidateTitles.some((title) => expectedTitles.has(title));
-    const score = (titleMatch ? 10 : 0) + (
+    const score = (originalNameMatch ? 20 : 0) + (titleMatch ? 10 : 0) + (
       expectedYear && candidateYear === expectedYear ? 5 : candidateYear === 0 ? 1 : 0
     );
     const previous = candidates.get(item.slug);
@@ -687,7 +703,7 @@ async function findNguonCMovieSlug(movie: Pick<DetailMovie, "name" | "origin_nam
 }
 
 /** Lấy các tập từ NguonC và gom thành một server dự phòng riêng. */
-async function getNguonCEpisodes(movie: Pick<DetailMovie, "name" | "origin_name" | "year">): Promise<Episode[]> {
+async function getNguonCEpisodes(movie: Pick<DetailMovie, "name" | "origin_name" | "original_name" | "year">): Promise<Episode[]> {
   try {
     const slug = await findNguonCMovieSlug(movie);
     if (!slug) return [];
