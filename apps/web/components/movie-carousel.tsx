@@ -16,7 +16,7 @@ interface MovieCarouselProps {
   viewMoreLink?: string;
   /** gradient text color for title like Phim Lậu */
   titleGradient?: string;
-  layout?: "standard" | "ranked";
+  layout?: "standard" | "ranked" | "poster" | "compact";
   items: {
     id: string;
     title: string;
@@ -53,8 +53,8 @@ export const MovieCarousel = ({
   return (
     <section className="w-full relative py-3 md:py-5">
       <div className="container mx-auto px-3 md:px-6">
-        <div className={layout === "ranked" ? "flex flex-col gap-3" : "flex flex-col md:flex-row md:items-stretch gap-3 md:gap-5"}>
-          <div className={layout === "ranked" ? "flex items-center justify-between gap-3" : "md:w-[160px] lg:w-[180px] shrink-0 flex flex-col justify-center"}>
+        <div className={layout === "ranked" || layout === "poster" ? "flex flex-col gap-3" : "flex flex-col md:flex-row md:items-stretch gap-3 md:gap-5"}>
+          <div className={layout === "ranked" || layout === "poster" ? "flex items-center justify-between gap-3" : "md:w-[160px] lg:w-[180px] shrink-0 flex flex-col justify-center"}>
             <h2
               className={`text-xl md:text-2xl font-bold leading-tight mb-1 ${layout === "ranked" ? "md:text-2xl" : ""}`}
               style={{
@@ -97,7 +97,7 @@ export const MovieCarousel = ({
             <Swiper
               modules={[Navigation]}
               spaceBetween={10}
-              slidesPerView={layout === "ranked" ? 2.65 : 1.6}
+              slidesPerView={layout === "ranked" ? 2.65 : layout === "poster" ? 2.35 : layout === "compact" ? 1.85 : 1.6}
               navigation={{
                 prevEl: navigationPrevRef.current,
                 nextEl: navigationNextRef.current,
@@ -110,11 +110,11 @@ export const MovieCarousel = ({
                 }
               }}
               breakpoints={{
-                480: { slidesPerView: layout === "ranked" ? 3.1 : 2.1, spaceBetween: 10 },
-                768: { slidesPerView: layout === "ranked" ? 4.2 : 2.6, spaceBetween: 12 },
-                1024: { slidesPerView: layout === "ranked" ? 5.2 : 3.4, spaceBetween: 12 },
-                1280: { slidesPerView: layout === "ranked" ? 6.2 : 4.1, spaceBetween: 12 },
-                1536: { slidesPerView: layout === "ranked" ? 6.5 : 4.4, spaceBetween: 14 },
+                480: { slidesPerView: layout === "ranked" ? 3.1 : layout === "poster" ? 2.8 : layout === "compact" ? 2.5 : 2.1, spaceBetween: 10 },
+                768: { slidesPerView: layout === "ranked" ? 4.2 : layout === "poster" ? 3.8 : layout === "compact" ? 3.2 : 2.6, spaceBetween: 12 },
+                1024: { slidesPerView: layout === "ranked" ? 5.2 : layout === "poster" ? 4.8 : layout === "compact" ? 4 : 3.4, spaceBetween: 12 },
+                1280: { slidesPerView: layout === "ranked" ? 6.2 : layout === "poster" ? 5.8 : layout === "compact" ? 4.8 : 4.1, spaceBetween: 12 },
+                1536: { slidesPerView: layout === "ranked" ? 6.5 : layout === "poster" ? 6.2 : layout === "compact" ? 5.2 : 4.4, spaceBetween: 14 },
               }}
               className="w-full !overflow-hidden"
             >
@@ -152,7 +152,7 @@ export const MovieCarousel = ({
                       </div>
                     </div>
                   ) : (
-                    <MovieCard {...movie} variant="horizontal" />
+                    <MovieCard {...movie} variant={layout === "poster" ? "vertical" : "horizontal"} />
                   )}
                 </SwiperSlide>
               ))}

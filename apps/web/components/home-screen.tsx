@@ -248,6 +248,7 @@ export function HomeScreen() {
                 title="Điện ảnh Hàn Quốc"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)"
                 viewMoreLink="/quoc-gia/han-quoc"
+                layout="poster"
                 items={transformMovies(data.korean)}
               />
 
@@ -255,6 +256,7 @@ export function HomeScreen() {
                 title="Mọt phim Hoa Ngữ"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #f472b6 130%)"
                 viewMoreLink="/quoc-gia/trung-quoc"
+                layout="poster"
                 items={transformMovies(data.chinese)}
               />
 
@@ -262,6 +264,7 @@ export function HomeScreen() {
                 title="Thiên đường Phim Thái"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #34d399 130%)"
                 viewMoreLink="/quoc-gia/thai-lan"
+                layout="poster"
                 items={transformMovies(data.thai)}
               />
 
@@ -269,6 +272,7 @@ export function HomeScreen() {
                 title="Phim US-UK Mới"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #60a5fa 130%)"
                 viewMoreLink="/quoc-gia/au-my"
+                layout="poster"
                 items={transformMovies(data.usuk)}
               />
 
@@ -276,6 +280,7 @@ export function HomeScreen() {
                 title="Phim Thuyết Minh Mới Nhất"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #fbbf24 130%)"
                 viewMoreLink="/danh-sach/phim-thuyet-minh"
+                layout="compact"
                 items={transformMovies(data.dubbed.slice(0, 14))}
               />
 
@@ -283,6 +288,7 @@ export function HomeScreen() {
                 title="Phim Điện Ảnh Mới Coóng"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #fb923c 130%)"
                 viewMoreLink="/danh-sach/phim-le"
+                layout="poster"
                 items={transformMovies(data.single)}
               />
 
@@ -290,6 +296,7 @@ export function HomeScreen() {
                 title="Dấu ấn điện ảnh Việt"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #ef4444 130%)"
                 viewMoreLink="/quoc-gia/viet-nam"
+                layout="poster"
                 items={transformMovies(data.viet)}
               />
 
@@ -297,6 +304,7 @@ export function HomeScreen() {
                 title="Đêm Kinh Hoàng"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #a855f7 130%)"
                 viewMoreLink="/the-loai/kinh-di"
+                layout="poster"
                 items={transformMovies(data.horror)}
               />
 
@@ -304,6 +312,7 @@ export function HomeScreen() {
                 title="Mê Cung Phim Nhật"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #f43f5e 130%)"
                 viewMoreLink="/quoc-gia/nhat-ban"
+                layout="poster"
                 items={transformMovies(data.japanese)}
               />
 
@@ -311,6 +320,7 @@ export function HomeScreen() {
                 title="Phim Bộ Đã Hoàn Thành"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #22d3ee 130%)"
                 viewMoreLink="/danh-sach/phim-bo"
+                layout="poster"
                 items={transformMovies(data.series)}
               />
 
@@ -318,6 +328,7 @@ export function HomeScreen() {
                 title="Hành Động Nghẹt Thở"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #f97316 130%)"
                 viewMoreLink="/the-loai/hanh-dong"
+                layout="compact"
                 items={transformMovies(
                   uniqueMovies([...data.usuk, ...data.korean]).slice(0, 14),
                 )}
@@ -327,6 +338,7 @@ export function HomeScreen() {
                 title="Trinh Thám & Bí Ẩn"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #818cf8 130%)"
                 viewMoreLink="/the-loai/hinh-su"
+                layout="compact"
                 items={transformMovies(
                   uniqueMovies([...data.korean, ...data.japanese]).slice(0, 14),
                 )}
@@ -336,6 +348,7 @@ export function HomeScreen() {
                 title="Tinh Hoa Điện Ảnh Hồng Kông"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #eab308 130%)"
                 viewMoreLink="/quoc-gia/hong-kong"
+                layout="poster"
                 items={transformMovies(data.hongkong)}
               />
 
@@ -352,6 +365,7 @@ export function HomeScreen() {
                 title="Thế giới Anime"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #38bdf8 130%)"
                 viewMoreLink="/danh-sach/hoat-hinh"
+                layout="poster"
                 items={transformMovies(data.cartoon)}
               />
 
@@ -359,6 +373,7 @@ export function HomeScreen() {
                 title="Cổ Trang Trung Quốc"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #c084fc 130%)"
                 viewMoreLink="/the-loai/co-trang"
+                layout="poster"
                 items={transformMovies(data.costume)}
               />
 
