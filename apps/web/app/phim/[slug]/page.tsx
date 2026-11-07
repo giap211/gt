@@ -611,7 +611,7 @@ function TabContent({
     const selectedVersionEpisode = selectedVersion?.server_data?.[0];
     const versionName = selectedVersion?.server_name || "Vietsub 1";
     const versionHref = selectedVersionEpisode
-      ? `/xem-phim/${movie.slug}?tap=${encodeURIComponent(selectedVersionEpisode.slug || selectedVersionEpisode.name)}`
+      ? `/xem-phim/${movie.slug}?sv=${selectedServer}&tap=${encodeURIComponent(selectedVersionEpisode.slug || selectedVersionEpisode.name)}`
       : `/xem-phim/${movie.slug}`;
 
     return (
