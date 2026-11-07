@@ -358,6 +358,41 @@ export const getMoviesByType = async (
   }
 };
 
+/** Lấy danh sách phim thuyết minh mới cập nhật từ bộ lọc ngôn ngữ PhimAPI. */
+export const getMoviesByLanguage = async (
+  language: "vietsub" | "thuyet-minh" | "long-tieng",
+  page: number = 1,
+): Promise<LatestMoviesResponse> => {
+  try {
+    const response = await fetch(
+      `${PRIMARY_API_BASE}/v1/api/danh-sach?page=${page}&sort_field=modified.time&sort_type=desc&sort_lang=${language}`,
+      {
+        next: { revalidate: 1800 },
+        headers: { Accept: "application/json", "User-Agent": "PhimLau/1.0" },
+      },
+    );
+    if (!response.ok) return failedListResponse();
+
+    const data = (await response.json()) as V1ListApiResponse;
+    if (!data.data) return failedListResponse();
+
+    const cdn =
+      data.data.APP_DOMAIN_CDN_IMAGE ||
+      data.data.params?.cdnData ||
+      DEFAULT_CDN_IMAGE;
+
+    return {
+      status: true,
+      items: cleanAndFilterMovies(data.data.items || [], cdn),
+      pathImage: cdn,
+      pagination: data.data.params?.pagination || emptyPagination(),
+    };
+  } catch (error) {
+    console.error(`Error fetching movies by language [${language}]:`, error);
+    return failedListResponse();
+  }
+};
+
 const normalizeCountryIdentifier = (value: string): string =>
   value
     .normalize("NFD")
