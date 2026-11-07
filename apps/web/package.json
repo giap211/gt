@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
-    "@rophim/database": "workspace:*",
     "artplayer": "^5.3.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.0",
@@ -23,7 +22,8 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "swiper": "^12.1.2",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "@vercel/blob": "^2.3.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
