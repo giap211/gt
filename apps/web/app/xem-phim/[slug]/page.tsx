@@ -563,6 +563,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                 slug={movie.slug}
                 currentServer={currentServer}
                 onServerChange={handleServerChange}
+                episodeStills={episodeStills}
               />
             </div>
 
@@ -583,6 +584,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                 slug={movie.slug}
                 currentServer={currentServer}
                 onServerChange={handleServerChange}
+                episodeStills={episodeStills}
               />
             </div>
 
@@ -647,6 +649,7 @@ interface EpisodeListProps {
   slug: string;
   currentServer: number;
   onServerChange: (serverIndex: number) => void;
+  episodeStills: Record<number, string>;
 }
 
 function EpisodeList({
@@ -655,6 +658,7 @@ function EpisodeList({
   slug,
   currentServer,
   onServerChange,
+  episodeStills,
 }: EpisodeListProps) {
   if (!episodes || episodes.length === 0) return null;
 
