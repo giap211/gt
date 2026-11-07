@@ -26,7 +26,6 @@ import { Navbar } from "@/components/navbar";
 import { BottomDock } from "@/components/bottom-dock";
 import { Footer } from "@/components/footer";
 import { HideDevBadge } from "@/components/hide-dev-badge";
-import { ScrollToTop } from "@/components/scroll-to-top";
 import { MemberProvider } from "@/components/member-provider";
 import NextTopLoader from "nextjs-toploader";
 import { RouteScrollReset } from "@/components/route-scroll-reset";
@@ -68,7 +67,6 @@ export default function RootLayout({
           <Navbar />
           <div className="pb-24 lg:pb-0">{children}</div>
           <BottomDock />
-          <ScrollToTop />
           <Footer />
         </MemberProvider>
       </body>
