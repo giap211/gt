@@ -130,6 +130,12 @@ export default function MovieDetailPage({
     (episodes[0]?.server_data?.length || 0) > 1;
 
   const currentServerData = episodes[selectedServer]?.server_data || [];
+  // Nút Xem Ngay phải mở tập đầu của đúng bản chiếu đang được chọn,
+  // không để trang xem tự suy đoán và ưu tiên Thuyết minh.
+  const firstSelectedEpisode = currentServerData[0];
+  const watchHref = firstSelectedEpisode
+    ? `/xem-phim/${movie.slug}?sv=${selectedServer}&tap=${encodeURIComponent(firstSelectedEpisode.slug || firstSelectedEpisode.name)}`
+    : `/xem-phim/${movie.slug}?sv=${selectedServer}`;
   const imdbScore =
     movie.tmdb?.vote_average != null
       ? Number(movie.tmdb.vote_average).toFixed(1)
@@ -298,7 +304,7 @@ export default function MovieDetailPage({
         {/* center play — desktop */}
         <div className="absolute inset-0 hidden lg:flex items-center justify-center z-10 pointer-events-none">
           <Link
-            href={`/xem-phim/${movie.slug}`}
+            href={watchHref}
             className="pointer-events-auto w-16 h-16 rounded-full bg-[#ffd875] text-[#1a1a1a] flex items-center justify-center shadow-[0_0_32px_rgba(255,216,117,0.4)] hover:scale-105 transition-transform"
           >
             <Play size={26} className="fill-current ml-0.5" />
@@ -330,7 +336,7 @@ export default function MovieDetailPage({
           )}
 
           <Link
-            href={`/xem-phim/${movie.slug}`}
+            href={watchHref}
             className="mt-4 w-full max-w-xs inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#ffd875] to-[#f0c24d] text-[#1a1a1a] font-bold py-3 rounded-full"
           >
             <Play size={18} className="fill-current" />
@@ -461,7 +467,7 @@ export default function MovieDetailPage({
               {/* Action bar — aligns with top of poster card area */}
               <div className="flex items-center gap-4 bg-[#161822]/95 backdrop-blur-md border border-white/8 rounded-2xl px-5 py-3 shadow-xl">
                 <Link
-                  href={`/xem-phim/${movie.slug}`}
+                  href={watchHref}
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ffd875] to-[#f0c24d] text-[#1a1a1a] font-bold text-[15px] px-6 py-2.5 rounded-full shrink-0 hover:brightness-105"
                 >
                   <Play size={16} className="fill-current" />
