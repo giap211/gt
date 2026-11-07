@@ -535,3 +535,66 @@ body {
     transition: none;
   }
 }
+
+
+/* Liquid Glass UI refresh — applies to shared chrome and overlays, not movie artwork. */
+header.fixed {
+  background: linear-gradient(110deg, rgba(18,20,29,.82), rgba(28,30,40,.62) 55%, rgba(18,20,29,.78)) !important;
+  border-bottom: 1px solid rgba(255,255,255,.16);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  backdrop-filter: blur(26px) saturate(180%);
+  box-shadow: 0 10px 35px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.12);
+}
+header.fixed .absolute.top-full,
+header.fixed .fixed.inset-y-0,
+.fixed.z-\\[190\\] > div,
+.fixed.z-\\[200\\] > div {
+  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.055) 52%, rgba(255,216,117,.055)) !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  backdrop-filter: blur(22px) saturate(165%);
+  box-shadow: 0 18px 55px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.3), inset 0 -1px 0 rgba(255,255,255,.05);
+}
+header.fixed button,
+.fixed.z-\\[190\\] button,
+.fixed.z-\\[200\\] button,
+.artplayer-app button {
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+header.fixed button:hover,
+.fixed.z-\\[190\\] button:hover,
+.fixed.z-\\[200\\] button:hover {
+  border-color: rgba(255,255,255,.42);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 6px 20px rgba(0,0,0,.2);
+}
+header.fixed input,
+.fixed.z-\\[200\\] input {
+  background: rgba(255,255,255,.075) !important;
+  border-color: rgba(255,255,255,.19) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+header.fixed input:focus,
+.fixed.z-\\[200\\] input:focus {
+  border-color: rgba(255,216,117,.65) !important;
+  box-shadow: 0 0 0 3px rgba(255,216,117,.09), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.artplayer-app {
+  border: 1px solid rgba(255,255,255,.2);
+  box-shadow: 0 24px 65px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.artplayer-app .art-controls,
+.artplayer-app .art-bottom,
+.artplayer-app .art-contextmenus,
+.artplayer-app .art-settings,
+.artplayer-app .art-layer-auto-playback {
+  -webkit-backdrop-filter: blur(18px) saturate(155%);
+  backdrop-filter: blur(18px) saturate(155%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  header.fixed, header.fixed .absolute.top-full, header.fixed .fixed.inset-y-0,
+  .fixed.z-\\[190\\] > div, .fixed.z-\\[200\\] > div {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
