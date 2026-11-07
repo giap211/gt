@@ -611,6 +611,59 @@ export const searchMovies = async (
 };
 
 
+/** Lấy các tập từ NguonC và gom thành một server dự phòng riêng. */
+async function getNguonCEpisodes(slug: string): Promise<Episode[]> {
+  try {
+    if (!slug) return [];
+    const response = await fetch(
+      `https://phim.nguonc.com/api/film/${encodeURIComponent(slug)}`,
+      {
+        next: { revalidate: 1800 },
+        headers: { Accept: "application/json", "User-Agent": "PhimLau/1.0" },
+      },
+    );
+    if (!response.ok) return [];
+
+    const payload = (await response.json()) as {
+      status?: string;
+      movie?: {
+        episodes?: Array<{
+          items?: Array<{
+            name?: string;
+            slug?: string;
+            embed?: string;
+          }>;
+        }>;
+      };
+    };
+    if (payload.status !== "success" || !Array.isArray(payload.movie?.episodes)) {
+      return [];
+    }
+
+    const serverData = payload.movie.episodes.flatMap((server) =>
+      (server.items || [])
+        .filter((episode) => Boolean(episode.embed))
+        .map((episode) => ({
+          name: episode.name || episode.slug || "Tập",
+          slug: episode.slug || `tap-${episode.name || "unknown"}`,
+          filename: episode.name || "",
+          link_embed: episode.embed || "",
+          link_m3u8: "",
+        })),
+    );
+
+    const uniqueEpisodes = Array.from(
+      new Map(serverData.map((episode) => [episode.slug, episode])).values(),
+    );
+    return uniqueEpisodes.length
+      ? [{ server_name: "Dự phòng", server_data: uniqueEpisodes }]
+      : [];
+  } catch (error) {
+    console.warn("Không tải được server dự phòng NguonC:", error);
+    return [];
+  }
+}
+
 /** Lấy thêm luồng Thuyết minh từ OPhim v1 nếu API có cung cấp cho phim này. */
 async function getOPhimNarrationEpisodes(slug: string): Promise<Episode[]> {
   try {
@@ -692,7 +745,10 @@ export const getMovieDetail = async (
     movie.thumb_url = formatImageUrl(movie.thumb_url || movie.poster_url);
 
     const baseEpisodes = data.episodes || [];
-    const narrationEpisodes = await getOPhimNarrationEpisodes(slug);
+    const [narrationEpisodes, nguoncEpisodes] = await Promise.all([
+      getOPhimNarrationEpisodes(slug),
+      getNguonCEpisodes(slug),
+    ]);
     const existingEpisodeUrls = new Set(
       baseEpisodes.flatMap((server) =>
         (server.server_data || []).map((episode) => episode.link_m3u8 || episode.link_embed).filter(Boolean),
@@ -711,7 +767,7 @@ export const getMovieDetail = async (
       status: true,
       msg: data.msg || data.message || "done",
       movie,
-      episodes: [...baseEpisodes, ...uniqueNarrationEpisodes],
+      episodes: [...baseEpisodes, ...uniqueNarrationEpisodes, ...nguoncEpisodes],
     };
   } catch (error) {
     console.error(`Error fetching movie detail [${slug}]:`, error);
