@@ -8,6 +8,9 @@ type TmdbRuntimeResponse = {
 };
 
 type TmdbEpisodeRuntimeResponse = { runtime?: number | null };
+type TmdbSeasonResponse = {
+  episodes?: Array<{ episode_number?: number; still_path?: string | null }>;
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -17,7 +20,7 @@ export async function GET(request: Request) {
   const episode = Number(searchParams.get("episode") || 0);
 
   if (!/^\d+$/.test(id)) {
-    return NextResponse.json({ runtimeSeconds: 0 }, { status: 400 });
+    return NextResponse.json({ runtimeSeconds: 0, episodeStills: [] }, { status: 400 });
   }
 
   const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
@@ -34,6 +37,23 @@ export async function GET(request: Request) {
     };
     const authQuery = !accessToken && apiKey ? `?api_key=${encodeURIComponent(apiKey)}` : "";
     let runtimeMinutes = 0;
+    let episodeStills: Array<{ episodeNumber: number; stillPath: string }> = [];
+
+    if (type === "tv" && Number.isInteger(season) && season >= 0) {
+      const seasonUrl = new URL(`https://api.themoviedb.org/3/tv/${id}/season/${season}`);
+      seasonUrl.searchParams.set("language", "en-US");
+      if (!accessToken && apiKey) seasonUrl.searchParams.set("api_key", apiKey);
+      const seasonResponse = await fetch(seasonUrl, { headers, next: { revalidate } });
+      if (seasonResponse.ok) {
+        const seasonData = (await seasonResponse.json()) as TmdbSeasonResponse;
+        episodeStills = (seasonData.episodes || [])
+          .filter((item) => Number(item.episode_number) > 0 && Boolean(item.still_path))
+          .map((item) => ({
+            episodeNumber: Number(item.episode_number),
+            stillPath: String(item.still_path),
+          }));
+      }
+    }
 
     // For series, prefer the selected episode's own runtime instead of the
     // show's average episode_run_time.
@@ -72,7 +92,7 @@ export async function GET(request: Request) {
       : 0;
 
     return NextResponse.json(
-      { runtimeSeconds },
+      { runtimeSeconds, episodeStills },
       {
         headers: {
           "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
