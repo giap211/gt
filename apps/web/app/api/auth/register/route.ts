@@ -5,7 +5,10 @@ export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json().catch(() => ({}));
+    const parsed = await request.json().catch(() => ({}));
+    const body = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as Record<string, unknown>
+      : {};
     const username = normalizeUsername(body.username);
     const password = typeof body.password === "string" ? body.password : "";
     if (!validUsername(username)) {
@@ -15,7 +18,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Mật khẩu phải có từ 8 đến 128 ký tự." }, { status: 400 });
     }
     const user = await registerMember(username, hashPassword(password));
-    const token = createMemberSession(user.id);
+    const token = await createMemberSession(user.id);
     const response = NextResponse.json({ user: publicMember(user) }, { status: 201 });
     attachMemberCookie(response, token);
     return response;

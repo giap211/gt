@@ -5,7 +5,10 @@ export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json().catch(() => ({}));
+    const parsed = await request.json().catch(() => ({}));
+    const body = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as Record<string, unknown>
+      : {};
     const username = normalizeUsername(body.username);
     const password = typeof body.password === "string" ? body.password : "";
     if (!username || !password) {
@@ -15,8 +18,7 @@ export async function POST(request: NextRequest) {
     if (!user || !verifyPassword(password, user.passwordHash)) {
       return NextResponse.json({ message: "Tên tài khoản hoặc mật khẩu không đúng." }, { status: 401 });
     }
-    // Signing a cookie is local CPU work; login performs no Blob write.
-    const token = createMemberSession(user.id);
+    const token = await createMemberSession(user.id);
     const response = NextResponse.json({ user: publicMember(user) });
     attachMemberCookie(response, token);
     return response;

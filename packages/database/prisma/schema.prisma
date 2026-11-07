@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model Movie {
@@ -30,6 +31,7 @@ model User {
   passwordHash String
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  legacyHistoryMigratedAt DateTime?
   sessions     Session[]
   favorites    Favorite[]
   comments     Comment[]
@@ -98,7 +100,7 @@ model WatchHistory {
   movieTitle            String
   posterUrl             String?
   episodeName           String
-  episodeSlug            String?
+  episodeSlug           String?
   progressSeconds       Int      @default(0)
   totalDurationSeconds  Int      @default(0)
   updatedAt             DateTime @updatedAt
