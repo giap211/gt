@@ -20,6 +20,7 @@ interface VideoPlayerProps {
   introEndSeconds?: number;
   introDebugStatus?: string;
   onProgress?: (seconds: number, durationSeconds: number, force?: boolean) => void;
+  onUserInteraction?: () => void;
 }
 
 export const VideoPlayer = ({
@@ -32,6 +33,7 @@ export const VideoPlayer = ({
   introEndSeconds,
   introDebugStatus = "Chưa có trạng thái API",
   onProgress,
+  onUserInteraction,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
   const introSegmentRef = useRef({
@@ -566,6 +568,10 @@ export const VideoPlayer = ({
           video.play().catch(() => {});
         };
 
+        // Gọi lại thanh tiêu đề ngay khi người dùng chạm player.
+        const onPlayerPointerDown = () => onUserInteraction?.();
+        container.addEventListener("pointerdown", onPlayerPointerDown, { passive: true });
+
         // Chỉ sử dụng pointerup, không dùng click + touchend cùng lúc
         const onPointerUp = (e: PointerEvent) => {
           const target = e.target as HTMLElement | null;
@@ -612,6 +618,7 @@ export const VideoPlayer = ({
           | undefined;
 
         (art as any).__seekCleanup = () => {
+          container.removeEventListener("pointerdown", onPlayerPointerDown);
           container.removeEventListener(
             "pointerup",
             onPointerUp,
@@ -678,11 +685,15 @@ export const VideoPlayer = ({
           .forEach((el) => el.remove());
       }
     };
-  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress]);
+  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, onUserInteraction]);
 
   if (isEmbed) {
     return (
-      <div className="w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
+      <div
+        className="w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10"
+        onPointerDownCapture={() => onUserInteraction?.()}
+        onFocusCapture={() => onUserInteraction?.()}
+      >
         <iframe
           src={url}
           title={title || "Phim Lậu Player"}
