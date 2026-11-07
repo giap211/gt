@@ -79,24 +79,24 @@ export function MemberMovieActions({ movie, variant = "default" }: { movie: Movi
         className={actionClass}
       >
         <Bell size={mobile ? 20 : 18} />
-        <span className="text-[10px]">Theo dõi</span>
+        <span className={mobile ? "text-[10px] font-medium" : "text-[10px]"}>Theo dõi</span>
       </button>
 
       <button
         onClick={saveToLibrary}
         disabled={pending}
-        className="flex flex-col items-center gap-0.5 text-white/60 hover:text-white transition-colors"
+        className={actionClass}
       >
         <Plus size={mobile ? 20 : 18} />
-        <span className="text-[10px]">Thêm vào</span>
+        <span className={mobile ? "text-[10px] font-medium" : "text-[10px]"}>Thêm vào</span>
       </button>
 
       <button
         onClick={shareMovie}
-        className="flex flex-col items-center gap-0.5 text-white/60 hover:text-white transition-colors"
+        className={actionClass}
       >
         <Send size={mobile ? 20 : 18} />
-        <span className="text-[10px]">Chia sẻ</span>
+        <span className={mobile ? "text-[10px] font-medium" : "text-[10px]"}>Chia sẻ</span>
       </button>
     </div>
   );
