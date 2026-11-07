@@ -95,16 +95,30 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             requestedServerIndex >= 0 &&
             requestedServerIndex < merged.length &&
             (!tapParam || merged[requestedServerIndex]?.server_data?.some((episode) => episode.slug === tapParam));
-          const matchedServerIndex = tapParam
-            ? merged.findIndex((server) =>
-                server.server_data?.some((episode) => episode.slug === tapParam),
-              )
-            : -1;
+          const narrationServerIndex = merged.findIndex((server) =>
+            /thuyết minh|thuyet minh|lồng tiếng|long tieng/i.test(server.server_name),
+          );
+          const matchedServerIndexes = tapParam
+            ? merged
+                .map((server, index) =>
+                  server.server_data?.some((episode) => episode.slug === tapParam)
+                    ? index
+                    : -1,
+                )
+                .filter((index) => index >= 0)
+            : [];
+          // Khi cùng một tập có ở nhiều server, ưu tiên Thuyết minh.
+          const matchedServerIndex =
+            matchedServerIndexes.includes(narrationServerIndex)
+              ? narrationServerIndex
+              : matchedServerIndexes[0] ?? -1;
           const selectedServerIndex = validRequestedServer
             ? requestedServerIndex
             : matchedServerIndex >= 0
               ? matchedServerIndex
-              : 0;
+              : narrationServerIndex >= 0
+                ? narrationServerIndex
+                : 0;
           setCurrentServer(selectedServerIndex);
 
           const selectedServer = merged[selectedServerIndex];
@@ -440,7 +454,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   <button
                     onClick={() =>
                       router.push(
-                        `/xem-phim/${movie.slug}?tap=${prevEp.slug}`,
+                        `/xem-phim/${movie.slug}?tap=${prevEp.slug}&sv=${currentServer}`,
                       )
                     }
                     className="flex items-center gap-1 px-3.5 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-xs font-bold text-white/80 transition-all"
@@ -456,7 +470,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   <button
                     onClick={() =>
                       router.push(
-                        `/xem-phim/${movie.slug}?tap=${nextEp.slug}`,
+                        `/xem-phim/${movie.slug}?tap=${nextEp.slug}&sv=${currentServer}`,
                       )
                     }
                     className="flex items-center gap-1 px-4 py-2 bg-[#ffd875] hover:brightness-110 text-black rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
@@ -653,7 +667,7 @@ function EpisodeList({
           {episodes[currentServer]?.server_data.map((ep: ServerData) => (
             <Link
               key={ep.slug}
-              href={`/xem-phim/${slug}?tap=${ep.slug}`}
+              href={`/xem-phim/${slug}?tap=${ep.slug}&sv=${currentServer}`}
               className={`h-11 flex items-center justify-center rounded-xl text-xs font-black transition-all border ${
                 currentEpisode?.name === ep.name
                   ? "bg-[#ffd875] text-black border-[#ffd875] shadow-[0_0_15px_rgba(255,216,117,0.2)]"
