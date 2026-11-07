@@ -288,7 +288,7 @@ export default function MovieDetailPage({
   return (
     <main className="min-h-screen bg-[#0f111a] text-white">
       {/* HERO — shorter + lighter overlay so image shows */}
-      <div className="relative w-full h-[220px] md:h-[340px] lg:h-[420px]">
+      <div className="movie-detail-hero relative w-full h-[220px] md:h-[340px] lg:h-[420px]">
         <Image
           src={heroSrc}
           alt={movie.name}
@@ -299,7 +299,7 @@ export default function MovieDetailPage({
           className="object-cover object-top"
         />
         {/* soft bottom fade only */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f111a] via-[#0f111a]/25 to-black/20" />
+        <div className="movie-detail-hero-fade absolute inset-0 bg-gradient-to-t from-[#0f111a] via-[#0f111a]/25 to-black/20" />
 
         {/* center play — desktop */}
         <div className="absolute inset-0 hidden lg:flex items-center justify-center z-10 pointer-events-none">
@@ -313,7 +313,7 @@ export default function MovieDetailPage({
       </div>
 
       {/* ========== MOBILE ========== */}
-      <div className="lg:hidden relative z-10 -mt-16 px-4 pb-6">
+      <div className="movie-detail-content lg:hidden relative z-10 -mt-16 px-4 pb-6">
         <div className="flex flex-col items-center">
           <div className="relative w-[130px] aspect-[2/3] rounded-xl overflow-hidden border border-white/10 shadow-2xl mb-3">
             <Image src={movie.poster_url} alt={movie.name} fill priority sizes="130px" className="object-cover" />

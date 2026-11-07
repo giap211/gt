@@ -151,11 +151,25 @@ export function BottomDock() {
           html[data-mobile-theme="light"] body .mobile-account-sheet button { color: #303746; }
           html[data-mobile-theme="light"] body .mobile-search-overlay { background: #eef1f5 !important; }
 
-          /* Home hero: fade into the same light surface used by the content below. */
+          /* Home hero: preserve readable cinematic text over the image. */
           html[data-mobile-theme="light"] body main > section:first-child {
             background: #eef1f5 !important;
           }
-          /* Only recolor the fade overlay inside each hero slide, never the six film thumbnails. */
+          html[data-mobile-theme="light"] body main > section:first-child a {
+            color: #fff !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child a h1 {
+            color: #fff !important;
+            text-shadow: 0 2px 5px rgba(0,0,0,.9), 0 5px 18px rgba(0,0,0,.72);
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .container p {
+            color: #ffe3a0 !important;
+            text-shadow: 0 2px 5px rgba(0,0,0,.9);
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .container span {
+            text-shadow: 0 1px 3px rgba(0,0,0,.8);
+          }
+          /* Fade the home hero into the soft light page surface, not over the thumbnail dots. */
           html[data-mobile-theme="light"] body main > section:first-child .swiper-slide > div.pointer-events-none {
             background: linear-gradient(
               to bottom,
@@ -166,6 +180,37 @@ export function BottomDock() {
           }
           html[data-mobile-theme="light"] body main > section:first-child .hero-cast-slider .swiper-slide > div {
             background-color: #292c38 !important;
+            border-color: rgba(255,255,255,.45) !important;
+          }
+          /* Detail-page hero fades into the same light surface as its content. */
+          html[data-mobile-theme="light"] body .movie-detail-hero {
+            background: #eef1f5 !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-hero-fade {
+            background: linear-gradient(
+              to bottom,
+              rgba(238,241,245,0) 0%,
+              rgba(238,241,245,.38) 38%,
+              rgba(238,241,245,.88) 72%,
+              #eef1f5 100%
+            ) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-content h1 {
+            color: #263247 !important;
+            text-shadow: none !important;
+            letter-spacing: -.025em;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-content > p {
+            color: #96702b !important;
+            font-weight: 600;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-content > button {
+            color: #8a641f !important;
+          }
+          /* Remove the heavy drop shadows from the topic chips in light mode. */
+          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a {
+            box-shadow: none !important;
+            border: 1px solid rgba(255,255,255,.32);
           }
 
           /* Give the topic heading a deliberate hierarchy in light mode. */
@@ -185,10 +230,6 @@ export function BottomDock() {
             border-radius: 99px;
             background: linear-gradient(180deg, #e8b94f, #d99a25);
             box-shadow: 0 2px 8px rgba(217,154,37,.2);
-          }
-          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a {
-            border: 1px solid rgba(255,255,255,.42);
-            box-shadow: 0 5px 14px rgba(31,41,61,.12), inset 0 1px 0 rgba(255,255,255,.18);
           }
           html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a span {
             color: #fff !important;

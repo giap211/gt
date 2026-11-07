@@ -67,7 +67,7 @@ export const TopicGrid = () => {
             <Link
               key={topic.slug}
               href={topic.href}
-              className={`bg-gradient-to-br ${topic.color} rounded-xl px-4 py-2.5 md:px-5 md:py-3 min-w-[100px] md:min-w-[120px] flex items-center justify-center shrink-0 group transition-all duration-300 hover:scale-[1.04] hover:brightness-110 shadow-lg`}
+              className={`bg-gradient-to-br ${topic.color} rounded-xl px-4 py-2.5 md:px-5 md:py-3 min-w-[100px] md:min-w-[120px] flex items-center justify-center shrink-0 group transition-all duration-300 hover:scale-[1.04] hover:brightness-110`}
             >
               <span className="text-white font-bold text-xs md:text-sm whitespace-nowrap tracking-wide">
                 {topic.name}
