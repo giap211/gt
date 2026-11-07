@@ -64,7 +64,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const { user } = useMember();
   const lastHistorySaveRef = useRef(0);
   const latestProgressRef = useRef<{ seconds: number; durationSeconds: number } | null>(null);
-  const [tmdbRuntimeSeconds, setTmdbRuntimeSeconds] = useState(0);
+  const [tmdbRuntimeSeconds, setTmdbRuntimeSeconds] = useState(0);\n  const [episodeStills, setEpisodeStills] = useState<Record<number, string>>({});
   const resumeAt = Math.max(0, Number(searchParams.get("at") || 0));
 
   const tapParam = searchParams.get("tap");
@@ -154,7 +154,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
 
   useEffect(() => {
     let cancelled = false;
-    setTmdbRuntimeSeconds(0);
+    setTmdbRuntimeSeconds(0);\n    setEpisodeStills({});
     if (!movie?.tmdb?.id || !currentEpisode) return;
     const namedEpisode = currentEpisode.name.match(/s(\\d{1,2})\\s*e(\\d{1,3})/i);
     const simpleEpisode = currentEpisode.name.match(/(?:tập|episode|ep)\\s*0*(\\d+)/i) ||
@@ -566,46 +566,6 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
               />
             </div>
 
-            <div className="mx-4 sm:mx-0 bg-white/[0.045] p-5 sm:p-8 rounded-2xl border border-white/[0.08] relative overflow-hidden group mb-8">
-              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Play size={120} className="text-white fill-white" />
-              </div>
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-1.5 h-6 bg-[#ffd875] rounded-full" />
-                  <h3 className="text-lg font-black uppercase tracking-widest">
-                    Chi tiết phim
-                  </h3>
-                </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6 text-[12px] font-bold uppercase tracking-widest text-white/40">
-                  <div className="space-y-1">
-                    <span>Năm sản xuất</span>
-                    <p className="text-white text-sm">{movie.year}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <span>Định dạng</span>
-                    <p className="text-[#ffd875] text-sm">{movie.quality}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <span>Trạng thái</span>
-                    <p className="text-white text-sm">
-                      {movie.episode_current}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <span>Quốc gia</span>
-                    <p className="text-white text-sm">
-                      {movie.country?.[0]?.name || "Đang cập nhật"}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className="text-white/60 text-sm leading-relaxed max-w-4xl"
-                  dangerouslySetInnerHTML={{ __html: movie.content }}
-                />
-              </div>
-            </div>
-
             <CommentsPanel
               movie={{
                 movieSlug: movie.slug,
@@ -729,6 +689,9 @@ function EpisodeList({
       <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:grid xl:grid-cols-2 xl:overflow-y-auto xl:max-h-[520px] xl:overflow-x-hidden">
         {activeEpisodes.map((ep: ServerData, index: number) => {
           const active = currentEpisode?.name === ep.name;
+          const episodeNumberMatch = ep.name.match(/(?:tập|episode|ep)\\s*0*(\\d+)/i) || ep.name.match(/^0*(\\d+)$/);
+          const episodeNumber = Number(episodeNumberMatch?.[1] || index + 1);
+          const stillUrl = episodeStills[episodeNumber];
           return (
             <Link
               key={ep.slug}
