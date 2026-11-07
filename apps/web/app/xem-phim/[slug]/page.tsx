@@ -66,6 +66,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const resumeAt = Math.max(0, Number(searchParams.get("at") || 0));
 
   const tapParam = searchParams.get("tap");
+  const serverParam = searchParams.get("sv");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,14 +89,22 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           setEpisodes(merged);
 
           // Khôi phục đúng server chứa tập đã lưu, không mặc định server đầu tiên.
+          const requestedServerIndex = serverParam !== null ? Number(serverParam) : -1;
+          const validRequestedServer =
+            Number.isInteger(requestedServerIndex) &&
+            requestedServerIndex >= 0 &&
+            requestedServerIndex < merged.length &&
+            (!tapParam || merged[requestedServerIndex]?.server_data?.some((episode) => episode.slug === tapParam));
           const matchedServerIndex = tapParam
             ? merged.findIndex((server) =>
                 server.server_data?.some((episode) => episode.slug === tapParam),
               )
             : -1;
-          const selectedServerIndex = matchedServerIndex >= 0
-            ? matchedServerIndex
-            : 0;
+          const selectedServerIndex = validRequestedServer
+            ? requestedServerIndex
+            : matchedServerIndex >= 0
+              ? matchedServerIndex
+              : 0;
           setCurrentServer(selectedServerIndex);
 
           const selectedServer = merged[selectedServerIndex];
@@ -125,7 +134,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       }
     };
     if (slug) fetchData();
-  }, [slug, tapParam]);
+  }, [slug, tapParam, serverParam]);
 
   useEffect(() => {
     let cancelled = false;
