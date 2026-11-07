@@ -136,7 +136,11 @@ export const memberClient = {
       body: JSON.stringify(input),
     });
     setLocalItem(STORAGE_KEYS.USER, res.user);
-    if (previousUser?.username?.toLowerCase() === res.user.username.toLowerCase()) {
+    const canImportHistory =
+      !previousUser ||
+      previousUser.id === "usr_guest" ||
+      previousUser.username?.toLowerCase() === res.user.username.toLowerCase();
+    if (canImportHistory) {
       try {
         await this.syncLocalHistoryToAccount(res.user.username);
       } catch (error) {
@@ -153,7 +157,11 @@ export const memberClient = {
       body: JSON.stringify(input),
     });
     setLocalItem(STORAGE_KEYS.USER, res.user);
-    if (previousUser?.username?.toLowerCase() === res.user.username.toLowerCase()) {
+    const canImportHistory =
+      !previousUser ||
+      previousUser.id === "usr_guest" ||
+      previousUser.username?.toLowerCase() === res.user.username.toLowerCase();
+    if (canImportHistory) {
       await this.syncLocalHistoryToAccount(res.user.username);
     }
     return res;
@@ -166,10 +174,10 @@ export const memberClient = {
     const localHistory = getLocalItem<WatchHistoryItem[]>(STORAGE_KEYS.HISTORY, []);
     if (!localHistory.length) return;
 
-    await Promise.all(localHistory.slice(0, 50).map((item) =>
-      request<{ item: unknown }>("/api/member/history", {
-        method: "POST",
-        body: JSON.stringify({
+    await request<{ items: unknown[] }>("/api/member/history", {
+      method: "POST",
+      body: JSON.stringify({
+        items: localHistory.slice(0, 50).map((item) => ({
           movieSlug: item.movieSlug,
           movieTitle: item.movieTitle,
           posterUrl: item.posterUrl,
@@ -177,9 +185,9 @@ export const memberClient = {
           episodeSlug: item.episodeSlug,
           progressSeconds: item.progressSeconds,
           totalDurationSeconds: item.totalDurationSeconds,
-        }),
+        })),
       }),
-    ));
+    });
     setLocalItem(STORAGE_KEYS.HISTORY, []);
   },
 
