@@ -148,11 +148,11 @@ async function findCatalogMatches(
 
 function decodeHtml(value: string) {
   return value
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
+    .replace(/&/g, "&")
+    .replace(/"/g, '"')
+    .replace(/&#39;|'/g, "'")
+    .replace(/</g, "<")
+    .replace(/>/g, ">");
 }
 
 async function getNetflixVietnamTopTvShows() {
@@ -216,8 +216,8 @@ async function buildHeroItems(tmdbTitles: string[], netflixTvTitles: string[]) {
   const netflixTvShows = await findCatalogMatches(netflixTvTitles, 3, seen, "tv");
 
   const selected: HeroItem[] = [
-    ...tmdbMovies.map((movie) => ({ ...movie, hero_source: "tmdb" as const })),
     ...netflixTvShows.map((movie) => ({ ...movie, hero_source: "netflix" as const })),
+    ...tmdbMovies.map((movie) => ({ ...movie, hero_source: "tmdb" as const })),
   ];
 
   // Chỉ dùng phim mới cập nhật khi hai bảng xếp hạng không đủ phim có trong kho.
