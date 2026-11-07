@@ -91,7 +91,7 @@ const setLocalItem = <T>(key: string, value: T): void => {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2500);
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
     const response = await fetch(`${memberApiBaseUrl()}${path}`, {
@@ -122,53 +122,54 @@ export const memberClient = {
     try {
       return await request<{ user: MemberUser | null }>("/auth/me");
     } catch {
-      const localUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
-      return { user: localUser };
+      // Không giả lập trạng thái đăng nhập từ localStorage.
+      return { user: null };
     }
   },
 
   async register(input: { email: string; name: string; password: string }): Promise<{ user: MemberUser }> {
-    try {
-      const res = await request<{ user: MemberUser }>("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(input),
-      });
-      setLocalItem(STORAGE_KEYS.USER, res.user);
-      return res;
-    } catch {
-      // Local Registration Fallback
-      const newUser: MemberUser = {
-        id: `usr_${Date.now().toString(36)}`,
-        email: input.email.trim().toLowerCase(),
-        name: input.name.trim() || input.email.split("@")[0] || "Thành viên",
-      };
-      setLocalItem(STORAGE_KEYS.USER, newUser);
-      return { user: newUser };
-    }
+    const res = await request<{ user: MemberUser }>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+    setLocalItem(STORAGE_KEYS.USER, res.user);
+    await this.syncLocalHistoryToAccount(res.user.email);
+    return res;
   },
 
   async login(input: { email: string; password: string }): Promise<{ user: MemberUser }> {
-    try {
-      const res = await request<{ user: MemberUser }>("/auth/login", {
+    const res = await request<{ user: MemberUser }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+    setLocalItem(STORAGE_KEYS.USER, res.user);
+    await this.syncLocalHistoryToAccount(res.user.email);
+    return res;
+  },
+
+  async syncLocalHistoryToAccount(accountEmail: string): Promise<void> {
+    const localUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
+    if (!localUser || localUser.email.toLowerCase() !== accountEmail.toLowerCase()) return;
+
+    const localHistory = getLocalItem<WatchHistoryItem[]>(STORAGE_KEYS.HISTORY, []);
+    if (!localHistory.length) return;
+
+    // Chỉ xóa lịch sử trên thiết bị sau khi máy chủ xác nhận đã nhận toàn bộ.
+    await Promise.all(localHistory.slice(0, 50).map((item) =>
+      request<{ item: unknown }>("/member/history", {
         method: "POST",
-        body: JSON.stringify(input),
-      });
-      setLocalItem(STORAGE_KEYS.USER, res.user);
-      return res;
-    } catch {
-      // Local Login Fallback
-      const email = input.email.trim().toLowerCase();
-      const existingUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
-      const user: MemberUser = existingUser && existingUser.email === email
-        ? existingUser
-        : {
-            id: `usr_${Date.now().toString(36)}`,
-            email: email,
-            name: email.split("@")[0] || "Thành viên",
-          };
-      setLocalItem(STORAGE_KEYS.USER, user);
-      return { user };
-    }
+        body: JSON.stringify({
+          movieSlug: item.movieSlug,
+          movieTitle: item.movieTitle,
+          posterUrl: item.posterUrl,
+          episodeName: item.episodeName,
+          episodeSlug: item.episodeSlug,
+          progressSeconds: item.progressSeconds,
+          totalDurationSeconds: item.totalDurationSeconds,
+        }),
+      }),
+    ));
+    setLocalItem(STORAGE_KEYS.HISTORY, []);
   },
 
   async logout(): Promise<{ ok: true }> {
@@ -233,12 +234,7 @@ export const memberClient = {
   },
 
   async history(): Promise<{ items: WatchHistoryItem[] }> {
-    try {
-      return await request<{ items: WatchHistoryItem[] }>("/member/history");
-    } catch {
-      const items = getLocalItem<WatchHistoryItem[]>(STORAGE_KEYS.HISTORY, []);
-      return { items };
-    }
+    return await request<{ items: WatchHistoryItem[] }>("/member/history");
   },
 
   async comments(movieSlug: string): Promise<{ items: CommentItem[] }> {
@@ -286,32 +282,10 @@ export const memberClient = {
   async saveHistory(
     input: MoviePayload & { episodeName: string; episodeSlug?: string; progressSeconds?: number; totalDurationSeconds?: number },
   ): Promise<{ item: unknown }> {
-    try {
-      return await request<{ item: unknown }>("/member/history", {
-        method: "POST",
-        body: JSON.stringify(input),
-      });
-    } catch {
-      const list = getLocalItem<WatchHistoryItem[]>(STORAGE_KEYS.HISTORY, []);
-      const index = list.findIndex((h) => h.movieSlug === input.movieSlug);
-      const item: WatchHistoryItem = {
-        id: index >= 0 ? list[index]?.id || `his_${Date.now().toString(36)}` : `his_${Date.now().toString(36)}`,
-        movieSlug: input.movieSlug,
-        movieTitle: input.movieTitle,
-        posterUrl: input.posterUrl,
-        episodeName: input.episodeName,
-        episodeSlug: input.episodeSlug,
-        progressSeconds: input.progressSeconds || 0,
-        totalDurationSeconds: input.totalDurationSeconds || 0,
-        updatedAt: new Date().toISOString(),
-      };
-      if (index >= 0) {
-        list.splice(index, 1);
-      }
-      list.unshift(item);
-      setLocalItem(STORAGE_KEYS.HISTORY, list.slice(0, 50));
-      return { item };
-    }
+    return await request<{ item: unknown }>("/member/history", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
   },
 };
 
