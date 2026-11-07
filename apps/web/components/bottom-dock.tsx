@@ -261,7 +261,8 @@ export function BottomDock() {
             {/* Home */}
             <Link
               href="/"
-              className="flex flex-col items-center justify-end gap-0.5 py-1.5"
+              onClick={(event) => handleDockNavigation(event, isHome)}
+              className="flex flex-col items-center justify-center gap-0.5 py-1"
             >
               <Home
                 size={22}
