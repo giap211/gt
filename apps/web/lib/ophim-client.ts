@@ -630,6 +630,14 @@ async function getNguonCEpisodes(
       .trim()
       .replace(/\s+/g, " ");
   const expected = Array.from(new Set(names.map(normalize).filter(Boolean)));
+  // NguonC đặt tên tiếng Anh cho loạt phim Nhật "Bác Sĩ X".
+  // Bổ sung bí danh để tên tiếng Việt của PhimAPI khớp được kết quả tiếng Anh.
+  const isDoctorX = expected.some((name) =>
+    name.includes("bac si x") || name.includes("doctor x"),
+  );
+  if (isDoctorX) {
+    expected.push("doctor x", "doctor x surgeon michiko daimon", "bac si x");
+  }
   const matches = (a: string, b: string) =>
     a === b || (a.length >= 5 && b.includes(a)) || (b.length >= 5 && a.includes(b));
 
@@ -673,7 +681,7 @@ async function getNguonCEpisodes(
           const score =
             (titleMatch ? 20 : 0) +
             (expected.some((wanted) => titles.some((candidate: string) => candidate === wanted)) ? 10 : 0) +
-            (yearMatch ? 5 : -100);
+            (yearMatch ? 5 : 0);
           return { item, score, titleMatch };
         })
         .filter((entry: any) => entry.titleMatch && entry.score > 0)
