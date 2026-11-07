@@ -78,10 +78,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         if (movieRes && movieRes.status) {
           setMovie(movieRes.movie);
 
-          // Chỉ sử dụng các server Ophim và hiển thị tên thống nhất SV 1, SV 2...
+          // Giữ nhãn Thuyết minh từ nguồn; các server thông thường vẫn đánh số SV.
           const merged = (movieRes.episodes || []).map((server, i) => ({
             ...server,
-            server_name: `SV ${i + 1}`,
+            server_name: /thuyết minh|thuyet minh|lồng tiếng|long tieng/i.test(server.server_name)
+              ? server.server_name
+              : `SV ${i + 1}`,
           }));
           setEpisodes(merged);
 
@@ -630,7 +632,7 @@ function EpisodeList({
                     : "bg-white/5 text-white/40 hover:text-white"
                 }`}
               >
-                { `SV ${i + 1}` }
+                {server.server_name}
               </button>
             ))}
           </div>
