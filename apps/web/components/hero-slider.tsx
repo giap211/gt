@@ -100,7 +100,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   )}
 
                   {movie.hero_source && (
-                    <span className="mt-2 inline-flex rounded-full border border-white/30 bg-black/40 px-2.5 py-1 text-[9px] sm:text-[10px] font-semibold tracking-wider text-white/90 backdrop-blur-md">
+                    <span className={`hero-source-badge hero-source-${movie.hero_source} mt-2 inline-flex rounded-full border border-white/30 bg-black/40 px-2.5 py-1 text-[9px] sm:text-[10px] font-semibold tracking-wider text-white/90 backdrop-blur-md`}>
                       {movie.hero_source === "tmdb"
                         ? "TMDB TRENDING"
                         : movie.hero_source === "netflix"
@@ -111,20 +111,20 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
 
                   <div className="mt-3 flex flex-wrap items-center justify-center md:justify-start gap-1.5">
                     {movie.quality && (
-                      <span className="rounded border border-[#ffd875]/70 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-[#ffd875]">
+                      <span className="hero-meta-badge hero-meta-quality rounded border border-[#ffd875]/70 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-[#ffd875]">
                         {movie.quality}
                       </span>
                     )}
-                    <span className="rounded border border-white/55 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
+                    <span className="hero-meta-badge hero-meta-year rounded border border-white/55 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
                       {movie.year}
                     </span>
                     {movie.episode_current && (
-                      <span className="rounded border border-white/55 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
+                      <span className="hero-meta-badge hero-meta-episode rounded border border-white/55 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
                         {movie.episode_current}
                       </span>
                     )}
                     {movie.lang && (
-                      <span className="rounded border border-white/45 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
+                      <span className="hero-meta-badge hero-meta-language rounded border border-white/45 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-white">
                         {movie.lang}
                       </span>
                     )}

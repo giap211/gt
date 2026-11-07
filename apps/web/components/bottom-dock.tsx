@@ -43,6 +43,13 @@ export function BottomDock() {
     setSearchOpen(false);
   }, [pathname]);
 
+  // Prefetch the main dock destinations while the current page is idle.
+  useEffect(() => {
+    ["/", "/danh-sach/phim-bo", "/danh-sach/phim-le"].forEach((href) => {
+      router.prefetch(href);
+    });
+  }, [router]);
+
   useEffect(() => {
     const saved = window.localStorage.getItem("gt-mobile-theme");
     const theme = saved === "light" ? "light" : "dark";
@@ -167,7 +174,61 @@ export function BottomDock() {
             text-shadow: 0 2px 5px rgba(0,0,0,.9);
           }
           html[data-mobile-theme="light"] body main > section:first-child .container span {
-            text-shadow: 0 1px 3px rgba(0,0,0,.8);
+            text-shadow: none;
+          }
+          /* Clear, coordinated hero labels for the light theme. */
+          html[data-mobile-theme="light"] body main > section:first-child .hero-source-badge {
+            border: 1px solid transparent !important;
+            box-shadow: 0 3px 10px rgba(15,23,42,.16) !important;
+            letter-spacing: .075em !important;
+            text-shadow: none !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-source-netflix {
+            color: #fff !important;
+            background: #e50914 !important;
+            border-color: rgba(255,255,255,.55) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-source-tmdb {
+            color: #eaf5ff !important;
+            background: #173b59 !important;
+            border-color: rgba(255,255,255,.35) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-source-latest {
+            color: #63440c !important;
+            background: #f8e7b8 !important;
+            border-color: #e6c46d !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 22px;
+            padding: 3px 9px !important;
+            border-radius: 7px !important;
+            border: 1px solid rgba(42,55,78,.14) !important;
+            background: rgba(248,250,253,.94) !important;
+            color: #344258 !important;
+            font-weight: 700 !important;
+            letter-spacing: .025em;
+            box-shadow: 0 2px 7px rgba(15,23,42,.10);
+            text-shadow: none !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-quality {
+            color: #155b50 !important;
+            background: #dff4ed !important;
+            border-color: #a8dccc !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-year {
+            color: #344258 !important;
+            background: rgba(255,255,255,.96) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-episode {
+            color: #46536a !important;
+            background: #e9edf4 !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-language {
+            color: #654b19 !important;
+            background: #fbf0d7 !important;
+            border-color: #ead7a8 !important;
           }
           /* Fade the home hero into the soft light page surface, not over the thumbnail dots. */
           html[data-mobile-theme="light"] body main > section:first-child .swiper-slide > div.pointer-events-none {
