@@ -98,7 +98,6 @@ export interface MovieDetailResponse {
 const PRIMARY_API_BASE = "https://phimapi.com";
 const BACKUP_API_BASE = "https://ophim.cc";
 const DEFAULT_CDN_IMAGE = "https://phimimg.com";
-const VSMOV_API_BASE = "https://vsmov.com";
 
 type ApiMovieItem = Partial<Omit<ListMovie, "year" | "view">> & {
   _id?: string;
@@ -860,71 +859,6 @@ export const getMovieDetail = async (
   } catch (error) {
     console.error(`Error fetching movie detail [${slug}]:`, error);
     return null;
-  }
-};
-
-/** VSMOV — dùng làm SV dự phòng (thường chỉ có link_embed) */
-export const getVSMovEpisodes = async (slug: string): Promise<Episode[]> => {
-  try {
-    if (!slug) return [];
-
-    const res = await fetch(
-      `${VSMOV_API_BASE}/api/phim/${encodeURIComponent(slug)}`,
-      {
-        next: { revalidate: 1800 },
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "PhimLau/1.0",
-        },
-      },
-    );
-
-    if (!res.ok) return [];
-
-    const data = (await res.json()) as {
-      status?: boolean | string;
-      episodes?: Array<{
-        server_name?: string;
-        server_data?: Array<{
-          name?: string;
-          slug?: string;
-          filename?: string;
-          link_embed?: string;
-          link_m3u8?: string;
-        }>;
-      }>;
-    };
-
-    if (!data || (data.status !== true && data.status !== "true")) {
-      return [];
-    }
-
-    const episodes = (data.episodes || [])
-      .map((server, index) => {
-        const serverData = (server.server_data || [])
-          .filter((ep) => ep.link_embed || ep.link_m3u8)
-          .map((ep) => ({
-            name: ep.name || "",
-            slug: ep.slug || `tap-${ep.name || ""}`,
-            filename: ep.filename || ep.name || "",
-            link_embed: ep.link_embed || "",
-            link_m3u8: ep.link_m3u8 || "",
-          }));
-
-        if (serverData.length === 0) return null;
-
-        const rawName = (server.server_name || "").replace(/\s+/g, " ").trim();
-        return {
-          server_name: rawName ? `VSMOV ${rawName}` : `VSMOV #${index + 1}`,
-          server_data: serverData,
-        } as Episode;
-      })
-      .filter(Boolean) as Episode[];
-
-    return episodes;
-  } catch (error) {
-    console.error(`Error fetching VSMOV episodes [${slug}]:`, error);
-    return [];
   }
 };
 
