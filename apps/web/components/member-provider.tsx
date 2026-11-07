@@ -240,8 +240,7 @@ function MemberAuthModal({
   onClose: () => void;
   onAuthenticated: (user: MemberUser) => void;
 }) {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -257,8 +256,8 @@ function MemberAuthModal({
 
     try {
       const result = isRegister
-        ? await memberClient.register({ email, name, password })
-        : await memberClient.login({ email, password });
+        ? await memberClient.register({ username, password })
+        : await memberClient.login({ username, password });
       onAuthenticated(result.user);
       setPassword("");
     } catch (submitError) {
@@ -292,28 +291,18 @@ function MemberAuthModal({
             {isRegister ? "Tạo tài khoản" : "Đăng nhập"}
           </h2>
           <p className="mb-6 text-sm leading-relaxed text-white/45">
-            Lưu tủ phim, bình luận và tiếp tục xem tập đang dang dở trên mọi
-            thiết bị.
+            Dùng tên tài khoản và mật khẩu để lưu phim đang xem trên mọi thiết bị.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-3">
-            {isRegister && (
-              <input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
-                placeholder="Tên hiển thị"
-                autoComplete="name"
-                required
-              />
-            )}
             <input
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
               className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
-              placeholder="Email"
-              type="email"
-              autoComplete="email"
+              placeholder="Tên tài khoản"
+              autoComplete="username"
+              minLength={3}
+              maxLength={24}
               required
             />
             <input
@@ -324,6 +313,7 @@ function MemberAuthModal({
               type="password"
               autoComplete={isRegister ? "new-password" : "current-password"}
               minLength={8}
+              maxLength={128}
               required
             />
 
