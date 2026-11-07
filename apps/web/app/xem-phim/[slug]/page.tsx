@@ -82,7 +82,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           // Giữ nhãn Thuyết minh từ nguồn; các server thông thường vẫn đánh số SV.
           const merged = (movieRes.episodes || []).map((server, i) => ({
             ...server,
-            server_name: /thuyết minh|thuyet minh|lồng tiếng|long tieng/i.test(server.server_name)
+            server_name: /thuyết minh|thuyet minh|lồng tiếng|long tieng|dự phòng/i.test(server.server_name)
               ? server.server_name
               : `SV ${i + 1}`,
           }));
