@@ -706,7 +706,7 @@ async function getNguonCEpisodes(
         detailPayload?.data ||
         null;
       const groups = Array.isArray(detailMovie?.episodes) ? detailMovie.episodes : [];
-      const serverData = groups.flatMap((group: any) =>
+      const serverData: ServerData[] = groups.flatMap((group: any) =>
         (Array.isArray(group?.items) ? group.items : []).flatMap((episode: any) => {
           const embed = episode?.embed || episode?.link_embed || episode?.url || "";
           const m3u8 = episode?.m3u8 || episode?.link_m3u8 || "";
@@ -722,7 +722,7 @@ async function getNguonCEpisodes(
         }),
       );
       const uniqueEpisodes = Array.from(
-        new Map(serverData.map((episode: ServerData) => [episode.slug, episode])).values(),
+        new Map<string, ServerData>(serverData.map((episode): [string, ServerData] => [episode.slug, episode])).values(),
       );
       return uniqueEpisodes.length
         ? [{ server_name: "Dự phòng NguonC", server_data: uniqueEpisodes }]
