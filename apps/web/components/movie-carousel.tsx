@@ -136,9 +136,6 @@ export const MovieCarousel = ({
                         style={{ clipPath: `url(#cinema-poster-clip-${index})` }}
                       >
                       <MovieCard {...movie} hideInfo variant="vertical" />
-                      <span className="absolute left-2 top-2 z-30 rounded-md bg-[#3989ed] px-2 py-1 text-[10px] md:text-xs font-bold text-white shadow-md pointer-events-none">
-                        Song ngữ
-                      </span>
                     </div>
                       <div className="mt-1 flex items-start gap-2">
                         <span className="shrink-0 text-3xl md:text-4xl font-black italic leading-none text-[#f5c451] drop-shadow-[0_2px_8px_rgba(245,196,81,0.2)]">
