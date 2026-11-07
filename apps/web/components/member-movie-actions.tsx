@@ -5,7 +5,7 @@ import { Heart, Bell, Plus, Send } from "lucide-react";
 import { memberClient, type MoviePayload } from "@/lib/member-client";
 import { useMember } from "./member-provider";
 
-export function MemberMovieActions({ movie }: { movie: MoviePayload }) {
+export function MemberMovieActions({ movie, variant = "default" }: { movie: MoviePayload; variant?: "default" | "mobile" }) {
   const { user, openAuth, openLibrary } = useMember();
   const [favorited, setFavorited] = useState(false);
   const [pending, setPending] = useState(false);
@@ -56,24 +56,29 @@ export function MemberMovieActions({ movie }: { movie: MoviePayload }) {
     }
   };
 
+  const mobile = variant === "mobile";
+  const actionClass = mobile
+    ? "flex min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.055] py-3 text-white/70 transition-colors active:bg-white/10"
+    : "flex flex-col items-center gap-0.5 text-white/60 transition-colors hover:text-white";
+
   return (
-    <div className="flex items-center gap-4 sm:gap-5">
+    <div className={mobile ? "grid w-full grid-cols-4 gap-2 rounded-[26px] border border-white/10 bg-white/[0.035] p-2" : "flex items-center gap-4 sm:gap-5"}>
       <button
         onClick={toggleFavorite}
         disabled={pending}
-        className={`flex flex-col items-center gap-0.5 transition-colors ${
+        className={`${actionClass} ${
           favorited ? "text-[#ffd875]" : "text-white/60 hover:text-white"
         }`}
       >
-        <Heart size={18} className={favorited ? "fill-[#ffd875]" : ""} />
-        <span className="text-[10px]">Yêu thích</span>
+        <Heart size={mobile ? 20 : 18} className={favorited ? "fill-[#ffd875]" : ""} />
+        <span className={mobile ? "text-[10px] font-medium" : "text-[10px]"}>Yêu thích</span>
       </button>
 
       <button
         onClick={() => requireMember()}
-        className="flex flex-col items-center gap-0.5 text-white/60 hover:text-white transition-colors"
+        className={actionClass}
       >
-        <Bell size={18} />
+        <Bell size={mobile ? 20 : 18} />
         <span className="text-[10px]">Theo dõi</span>
       </button>
 
@@ -82,7 +87,7 @@ export function MemberMovieActions({ movie }: { movie: MoviePayload }) {
         disabled={pending}
         className="flex flex-col items-center gap-0.5 text-white/60 hover:text-white transition-colors"
       >
-        <Plus size={18} />
+        <Plus size={mobile ? 20 : 18} />
         <span className="text-[10px]">Thêm vào</span>
       </button>
 
@@ -90,7 +95,7 @@ export function MemberMovieActions({ movie }: { movie: MoviePayload }) {
         onClick={shareMovie}
         className="flex flex-col items-center gap-0.5 text-white/60 hover:text-white transition-colors"
       >
-        <Send size={18} />
+        <Send size={mobile ? 20 : 18} />
         <span className="text-[10px]">Chia sẻ</span>
       </button>
     </div>
