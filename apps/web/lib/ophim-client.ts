@@ -623,12 +623,12 @@ async function getNguonCEpisodes(
   const normalize = (value: unknown) =>
     String(value || "")
       .normalize("NFD")
-      .replace(/[\\u0300-\\u036f]/g, "")
+      .replace(/[\u0300-\u036f]/g, "")
       .replace(/đ/gi, "d")
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, " ")
       .trim()
-      .replace(/\\s+/g, " ");
+      .replace(/\s+/g, " ");
   const expected = Array.from(new Set(names.map(normalize).filter(Boolean)));
   const matches = (a: string, b: string) =>
     a === b || (a.length >= 5 && b.includes(a)) || (b.length >= 5 && a.includes(b));
