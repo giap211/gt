@@ -12,10 +12,10 @@ export async function POST(request: NextRequest) {
     const username = normalizeUsername(body.username);
     const password = typeof body.password === "string" ? body.password : "";
     if (!validUsername(username)) {
-      return NextResponse.json({ message: "Tên tài khoản phải có 3–24 ký tự, chỉ gồm chữ thường, số, dấu chấm, gạch ngang hoặc gạch dưới." }, { status: 400 });
+      return NextResponse.json({ message: "Tên tài khoản phải có 3–20 ký tự, chỉ gồm chữ cái, chữ số và @." }, { status: 400 });
     }
-    if (password.length < 8 || password.length > 128) {
-      return NextResponse.json({ message: "Mật khẩu phải có từ 8 đến 128 ký tự." }, { status: 400 });
+    if (!/^[\p{L}\p{N}@]{3,128}$/u.test(password)) {
+      return NextResponse.json({ message: "Mật khẩu phải có ít nhất 3 ký tự, chỉ gồm chữ cái, chữ số và @ (tối đa 128 ký tự)." }, { status: 400 });
     }
     const user = await registerMember(username, hashPassword(password));
     const token = await createMemberSession(user.id);
