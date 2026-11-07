@@ -615,6 +615,7 @@ export const searchMovies = async (
 /** Lấy server dự phòng NguonC trực tiếp từ trình duyệt; nếu không chạy ở browser thì dùng API nội bộ. */
 async function getNguonCEpisodes(
   movie: Pick<DetailMovie, "name" | "origin_name" | "original_name" | "year">,
+  movieSlug = "",
 ): Promise<Episode[]> {
   const names = [movie.original_name, movie.origin_name, movie.name]
     .filter((value): value is string => Boolean(value?.trim()));
@@ -632,9 +633,11 @@ async function getNguonCEpisodes(
   const expected = Array.from(new Set(names.map(normalize).filter(Boolean)));
   // NguonC đặt tên tiếng Anh cho loạt phim Nhật "Bác Sĩ X".
   // Bổ sung bí danh để tên tiếng Việt của PhimAPI khớp được kết quả tiếng Anh.
-  const isDoctorX = expected.some((name) =>
-    name.includes("bac si x") || name.includes("doctor x"),
-  );
+  const isDoctorX =
+    movieSlug.includes("bac-si-x") ||
+    expected.some((name) =>
+      name.includes("bac si x") || name.includes("doctor x"),
+    );
   if (isDoctorX) {
     expected.push("doctor x", "doctor x surgeon michiko daimon", "bac si x");
   }
@@ -645,29 +648,39 @@ async function getNguonCEpisodes(
     // getMovieDetail được gọi trong Client Component nên ưu tiên kết nối browser,
     // nơi đã được người dùng kiểm tra HTTP 200/CORS thành công.
     if (typeof window !== "undefined") {
-      const searchName = movie.name || movie.origin_name || movie.original_name || "";
-      const searchUrl =
-        "https://phim.nguonc.com/api/films/search?keyword=" +
-        encodeURIComponent(searchName) +
-        "&page=1";
-      const searchResponse = await fetch(searchUrl, {
-        method: "GET",
-        mode: "cors",
-        headers: { Accept: "application/json" },
-        cache: "no-store",
-      });
-      if (!searchResponse.ok) {
-        console.warn("[NguonC] Browser search HTTP:", searchResponse.status);
-        return [];
-      }
-
-      const searchPayload = await searchResponse.json();
-      const items = Array.isArray(searchPayload?.items)
-        ? searchPayload.items
-        : Array.isArray(searchPayload?.data?.items)
-          ? searchPayload.data.items
-          : [];
-      const candidates = items
+      // Tên từ PhimAPI đôi khi bị lỗi mã hóa; luôn thử cả tên Việt đã xác nhận.
+      const searchTerms = Array.from(new Set([
+        ...names,
+        ...(isDoctorX ? ["Bác Sĩ X", "Doctor X"] : []),
+      ].filter(Boolean)));
+      const searchPayloads = await Promise.all(searchTerms.map(async (term) => {
+        const searchUrl =
+          "https://phim.nguonc.com/api/films/search?keyword=" +
+          encodeURIComponent(term) +
+          "&page=1";
+        const response = await fetch(searchUrl, {
+          method: "GET",
+          mode: "cors",
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          console.warn("[NguonC] Browser search HTTP:", term, response.status);
+          return null;
+        }
+        return response.json();
+      }));
+      const items = searchPayloads.flatMap((payload: any) =>
+        Array.isArray(payload?.items)
+          ? payload.items
+          : Array.isArray(payload?.data?.items)
+            ? payload.data.items
+            : [],
+      );
+      const uniqueItems = Array.from(
+        new Map(items.filter((item: any) => item?.slug).map((item: any) => [item.slug, item])).values(),
+      );
+      const candidates = uniqueItems
         .filter((item: any) => item?.slug)
         .map((item: any) => {
           const titles = [item.original_name, item.origin_name, item.name, item.slug]
@@ -838,7 +851,7 @@ export const getMovieDetail = async (
     const baseEpisodes = data.episodes || [];
     const [narrationEpisodes, nguoncEpisodes] = await Promise.all([
       getOPhimNarrationEpisodes(slug),
-      getNguonCEpisodes(movie),
+      getNguonCEpisodes(movie, slug),
     ]);
     const existingEpisodeUrls = new Set(
       baseEpisodes.flatMap((server) =>
