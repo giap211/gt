@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Home,
   Clapperboard,
@@ -48,12 +48,11 @@ const DOCK_ITEMS = [
 
 export function BottomDock() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user, openAuth, openLibrary } = useMember();
 
   const handleAccount = () => {
     if (user) {
-      openLibrary();
+      openLibrary("favorites");
     } else {
       openAuth();
     }
