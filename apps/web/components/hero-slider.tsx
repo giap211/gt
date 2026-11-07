@@ -79,6 +79,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/25" />
               </div>
 
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-36 sm:h-44 bg-gradient-to-b from-transparent via-[#0b0d14]/65 to-[#0b0d14]" />
+
               <div className="container relative z-20 h-full flex flex-col items-center justify-end text-center px-4 pb-[76px] md:items-start md:justify-center md:text-left md:pb-8">
                 <div className="w-full max-w-3xl animate-fade-up md:max-w-xl">
                   <Link
