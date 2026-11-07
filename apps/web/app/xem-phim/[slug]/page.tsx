@@ -77,7 +77,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const handlePlayerTap = (event: MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement | null;
     // Không bật/tắt thanh chrome khi người xem thao tác với điều khiển của Artplayer.
-    if (target?.closest("button, a, input, video, iframe, .art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, .art-volume, .art-contextmenu")) return;
+    if (target?.closest("button, a, input, .art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, .art-volume, .art-contextmenu")) return;
+    // Chạm trực tiếp vùng video/iframe phải hiện lại tên phim và thông tin tập.
+    if (target?.closest("video, iframe, .artplayer-app")) {
+      setShowPlayerChrome(true);
+      return;
+    }
     setShowPlayerChrome((visible) => !visible);
   };
 
@@ -503,7 +508,9 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
         .watch-player-menu .active-choice { color:#171717; background:#ffd875; border-color:#ffd875; }
-        .watch-player-round { width:54px;height:54px;border-radius:999px;display:grid;place-items:center; }
+        .watch-player-round { width:54px;height:54px;border-radius:999px;display:grid;place-items:center; flex:0 0 54px; cursor:pointer; }
+        .watch-player-page > .watch-player-round { position:absolute; z-index:70; pointer-events:auto; }
+        .watch-player-page .watch-player-top { z-index:50; }
         .watch-player-hidden { opacity:0; pointer-events:none; transform:translateY(-8px); }
         .watch-player-rotate-hint { display:none; }
         @media (orientation:landscape) and (max-width:1023px) {
@@ -573,10 +580,10 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             <div className="truncate text-[10px] text-white/65 sm:text-xs">{formatEpisodeName(currentEpisode?.name || "Đang tải tập")}</div>
           </div>
         </div>
-        <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass hover:border-[#ffd875]/70">
-          {overlayOpen ? <X size={23}/> : <Settings2 size={23}/>}
-        </button>
       </div>
+      <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass absolute right-4 top-4 z-[70] hover:border-[#ffd875]/70">
+        {overlayOpen ? <X size={23}/> : <Settings2 size={23}/>}
+      </button>
 
       {overlayOpen && (
         <>
