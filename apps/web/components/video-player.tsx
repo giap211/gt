@@ -19,7 +19,7 @@ interface VideoPlayerProps {
   introStartSeconds?: number;
   introEndSeconds?: number;
   introDebugStatus?: string;
-  onProgress?: (seconds: number, durationSeconds: number) => void;
+  onProgress?: (seconds: number, durationSeconds: number, force?: boolean) => void;
 }
 
 export const VideoPlayer = ({
@@ -503,11 +503,29 @@ export const VideoPlayer = ({
           }
         };
 
+        const reportFinalProgress = () => {
+          if (!Number.isFinite(video.currentTime)) return;
+          const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
+            ? video.duration
+            : knownDurationSeconds;
+          onProgress?.(video.currentTime, mediaDuration);
+        };
+        const reportFinalProgress = () => {
+          if (!Number.isFinite(video.currentTime)) return;
+          const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
+            ? video.duration
+            : knownDurationSeconds;
+          onProgress?.(video.currentTime, mediaDuration, true);
+        };
         video.addEventListener("timeupdate", reportProgress);
+        video.addEventListener("pause", reportFinalProgress);
+        video.addEventListener("ended", reportFinalProgress);
 
         const previousCleanup = (art as any).__seekCleanup as (() => void) | undefined;
         (art as any).__seekCleanup = () => {
           video.removeEventListener("timeupdate", reportProgress);
+          video.removeEventListener("pause", reportFinalProgress);
+          video.removeEventListener("ended", reportFinalProgress);
           previousCleanup?.();
         };
       }

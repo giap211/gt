@@ -63,6 +63,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [copiedToast, setCopiedToast] = useState(false);
   const { user } = useMember();
   const lastHistorySaveRef = useRef(0);
+  const latestProgressRef = useRef<{ seconds: number; durationSeconds: number } | null>(null);
+  const [tmdbRuntimeSeconds, setTmdbRuntimeSeconds] = useState(0);
   const resumeAt = Math.max(0, Number(searchParams.get("at") || 0));
 
   const tapParam = searchParams.get("tap");
@@ -149,6 +151,39 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     };
     if (slug) fetchData();
   }, [slug, tapParam, serverParam]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setTmdbRuntimeSeconds(0);
+    if (!movie?.tmdb?.id || !currentEpisode) return;
+    const namedEpisode = currentEpisode.name.match(/s(\\d{1,2})\\s*e(\\d{1,3})/i);
+    const simpleEpisode = currentEpisode.name.match(/(?:tập|episode|ep)\\s*0*(\\d+)/i) ||
+      currentEpisode.name.match(/^0*(\\d+)$/);
+    const isSeries =
+      movie.tmdb?.type?.toLowerCase() === "tv" ||
+      movie.type === "series" ||
+      movie.type === "tvshows" ||
+      Boolean(namedEpisode || simpleEpisode);
+    if (!isSeries) return;
+    const season = namedEpisode ? Number(namedEpisode[1]) : 1;
+    const episode = namedEpisode ? Number(namedEpisode[2]) : Number(simpleEpisode?.[1] || 0);
+    if (!episode) return;
+    const params = new URLSearchParams({
+      id: String(movie.tmdb.id),
+      type: "tv",
+      season: String(season),
+      episode: String(episode),
+    });
+    fetch(`/api/tmdb-runtime?${params.toString()}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (!cancelled && Number(data?.runtimeSeconds) > 0) {
+          setTmdbRuntimeSeconds(Math.floor(Number(data.runtimeSeconds)));
+        }
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [movie, currentEpisode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -260,18 +295,19 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           episodeName: currentEpisode.name,
           episodeSlug: currentEpisode.slug,
           progressSeconds: resumeAt,
-          totalDurationSeconds: 0,
+          totalDurationSeconds: tmdbRuntimeSeconds,
         })
         .catch(() => undefined);
     }, 2500);
 
     return () => window.clearTimeout(timeoutId);
-  }, [user, movie, currentEpisode, resumeAt]);
+  }, [user, movie, currentEpisode, resumeAt, tmdbRuntimeSeconds]);
 
-  const handlePlaybackProgress = useCallback((seconds: number, durationSeconds: number) => {
-    if (!user || !movie || !currentEpisode) return;
+  const persistPlaybackProgress = useCallback((seconds: number, durationSeconds: number, force = false) => {
+    if (!user || !movie || !currentEpisode || !Number.isFinite(seconds)) return;
+    latestProgressRef.current = { seconds, durationSeconds };
     const now = Date.now();
-    if (now - lastHistorySaveRef.current < 10000) return;
+    if (!force && now - lastHistorySaveRef.current < 3000) return;
     lastHistorySaveRef.current = now;
     void memberClient.saveHistory({
       movieSlug: movie.slug,
@@ -279,10 +315,45 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       posterUrl: movie.poster_url,
       episodeName: currentEpisode.name,
       episodeSlug: currentEpisode.slug,
-      progressSeconds: Math.floor(seconds),
-      totalDurationSeconds: Math.floor(durationSeconds > 0 ? durationSeconds : 0),
+      progressSeconds: Math.floor(Math.max(0, seconds)),
+      totalDurationSeconds: Math.floor(durationSeconds > 0 ? durationSeconds : tmdbRuntimeSeconds),
     }).catch(() => undefined);
-  }, [user, movie, currentEpisode]);
+  }, [user, movie, currentEpisode, tmdbRuntimeSeconds]);
+
+  const handlePlaybackProgress = useCallback((seconds: number, durationSeconds: number, force = false) => {
+    persistPlaybackProgress(seconds, durationSeconds, force);
+  }, [persistPlaybackProgress]);
+
+  useEffect(() => {
+    if (!user || !movie || !currentEpisode) return;
+    const flushProgress = () => {
+      const latest = latestProgressRef.current;
+      if (!latest) return;
+      const payload = {
+        movieSlug: movie.slug,
+        movieTitle: movie.name,
+        posterUrl: movie.poster_url,
+        episodeName: currentEpisode.name,
+        episodeSlug: currentEpisode.slug,
+        progressSeconds: Math.floor(Math.max(0, latest.seconds)),
+        totalDurationSeconds: Math.floor(latest.durationSeconds > 0 ? latest.durationSeconds : tmdbRuntimeSeconds),
+      };
+      void fetch("/api/member/history", {
+        method: "POST",
+        credentials: "include",
+        keepalive: true,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }).catch(() => undefined);
+    };
+    window.addEventListener("pagehide", flushProgress);
+    document.addEventListener("visibilitychange", flushProgress);
+    return () => {
+      flushProgress();
+      window.removeEventListener("pagehide", flushProgress);
+      document.removeEventListener("visibilitychange", flushProgress);
+    };
+  }, [user, movie, currentEpisode, tmdbRuntimeSeconds]);
   const handleShare = async () => {
     try {
       if (navigator.clipboard) {
