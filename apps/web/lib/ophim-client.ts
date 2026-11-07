@@ -612,159 +612,34 @@ export const searchMovies = async (
 };
 
 
-/** Chuẩn hóa tên phim để đối chiếu kết quả tìm kiếm giữa các nguồn. */
-function normalizeNguonCTitle(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/gi, "d")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .replace(/\s+/g, " ");
-}
-
-/** Tìm phim trên NguonC bằng tên/tên gốc và năm, không phụ thuộc slug của PhimAPI. */
-async function findNguonCMovieSlug(movie: Pick<DetailMovie, "name" | "origin_name" | "original_name" | "year">): Promise<string | null> {
-  // Thu thập tất cả biến thể tên từ PhimAPI/OPhim: tên hiển thị và tên gốc.
-  const titles = Array.from(new Set(
-    [movie.original_name, movie.origin_name, movie.name]
-      .map((title) => String(title || "").trim())
-      .filter((title) => title.length >= 2),
-  ));
-  const sourceOriginalTitles = new Set(
-    [movie.original_name, movie.origin_name]
-      .map((title) => normalizeNguonCTitle(String(title || "")))
-      .filter(Boolean),
-  );
-  if (!titles.length) return null;
-
-  type NguonCSearchItem = {
-    name?: string;
-    origin_name?: string;
-    original_name?: string;
-    slug?: string;
-    year?: number | string;
-  };
-  type NguonCSearchResponse = {
-    status?: string;
-    items?: NguonCSearchItem[];
-    data?: { items?: NguonCSearchItem[] };
-  };
-
-  const results = await Promise.all(titles.map(async (title) => {
-    try {
-      const url = `https://phim.nguonc.com/api/films/search?keyword=${encodeURIComponent(title)}&page=1`;
-      const response = await fetch(url, {
-        next: { revalidate: 1800 },
-        headers: { Accept: "application/json", "User-Agent": "PhimLau/1.0" },
-      });
-      if (!response.ok) return [];
-      const payload = await response.json() as NguonCSearchResponse;
-      return payload.items || payload.data?.items || [];
-    } catch {
-      return [];
-    }
-  }));
-
-  const expectedTitles = new Set(titles.map(normalizeNguonCTitle));
-  const expectedYear = Number(movie.year) || 0;
-  const candidates = new Map<string, { item: NguonCSearchItem; score: number }>();
-
-  for (const item of results.flat()) {
-    if (!item.slug) continue;
-    // NguonC dùng original_name; một số phiên bản/nguồn có thể trả origin_name.
-    const candidateOriginalTitles = [item.original_name, item.origin_name]
-      .filter((value): value is string => Boolean(value))
-      .map(normalizeNguonCTitle)
-      .filter(Boolean);
-    const candidateTitles = [item.original_name, item.origin_name, item.name]
-      .filter((value): value is string => Boolean(value))
-      .map(normalizeNguonCTitle)
-      .filter(Boolean);
-
-    // Ưu tiên tên gốc của nguồn này khớp tên gốc của nguồn kia.
-    const originalNameMatch = candidateOriginalTitles.some((title) => sourceOriginalTitles.has(title));
-    const titleMatch = candidateTitles.some((title) => expectedTitles.has(title));
-    if (!originalNameMatch && !titleMatch) continue;
-
-    const candidateYear = Number(item.year) || 0;
-    if (expectedYear && candidateYear && candidateYear !== expectedYear) continue;
-
-    const score = (originalNameMatch ? 20 : 0) + (titleMatch ? 10 : 0) + (
-      expectedYear && candidateYear === expectedYear ? 5 : candidateYear === 0 ? 1 : 0
-    );
-    const previous = candidates.get(item.slug);
-    if (!previous || score > previous.score) candidates.set(item.slug, { item, score });
-  }
-
-  return Array.from(candidates.entries())
-    .sort((a, b) => b[1].score - a[1].score)[0]?.[0] || null;
-}
-
-/** Lấy các tập từ NguonC và gom thành một server dự phòng riêng. */
-async function getNguonCEpisodes(movie: Pick<DetailMovie, "name" | "origin_name" | "original_name" | "year">): Promise<Episode[]> {
+/** Lấy server dự phòng NguonC qua API nội bộ để tránh CORS khi gọi từ Client Component. */
+async function getNguonCEpisodes(
+  movie: Pick<DetailMovie, "name" | "origin_name" | "original_name" | "year">,
+): Promise<Episode[]> {
   try {
-    const slug = await findNguonCMovieSlug(movie);
-    if (!slug) return [];
+    const params = new URLSearchParams();
+    if (movie.name) params.set("name", movie.name);
+    if (movie.origin_name) params.set("origin_name", movie.origin_name);
+    if (movie.original_name) params.set("original_name", movie.original_name);
+    if (movie.year) params.set("year", String(movie.year));
 
-    const response = await fetch(
-      `https://phim.nguonc.com/api/film/${encodeURIComponent(slug)}`,
-      {
-        next: { revalidate: 1800 },
-        headers: { Accept: "application/json", "User-Agent": "PhimLau/1.0" },
-      },
-    );
-    if (!response.ok) return [];
-
-    const payload = (await response.json()) as {
-      status?: string;
-      movie?: {
-        category?: Array<{
-          list?: Array<{ name?: string; slug?: string }>;
-        }>;
-        episodes?: Array<{
-          items?: Array<{
-            name?: string;
-            slug?: string;
-            embed?: string;
-          }>;
-        }>;
-      };
-    };
-    if (payload.status !== "success" || !Array.isArray(payload.movie?.episodes)) {
+    const response = await fetch(`/api/nguonc?${params.toString()}`, {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) {
+      console.warn("[NguonC] API nội bộ trả lỗi:", response.status);
       return [];
     }
 
-    const isAdultCategory = (payload.movie.category || []).some((group) =>
-      (group.list || []).some((category) =>
-        /18\\s*\\+|phim\\s*18|người\\s*lớn|adult/i.test(
-          `${category.name || ""} ${category.slug || ""}`,
-        ),
-      ),
-    );
-    if (isAdultCategory) return [];
-
-    const serverData = payload.movie.episodes.flatMap((server) =>
-      (server.items || [])
-        .filter((episode) => Boolean(episode.embed))
-        .map((episode) => ({
-          name: episode.name || episode.slug || "Tập",
-          slug: episode.slug || `tap-${episode.name || "unknown"}`,
-          filename: episode.name || "",
-          link_embed: episode.embed || "",
-          link_m3u8: "",
-        })),
-    );
-
-    const uniqueEpisodes = Array.from(
-      new Map(serverData.map((episode) => [episode.slug, episode])).values(),
-    );
-    return uniqueEpisodes.length
-      ? [{ server_name: "Dự phòng", server_data: uniqueEpisodes }]
-      : [];
+    const payload = await response.json() as { episodes?: Episode[]; reason?: string };
+    if (!Array.isArray(payload.episodes)) {
+      console.warn("[NguonC] Không có server dự phòng:", payload.reason || "unknown");
+      return [];
+    }
+    return payload.episodes;
   } catch (error) {
-    console.warn("Không tải được server dự phòng NguonC:", error);
+    console.warn("[NguonC] Không gọi được API nội bộ:", error);
     return [];
   }
 }
