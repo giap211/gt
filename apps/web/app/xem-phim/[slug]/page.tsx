@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, Suspense, use } from "react";
+import { useEffect, useState, useRef, useCallback, Suspense, use, type MouseEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Play,
@@ -68,26 +68,13 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [isLandscape, setIsLandscape] = useState(false);
-
-  useEffect(() => {
-    const updateOrientation = () => setIsLandscape(window.matchMedia("(orientation: landscape)").matches);
-    updateOrientation();
-    window.addEventListener("resize", updateOrientation);
-    window.addEventListener("orientationchange", updateOrientation);
-    return () => {
-      window.removeEventListener("resize", updateOrientation);
-      window.removeEventListener("orientationchange", updateOrientation);
-    };
-  }, []);
-
   useEffect(() => {
     if (overlayOpen || !showPlayerChrome) return;
     const timeout = window.setTimeout(() => setShowPlayerChrome(false), 3200);
     return () => window.clearTimeout(timeout);
   }, [overlayOpen, showPlayerChrome]);
 
-  const handlePlayerTap = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handlePlayerTap = (event: MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement | null;
     // Không bật/tắt thanh chrome khi người xem thao tác với điều khiển của Artplayer.
     if (target?.closest("button, a, input, video, iframe, .art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, .art-volume, .art-contextmenu")) return;
