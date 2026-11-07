@@ -24,11 +24,10 @@ const oswald = Oswald({
 
 import { Navbar } from "@/components/navbar";
 import { BottomDock } from "@/components/bottom-dock";
-import { Footer } from "@/components/footer";
 import { HideDevBadge } from "@/components/hide-dev-badge";
 import { MemberProvider } from "@/components/member-provider";
-import NextTopLoader from "nextjs-toploader";
 import { RouteScrollReset } from "@/components/route-scroll-reset";
+import { PersistentTabShell } from "@/components/persistent-tab-shell";
 
 export const metadata: Metadata = {
   title: "GiapTran - Xem phim chất lượng cao",
@@ -60,14 +59,12 @@ export default function RootLayout({
       <body
         className={`${beVietnamPro.variable} ${oswald.variable} antialiased bg-black text-white font-sans`}
       >
-        <NextTopLoader color="#ffd875" showSpinner={false} />
         <RouteScrollReset />
         <HideDevBadge />
         <MemberProvider>
           <Navbar />
-          <div className="pb-24 lg:pb-0">{children}</div>
+          <div className="pb-24 lg:pb-0"><PersistentTabShell>{children}</PersistentTabShell></div>
           <BottomDock />
-          <Footer />
         </MemberProvider>
       </body>
     </html>
