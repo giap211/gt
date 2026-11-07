@@ -312,104 +312,158 @@ export default function MovieDetailPage({
         </div>
       </div>
 
-      {/* ========== MOBILE ========== */}
-      <div className="movie-detail-content lg:hidden relative z-10 -mt-16 px-4 pb-6">
-        <div className="flex flex-col items-center">
-          <div className="relative w-[130px] aspect-[2/3] rounded-xl overflow-hidden border border-white/10 shadow-2xl mb-3">
-            <Image src={movie.poster_url} alt={movie.name} fill priority sizes="130px" className="object-cover" />
-          </div>
-          <h1 className="text-xl font-bold text-center leading-tight">{movie.name}</h1>
-          <p className="text-sm text-[#d4a84b] mt-0.5 text-center">{movie.origin_name}</p>
-
-          <button
-            onClick={() => setShowInfo(!showInfo)}
-            className="mt-2 flex items-center gap-1 text-[#ffd875] text-sm"
-          >
-            Thông tin phim
-            <ChevronDown size={14} className={showInfo ? "rotate-180" : ""} />
-          </button>
-
-          {showInfo && (
-            <div className="mt-3 w-full bg-white/5 rounded-xl p-3 border border-white/5">
-              <InfoBlock mobile />
+      {/* ========== MOBILE — APPLE TV STYLE ========== */}
+      <section className="movie-detail-mobile lg:hidden">
+        <div className="relative h-[570px] w-full overflow-hidden">
+          <Image
+            src={heroSrc}
+            alt={movie.name}
+            fill
+            priority
+            quality={92}
+            sizes="100vw"
+            className="object-cover object-[center_25%]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#080b12]" />
+          <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),14px)]">
+            <Link href="/" aria-label="Quay lại" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white shadow-lg backdrop-blur-xl">
+              <span className="text-[26px] leading-none">‹</span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <button type="button" aria-label="Truyền phát" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white backdrop-blur-xl">
+                <span className="text-lg">▣</span>
+              </button>
+              <button type="button" onClick={() => setShowInfo(!showInfo)} aria-label="Thông tin phim" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white backdrop-blur-xl">
+                <span className="text-xl leading-none">•••</span>
+              </button>
             </div>
-          )}
+          </div>
 
-          <Link
-            href={watchHref}
-            className="mt-4 w-full max-w-xs inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#ffd875] to-[#f0c24d] text-[#1a1a1a] font-bold py-3 rounded-full"
-          >
-            <Play size={18} className="fill-current" />
-            Xem Ngay
-          </Link>
+          <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-7 pt-24">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.34em] text-white/65">PHIM ĐẶC SẮC</p>
+            <h1 className="max-w-[95%] text-[34px] font-bold leading-[1.06] tracking-[-0.04em] text-white drop-shadow-lg">{movie.name}</h1>
+            {movie.origin_name && <p className="mt-2 text-sm font-medium text-white/70">{movie.origin_name}</p>}
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-white/80">
+              {movie.year && <span>{movie.year}</span>}
+              {movie.year && movie.time && <span className="text-white/35">·</span>}
+              {movie.time && <span>{movie.time}</span>}
+              {imdbScore && <span className="rounded-md border border-amber-300/50 px-1.5 py-0.5 font-semibold text-amber-200">★ {imdbScore}</span>}
+              {movie.quality && <span className="rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-slate-900">{movie.quality}</span>}
+              {movie.episode_current && <span className="rounded-md border border-white/25 px-1.5 py-0.5">{movie.episode_current}</span>}
+            </div>
+            {movie.category?.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {movie.category.slice(0, 4).map((c) => (
+                  <Link key={c.id} href={`/the-loai/${c.slug}`} className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] text-white/85 backdrop-blur-md">{c.name}</Link>
+                ))}
+              </div>
+            )}
+            <div className="mt-5 grid grid-cols-[1.25fr_1fr] gap-2.5">
+              <Link href={watchHref} className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full bg-white px-5 text-[15px] font-bold text-[#10131a] shadow-[0_8px_28px_rgba(255,255,255,.18)] active:scale-[.98]">
+                <Play size={19} fill="currentColor" /> Phát ngay
+              </Link>
+              <button type="button" onClick={() => setShowInfo(!showInfo)} className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 text-[14px] font-semibold text-white backdrop-blur-xl active:scale-[.98]">
+                <ChevronDown size={17} className={showInfo ? "rotate-180 transition-transform" : "transition-transform"} /> Thông tin
+              </button>
+            </div>
+          </div>
+        </div>
 
-          <div className="mt-4 flex items-center gap-5">
-            <MemberMovieActions
-              movie={{
-                movieSlug: movie.slug,
-                movieTitle: movie.name,
-                posterUrl: movie.poster_url,
-              }}
-            />
-            <button className="flex flex-col items-center gap-0.5 text-white/60">
-              <span className="flex items-center gap-1 rounded-full bg-[#282b3a] px-2.5 py-1">
-                <Star size={13} className="fill-[#ffd875] text-[#ffd875]" />
-                <span className="text-xs font-bold">0</span>
-              </span>
-              <span className="text-[10px]">Điểm</span>
+        <div className="relative -mt-1 space-y-7 bg-[#080b12] px-4 pb-10 pt-5">
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[14px] leading-6 text-white/75 line-clamp-3" dangerouslySetInnerHTML={{ __html: movie.content || "Nội dung phim đang được cập nhật." }} />
+            </div>
+            <button type="button" onClick={() => setShowInfo(!showInfo)} className="mt-1 inline-flex items-center gap-1 text-[13px] font-semibold text-white/65">
+              {showInfo ? "Thu gọn" : "Xem thêm"} <ChevronDown size={15} className={showInfo ? "rotate-180" : ""} />
+            </button>
+            {showInfo && (
+              <div className="mt-3 space-y-2 rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-[13px] text-white/70 backdrop-blur-xl">
+                <p><span className="text-white/40">Quốc gia: </span>{movie.country?.map((c) => c.name).join(", ") || "Đang cập nhật"}</p>
+                {movie.director?.length > 0 && <p><span className="text-white/40">Đạo diễn: </span>{movie.director.join(", ")}</p>}
+                <p><span className="text-white/40">Trạng thái: </span>{completed ? "Đã hoàn thành" : "Đang chiếu"}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-4 gap-2 border-y border-white/10 py-4">
+            <MemberMovieActions movie={{ movieSlug: movie.slug, movieTitle: movie.name, posterUrl: movie.poster_url }} />
+            <button type="button" onClick={() => setShowInfo(true)} className="flex flex-col items-center gap-2 text-white/65">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl">☆</span>
+              <span className="text-[11px]">Đánh giá</span>
+            </button>
+            <button type="button" onClick={() => { if (navigator.share) void navigator.share({ title: movie.name, url: window.location.href }); else void navigator.clipboard?.writeText(window.location.href); }} className="flex flex-col items-center gap-2 text-white/65">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl">↗</span>
+              <span className="text-[11px]">Chia sẻ</span>
+            </button>
+            <button type="button" onClick={() => document.getElementById("movie-episodes")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="flex flex-col items-center gap-2 text-white/65">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl">↓</span>
+              <span className="text-[11px]">Danh sách tập</span>
             </button>
           </div>
-        </div>
 
-        <div className="mt-5 border-b border-white/10">
-          <div className="flex gap-4 overflow-x-auto no-scrollbar">
-            {TABS.map((tab) => {
-              const key = tab.toLowerCase();
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(key)}
-                  className={`relative pb-2.5 text-sm whitespace-nowrap ${activeTab === key ? "text-[#ffd875]" : "text-white/40"}`}
-                >
-                  {tab}
-                  {activeTab === key && (
-                    <span className="absolute bottom-0 inset-x-0 h-0.5 bg-[#ffd875] rounded-full" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="mt-4 space-y-5">
-          <TabContent
-            activeTab={activeTab}
-            isSeries={isSeries}
-            episodes={episodes}
-            selectedServer={selectedServer}
-            setSelectedServer={setSelectedServer}
-            currentServerData={currentServerData}
-            movie={movie}
-            related={related}
-            actorImages={actorImages}
-          />
-          {activeTab === "tập phim" && (
-            <>
-              <div id="comments-section">
-                <CommentsPanel
-                  movie={{
-                    movieSlug: movie.slug,
-                    movieTitle: movie.name,
-                    posterUrl: movie.poster_url,
-                  }}
-                />
+          {movie.actor?.length > 0 && (
+            <section>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-[17px] font-semibold tracking-tight text-white">Diễn viên nổi bật</h2>
+                <button type="button" onClick={() => setActiveTab("diễn viên")} className="text-[12px] text-white/50">Xem tất cả ›</button>
               </div>
+              <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 no-scrollbar snap-x">
+                {movie.actor.slice(0, 12).map((name) => (
+                  <div key={name} className="w-[104px] shrink-0 snap-start">
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 bg-white/10">
+                      {actorImages[name] ? <img src={actorImages[name]} alt={name} className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" /> : <div className="flex h-full items-center justify-center text-2xl font-semibold text-white/30">{name.trim().charAt(0).toUpperCase()}</div>}
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-[12px] font-medium leading-snug text-white/85">{name}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section id="movie-episodes" className="scroll-mt-5">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-[17px] font-semibold tracking-tight text-white">Danh sách tập</h2>
+              <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] text-white/70">{episodes[selectedServer]?.server_name || "Bản chiếu"}</span>
+            </div>
+            <div className="mb-3 flex gap-2 overflow-x-auto no-scrollbar">
+              {episodes.map((ep, idx) => (
+                <button key={idx} type="button" onClick={() => setSelectedServer(idx)} className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] ${selectedServer === idx ? "border-white/60 bg-white text-slate-900" : "border-white/15 bg-white/[0.06] text-white/65"}`}>{ep.server_name || `Server ${idx + 1}`}</button>
+              ))}
+            </div>
+            <div className="space-y-2">
+              {currentServerData.map((ep, idx) => (
+                <Link key={ep.slug || ep.name} href={`/xem-phim/${movie.slug}?sv=${selectedServer}&tap=${encodeURIComponent(ep.slug || ep.name)}`} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-2.5 transition-colors active:bg-white/10">
+                  <div className="relative h-[76px] w-[118px] shrink-0 overflow-hidden rounded-xl bg-white/10">
+                    <Image src={movie.thumb_url || movie.poster_url} alt="" fill sizes="118px" className="object-cover" />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/25"><Play size={22} fill="white" /></span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-white">{formatEpisodeName(ep.name) || `Tập ${idx + 1}`}</p>
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-white/45">{movie.name} · {movie.time || "Thời lượng đang cập nhật"}</p>
+                  </div>
+                </Link>
+              ))}
+              {!currentServerData.length && <p className="rounded-xl bg-white/[0.06] p-4 text-sm text-white/50">Danh sách tập đang được cập nhật.</p>}
+            </div>
+          </section>
+
+          <div className="border-t border-white/10 pt-5">
+            <div className="mb-4 flex gap-4 overflow-x-auto no-scrollbar">
+              {TABS.map((tab) => {
+                const key = tab.toLowerCase();
+                return <button key={tab} type="button" onClick={() => setActiveTab(key)} className={`shrink-0 pb-2 text-[13px] ${activeTab === key ? "border-b-2 border-white text-white" : "text-white/45"}`}>{tab}</button>;
+              })}
+            </div>
+            <div className="space-y-5">
+              {activeTab !== "tập phim" && <TabContent activeTab={activeTab} isSeries={isSeries} episodes={episodes} selectedServer={selectedServer} setSelectedServer={setSelectedServer} currentServerData={currentServerData} movie={movie} related={related} actorImages={actorImages} />}
+              <div id="comments-section"><CommentsPanel movie={{ movieSlug: movie.slug, movieTitle: movie.name, posterUrl: movie.poster_url }} /></div>
               <FaqSection name={movie.name} items={faqItems} />
               <RelatedSection related={related} />
-            </>
-          )}
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* ========== DESKTOP PC ========== */}
       <div className="hidden lg:block relative z-10 -mt-28 pb-10">
