@@ -155,7 +155,7 @@ export function BottomDock() {
 
       {/* Full-screen search overlay */}
       {searchOpen && (
-        <div className="mobile-search-overlay lg:hidden fixed inset-0 z-[90] bg-[#0a0b10] flex flex-col">
+        <div className="mobile-search-overlay lg:hidden fixed inset-0 z-[70] bg-[#0a0b10] flex flex-col pb-[calc(env(safe-area-inset-bottom)+88px)]">
           <div className="flex items-center gap-2 px-3 pt-[max(12px,env(safe-area-inset-top))] pb-2 border-b border-white/10">
             <button
               type="button"
@@ -287,7 +287,7 @@ export function BottomDock() {
 
       {/* Account menu overlay */}
       {accountOpen && (
-        <div className="lg:hidden fixed inset-0 z-[95] flex items-end justify-center bg-black/65 px-4 pb-[calc(env(safe-area-inset-bottom)+92px)] backdrop-blur-md" onClick={() => setAccountOpen(false)}>
+        <div className="lg:hidden fixed inset-0 z-[70] flex items-end justify-center bg-black/65 px-4 pb-[calc(env(safe-area-inset-bottom)+92px)] backdrop-blur-md" onClick={() => setAccountOpen(false)}>
           <div className="mobile-account-sheet w-full max-w-sm overflow-hidden rounded-[26px] border border-white/20 bg-[#171923]/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl" style={{ WebkitBackdropFilter: "blur(30px) saturate(170%)" }} onClick={(event) => event.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between border-b border-white/10 px-1 pb-3">
               <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ffd875]">Tài khoản</p><p className="mt-1 truncate text-sm font-semibold text-white">{user ? user.username : "Chào mừng bạn"}</p></div>
@@ -317,10 +317,7 @@ export function BottomDock() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-3 pb-2.5 pt-1">
           <nav
-            className="bottom-dock-surface pointer-events-auto grid grid-cols-5 items-center rounded-[26px] px-1.5 py-2
-              bg-white/[0.1] border border-white/20
-              shadow-[0_8px_36px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.22)]
-              backdrop-blur-2xl"
+            className="bottom-dock-surface pointer-events-auto grid grid-cols-5 items-center rounded-[26px] px-1.5 py-2 bg-white/[0.1] border border-white/20 shadow-[0_8px_36px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.22)] backdrop-blur-2xl"
             style={{ WebkitBackdropFilter: "blur(28px) saturate(160%)" }}
           >
             {/* Home */}
