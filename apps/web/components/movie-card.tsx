@@ -44,48 +44,29 @@ function buildLangChip(
   language?: string,
   episodeCurrent?: string,
 ): string | null {
-  if (!language && !episodeCurrent) return null;
+  if (!language) return null;
 
-  const l = (language || "").toLowerCase();
-  let prefix = "PĐ.";
-  if (
-    l.includes("vietsub") &&
-    (l.includes("thuyết") || l.includes("tm") || l.includes("thuyet"))
-  ) {
-    prefix = "VS+TM.";
-  } else if (
-    l.includes("thuyết minh") ||
-    l === "tm" ||
-    l.includes("thuyet minh")
-  ) {
-    prefix = "TM.";
-  } else if (l.includes("lồng") || l.includes("long tieng")) {
-    prefix = "LT.";
-  } else if (
-    l.includes("vietsub") ||
-    l.includes("phụ đề") ||
-    l === "pđ" ||
-    l === "pd"
-  ) {
-    prefix = "PĐ.";
-  } else if (language) {
-    prefix =
-      language.length > 6
-        ? language.slice(0, 4).toUpperCase() + "."
-        : language.toUpperCase();
-  }
+  const l = language.toLowerCase();
+  const hasSubtitle = /vietsub|phụ đề|phu de|pđ|\\bpd\\b/.test(l);
+  const hasNarration = /thuyết minh|thuyet minh|\\btm\\b/.test(l);
+  const hasDubbing = /lồng tiếng|long tieng|\\blt\\b/.test(l);
+  const formats = [
+    hasSubtitle ? "PĐ" : "",
+    hasNarration ? "TM" : "",
+    hasDubbing ? "LT" : "",
+  ].filter(Boolean);
+  if (formats.length === 0) return null;
 
   let ep = "";
   if (episodeCurrent) {
-    const m = episodeCurrent.match(/(\d+)/);
+    const m = episodeCurrent.match(/(\\d+)/);
     if (m) ep = ` ${m[1]}`;
     else if (/full/i.test(episodeCurrent)) ep = " Full";
-    else ep = ` ${episodeCurrent.replace(/tập\s*/i, "").trim()}`;
+    else ep = ` ${episodeCurrent.replace(/tập\\s*/i, "").trim()}`;
   }
 
-  return `${prefix}${ep}`.trim();
+  return `${formats.join(" ")}${ep}`.trim();
 }
-
 function qualityChip(quality?: string): string {
   if (!quality) return "QL. HD";
   const q = quality.toUpperCase();
@@ -135,12 +116,6 @@ export const MovieCard = ({
       : 0;
   const showProgressBar = hasRuntime && (hasRealProgress || simulateProgressWhenEmpty);
 
-  const showBilingual =
-    (language || "").toLowerCase().includes("vietsub") ||
-    (language || "").toLowerCase().includes("song") ||
-    (language || "").toLowerCase().includes("tm") ||
-    true;
-
   return (
     <div className="group relative w-full">
       <Link
@@ -163,12 +138,6 @@ export const MovieCard = ({
           quality={80}
           loading="lazy"
         />
-
-        {showBilingual && isHorizontal && (
-          <span className="absolute top-2 left-2 z-20 rounded-md bg-[#3b82f6] px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-sm">
-            Song ngữ
-          </span>
-        )}
 
         <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-wrap gap-0.5 p-1.5 pointer-events-none">
           {langChip && (
