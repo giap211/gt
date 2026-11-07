@@ -301,10 +301,15 @@ function MemberAuthModal({
               className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#ffd875]/60"
               placeholder="Tên tài khoản"
               autoComplete="username"
-              minLength={3}
-              maxLength={24}
+              minLength={isRegister ? 3 : undefined}
+              maxLength={isRegister ? 20 : undefined}
               required
             />
+            {isRegister && (
+              <p className="-mt-1 px-1 text-[11px] text-white/40">
+                3–20 ký tự: chữ cái, chữ số và @.
+              </p>
+            )}
             <input
               value={password}
               onChange={(event) => setPassword(event.target.value)}
@@ -312,10 +317,15 @@ function MemberAuthModal({
               placeholder="Mật khẩu"
               type="password"
               autoComplete={isRegister ? "new-password" : "current-password"}
-              minLength={8}
-              maxLength={128}
+              minLength={isRegister ? 3 : undefined}
+              maxLength={isRegister ? 128 : undefined}
               required
             />
+            {isRegister && (
+              <p className="-mt-1 px-1 text-[11px] text-white/40">
+                Tối thiểu 3 ký tự: chữ cái, chữ số và @.
+              </p>
+            )}
 
             {error && (
               <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-200">
