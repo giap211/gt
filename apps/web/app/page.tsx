@@ -10,6 +10,7 @@ import { GhibliSection } from "@/components/ghibli-section";
 import { ContinueWatchingSection } from "@/components/continue-watching-section";
 import {
   getLatestMovies,
+  getMoviesByLanguage,
   getMoviesByType,
   getMoviesByCountry,
   getMoviesByCategory,
@@ -24,6 +25,7 @@ type HeroMovie = ListMovie & {
 export default function Home() {
   const [data, setData] = useState<{
     latest: ListMovie[];
+    dubbed: ListMovie[];
     korean: ListMovie[];
     chinese: ListMovie[];
     usuk: ListMovie[];
@@ -41,6 +43,7 @@ export default function Home() {
     hero: HeroMovie[];
   }>({
     latest: [],
+    dubbed: [],
     korean: [],
     chinese: [],
     usuk: [],
@@ -106,6 +109,7 @@ export default function Home() {
       try {
         const [
           latestRes,
+          dubbedRes,
           koreanRes,
           chineseRes,
           usukRes,
@@ -122,6 +126,7 @@ export default function Home() {
           vietRes,
         ] = await Promise.all([
           getLatestMovies(1),
+          getMoviesByLanguage("thuyet-minh", 1),
           getMoviesByCountry("han-quoc", 1, true),
           getMoviesByCountry("trung-quoc", 1, true),
           getMoviesByCountry("au-my", 1, true),
@@ -161,6 +166,7 @@ export default function Home() {
 
         setData({
           latest: latestRes?.items || [],
+          dubbed: dubbedRes?.items || [],
           korean: koreanRes?.items || [],
           chinese: chineseRes?.items || [],
           usuk: usukRes?.items || [],
@@ -268,12 +274,10 @@ export default function Home() {
               />
 
               <MovieCarousel
-                title="Phim Phụ Đề Mới Nhất"
+                title="Phim Thuyết Minh Mới Nhất"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #fbbf24 130%)"
-                viewMoreLink="/danh-sach/phim-bo"
-                items={transformMovies(
-                  uniqueMovies([...data.series, ...data.single]).slice(0, 14),
-                )}
+                viewMoreLink="/danh-sach/phim-thuyet-minh"
+                items={transformMovies(data.dubbed.slice(0, 14))}
               />
 
               <MovieCarousel
