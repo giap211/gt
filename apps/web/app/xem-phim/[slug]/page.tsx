@@ -177,8 +177,19 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     fetch(`/api/tmdb-runtime?${params.toString()}`)
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
-        if (!cancelled && Number(data?.runtimeSeconds) > 0) {
+        if (cancelled) return;
+        if (Number(data?.runtimeSeconds) > 0) {
           setTmdbRuntimeSeconds(Math.floor(Number(data.runtimeSeconds)));
+        }
+        if (Array.isArray(data?.episodeStills)) {
+          setEpisodeStills(Object.fromEntries(
+            data.episodeStills
+              .filter((item: { episodeNumber?: number; stillPath?: string }) => Number(item.episodeNumber) > 0 && item.stillPath)
+              .map((item: { episodeNumber: number; stillPath: string }) => [
+                Number(item.episodeNumber),
+                `https://image.tmdb.org/t/p/w500${item.stillPath}`,
+              ]),
+          ));
         }
       })
       .catch(() => undefined);
