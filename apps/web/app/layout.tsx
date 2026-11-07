@@ -23,6 +23,7 @@ const oswald = Oswald({
 });
 
 import { Navbar } from "@/components/navbar";
+import { BottomDock } from "@/components/bottom-dock";
 import { Footer } from "@/components/footer";
 import { HideDevBadge } from "@/components/hide-dev-badge";
 import { ScrollToTop } from "@/components/scroll-to-top";
@@ -65,7 +66,8 @@ export default function RootLayout({
         <HideDevBadge />
         <MemberProvider>
           <Navbar />
-          {children}
+          <div className="pb-24 lg:pb-0">{children}</div>
+          <BottomDock />
           <ScrollToTop />
           <Footer />
         </MemberProvider>
