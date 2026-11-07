@@ -133,7 +133,9 @@ export default function Home() {
           getMoviesByType("phim-bo", 1, true),
           getMoviesByType("phim-le", 1, true),
           getMoviesByType("hoat-hinh", 1, true),
-          getMoviesByType("phim-sap-chieu", 1, true),
+          // Dùng category chieu-rap (map sang phim-le) thay vì phim-sap-chieu
+          // để chỉ hiện phim chiếu rạp đã có nguồn xem.
+          getMoviesByCategory("chieu-rap", 1, true),
           getMoviesByCountry("nhat-ban", 1, true),
           getMoviesByCountry("thai-lan", 1, true),
           getMoviesByCountry("hong-kong", 1, true),
@@ -173,10 +175,7 @@ export default function Home() {
           series: seriesRes?.items || [],
           single: singleRes?.items || [],
           cartoon: cartoonRes?.items || [],
-          cinema:
-            (cinemaRes?.items?.length
-              ? cinemaRes.items
-              : singleRes?.items) || [],
+          cinema: cinemaRes?.items || singleRes?.items || [],
           japanese: japaneseRes?.items || [],
           thai: thaiRes?.items || [],
           hongkong: hongkongRes?.items || [],
