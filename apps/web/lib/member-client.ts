@@ -5,6 +5,7 @@ const BACKEND_PROXY_BASE_URL = "/api/backend";
 
 export interface MemberUser {
   id: string;
+  username: string;
   email: string;
   name: string;
 }
@@ -94,7 +95,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
-    const response = await fetch(`${memberApiBaseUrl()}${path}`, {
+    const url = path.startsWith("/api/") ? path : `${memberApiBaseUrl()}${path}`;
+    const response = await fetch(url, {
       ...init,
       credentials: "include",
       signal: controller.signal,
@@ -120,23 +122,23 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const memberClient = {
   async me(): Promise<{ user: MemberUser | null }> {
     try {
-      return await request<{ user: MemberUser | null }>("/auth/me");
+      return await request<{ user: MemberUser | null }>("/api/auth/me");
     } catch {
       // Không giả lập trạng thái đăng nhập từ localStorage.
       return { user: null };
     }
   },
 
-  async register(input: { email: string; name: string; password: string }): Promise<{ user: MemberUser }> {
-    const res = await request<{ user: MemberUser }>("/auth/register", {
+  async register(input: { username: string; password: string }): Promise<{ user: MemberUser }> {
+    const previousUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
+    const res = await request<{ user: MemberUser }>("/api/auth/register", {
       method: "POST",
       body: JSON.stringify(input),
     });
-    const previousUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
     setLocalItem(STORAGE_KEYS.USER, res.user);
-    if (previousUser?.email.toLowerCase() === res.user.email.toLowerCase()) {
+    if (previousUser?.username?.toLowerCase() === res.user.username.toLowerCase()) {
       try {
-        await this.syncLocalHistoryToAccount(res.user.email);
+        await this.syncLocalHistoryToAccount(res.user.username);
       } catch (error) {
         console.warn("[Member] Chưa thể đồng bộ lịch sử xem cũ:", error);
       }
@@ -144,29 +146,28 @@ export const memberClient = {
     return res;
   },
 
-  async login(input: { email: string; password: string }): Promise<{ user: MemberUser }> {
-    const res = await request<{ user: MemberUser }>("/auth/login", {
+  async login(input: { username: string; password: string }): Promise<{ user: MemberUser }> {
+    const previousUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
+    const res = await request<{ user: MemberUser }>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(input),
     });
-    const previousUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
     setLocalItem(STORAGE_KEYS.USER, res.user);
-    if (previousUser?.email.toLowerCase() === res.user.email.toLowerCase()) {
-      await this.syncLocalHistoryToAccount(res.user.email);
+    if (previousUser?.username?.toLowerCase() === res.user.username.toLowerCase()) {
+      await this.syncLocalHistoryToAccount(res.user.username);
     }
     return res;
   },
 
-  async syncLocalHistoryToAccount(accountEmail: string): Promise<void> {
+  async syncLocalHistoryToAccount(accountUsername: string): Promise<void> {
     const localUser = getLocalItem<MemberUser | null>(STORAGE_KEYS.USER, null);
-    if (!localUser || localUser.email.toLowerCase() !== accountEmail.toLowerCase()) return;
+    if (!localUser || localUser.username.toLowerCase() !== accountUsername.toLowerCase()) return;
 
     const localHistory = getLocalItem<WatchHistoryItem[]>(STORAGE_KEYS.HISTORY, []);
     if (!localHistory.length) return;
 
-    // Chỉ xóa lịch sử trên thiết bị sau khi máy chủ xác nhận đã nhận toàn bộ.
     await Promise.all(localHistory.slice(0, 50).map((item) =>
-      request<{ item: unknown }>("/member/history", {
+      request<{ item: unknown }>("/api/member/history", {
         method: "POST",
         body: JSON.stringify({
           movieSlug: item.movieSlug,
@@ -184,7 +185,7 @@ export const memberClient = {
 
   async logout(): Promise<{ ok: true }> {
     try {
-      await request<{ ok: true }>("/auth/logout", { method: "POST" });
+      await request<{ ok: true }>("/api/auth/logout", { method: "POST" });
     } catch {
       // ignore
     }
@@ -244,7 +245,7 @@ export const memberClient = {
   },
 
   async history(): Promise<{ items: WatchHistoryItem[] }> {
-    return await request<{ items: WatchHistoryItem[] }>("/member/history");
+    return await request<{ items: WatchHistoryItem[] }>("/api/member/history");
   },
 
   async comments(movieSlug: string): Promise<{ items: CommentItem[] }> {
@@ -292,7 +293,7 @@ export const memberClient = {
   async saveHistory(
     input: MoviePayload & { episodeName: string; episodeSlug?: string; progressSeconds?: number; totalDurationSeconds?: number },
   ): Promise<{ item: unknown }> {
-    return await request<{ item: unknown }>("/member/history", {
+    return await request<{ item: unknown }>("/api/member/history", {
       method: "POST",
       body: JSON.stringify(input),
     });
