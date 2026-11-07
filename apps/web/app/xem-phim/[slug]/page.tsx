@@ -87,7 +87,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     return () => window.clearTimeout(timeout);
   }, [overlayOpen, showPlayerChrome]);
 
-  const handlePlayerTap = () => setShowPlayerChrome((visible) => !visible);
+  const handlePlayerTap = (event: React.MouseEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement | null;
+    // Không bật/tắt thanh chrome khi người xem thao tác với điều khiển của Artplayer.
+    if (target?.closest("button, a, input, video, iframe, .art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, .art-volume, .art-contextmenu")) return;
+    setShowPlayerChrome((visible) => !visible);
+  };
 
   const changePlaybackRate = (rate: number) => {
     setPlaybackRate(rate);
@@ -97,17 +102,18 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   };
 
   const enterPlayerFullscreen = async () => {
-    const shell = document.querySelector(".watch-player-shell") as HTMLElement | null;
+    const playerPage = document.querySelector(".watch-player-page") as HTMLElement | null;
     try {
-      if (!document.fullscreenElement && shell?.requestFullscreen) {
-        await shell.requestFullscreen();
-        const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> };
-        await orientation.lock?.("landscape").catch(() => undefined);
+      if (!document.fullscreenElement && playerPage?.requestFullscreen) {
+        // Fullscreen toàn bộ player để overlay và nút tùy chọn vẫn nằm trên video.
+        // Không khóa hướng hệ điều hành: chế độ ngang được xử lý bằng CSS.
+        await playerPage.requestFullscreen();
       } else if (document.fullscreenElement) {
         await document.exitFullscreen();
       }
     } catch {
-      // iOS Safari có thể không hỗ trợ khóa xoay; người dùng vẫn xoay máy thủ công.
+      // Một số phiên bản iOS Safari không hỗ trợ fullscreen cho phần tử tùy ý.
+      // Player vẫn phủ toàn màn hình bằng CSS.
     }
   };
 
@@ -506,7 +512,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-top { position:absolute; z-index:50; top:max(14px,env(safe-area-inset-top)); left:max(16px,env(safe-area-inset-left)); right:max(16px,env(safe-area-inset-right)); display:flex; align-items:center; justify-content:space-between; pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
         .watch-player-top > * { pointer-events:auto; }
         .watch-player-glass { background:rgba(15,18,27,.58); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
-        .watch-player-menu { position:absolute; z-index:60; top:50%; right:max(18px,env(safe-area-inset-right)); transform:translateY(-50%); width:min(390px,42vw); max-height:min(82dvh,720px); overflow:auto; border-radius:28px; padding:18px; background:linear-gradient(145deg,rgba(28,32,44,.94),rgba(12,15,23,.9)); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.16); }
+        .watch-player-menu { position:absolute; z-index:60; top:50%; right:18px; transform:translateY(-50%); width:min(390px,42vw); max-height:min(82dvh,720px); overflow:auto; border-radius:28px; padding:18px; background:linear-gradient(145deg,rgba(28,32,44,.94),rgba(12,15,23,.9)); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.16); }
         .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
         .watch-player-menu .active-choice { color:#171717; background:#ffd875; border-color:#ffd875; }
@@ -514,13 +520,43 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-hidden { opacity:0; pointer-events:none; transform:translateY(-8px); }
         .watch-player-rotate-hint { display:none; }
         @media (orientation:landscape) and (max-width:1023px) {
-          .watch-player-shell .artplayer-app { height:100dvh !important; }
+          .watch-player-shell .artplayer-app { height:100% !important; }
         }
         @media (orientation:portrait) and (max-width:1023px) {
-          .watch-player-shell > div { height:auto !important; aspect-ratio:16/9 !important; }
-          .watch-player-shell .artplayer-app { height:auto !important; aspect-ratio:16/9 !important; }
-          .watch-player-menu { top:auto; bottom:max(12px,env(safe-area-inset-bottom)); left:12px; right:12px; transform:none; width:auto; max-height:72dvh; border-radius:24px; }
-          .watch-player-rotate-hint { display:block; position:absolute; z-index:30; bottom:18px; left:50%; transform:translateX(-50%); white-space:nowrap; color:rgba(255,255,255,.65); font-size:11px; }
+          /* Xoay toàn bộ giao diện 90° bằng CSS, không phụ thuộc khóa xoay iPhone. */
+          .watch-player-page {
+            inset:auto !important;
+            top:50% !important;
+            left:50% !important;
+            right:auto !important;
+            bottom:auto !important;
+            width:100vh !important;
+            height:100vw !important;
+            width:100dvh !important;
+            height:100vw !important;
+            transform:translate(-50%,-50%) rotate(90deg);
+            transform-origin:center center;
+            overflow:hidden !important;
+          }
+          .watch-player-shell > div,
+          .watch-player-shell .artplayer-app {
+            width:100% !important;
+            height:100% !important;
+            aspect-ratio:auto !important;
+          }
+          /* Dùng hệ kích thước của khung đã xoay: d/vh là chiều ngang, vw là chiều dọc. */
+          .watch-player-menu {
+            top:50%;
+            bottom:auto;
+            left:auto;
+            right:12px;
+            transform:translateY(-50%);
+            width:min(390px,42dvh);
+            max-height:min(82vw,720px);
+            border-radius:24px;
+          }
+          .watch-player-top { top:12px; left:16px; right:16px; }
+          .watch-player-rotate-hint { display:none !important; }
         }
         @media (min-width:1024px) { .watch-player-menu { right:32px; } }
       `}</style>
@@ -595,7 +631,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           </section>
         </>
       )}
-      {!isLandscape && <div className="watch-player-rotate-hint">Xoay ngang điện thoại để xem toàn màn hình</div>}
+
     </main>
   );
 }
