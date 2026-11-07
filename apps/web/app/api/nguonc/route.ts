@@ -69,14 +69,15 @@ export async function GET(request: NextRequest) {
       .filter(Boolean),
   );
 
-  const searches = await Promise.all(
+  const searchResponses = await Promise.all(
     names.map(async (name) => {
       const result = await fetchJson(
         `https://phim.nguonc.com/api/films/search?keyword=${encodeURIComponent(name)}&page=1`,
       );
-      return result.ok ? getSearchItems(result.data) : [];
+      return { ...result, items: result.ok ? getSearchItems(result.data) : [] };
     }),
   );
+  const searches = searchResponses.map((result) => result.items);
 
   const candidates = new Map<string, { item: SearchItem; score: number }>();
   for (const item of searches.flat()) {
@@ -87,8 +88,12 @@ export async function GET(request: NextRequest) {
     const itemNames = [item.original_name, item.origin_name, item.name]
       .map(normalizeTitle)
       .filter(Boolean);
-    const originalMatch = itemOriginalNames.some((name) => normalizedOriginalNames.has(name));
-    const titleMatch = itemNames.some((name) => normalizedNames.includes(name));
+    const originalMatch = itemOriginalNames.some((candidate) =>
+      Array.from(normalizedOriginalNames).some((expected) => titlesMatch(candidate, expected)),
+    );
+    const titleMatch = itemNames.some((candidate) =>
+      normalizedNames.some((expected) => titlesMatch(candidate, expected)),
+    );
     if (!originalMatch && !titleMatch) continue;
 
     const itemYear = Number(item.year) || 0;
@@ -111,6 +116,10 @@ export async function GET(request: NextRequest) {
       reason: searches.some((items) => items.length) ? "no-title-match" : "search-empty-or-failed",
       searchedNames: names,
       searchResultCounts: searches.map((items) => items.length),
+      searchHttpStatuses: searchResponses.map((result) => result.status),
+      searchPayloadKeys: searchResponses.map((result) =>
+        result.data && typeof result.data === "object" ? Object.keys(result.data) : [],
+      ),
     });
   }
 
