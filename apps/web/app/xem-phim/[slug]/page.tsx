@@ -597,7 +597,10 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       )}
       {!isLandscape && <div className="watch-player-rotate-hint">Xoay ngang điện thoại để xem toàn màn hình</div>}
     </main>
-  );interface EpisodeListProps {
+  );
+}
+
+interface EpisodeListProps {
   episodes: Episode[];
   currentEpisode: { name: string; url: string } | null;
   slug: string;
