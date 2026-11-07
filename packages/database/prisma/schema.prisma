@@ -24,6 +24,7 @@ model Movie {
 
 model User {
   id           String         @id @default(cuid())
+  username     String         @unique
   email        String         @unique
   name         String
   passwordHash String
@@ -90,17 +91,18 @@ model Rating {
 }
 
 model WatchHistory {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  movieSlug       String
-  movieTitle      String
-  posterUrl       String?
-  episodeName     String
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movieSlug             String
+  movieTitle            String
+  posterUrl             String?
+  episodeName           String
+  episodeSlug            String?
   progressSeconds       Int      @default(0)
   totalDurationSeconds  Int      @default(0)
-  updatedAt       DateTime @updatedAt
-  createdAt       DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  createdAt             DateTime @default(now())
 
   @@unique([userId, movieSlug, episodeName])
   @@index([userId, updatedAt])
