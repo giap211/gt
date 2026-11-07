@@ -155,10 +155,11 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
 
   useEffect(() => {
     let cancelled = false;
-    setTmdbRuntimeSeconds(0);\n    setEpisodeStills({});
-    if (!movie?.tmdb?.id || !currentEpisode) return;
-    const namedEpisode = currentEpisode.name.match(/s(\\d{1,2})\\s*e(\\d{1,3})/i);
-    const simpleEpisode = currentEpisode.name.match(/(?:tập|episode|ep)\\s*0*(\\d+)/i) ||
+    setTmdbRuntimeSeconds(0);
+    setEpisodeStills({});
+    const namedEpisode = currentEpisode.name.match(/s(\d{1,2})\s*e(\d{1,3})/i);
+    const simpleEpisode = currentEpisode.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) ||
+      currentEpisode.name.match(/^0*(\d+)$/);
       currentEpisode.name.match(/^0*(\\d+)$/);
     const isSeries =
       movie.tmdb?.type?.toLowerCase() === "tv" ||
