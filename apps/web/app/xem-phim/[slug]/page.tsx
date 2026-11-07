@@ -13,9 +13,6 @@ import {
   SkipBack,
   SkipForward,
   Check,
-  ChevronDown,
-  MonitorPlay,
-  Subtitles,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
