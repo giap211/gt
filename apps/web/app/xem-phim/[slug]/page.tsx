@@ -496,7 +496,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const suggestedMovies = transformListMovies(latestMovies);
 
   return (
-    <main className="watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white" onPointerDown={() => setShowPlayerChrome(true)}>
+    <main className="watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white">
       <style jsx global>{`
         .watch-player-page { width:100vw; height:100dvh; }
         .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
