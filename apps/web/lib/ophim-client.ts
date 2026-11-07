@@ -746,7 +746,7 @@ async function getNguonCEpisodes(
         new Map<string, ServerData>(serverData.map((episode): [string, ServerData] => [episode.slug, episode])).values(),
       );
       return uniqueEpisodes.length
-        ? [{ server_name: "Dự phòng NguonC", server_data: uniqueEpisodes }]
+        ? [{ server_name: "Dự phòng", server_data: uniqueEpisodes }]
         : [];
     }
 
