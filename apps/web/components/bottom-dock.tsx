@@ -16,6 +16,8 @@ import {
   Bookmark,
   Clock3,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
@@ -27,6 +29,7 @@ export function BottomDock() {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [mobileTheme, setMobileTheme] = useState<"dark" | "light">("dark");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ListMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -39,6 +42,20 @@ export function BottomDock() {
   useEffect(() => {
     setSearchOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("gt-mobile-theme");
+    const theme = saved === "light" ? "light" : "dark";
+    setMobileTheme(theme);
+    document.documentElement.dataset.mobileTheme = theme;
+  }, []);
+
+  const toggleMobileTheme = () => {
+    const next = mobileTheme === "dark" ? "light" : "dark";
+    setMobileTheme(next);
+    document.documentElement.dataset.mobileTheme = next;
+    window.localStorage.setItem("gt-mobile-theme", next);
+  };
 
   useEffect(() => {
     if (searchOpen) {
@@ -92,9 +109,53 @@ export function BottomDock() {
 
   return (
     <>
+      <style jsx global>{`
+        @media (max-width: 1023px) {
+          html[data-mobile-theme="light"] body { background: #f4f6fb !important; color: #252a36 !important; }
+          html[data-mobile-theme="light"] body [class~="text-white"],
+          html[data-mobile-theme="light"] body [class~="text-white/90"],
+          html[data-mobile-theme="light"] body [class~="text-white/85"],
+          html[data-mobile-theme="light"] body [class~="text-white/80"],
+          html[data-mobile-theme="light"] body [class~="text-white/75"],
+          html[data-mobile-theme="light"] body [class~="text-white/70"],
+          html[data-mobile-theme="light"] body [class~="text-white/65"],
+          html[data-mobile-theme="light"] body [class~="text-white/60"],
+          html[data-mobile-theme="light"] body [class~="text-white/55"] { color: #303746 !important; }
+          html[data-mobile-theme="light"] body [class~="text-white/50"],
+          html[data-mobile-theme="light"] body [class~="text-white/45"],
+          html[data-mobile-theme="light"] body [class~="text-white/40"],
+          html[data-mobile-theme="light"] body [class~="text-white/35"],
+          html[data-mobile-theme="light"] body [class~="text-white/30"] { color: #687184 !important; }
+          html[data-mobile-theme="light"] body [class*="bg-[#0"],
+          html[data-mobile-theme="light"] body [class*="bg-[#1"],
+          html[data-mobile-theme="light"] body [class*="bg-[#2"] { background-color: #fff !important; }
+          html[data-mobile-theme="light"] body [class*="border-white/"] { border-color: rgba(40,48,65,.14) !important; }
+          html[data-mobile-theme="light"] header.fixed {
+            background: rgba(250,251,255,.9) !important; border-color: rgba(40,48,65,.12) !important;
+            box-shadow: 0 8px 28px rgba(35,45,65,.1) !important;
+          }
+          html[data-mobile-theme="light"] header.fixed a,
+          html[data-mobile-theme="light"] header.fixed button { color: #303746; }
+          html[data-mobile-theme="light"] body input,
+          html[data-mobile-theme="light"] body select {
+            color: #252a36 !important; background-color: #fff !important; border-color: rgba(40,48,65,.18) !important;
+          }
+          html[data-mobile-theme="light"] body input::placeholder { color: #8992a3 !important; }
+          html[data-mobile-theme="light"] body .bottom-dock-surface {
+            background: rgba(255,255,255,.84) !important; border-color: rgba(40,48,65,.15) !important;
+            box-shadow: 0 8px 30px rgba(35,45,65,.14), inset 0 1px 0 rgba(255,255,255,.9) !important;
+          }
+          html[data-mobile-theme="light"] body .mobile-account-sheet {
+            background: rgba(255,255,255,.95) !important; border-color: rgba(40,48,65,.15) !important;
+          }
+          html[data-mobile-theme="light"] body .mobile-account-sheet button { color: #303746; }
+          html[data-mobile-theme="light"] body .mobile-search-overlay { background: #f4f6fb !important; }
+        }
+      `}</style>
+
       {/* Full-screen search overlay */}
       {searchOpen && (
-        <div className="lg:hidden fixed inset-0 z-[90] bg-[#0a0b10] flex flex-col">
+        <div className="mobile-search-overlay lg:hidden fixed inset-0 z-[90] bg-[#0a0b10] flex flex-col">
           <div className="flex items-center gap-2 px-3 pt-[max(12px,env(safe-area-inset-top))] pb-2 border-b border-white/10">
             <button
               type="button"
@@ -227,11 +288,15 @@ export function BottomDock() {
       {/* Account menu overlay */}
       {accountOpen && (
         <div className="lg:hidden fixed inset-0 z-[95] flex items-end justify-center bg-black/65 px-4 pb-[calc(env(safe-area-inset-bottom)+92px)] backdrop-blur-md" onClick={() => setAccountOpen(false)}>
-          <div className="w-full max-w-sm overflow-hidden rounded-[26px] border border-white/20 bg-[#171923]/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl" style={{ WebkitBackdropFilter: "blur(30px) saturate(170%)" }} onClick={(event) => event.stopPropagation()}>
+          <div className="mobile-account-sheet w-full max-w-sm overflow-hidden rounded-[26px] border border-white/20 bg-[#171923]/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl" style={{ WebkitBackdropFilter: "blur(30px) saturate(170%)" }} onClick={(event) => event.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between border-b border-white/10 px-1 pb-3">
               <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ffd875]">Tài khoản</p><p className="mt-1 truncate text-sm font-semibold text-white">{user ? user.username : "Chào mừng bạn"}</p></div>
               <button type="button" onClick={() => setAccountOpen(false)} aria-label="Đóng menu tài khoản" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70"><X size={18} /></button>
             </div>
+            <button type="button" onClick={toggleMobileTheme} className="mb-2 flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.07] px-3 py-3 text-left text-sm text-white/90 active:bg-white/10">
+              <span className="flex items-center gap-3">{mobileTheme === "dark" ? <Sun size={18} className="text-[#ffd875]" /> : <Moon size={18} className="text-[#ffd875]" />} Giao diện {mobileTheme === "dark" ? "sáng" : "tối"}</span>
+              <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs">{mobileTheme === "dark" ? "Tối" : "Sáng"}</span>
+            </button>
             {user ? (
               <div className="space-y-1">
                 <button type="button" onClick={() => { setAccountOpen(false); openLibrary("favorites"); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm text-white/85 active:bg-white/10"><Bookmark size={18} className="text-[#ffd875]" /> Tủ phim của tôi</button>
@@ -252,7 +317,7 @@ export function BottomDock() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-3 pb-2.5 pt-1">
           <nav
-            className="pointer-events-auto grid grid-cols-5 items-center rounded-[26px] px-1.5 py-2
+            className="bottom-dock-surface pointer-events-auto grid grid-cols-5 items-center rounded-[26px] px-1.5 py-2
               bg-white/[0.1] border border-white/20
               shadow-[0_8px_36px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.22)]
               backdrop-blur-2xl"
