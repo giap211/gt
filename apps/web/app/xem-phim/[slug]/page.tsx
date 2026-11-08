@@ -68,41 +68,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [deviceRotation, setDeviceRotation] = useState<"portrait" | "left" | "right">("portrait");
-  const orientationPermissionRequestedRef = useRef(false);
-
-  useEffect(() => {
-    const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
-      if (event.gamma == null) return;
-      const gamma = event.gamma;
-      setDeviceRotation((current) => {
-        // Dùng ngưỡng khác nhau để tránh giao diện rung khi nghiêng máy gần ranh giới.
-        if (Math.abs(gamma) >= 55) return gamma > 0 ? "right" : "left";
-        if (Math.abs(gamma) <= 35) return "portrait";
-        return current;
-      });
-    };
-
-    window.addEventListener("deviceorientation", handleDeviceOrientation);
-    return () => window.removeEventListener("deviceorientation", handleDeviceOrientation);
-  }, []);
-
-  const requestOrientationSensor = useCallback(() => {
-    if (orientationPermissionRequestedRef.current) return;
-    orientationPermissionRequestedRef.current = true;
-
-    // iOS 13+ yêu cầu xin quyền cảm biến từ một thao tác chạm của người dùng.
-    const OrientationEvent = DeviceOrientationEvent as typeof DeviceOrientationEvent & {
-      requestPermission?: () => Promise<"granted" | "denied">;
-    };
-    if (typeof OrientationEvent.requestPermission === "function") {
-      void OrientationEvent.requestPermission().catch(() => {
-        orientationPermissionRequestedRef.current = false;
-      }).then((permission) => {
-        if (permission === "denied") orientationPermissionRequestedRef.current = false;
-      });
-    }
-  }, []);
+  const [isPlayerRotated, setIsPlayerRotated] = useState(false);
   useEffect(() => {
     if (overlayOpen || !showPlayerChrome) return;
     const timeout = window.setTimeout(() => setShowPlayerChrome(false), 3200);
@@ -110,11 +76,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   }, [overlayOpen, showPlayerChrome]);
 
   const handlePlayerInteraction = useCallback(() => {
-    // Chạm player cũng là thao tác hợp lệ để xin quyền cảm biến trên iPhone.
-    requestOrientationSensor();
-    // Chạm vào player luôn gọi lại tiêu đề.
     setShowPlayerChrome(true);
-  }, [requestOrientationSensor]);
+  }, []);
 
   const changePlaybackRate = (rate: number) => {
     setPlaybackRate(rate);
@@ -524,7 +487,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const suggestedMovies = transformListMovies(latestMovies);
 
   return (
-    <main className={`watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white ${deviceRotation === "left" ? "watch-device-landscape-left" : deviceRotation === "right" ? "watch-device-landscape-right" : ""}`}>
+    <main className={`watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white ${isPlayerRotated ? "watch-player-rotated" : ""}`}>
       <style jsx global>{`
         .watch-player-page { width:100vw; height:100dvh; }
         .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
@@ -547,9 +510,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           .watch-player-shell .artplayer-app { height:100% !important; }
         }
         @media (orientation:portrait) and (max-width:1023px) {
-          /* Chỉ xoay khi cảm biến xác nhận người dùng đang cầm máy ngang. */
-          .watch-player-page.watch-device-landscape-right,
-          .watch-player-page.watch-device-landscape-left {
+          /* Xoay thủ công bằng nút; không đọc cảm biến và không phụ thuộc khóa xoay iPhone. */
+          .watch-player-page.watch-player-rotated {
             position:fixed !important;
             inset:auto !important;
             top:50% !important;
@@ -561,15 +523,9 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             max-width:none !important;
             max-height:none !important;
             margin:0 !important;
+            transform:translate(-50%,-50%) rotate(90deg);
             transform-origin:center center;
             overflow:hidden !important;
-          }
-          /* Đảo chiều góc để chiều ngang khớp với hướng cầm thực tế trên iPhone. */
-          .watch-player-page.watch-device-landscape-right {
-            transform:translate(-50%,-50%) rotate(-90deg);
-          }
-          .watch-player-page.watch-device-landscape-left {
-            transform:translate(-50%,-50%) rotate(90deg);
           }
           .watch-player-shell > div,
           .watch-player-shell .artplayer-app {
@@ -626,9 +582,14 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           </div>
         </div>
       </div>
-      <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); requestOrientationSensor(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className={`watch-player-round watch-player-glass absolute right-4 top-4 z-[70] hover:border-[#ffd875]/70 transition-opacity duration-200 ${!showPlayerChrome && !overlayOpen ? "watch-player-hidden" : ""}`}>
-        {overlayOpen ? <X size={23}/> : <Settings2 size={23}/>}
-      </button>
+      <div className={`absolute right-4 top-4 z-[70] flex items-center gap-2 transition-opacity duration-200 ${!showPlayerChrome && !overlayOpen ? "watch-player-hidden" : ""}`}>
+        <button type="button" aria-label={isPlayerRotated ? "Xoay player về dọc" : "Xoay player sang ngang"} title={isPlayerRotated ? "Xoay về dọc" : "Xoay sang ngang"} onClick={(event) => { event.stopPropagation(); setIsPlayerRotated((rotated) => !rotated); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass hover:border-[#ffd875]/70">
+          <RotateCw size={21}/>
+        </button>
+        <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass hover:border-[#ffd875]/70">
+          {overlayOpen ? <X size={23}/> : <Settings2 size={23}/>}
+        </button>
+      </div>
 
       {overlayOpen && (
         <>
