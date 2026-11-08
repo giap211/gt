@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Search, Play, Bookmark, Check, X, Clock3, ArrowRight, Sparkles } from "lucide-react";
+import { Bell, Search, Play, Bookmark, X, Clock3, ArrowRight, Sparkles } from "lucide-react";
 import { useMember } from "./member-provider";
 import { memberClient } from "@/lib/member-client";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -183,16 +183,9 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                       aria-pressed={savedSlugs.has(movie.slug)}
                       disabled={savingSlug === movie.slug}
                       onClick={() => void handleToggleFavorite(movie)}
-                      className={`group/save inline-flex h-[42px] min-w-[42px] items-center justify-center gap-2 rounded-full border px-3 text-white backdrop-blur-xl transition-all duration-300 active:scale-[.94] disabled:opacity-70 sm:h-12 ${savedSlugs.has(movie.slug) ? "border-emerald-300/45 bg-emerald-400/20 text-emerald-100 shadow-[0_0_22px_rgba(52,211,153,.22)]" : "border-violet-300/35 bg-violet-400/15 shadow-[0_4px_18px_rgba(124,58,237,.24)] hover:bg-violet-400/25"}`}
+                      className={`group/save inline-flex h-[42px] min-w-[42px] items-center justify-center rounded-full border px-3 text-white backdrop-blur-xl transition-all duration-300 active:scale-[.94] disabled:opacity-70 sm:h-12 ${savedSlugs.has(movie.slug) ? "border-violet-200/70 bg-gradient-to-br from-fuchsia-500/90 to-violet-600/95 text-white shadow-[0_0_22px_rgba(168,85,247,.38)]" : "border-violet-300/35 bg-violet-400/15 shadow-[0_4px_18px_rgba(124,58,237,.24)] hover:bg-violet-400/25"}`}
                     >
-                      {savedSlugs.has(movie.slug) ? (
-                        <>
-                          <Check size={18} strokeWidth={2.6} className="animate-[heroSavedPop_.35s_ease-out]" />
-                          <span className="text-[12px] font-bold">Đã lưu</span>
-                        </>
-                      ) : (
-                        <Bookmark size={19} className="transition-transform duration-300 group-hover/save:scale-110" />
-                      )}
+                      <Bookmark size={19} fill={savedSlugs.has(movie.slug) ? "currentColor" : "none"} strokeWidth={2.4} className={savedSlugs.has(movie.slug) ? "animate-[heroSavedPop_.35s_ease-out] fill-current" : "transition-transform duration-300 group-hover/save:scale-110"} />
                     </button>
                   </div>
                 </div>
