@@ -75,11 +75,11 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   quality={92}
                   className="object-cover object-[center_28%] sm:object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-[#080a10]/95" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/10" />
               </div>
 
-              <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-[#080a10] opacity-95" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[145px] bg-gradient-to-b from-transparent via-[#080a10]/75 to-[#080a10] opacity-95 md:h-[185px]" />
 
               <div className="container relative z-20 flex h-full flex-col items-start justify-end px-5 pb-[142px] text-left sm:px-8 sm:pb-[150px] md:justify-center md:pb-10">
                 <div className="w-full max-w-[560px] animate-fade-up">
