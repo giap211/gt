@@ -799,6 +799,83 @@ export function BottomDock() {
           html[data-mobile-theme] body .movie-carousel-view-more:active {
             transform: scale(.97);
           }
+
+          /* Instagram-inspired compact floating dock: geometry matched to the supplied reference video. */
+          @media (max-width: 1023px) {
+            html[data-mobile-theme] body .liquid-dock {
+              width: min(84vw, 390px);
+              min-height: 50px !important;
+              height: 50px;
+              margin-inline: auto;
+              padding: 4px 7px !important;
+              border-radius: 999px !important;
+              background: rgba(246, 247, 249, .78) !important;
+              border: 1px solid rgba(255,255,255,.72) !important;
+              box-shadow: 0 7px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.92) !important;
+              -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
+              backdrop-filter: blur(24px) saturate(165%) !important;
+              overflow: visible;
+            }
+            html[data-mobile-theme] body .liquid-dock::before {
+              inset: 1px;
+              border-radius: inherit;
+              background: linear-gradient(115deg, rgba(255,255,255,.48), transparent 38%, rgba(210,218,232,.12));
+              opacity: 1;
+            }
+            html[data-mobile-theme] body .liquid-dock-indicator {
+              top: 50%;
+              bottom: auto;
+              left: calc(10% - 20px + var(--dock-active, 0) * 20%);
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              transform: translateY(-50%);
+              background: rgba(22, 25, 32, .09);
+              border: 0;
+              box-shadow: inset 0 1px 1px rgba(255,255,255,.58), 0 1px 3px rgba(20,25,35,.05);
+              transition: left .48s cubic-bezier(.2,.85,.2,1), background .25s ease;
+            }
+            html[data-mobile-theme] body .liquid-dock-item {
+              min-height: 40px !important;
+              height: 40px;
+              gap: 0 !important;
+              padding: 0 !important;
+              border-radius: 50%;
+              color: rgba(25, 28, 35, .78) !important;
+              transform: none;
+            }
+            html[data-mobile-theme] body .liquid-dock-item span {
+              display: none !important;
+            }
+            html[data-mobile-theme] body .liquid-dock-item svg {
+              width: 22px;
+              height: 22px;
+              filter: none;
+              stroke-width: 2;
+              color: inherit;
+            }
+            html[data-mobile-theme] body .liquid-dock-item.is-active {
+              color: #17191e !important;
+            }
+            html[data-mobile-theme] body .liquid-dock-item.is-active svg {
+              transform: scale(1.04);
+            }
+            html[data-mobile-theme="light"] body .liquid-dock {
+              background: rgba(250, 251, 255, .78) !important;
+              border-color: rgba(255,255,255,.88) !important;
+              box-shadow: 0 8px 25px rgba(55,65,100,.14), inset 0 1px 0 rgba(255,255,255,.98) !important;
+            }
+            html[data-mobile-theme="light"] body .liquid-dock-indicator {
+              background: rgba(70, 76, 96, .10);
+              box-shadow: inset 0 1px 1px rgba(255,255,255,.9), 0 1px 3px rgba(55,65,100,.06);
+            }
+            html[data-mobile-theme] body .liquid-dock-item:active {
+              transform: scale(.9);
+            }
+            @media (prefers-reduced-motion: reduce) {
+              html[data-mobile-theme] body .liquid-dock-indicator { transition: none !important; }
+            }
+          }
       `}</style>
 
       {/* Full-screen search overlay */}
