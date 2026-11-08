@@ -47,7 +47,7 @@ export const GhibliSection = () => {
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-1 sm:pt-4">
                 <Link
                   href="/phim/vung-dat-linh-hon"
-                  className="flex shrink-0 items-center gap-2 bg-white text-black px-5 sm:px-6 py-2.5 rounded-full font-black uppercase text-xs hover:bg-[#ffd875] transition-colors"
+                  className="flex shrink-0 items-center gap-2 bg-gradient-to-r from-fuchsia-500 via-violet-500 to-violet-700 text-white px-5 sm:px-6 py-2.5 rounded-full font-black uppercase text-xs shadow-[0_5px_20px_rgba(139,92,246,.3)] hover:brightness-110 transition-all"
                 >
                   <Play size={14} className="fill-black" />
                   Xem Ngay
