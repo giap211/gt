@@ -8,6 +8,9 @@ import { useEffect } from "react";
  */
 export function PosterScrollMotion() {
   useEffect(() => {
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (motionPreference.matches) return;
+
     const root = document.documentElement;
     let lastY = window.scrollY;
     let angle = 0;
