@@ -56,14 +56,14 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
     <>
       <style jsx global>{`
       .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:0 !important; }
-      .home-feature-hero .hero-bottom-fade { background:radial-gradient(ellipse 88% 105% at 50% 100%,rgba(168,85,247,.42) 0%,rgba(139,92,246,.24) 34%,rgba(124,58,237,.08) 62%,transparent 82%),linear-gradient(180deg,rgba(7,8,17,.06) 0%,rgba(7,8,17,.12) 28%,rgba(7,8,17,.68) 76%,#090b13 100%); }
-      .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,#0b0d14 0%,rgba(11,13,20,.96) 18%,rgba(76,29,149,.20) 58%,rgba(11,13,20,0) 100%); }
-      .home-feature-hero .hero-top-transition::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse 76% 85% at 50% 100%,rgba(139,92,246,.16) 0%,rgba(168,85,247,.07) 42%,transparent 78%); }
+      .home-feature-hero .hero-bottom-fade { background:radial-gradient(ellipse 88% 105% at 50% 100%,rgba(168,85,247,.38) 0%,rgba(139,92,246,.20) 34%,rgba(124,58,237,.06) 62%,transparent 82%),linear-gradient(180deg,rgba(7,8,17,0) 0%,rgba(7,8,17,.10) 28%,rgba(7,8,17,.62) 76%,#0b0d14 100%); }
+      .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,rgba(9,11,20,.78) 0%,rgba(9,11,20,.48) 16%,rgba(9,11,20,.20) 34%,rgba(9,11,20,.06) 49%,transparent 66%); }
+      .home-feature-hero .hero-top-transition::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse 78% 62% at 50% 0%,rgba(139,92,246,.16) 0%,rgba(168,85,247,.07) 40%,transparent 78%); }
       .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
       .home-feature-hero .hero-slide-dot[aria-current="true"] { width:17px;height:6px;background:linear-gradient(90deg,#e879f9,#8b5cf6);box-shadow:0 0 10px rgba(168,85,247,.85),0 0 20px rgba(168,85,247,.45); }
       html[data-mobile-theme="light"] .home-feature-hero,html[data-theme="light"] .home-feature-hero { background:#f5f3fb; }
-      html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition,html[data-theme="light"] .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,#f5f3fb 0%,rgba(245,243,251,.96) 18%,rgba(139,92,246,.30) 56%,rgba(139,92,246,.08) 82%,transparent 100%); }
-      html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition::after,html[data-theme="light"] .home-feature-hero .hero-top-transition::after { background:radial-gradient(ellipse 78% 90% at 50% 100%,rgba(139,92,246,.24) 0%,rgba(168,85,247,.10) 44%,transparent 78%); }
+      html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition,html[data-theme="light"] .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,rgba(245,243,251,.96) 0%,rgba(245,243,251,.78) 13%,rgba(139,92,246,.22) 30%,rgba(139,92,246,.06) 45%,transparent 62%); }
+      html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition::after,html[data-theme="light"] .home-feature-hero .hero-top-transition::after { background:radial-gradient(ellipse 82% 58% at 50% 0%,rgba(139,92,246,.16) 0%,rgba(168,85,247,.07) 42%,transparent 78%); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-mobile-theme="light"] .home-feature-hero .home-hero-top-shade,html[data-theme="light"] .home-feature-hero .home-hero-top-shade { background:transparent; }
       html[data-mobile-theme="light"] .home-feature-hero .hero-bottom-fade,html[data-theme="light"] .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(245,243,251,.35) 35%,#f5f3fb 100%); }
       html[data-mobile-theme="light"] .home-feature-hero h1,html[data-theme="light"] .home-feature-hero h1 { color:#29223d !important;text-shadow:none !important; }
@@ -97,7 +97,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   className="object-cover object-[58%_center] sm:object-center"
                 />
                 <div className="home-hero-top-shade absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#090b13]/75" />
-                <div aria-hidden="true" className="hero-top-transition pointer-events-none absolute inset-x-0 top-0 z-[1] h-[170px] sm:h-[220px]" />
+                <div aria-hidden="true" className="hero-top-transition pointer-events-none absolute inset-0 z-[1]" />
                 <div className="home-hero-side-shade absolute inset-0 bg-gradient-to-r from-[#090b13]/95 via-[#090b13]/65 to-transparent" />
               </div>
 
