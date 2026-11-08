@@ -984,7 +984,7 @@ export function BottomDock() {
       )}
 
       {/* Liquid Glass bottom dock */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
+      <div className="lg:hidden fixed bottom-[6px] left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-3 pb-2.5 pt-1">
           <nav
             className="rophim-liquid-nav pointer-events-auto"
