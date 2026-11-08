@@ -96,7 +96,7 @@ const AnimatedBrand = () => {
           return;
         }
 
-        const randomGlyph = glyphs[Math.floor(Math.random() * glyphs.length)];
+        const randomGlyph = glyphs[Math.floor(Math.random() * glyphs.length)] ?? "A";
         setLetters((current) =>
           current.map((char, i) => (i === currentIndex ? randomGlyph : char)),
         );
