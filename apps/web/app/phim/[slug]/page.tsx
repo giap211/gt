@@ -177,7 +177,7 @@ export default function MovieDetailPage({
     <div className={mobile ? "text-center" : "text-left"}>
       {!mobile && (
         <>
-          <h1 className="text-[22px] font-bold leading-snug text-white">
+          <h1 className="movie-detail-title text-[22px] font-bold leading-snug text-white">
             {movie.name}
           </h1>
           <p className="text-[13px] text-[#d4a84b] mt-1">{movie.origin_name}</p>
@@ -286,7 +286,7 @@ export default function MovieDetailPage({
   );
 
   return (
-    <main className="min-h-screen bg-[#0f111a] text-white">
+    <main className="movie-detail-page min-h-screen bg-[#0f111a] text-white">
       {/* HERO — shorter + lighter overlay so image shows */}
       <div className="movie-detail-hero relative hidden w-full h-[420px] lg:block">
         <Image
@@ -324,7 +324,7 @@ export default function MovieDetailPage({
             sizes="100vw"
             className="object-cover object-[center_25%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#080b12]" />
+          <div className="movie-detail-image-fade absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#080b12]" />
           <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),14px)]">
             <Link href="/" aria-label="Quay lại" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white shadow-lg backdrop-blur-xl">
               <span className="text-[26px] leading-none">‹</span>
@@ -341,7 +341,7 @@ export default function MovieDetailPage({
 
           <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-7 pt-24">
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.34em] text-white/65">PHIM ĐẶC SẮC</p>
-            <h1 className="max-w-[95%] text-[34px] font-bold leading-[1.06] tracking-[-0.04em] text-white drop-shadow-lg">{movie.name}</h1>
+            <h1 className="movie-detail-title max-w-[95%] text-[34px] font-bold leading-[1.06] tracking-[-0.04em] text-white drop-shadow-lg">{movie.name}</h1>
             {movie.origin_name && <p className="mt-2 text-sm font-medium text-white/70">{movie.origin_name}</p>}
             <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-white/80">
               {movie.year && <span>{movie.year}</span>}
@@ -369,7 +369,7 @@ export default function MovieDetailPage({
           </div>
         </div>
 
-        <div className="relative -mt-1 space-y-7 bg-[#080b12] px-4 pb-10 pt-5">
+        <div className="movie-detail-content relative -mt-1 space-y-7 bg-[#080b12] px-4 pb-10 pt-5">
           <div>
             <div className="flex items-center justify-between gap-3">
               <p className="text-[14px] leading-6 text-white/75 line-clamp-3" dangerouslySetInnerHTML={{ __html: movie.content || "Nội dung phim đang được cập nhật." }} />

@@ -368,6 +368,79 @@ export function BottomDock() {
             color: #fff !important;
             box-shadow: 0 8px 24px rgba(114,87,245,.22) !important;
           }
+
+          /* Softer home-hero typography and a high-contrast glass notification button. */
+          html[data-mobile-theme="light"] body main > section:first-child a h1 {
+            color: #fffdf8 !important;
+            text-shadow: 0 2px 8px rgba(30,39,74,.28), 0 0 22px rgba(114,87,245,.16) !important;
+            -webkit-text-stroke: .15px rgba(255,255,255,.16);
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .container p {
+            color: #f4efff !important;
+            text-shadow: 0 1px 6px rgba(34,42,76,.24) !important;
+          }
+          html[data-mobile-theme="light"] body .home-hero-notification {
+            color: #5142a6 !important;
+            background: linear-gradient(145deg, rgba(255,255,255,.97), rgba(229,237,255,.92)) !important;
+            border: 1px solid rgba(114,87,245,.28) !important;
+            box-shadow: 0 7px 22px rgba(54,63,125,.2), inset 0 1px 0 #fff !important;
+          }
+          html[data-mobile-theme="light"] body .home-hero-notification svg {
+            color: #5847c4 !important;
+            filter: drop-shadow(0 1px 2px rgba(114,87,245,.18));
+          }
+          html[data-mobile-theme="light"] body .home-hero-notification-dot {
+            border-color: #fff !important;
+            box-shadow: 0 0 0 2px rgba(255,255,255,.88), 0 2px 8px rgba(239,54,82,.42) !important;
+          }
+
+          /* Movie-detail page: lavender / ice-blue surfaces and a smooth image fade. */
+          html[data-mobile-theme="light"] body .movie-detail-page {
+            background: linear-gradient(155deg, #f2f3fc 0%, #e8f5ff 48%, #f7f2ff 100%) !important;
+            color: #252b40 !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-hero { background: #edf2ff !important; }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-hero-fade {
+            background: linear-gradient(to bottom, rgba(238,241,255,0) 0%, rgba(238,241,255,.16) 28%, rgba(242,243,252,.72) 66%, #f2f3fc 100%) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-image-fade {
+            background: linear-gradient(to bottom, rgba(31,37,73,.12) 0%, rgba(57,63,113,.02) 35%, rgba(238,242,255,.18) 55%, rgba(242,243,252,.94) 87%, #f2f3fc 100%) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-title {
+            color: #fffdfb !important;
+            text-shadow: 0 2px 9px rgba(30,39,74,.24), 0 0 24px rgba(114,87,245,.18) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content {
+            background: linear-gradient(155deg, rgba(242,243,252,.98), rgba(232,245,255,.98) 54%, rgba(247,242,255,.98)) !important;
+            color: #303950 !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content h2,
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content h3 { color: #29334d !important; }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content p { color: #56627b !important; }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content [class*="bg-white/"],
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content [class*="bg-[#080b12"],
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content [class*="bg-[#1c1e2a"],
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content [class*="bg-[#161822"],
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content [class*="bg-[#282b3a"] {
+            background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(235,242,255,.88)) !important;
+            border-color: rgba(114,87,245,.16) !important;
+            box-shadow: 0 7px 22px rgba(65,75,130,.07) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content a { color: #3c4a69; }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content a p,
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content a span { color: #465574 !important; }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content button {
+            color: #5145a5;
+            border-color: rgba(114,87,245,.2) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content button[class*="bg-white"] {
+            background: linear-gradient(110deg, #7257f5, #42bdeb) !important;
+            color: #fff !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content [class*="text-white/"] { color: #65718a !important; }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content [class*="border-white/"] { border-color: rgba(114,87,245,.16) !important; }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content .text-emerald-400 { color: #16866d !important; }
+          html[data-mobile-theme="light"] body .movie-detail-page .movie-detail-content [class*="text-[#ff9800]"] { color: #bd7b20 !important; }
         }
       `}</style>
 
