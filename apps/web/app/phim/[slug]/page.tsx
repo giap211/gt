@@ -288,7 +288,9 @@ export default function MovieDetailPage({
   return (
     <main className="movie-detail-page min-h-screen bg-[#0b0d16] text-white">
       <style jsx global>{`
-        .movie-detail-content{background:radial-gradient(ellipse 78% 22% at 50% 0%,rgba(139,92,246,.22),transparent 72%),linear-gradient(180deg,#101321 0%,#0b0d16 38%,#0b0d16 100%)}
+        .movie-detail-content{background:radial-gradient(ellipse 78% 14% at 50% 0%,rgba(139,92,246,.075),transparent 78%),linear-gradient(180deg,#0b0d16 0%,#0b0d16 100%)}
+        .movie-detail-hero-fade{background:linear-gradient(180deg,transparent 42%,rgba(11,13,22,.16) 58%,rgba(11,13,22,.58) 78%,#0b0d16 100%)}
+        .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(11,13,22,0) 0%,rgba(11,13,22,.08) 48%,rgba(11,13,22,.48) 72%,#0b0d16 100%)}
         /* Remove the old card layout: content should flow freely, with glass only on controls. */
         .movie-glass-panel{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding-left:0!important;padding-right:0!important}
         .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
@@ -308,7 +310,8 @@ export default function MovieDetailPage({
         .movie-detail-page .movie-detail-content section>h2{color:#fff}
         .movie-detail-page .movie-detail-content .snap-x>div{transition:transform .25s ease}
         .movie-detail-page .movie-detail-content .snap-x>div:active{transform:scale(.97)}
-        html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:radial-gradient(ellipse 78% 22% at 50% 0%,rgba(167,139,250,.2),transparent 72%),linear-gradient(180deg,#f2effb 0%,#f7f6fc 40%,#f7f6fc 100%);color:#28243a}
+        html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:radial-gradient(ellipse 78% 14% at 50% 0%,rgba(167,139,250,.07),transparent 78%),linear-gradient(180deg,#f7f6fc 0%,#f7f6fc 100%);color:#28243a}
+        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 0%,rgba(247,246,252,.10) 48%,rgba(247,246,252,.58) 74%,#f7f6fc 100%)}
         html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:transparent!important;border:0!important;box-shadow:none!important}
         html[data-theme="light"] .movie-poster-glass,html[data-mobile-theme="light"] .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important}
         html[data-theme="light"] .movie-tabs,html[data-mobile-theme="light"] .movie-tabs{border-color:transparent}
@@ -353,7 +356,7 @@ export default function MovieDetailPage({
             sizes="100vw"
             className="object-cover object-[center_25%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#0b0d16]" />
+          <div className="movie-detail-mobile-fade absolute inset-0" />
           <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),14px)]">
             <Link href="/" aria-label="Quay lại" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white shadow-lg backdrop-blur-xl">
               <span className="text-[26px] leading-none">‹</span>
