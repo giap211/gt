@@ -601,6 +601,33 @@ export const VideoPlayer = ({
         // Chỉ nhấn hai lần cùng một nửa màn hình mới tua ±30 giây.
         let lastTap = 0;
         let lastSide: "left" | "right" | null = null;
+        let tapPointerId: number | null = null;
+        let tapStartX = 0;
+        let tapStartY = 0;
+        let tapMoved = false;
+
+        const isControlTarget = (target: EventTarget | null) =>
+          target instanceof HTMLElement &&
+          !!target.closest(
+            ".art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, button, input",
+          );
+
+        const onTapPointerDown = (event: PointerEvent) => {
+          if (isControlTarget(event.target)) return;
+          tapPointerId = event.pointerId;
+          tapStartX = event.clientX;
+          tapStartY = event.clientY;
+          tapMoved = false;
+        };
+
+        const onTapPointerMove = (event: PointerEvent) => {
+          if (event.pointerId !== tapPointerId || tapMoved) return;
+          if (Math.hypot(event.clientX - tapStartX, event.clientY - tapStartY) > 12) {
+            tapMoved = true;
+            lastTap = 0;
+            lastSide = null;
+          }
+        };
 
         const skipBy = (seconds: number) => {
           const video = art!.video as HTMLVideoElement | undefined;
@@ -621,14 +648,11 @@ export const VideoPlayer = ({
         };
 
         const onPointerUp = (event: PointerEvent) => {
-          const target = event.target as HTMLElement | null;
-          if (
-            target?.closest(
-              ".art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, button, input",
-            )
-          ) {
-            return;
-          }
+          if (event.pointerId !== tapPointerId) return;
+          const wasSwipe = tapMoved;
+          tapPointerId = null;
+          tapMoved = false;
+          if (wasSwipe || isControlTarget(event.target)) return;
 
           const rect = container.getBoundingClientRect();
           const isLandscapePlayer =
@@ -649,7 +673,15 @@ export const VideoPlayer = ({
           }
         };
 
+        container.addEventListener("pointerdown", onTapPointerDown);
+        container.addEventListener("pointermove", onTapPointerMove, { passive: true });
         container.addEventListener("pointerup", onPointerUp);
+        container.addEventListener("pointercancel", () => {
+          tapPointerId = null;
+          tapMoved = false;
+          lastTap = 0;
+          lastSide = null;
+        });
 
 
         // Người xem chỉ tua bằng thanh tiến trình hoặc các nút điều khiển.
@@ -666,6 +698,8 @@ export const VideoPlayer = ({
           document.removeEventListener("pointerup", onProgressPointerUp, true);
           document.removeEventListener("pointercancel", onProgressPointerUp, true);
           if (progressElement) progressElement.style.touchAction = "";
+          container.removeEventListener("pointerdown", onTapPointerDown);
+          container.removeEventListener("pointermove", onTapPointerMove);
           container.removeEventListener("pointerup", onPointerUp);
 
           prevCleanup?.();
