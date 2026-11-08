@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Play, Info, X, Clock3, ArrowRight, Sparkles } from "lucide-react";
+import { Bell, Play, Bookmark, X, Clock3, ArrowRight, Sparkles } from "lucide-react";
 import { useMember } from "./member-provider";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Thumbs } from "swiper/modules";
@@ -27,6 +27,9 @@ interface Movie {
   episode_current?: string;
   time?: string;
   hero_source?: "tmdb" | "netflix" | "latest";
+  rating?: number | string;
+  content?: string;
+  category?: { name: string }[];
 }
 
 interface HeroSliderProps {
@@ -50,8 +53,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
   return (
     <>
       <style jsx global>{`
-      .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:inherit; }
-      .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(9,11,19,.25) 30%,#090b13 100%); }
+      .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:0 !important; }
+      .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(9,11,19,.12) 24%,rgba(9,11,19,.72) 68%,#090b13 100%); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-theme="light"] .home-feature-hero .home-hero-side-shade { background:linear-gradient(105deg,rgba(248,246,255,.97) 0%,rgba(245,241,255,.88) 55%,rgba(245,241,255,.18) 100%); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-top-shade,html[data-theme="light"] .home-feature-hero .home-hero-top-shade { background:linear-gradient(180deg,rgba(248,246,255,.16),transparent 45%,rgba(245,243,251,.82)); }
       html[data-mobile-theme="light"] .home-feature-hero .hero-bottom-fade,html[data-theme="light"] .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(245,243,251,.35) 35%,#f5f3fb 100%); }
@@ -59,7 +62,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       html[data-mobile-theme="light"] .home-feature-hero p,html[data-theme="light"] .home-feature-hero p { color:rgba(41,34,61,.76) !important; }
       html[data-mobile-theme="light"] .home-feature-hero .hero-source-badge,html[data-theme="light"] .home-feature-hero .hero-source-badge,html[data-mobile-theme="light"] .home-feature-hero .hero-meta-badge,html[data-theme="light"] .home-feature-hero .hero-meta-badge { color:#51436f !important;background:rgba(255,255,255,.68) !important;border-color:rgba(112,84,170,.24) !important; }
       `}</style>
-      <section className="home-feature-hero relative isolate mx-3 mt-3 h-[590px] overflow-hidden rounded-[26px] border border-violet-300/15 bg-[#090b13] sm:mx-6 sm:h-[640px] md:h-[660px] lg:mx-8 lg:h-[700px]">
+      <section className="home-feature-hero relative isolate h-[690px] w-full overflow-hidden bg-[#090b13] sm:h-[740px] md:h-[760px]">
       <Swiper
         modules={[Autoplay, EffectFade, Thumbs]}
         effect="fade"
@@ -86,32 +89,26 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   quality={92}
                   className="object-cover object-[center_28%] sm:object-center"
                 />
-                <div className="home-hero-top-shade absolute inset-0 bg-gradient-to-b from-black/30 via-black/5 to-[#090b13]/95" />
-                <div className="home-hero-side-shade absolute inset-0 bg-gradient-to-r from-[#090b13]/95 via-[#090b13]/65 to-transparent" />
+                <div className="home-hero-top-shade absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#090b13]/75" />
+                <div className="home-hero-side-shade absolute inset-0 bg-gradient-to-r from-[#090b13]/90 via-[#090b13]/55 to-transparent" />
               </div>
 
-              <div className="pointer-events-none absolute -right-16 -top-24 z-10 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-24 right-1/4 z-10 h-56 w-64 rounded-full bg-fuchsia-500/15 blur-3xl" />
-              <div className="hero-bottom-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[90px] opacity-100 md:h-[120px]" />
+              <div className="hero-bottom-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[190px] opacity-100 md:h-[220px]" />
 
-              <div className="container relative z-20 flex h-full flex-col items-start justify-end px-5 pb-[142px] text-left sm:px-8 sm:pb-[150px] md:justify-center md:pb-10">
+              <div className="relative z-20 flex h-full w-full flex-col items-start justify-end px-5 pb-[150px] text-left sm:px-10 sm:pb-[160px] md:px-16 md:pb-[170px]">
                 <div className="w-full max-w-[560px] animate-fade-up">
-                  {movie.hero_source && (
+                  {(movie.hero_source || true) && (
                     <span className={`hero-source-badge hero-source-${movie.hero_source} inline-flex items-center rounded-full border border-violet-300/30 bg-violet-400/15 px-3 py-1.5 text-[9px] font-extrabold tracking-[.16em] text-violet-100 backdrop-blur-xl sm:text-[10px]`}>
-                      {movie.hero_source === "tmdb"
-                        ? "TMDB TRENDING"
-                        : movie.hero_source === "netflix"
-                          ? "NETFLIX TOP 10 TV SHOWS VIỆT NAM"
-                          : "ĐỀ XUẤT DÀNH CHO BẠN"}
+                      "PHIM ĐỀ CỬ"
                     </span>
                   )}
 
                   <Link
                     href={`/phim/${movie.slug}`}
-                    className="mt-3 block max-w-full text-white drop-shadow-[0_3px_12px_rgba(0,0,0,.8)] transition-colors hover:text-violet-200"
+                    className="mt-4 block max-w-full text-white drop-shadow-[0_3px_12px_rgba(0,0,0,.8)] transition-colors hover:text-violet-200"
                     aria-label={`Xem phim ${movie.name}`}
                   >
-                    <h1 className="line-clamp-2 text-[30px] font-black leading-[1.08] tracking-[-.04em] sm:text-4xl md:text-5xl lg:text-[56px]">
+                    <h1 className="line-clamp-2 text-[38px] font-black leading-[1.04] tracking-[-.045em] sm:text-5xl md:text-6xl lg:text-[64px]">
                       {movie.name}
                     </h1>
                   </Link>
@@ -122,40 +119,30 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                     </p>
                   )}
 
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    {movie.quality && (
-                      <span className="hero-meta-badge hero-meta-quality rounded-md border border-violet-300/45 bg-violet-400/15 px-2.5 py-1 text-[10px] font-bold text-violet-100 backdrop-blur-md">
-                        {movie.quality}
-                      </span>
-                    )}
-                    <span className="hero-meta-badge hero-meta-year rounded-md border border-white/25 bg-black/30 px-2.5 py-1 text-[10px] font-semibold text-white/90 backdrop-blur-md">
-                      {movie.year}
-                    </span>
-                    {movie.episode_current && (
-                      <span className="hero-meta-badge hero-meta-episode rounded-md border border-white/25 bg-black/30 px-2.5 py-1 text-[10px] font-semibold text-white/90 backdrop-blur-md">
-                        {movie.episode_current}
-                      </span>
-                    )}
-                    {movie.lang && (
-                      <span className="hero-meta-badge hero-meta-language rounded-md border border-white/25 bg-black/30 px-2.5 py-1 text-[10px] font-semibold text-white/90 backdrop-blur-md">
-                        {movie.lang}
-                      </span>
-                    )}
+                  <div className="mt-5 flex flex-wrap items-center gap-3 text-[13px] font-semibold text-white/90 sm:text-sm">
+                    {movie.rating && <span className="inline-flex items-center gap-1.5"><span className="text-amber-400">★</span>{movie.rating}</span>}
+                    {movie.rating && <span className="h-4 w-px bg-white/35" />}
+                    {movie.time && <span>{movie.time}</span>}
+                    {movie.time && movie.category?.[0]?.name && <span className="h-4 w-px bg-white/35" />}
+                    {movie.category?.[0]?.name && <span>{movie.category[0].name}</span>}
+                    {!movie.time && !movie.category?.[0]?.name && <span>{movie.year}</span>}
                   </div>
+                  {movie.content && <p className="mt-4 max-w-[440px] line-clamp-2 text-[13px] leading-6 text-white/75 drop-shadow sm:text-[15px]">{movie.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()}</p>}
 
-                  <div className="mt-5 flex items-center gap-3">
+                  <div className="mt-6 flex items-center gap-3">
                     <Link
                       href={`/phim/${movie.slug}`}
-                      className="inline-flex h-12 min-w-[142px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#8b5cf6] via-[#a855f7] to-[#d946ef] px-6 text-[13px] font-extrabold text-white shadow-[0_8px_28px_rgba(168,85,247,.28)] transition-all hover:brightness-110 active:scale-[.97]"
+                      className="inline-flex h-12 min-w-[148px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#a855f7] via-[#9333ea] to-[#6d28d9] px-6 text-[14px] font-extrabold text-white shadow-[0_8px_28px_rgba(168,85,247,.38)] transition-all hover:brightness-110 active:scale-[.97]"
                     >
                       <Play size={16} fill="currentColor" /> Xem ngay
                     </Link>
-                    <Link
-                      href={`/phim/${movie.slug}`}
-                      className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-violet-200/30 bg-white/[.13] px-5 text-[13px] font-bold text-white shadow-lg backdrop-blur-xl transition-all hover:bg-white/20 active:scale-[.97]"
+                    <button
+                      type="button"
+                      aria-label="Lưu phim"
+                      className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-white/[.13] text-white shadow-lg backdrop-blur-xl transition-all hover:bg-white/20 active:scale-[.97]"
                     >
-                      <Info size={17} /> Chi tiết
-                    </Link>
+                      <Bookmark size={19} />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -165,20 +152,13 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       </Swiper>
 
       {/* Compact app header: brand and a single notification icon. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between px-5 pt-[max(14px,env(safe-area-inset-top))] sm:px-8 lg:hidden">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between px-5 pt-[max(18px,env(safe-area-inset-top))] sm:px-10 md:px-16 lg:hidden">
         <Link
           href="/"
           aria-label="GiapTran Trang chủ"
           className="pointer-events-auto inline-flex items-center"
         >
-          <Image
-            src="/images/logo.svg"
-            alt="GiapTran"
-            width={124}
-            height={38}
-            priority
-            className="h-[30px] w-auto drop-shadow-[0_2px_10px_rgba(0,0,0,.65)]"
-          />
+          <span className="flex items-center gap-2.5 text-[23px] font-black tracking-[-.06em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,.6)]"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-violet-700 shadow-[0_4px_18px_rgba(168,85,247,.45)]"><Play size={19} fill="white" strokeWidth={0} /></span><span>PHIM <span className="bg-gradient-to-r from-fuchsia-300 to-violet-400 bg-clip-text text-transparent">LẬU</span></span></span>
         </Link>
         <button
           type="button"
@@ -270,7 +250,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         </div>
       )}
 
-      <div className="absolute bottom-7 left-1/2 z-40 w-fit max-w-[90%] -translate-x-1/2 sm:bottom-8">
+      <div className="absolute bottom-7 left-1/2 z-40 w-fit max-w-[90%] -translate-x-1/2 sm:bottom-9">
         <Swiper
           onSwiper={setThumbsSwiper}
           modules={[Thumbs]}
