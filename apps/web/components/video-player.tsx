@@ -599,7 +599,7 @@ export const VideoPlayer = ({
             now - lastTap < 320 &&
             lastSide === half
           ) {
-            skipBy(half === "top" ? 30 : -30);
+            skipBy(half === "top" ? -30 : 30);
 
             lastTap = 0;
             lastSide = null;
