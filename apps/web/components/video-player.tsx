@@ -585,26 +585,27 @@ export const VideoPlayer = ({
             return;
           }
 
+          // Player được xoay 90 độ trên điện thoại ở chế độ dọc.
+          // Vì vậy vùng tua được xác định theo trục Y trên màn hình:
+          // chạm 2 lần nửa TRÊN = tua tới 30 giây, nửa DƯỚI = lùi 30 giây.
           const rect = container.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-
-          const side: "left" | "right" =
-            x < rect.width / 2 ? "left" : "right";
+          const half: "top" | "bottom" =
+            e.clientY < rect.top + rect.height / 2 ? "top" : "bottom";
 
           const now = Date.now();
 
-          // Hai lần nhấn cùng một bên trong 320ms mới tua
+          // Hai lần nhấn cùng một nửa trong 320ms mới tua.
           if (
             now - lastTap < 320 &&
-            lastSide === side
+            lastSide === half
           ) {
-            skipBy(side === "left" ? -30 : 30);
+            skipBy(half === "top" ? 30 : -30);
 
             lastTap = 0;
             lastSide = null;
           } else {
             lastTap = now;
-            lastSide = side;
+            lastSide = half;
           }
         };
 
