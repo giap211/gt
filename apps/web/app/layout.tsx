@@ -28,6 +28,7 @@ import { HideDevBadge } from "@/components/hide-dev-badge";
 import { MemberProvider } from "@/components/member-provider";
 import { RouteScrollReset } from "@/components/route-scroll-reset";
 import { PersistentTabShell } from "@/components/persistent-tab-shell";
+import { PosterScrollMotion } from "@/components/poster-scroll-motion";
 
 export const metadata: Metadata = {
   title: "GiapTran - Xem phim chất lượng cao",
@@ -60,6 +61,7 @@ export default function RootLayout({
         className={`${beVietnamPro.variable} ${oswald.variable} antialiased bg-black text-white font-sans`}
       >
         <RouteScrollReset />
+        <PosterScrollMotion />
         <HideDevBadge />
         <MemberProvider>
           <Navbar />
