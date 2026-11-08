@@ -681,6 +681,31 @@ export function BottomDock() {
             background: linear-gradient(135deg, #9877f5, #6557d8) !important;
             box-shadow: 0 0 10px rgba(139,92,246,.38) !important;
           }
+          /* Interest chips: no glow or drop shadow; only a clean violet gradient outline. */
+          html[data-mobile-theme] body .topic-grid-title::before {
+            box-shadow: none !important;
+          }
+          html[data-mobile-theme] body .topic-grid-chip {
+            border: 1.5px solid transparent !important;
+            border-radius: 999px !important;
+            background:
+              linear-gradient(135deg, rgba(24,22,39,.96), rgba(18,23,39,.96)) padding-box,
+              linear-gradient(115deg, #7657f5 0%, #bd79f6 48%, #557cf5 100%) border-box !important;
+            box-shadow: none !important;
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+          }
+          html[data-mobile-theme="light"] body .topic-grid-chip {
+            background:
+              linear-gradient(135deg, #ffffff 0%, #f4f6ff 100%) padding-box,
+              linear-gradient(115deg, #7657f5 0%, #bd79f6 48%, #557cf5 100%) border-box !important;
+            box-shadow: none !important;
+          }
+          html[data-mobile-theme] body .topic-grid-chip:active {
+            transform: scale(.97);
+            filter: none !important;
+            box-shadow: none !important;
+          }
           html[data-mobile-theme] body .movie-carousel-view-more:active {
             transform: scale(.97);
           }
