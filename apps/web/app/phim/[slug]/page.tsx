@@ -286,11 +286,11 @@ export default function MovieDetailPage({
   );
 
   return (
-    <main className="movie-detail-page min-h-screen bg-[#0b0d16] text-white">
+    <main className="movie-detail-page min-h-screen bg-[#100f1e] text-white">
       <style jsx global>{`
-        .movie-detail-content{background:radial-gradient(ellipse 78% 14% at 50% 0%,rgba(139,92,246,.075),transparent 78%),linear-gradient(180deg,#0b0d16 0%,#0b0d16 100%)}
-        .movie-detail-hero-fade{background:linear-gradient(180deg,transparent 42%,rgba(11,13,22,.16) 58%,rgba(11,13,22,.58) 78%,#0b0d16 100%)}
-        .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(11,13,22,0) 0%,rgba(11,13,22,.08) 48%,rgba(11,13,22,.48) 72%,#0b0d16 100%)}
+        .movie-detail-content{background:radial-gradient(ellipse 78% 20% at 50% 0%,rgba(139,92,246,.11),transparent 78%),linear-gradient(180deg,#100f1e 0%,#100f1e 100%)}
+        .movie-detail-hero-fade{background:linear-gradient(180deg,transparent 34%,rgba(16,15,30,.18) 54%,rgba(16,15,30,.62) 78%,#100f1e 100%)}
+        .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,0) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.54) 70%,#100f1e 100%)}
         /* Remove the old card layout: content should flow freely, with glass only on controls. */
         .movie-glass-panel{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding-left:0!important;padding-right:0!important}
         .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
