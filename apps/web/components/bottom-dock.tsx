@@ -314,11 +314,6 @@ export function BottomDock() {
           html[data-mobile-theme="light"] body main > div:not(:first-child) {
             background: transparent !important;
           }
-          html[data-mobile-theme="light"] body [class*="bg-[#0"],
-          html[data-mobile-theme="light"] body [class*="bg-[#1"],
-          html[data-mobile-theme="light"] body [class*="bg-[#2"] {
-            background-color: rgba(255,255,255,.76) !important;
-          }
           html[data-mobile-theme="light"] body [class*="shadow-"] {
             --tw-shadow-color: rgba(75,82,130,.12);
           }
