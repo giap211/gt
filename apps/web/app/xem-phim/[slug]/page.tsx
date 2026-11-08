@@ -536,14 +536,13 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           }
           /* Dùng hệ kích thước của khung đã xoay: d/vh là chiều ngang, vw là chiều dọc. */
           .watch-player-menu {
-            top:50%;
-            bottom:auto;
-            left:auto;
-            right:12px;
-            transform:translateY(-50%);
-            width:min(390px,42dvh);
-            max-height:min(82vw,720px);
-            border-radius:24px;
+            inset:0 !important;
+            width:100% !important;
+            height:100% !important;
+            max-height:none !important;
+            border-radius:0 !important;
+            transform:none !important;
+            padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
           }
           .watch-player-top { top:12px; left:16px; right:16px; }
           .watch-player-rotate-hint { display:none !important; }
@@ -633,7 +632,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             </div>
           </section>
         </>
-      )}}
+      )}
 
     </main>
   );
