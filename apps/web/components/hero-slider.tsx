@@ -166,7 +166,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           <span className="flex items-center gap-2.5 text-[23px] font-black tracking-[-.06em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,.6)]"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-violet-700 shadow-[0_4px_18px_rgba(168,85,247,.45)]"><Play size={19} fill="white" strokeWidth={0} /></span><span>PHIM <span className="bg-gradient-to-r from-fuchsia-300 to-violet-400 bg-clip-text text-transparent">LẬU</span></span></span>
         </Link>
         <div className="pointer-events-auto flex items-center gap-2">
-        <Link href="/tim-kiem" aria-label="Tìm kiếm" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-[0_5px_20px_rgba(0,0,0,.2)] backdrop-blur-2xl"><Search size={20} /></Link>
+        <button type="button" aria-label="Tìm kiếm" onClick={() => window.dispatchEvent(new Event("gt:open-search"))} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-[0_5px_20px_rgba(0,0,0,.2)] backdrop-blur-2xl"><Search size={20} /></button>
         <button
           type="button"
           aria-label="Thông báo"
