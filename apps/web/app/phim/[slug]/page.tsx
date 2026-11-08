@@ -311,7 +311,7 @@ export default function MovieDetailPage({
           className="object-cover object-top"
         />
         {/* soft bottom fade only */}
-        <div className="movie-detail-hero-fade absolute inset-0 bg-gradient-to-t from-[#0f111a] via-[#0f111a]/25 to-black/20" />
+        <div className="movie-detail-hero-fade absolute inset-0 bg-gradient-to-t from-[#0b0d16] via-[#0b0d16]/25 to-black/20" />
 
         {/* center play — desktop */}
         <div className="absolute inset-0 hidden lg:flex items-center justify-center z-10 pointer-events-none">
@@ -336,7 +336,7 @@ export default function MovieDetailPage({
             sizes="100vw"
             className="object-cover object-[center_25%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#080b12]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#0b0d16]" />
           <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),14px)]">
             <Link href="/" aria-label="Quay lại" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white shadow-lg backdrop-blur-xl">
               <span className="text-[26px] leading-none">‹</span>
