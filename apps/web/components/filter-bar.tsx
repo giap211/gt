@@ -54,7 +54,7 @@ export const FilterBar = () => {
           />
         </button>
         {openDropdown === "type" && (
-          <div className="absolute top-full left-0 mt-2 w-48 bg-[#10121a]/98 border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-2xl z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute top-full left-0 mt-2 w-48 max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-none z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
             <Link
               href="/danh-sach/phim-le"
               onClick={() => setOpenDropdown(null)}
@@ -109,74 +109,74 @@ export const FilterBar = () => {
           />
         </button>
         {openDropdown === "genre" && (
-          <div className="absolute top-full left-0 mt-2 w-72 bg-[#10121a]/98 border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-2xl z-50 p-3 grid grid-cols-2 gap-1.5 text-xs font-bold animate-in fade-in zoom-in-95 duration-150 max-h-80 overflow-y-auto custom-scrollbar">
+          <div className="absolute top-full left-0 mt-2 w-[min(18rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-none z-50 p-3 grid grid-cols-2 gap-1.5 text-xs font-bold animate-in fade-in zoom-in-95 duration-150 max-h-[min(70vh,20rem)] overflow-y-auto custom-scrollbar min-w-0">
             <Link
               href="/the-loai/hanh-dong"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Hành Động
             </Link>
             <Link
               href="/the-loai/tinh-cam"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Tình Cảm
             </Link>
             <Link
               href="/the-loai/hai-huoc"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Hài Hước
             </Link>
             <Link
               href="/the-loai/co-trang"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Cổ Trang
             </Link>
             <Link
               href="/the-loai/kinh-di"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Kinh Dị
             </Link>
             <Link
               href="/the-loai/vo-thuat"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Võ Thuật
             </Link>
             <Link
               href="/the-loai/hinh-su"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Hình Sự
             </Link>
             <Link
               href="/the-loai/vien-tuong"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Viễn Tưởng
             </Link>
             <Link
               href="/the-loai/tam-ly"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Tâm Lý
             </Link>
             <Link
               href="/the-loai/hoc-duong"
               onClick={() => setOpenDropdown(null)}
-              className="p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase truncate"
+              className="min-w-0 p-2 hover:bg-[#ffd875] hover:text-black rounded-xl text-white/70 transition-colors uppercase break-words leading-snug"
             >
               Học Đường
             </Link>
@@ -206,7 +206,7 @@ export const FilterBar = () => {
           />
         </button>
         {openDropdown === "country" && (
-          <div className="absolute top-full left-0 mt-2 w-48 bg-[#10121a]/98 border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-2xl z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute top-full left-0 mt-2 w-48 max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-none z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
             <Link
               href="/quoc-gia/han-quoc"
               onClick={() => setOpenDropdown(null)}
