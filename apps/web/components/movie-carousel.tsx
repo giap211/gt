@@ -69,7 +69,7 @@ export const MovieCarousel = ({
             {viewMoreLink && (
               <Link
                 href={viewMoreLink}
-                className="movie-carousel-view-more group inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs md:text-sm font-semibold transition-all duration-200 mt-1"
+                className="movie-carousel-view-more group inline-flex w-max shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-2 text-xs md:text-sm font-semibold transition-all duration-200 mt-1"
               >
                 <span>Xem toàn bộ</span>
                 <span className="movie-carousel-view-more-icon flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-0.5">
