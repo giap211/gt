@@ -537,148 +537,9 @@ export const VideoPlayer = ({
       if (art) {
         const container = art.template.$player as HTMLElement;
 
-        let lastTap = 0;
-        let lastSide: "left" | "right" | null = null;
+        // Đã tắt thao tác chạm/nhấn hai lần trên hình video để tua.
+        // Người xem chỉ tua bằng thanh tiến trình hoặc các nút điều khiển.
 
-        const skipBy = (seconds: number) => {
-          const video = art!.video as
-            | HTMLVideoElement
-            | undefined;
-
-          if (!video || !Number.isFinite(video.duration)) {
-            return;
-          }
-
-          const next = Math.max(
-            0,
-            Math.min(
-              video.duration,
-              video.currentTime + seconds,
-            ),
-          );
-
-          video.currentTime = next;
-
-          try {
-            const hls = (art as any).hls as Hls | undefined;
-            hls?.startLoad(next);
-          } catch {
-            // ignore
-          }
-
-          art!.notice.show =
-            seconds < 0 ? "⏪  -30s" : "+30s  ⏩";
-
-          video.play().catch(() => {});
-        };
-
-        // Gọi lại thanh tiêu đề ngay khi người dùng chạm player.
-        const onPlayerPointerDown = () => onUserInteraction?.();
-        container.addEventListener("pointerdown", onPlayerPointerDown, { passive: true });
-
-        // Artplayer dùng .art-control-progress làm vùng tương tác;
-        // các lớp con là art-progress-played/loaded, không có .art-progress.
-        // Khi CSS xoay 90 độ, trục tiến trình ngang chuyển thành trục Y trên màn hình.
-        let progressDragging = false;
-        let progressPointerId: number | null = null;
-        const progressElement = (art.template as any).$progress as HTMLElement | undefined;
-
-        if (progressElement) {
-          progressElement.style.touchAction = "none";
-        }
-
-        const seekFromRotatedProgress = (clientY: number) => {
-          if (!progressElement || !art || !rotatedRef.current) return;
-          const rect = progressElement.getBoundingClientRect();
-          const duration = Number.isFinite(art.duration) ? art.duration : 0;
-          if (duration <= 0 || rect.height <= 0) return;
-          const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-          const seconds = fraction * duration;
-          art.emit("setBar", "played", fraction);
-          art.seek = seconds;
-        };
-
-        const onProgressPointerDown = (event: PointerEvent) => {
-          if (!rotatedRef.current || !progressElement) return;
-          const target = event.target as Node | null;
-          if (!target || !progressElement.contains(target)) return;
-
-          progressDragging = true;
-          progressPointerId = event.pointerId;
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-          seekFromRotatedProgress(event.clientY);
-        };
-
-        const onProgressPointerMove = (event: PointerEvent) => {
-          if (!progressDragging || event.pointerId !== progressPointerId) return;
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-          seekFromRotatedProgress(event.clientY);
-        };
-
-        const onProgressPointerUp = (event: PointerEvent) => {
-          if (!progressDragging || event.pointerId !== progressPointerId) return;
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-          seekFromRotatedProgress(event.clientY);
-          progressDragging = false;
-          progressPointerId = null;
-        };
-
-        container.addEventListener("pointerdown", onProgressPointerDown, true);
-        document.addEventListener("pointermove", onProgressPointerMove, true);
-        document.addEventListener("pointerup", onProgressPointerUp, true);
-        document.addEventListener("pointercancel", onProgressPointerUp, true);
-
-        // Chỉ sử dụng pointerup, không dùng click + touchend cùng lúc
-        const onPointerUp = (e: PointerEvent) => {
-          const target = e.target as HTMLElement | null;
-
-          // Không xử lý khi nhấn vào các nút điều khiển
-          if (
-            target?.closest(
-              ".art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, button, input",
-            )
-          ) {
-            return;
-          }
-
-          // Player nằm ngang (do xoay thủ công hoặc điện thoại đang ở landscape):
-          // nửa trên = tua tới 30 giây, nửa dưới = lùi 30 giây.
-          // Player dọc: nửa trái = lùi 30 giây, nửa phải = tua tới 30 giây.
-          const rect = container.getBoundingClientRect();
-          const isLandscapePlayer =
-            rotatedRef.current ||
-            window.matchMedia("(orientation: landscape)").matches;
-          const half: "left" | "right" = isLandscapePlayer
-            ? (e.clientY < rect.top + rect.height / 2 ? "left" : "right")
-            : (e.clientX < rect.left + rect.width / 2 ? "left" : "right");
-
-          const now = Date.now();
-
-          // Hai lần nhấn cùng một vùng trong 320ms mới tua.
-          if (now - lastTap < 320 && lastSide === half) {
-            const seconds = isLandscapePlayer
-              ? (half === "left" ? -30 : 30)
-              : (half === "left" ? -30 : 30);
-            skipBy(seconds);
-
-            lastTap = 0;
-            lastSide = null;
-          } else {
-            lastTap = now;
-            lastSide = half;
-          }
-        };
-
-        container.addEventListener(
-          "pointerup",
-          onPointerUp,
-        );
 
         const prevCleanup = (art as any).__seekCleanup as
           | (() => void)
@@ -691,10 +552,6 @@ export const VideoPlayer = ({
           document.removeEventListener("pointerup", onProgressPointerUp, true);
           document.removeEventListener("pointercancel", onProgressPointerUp, true);
           if (progressElement) progressElement.style.touchAction = "";
-          container.removeEventListener(
-            "pointerup",
-            onPointerUp,
-          );
 
           prevCleanup?.();
         };
