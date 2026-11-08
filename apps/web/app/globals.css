@@ -11,15 +11,15 @@
   --font-sans: 'Be Vietnam Pro';
   --background: #0b0d14;
   --foreground: #ffffff;
-  --phim-lau-primary: #f0c24d;
-  /* Updated to match screenshot yellow */
+  --phim-lau-primary: #a78bfa;
+  /* Purple gradient brand palette */
   --accent-pink: #d946ef;
 
-  /* Phim Lậu Brand Colors */
-  --primary-color: #ffd875;
-  --primary-color-hover: #ffde8a;
-  --primary-text: #ffd875;
-  --primary-button-text: #191b24;
+  /* Purple gradient brand colors */
+  --primary-color: #a78bfa;
+  --primary-color-hover: #c4b5fd;
+  --primary-text: #c4b5fd;
+  --primary-button-text: #ffffff;
   /* --accent-pink: #ff6eb4; */
   /* This was moved/updated above */
 
@@ -598,3 +598,82 @@ div[class*="z-[200]"] input:focus {
     backdrop-filter: none;
   }
 }
+
+
+/* Unified purple gradient brand accents */
+:root {
+  --phim-lau-glow: 0 0 15px 2px rgba(167, 139, 250, 0.28);
+}
+
+[class~="bg-[#ffd875]"],
+[class~="bg-[#f0c24d]"],
+[class~="bg-[#f5c451]"] {
+  background-color: transparent !important;
+  background-image: linear-gradient(115deg, #8b5cf6 0%, #a855f7 52%, #d946ef 100%) !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff;
+}
+
+button[class*="bg-[#ffd875]"],
+a[class*="bg-[#ffd875]"],
+button[class*="bg-[#f0c24d]"],
+a[class*="bg-[#f0c24d]"],
+button[class*="bg-[#f5c451]"],
+a[class*="bg-[#f5c451]"] {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff;
+}
+
+[class*="bg-[#ffd875]/"],
+[class*="bg-[#f0c24d]/"],
+[class*="bg-[#f5c451]/"] {
+  background-color: rgba(167, 139, 250, 0.13) !important;
+  background-image: none !important;
+}
+
+[class*="text-[#ffd875]"],
+[class*="text-[#f5c451]"],
+[class*="text-[#f0c24d]"],
+[class*="text-amber-300"],
+[class*="text-yellow-400"] {
+  background-image: linear-gradient(110deg, #c4b5fd 0%, #a78bfa 48%, #e879f9 100%);
+  color: transparent !important;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+svg[class*="text-[#ffd875]"],
+svg[class*="text-[#f5c451]"],
+svg[class*="text-[#f0c24d]"],
+svg[class*="text-amber-300"],
+svg[class*="text-yellow-400"] {
+  background: none !important;
+  color: #c4b5fd !important;
+  fill: none;
+  -webkit-text-fill-color: #c4b5fd !important;
+}
+
+[class*="border-[#ffd875]"],
+[class*="border-[#f5c451]"],
+[class*="border-[#f0c24d]"],
+[class*="border-amber-300"] {
+  border-color: rgba(192, 132, 252, 0.62) !important;
+}
+
+[class*="hover:text-[#ffd875]"]:hover,
+[class*="hover:text-[#f5c451]"]:hover,
+[class*="hover:border-[#ffd875]"]:hover,
+[class*="hover:border-amber-300"]:hover {
+  color: #d8b4fe !important;
+  border-color: rgba(216, 180, 254, 0.8) !important;
+}
+
+.thumbs-slider .swiper-slide-thumb-active {
+  border-color: #c084fc !important;
+}
+
+.art-control-progress-inner {
+  background: linear-gradient(90deg, #8b5cf6, #d946ef) !important;
+}
+
