@@ -91,6 +91,7 @@ export const InfiniteMovieGrid = ({
     view: m.view,
     rating: m.rating,
     isSeries: type === "phim-bo",
+    variant: "vertical" as const,
   });
 
   return (
