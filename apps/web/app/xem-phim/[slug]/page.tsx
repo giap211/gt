@@ -564,11 +564,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             transform-origin:center center;
             overflow:hidden !important;
           }
+          /* Đảo chiều góc để chiều ngang khớp với hướng cầm thực tế trên iPhone. */
           .watch-player-page.watch-device-landscape-right {
-            transform:translate(-50%,-50%) rotate(90deg);
+            transform:translate(-50%,-50%) rotate(-90deg);
           }
           .watch-player-page.watch-device-landscape-left {
-            transform:translate(-50%,-50%) rotate(-90deg);
+            transform:translate(-50%,-50%) rotate(90deg);
           }
           .watch-player-shell > div,
           .watch-player-shell .artplayer-app {
@@ -625,7 +626,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           </div>
         </div>
       </div>
-      <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); requestOrientationSensor(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass absolute right-4 top-4 z-[70] hover:border-[#ffd875]/70">
+      <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); requestOrientationSensor(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className={`watch-player-round watch-player-glass absolute right-4 top-4 z-[70] hover:border-[#ffd875]/70 transition-opacity duration-200 ${!showPlayerChrome && !overlayOpen ? "watch-player-hidden" : ""}`}>
         {overlayOpen ? <X size={23}/> : <Settings2 size={23}/>}
       </button>
 
