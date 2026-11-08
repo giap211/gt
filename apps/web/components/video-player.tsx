@@ -605,7 +605,7 @@ export const VideoPlayer = ({
           // Hai lần nhấn cùng một vùng trong 320ms mới tua.
           if (now - lastTap < 320 && lastSide === half) {
             const seconds = isLandscapePlayer
-              ? (half === "left" ? 30 : -30)
+              ? (half === "left" ? -30 : 30)
               : (half === "left" ? -30 : 30);
             skipBy(seconds);
 
