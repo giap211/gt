@@ -57,6 +57,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       <style jsx global>{`
       .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:0 !important; }
       .home-feature-hero .hero-bottom-fade { background:radial-gradient(ellipse 88% 105% at 50% 100%,rgba(168,85,247,.38) 0%,rgba(139,92,246,.20) 34%,rgba(124,58,237,.06) 62%,transparent 82%),linear-gradient(180deg,rgba(7,8,17,0) 0%,rgba(7,8,17,.10) 28%,rgba(7,8,17,.62) 76%,#0b0d14 100%); }
+      .home-feature-hero .hero-short-black-fade { height:clamp(56px,14.4vw,102px);background:linear-gradient(180deg,rgba(5,6,12,0) 0%,rgba(5,6,12,.10) 20%,rgba(5,6,12,.26) 40%,rgba(5,6,12,.47) 60%,rgba(5,6,12,.70) 80%,rgba(5,6,12,.882) 100%); }
       .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,#0b0d14 0%,rgba(93,55,150,.92) 18%,rgba(124,58,237,.48) 38%,rgba(139,92,246,.16) 55%,transparent 72%); }\n      .home-feature-hero .hero-black-transition { height:clamp(105px,24vw,190px);background:linear-gradient(180deg,#090b13 0%,rgba(9,11,19,.92) 18%,rgba(9,11,19,.58) 48%,rgba(9,11,19,.16) 78%,transparent 100%); }
       .home-feature-hero .hero-top-transition::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse 88% 72% at 50% 0%,rgba(139,92,246,.14) 0%,rgba(168,85,247,.055) 43%,transparent 86%); }
       .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
@@ -102,6 +103,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
               </div>
 
               <div className="hero-bottom-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[145px] opacity-100 sm:h-[190px] md:h-[230px]" />
+              <div aria-hidden="true" className="hero-short-black-fade pointer-events-none absolute inset-x-0 bottom-0 z-[11]" />
 
               <div className="relative z-20 flex h-full w-full flex-col items-start justify-center px-[19px] pb-[4px] pt-[92px] text-left sm:px-10 sm:pt-24 md:px-16 md:pt-28">
                 <div className="w-full max-w-[330px] animate-fade-up sm:max-w-[480px] md:max-w-[560px]">
