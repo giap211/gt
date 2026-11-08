@@ -288,15 +288,32 @@ export default function MovieDetailPage({
   return (
     <main className="movie-detail-page min-h-screen bg-[#0b0d16] text-white">
       <style jsx global>{`
-        .movie-detail-content{background:radial-gradient(ellipse 90% 24% at 50% 0%,rgba(139,92,246,.16),transparent 72%),linear-gradient(180deg,#101321 0%,#0b0d16 42%,#090b12 100%)}
-        .movie-glass-panel{background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1px solid rgba(196,181,253,.14);border-radius:24px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 38px rgba(0,0,0,.16);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
-        .movie-poster-glass{background:linear-gradient(145deg,rgba(167,139,250,.2),rgba(255,255,255,.035));border-color:rgba(196,181,253,.2);box-shadow:0 18px 48px rgba(0,0,0,.35),0 0 32px rgba(139,92,246,.08)}
-        .movie-tabs{border-color:rgba(196,181,253,.16)}
+        .movie-detail-content{background:radial-gradient(ellipse 78% 22% at 50% 0%,rgba(139,92,246,.22),transparent 72%),linear-gradient(180deg,#101321 0%,#0b0d16 38%,#0b0d16 100%)}
+        /* Remove the old card layout: content should flow freely, with glass only on controls. */
+        .movie-glass-panel{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding-left:0!important;padding-right:0!important}
+        .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+        .movie-tabs{border-color:rgba(196,181,253,.2)}
         .movie-detail-page a,.movie-detail-page button{-webkit-tap-highlight-color:transparent}
-        .movie-detail-page :is(button,a){transition-duration:220ms}
-        html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:radial-gradient(ellipse 90% 24% at 50% 0%,rgba(167,139,250,.16),transparent 72%),linear-gradient(180deg,#f2effb 0%,#f7f6fc 42%,#f2f1f8 100%);color:#28243a}
-        html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(255,255,255,.56));border-color:rgba(139,92,246,.16);box-shadow:inset 0 1px 0 #fff,0 12px 32px rgba(70,55,110,.07)}
-        html[data-theme="light"] .movie-tabs,html[data-mobile-theme="light"] .movie-tabs{border-color:rgba(139,92,246,.16)}
+        .movie-detail-page :is(button,a){transition:background .22s ease,color .22s ease,transform .22s ease,border-color .22s ease}
+        .movie-detail-page .movie-glass-panel :is(button,a){backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+        .movie-detail-page #movie-episodes>div:first-child h2,.movie-detail-page h2{letter-spacing:-.025em}
+        .movie-detail-page #movie-episodes>div:nth-child(2) button{border:1px solid rgba(196,181,253,.14);background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(139,92,246,.07));box-shadow:inset 0 1px 0 rgba(255,255,255,.1);backdrop-filter:blur(16px)}
+        .movie-detail-page #movie-episodes>div:nth-child(2) button:active{transform:scale(.96)}
+        .movie-detail-page #movie-episodes>div:nth-child(3)>a{border:0;background:linear-gradient(110deg,rgba(255,255,255,.075),rgba(139,92,246,.09));box-shadow:inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+        .movie-detail-page #movie-episodes>div:nth-child(3)>a:hover{background:linear-gradient(110deg,rgba(167,139,250,.18),rgba(217,70,239,.12))}
+        .movie-detail-page .movie-tabs{position:relative;border:0}
+        .movie-detail-page .movie-tabs:after{content:"";display:block;height:1px;margin-top:-1px;background:linear-gradient(90deg,rgba(167,139,250,.55),rgba(255,255,255,.08),transparent)}
+        .movie-detail-page .movie-tabs button{border:0!important}
+        .movie-detail-page .movie-tabs button[aria-selected="true"]{color:#c4b5fd}
+        .movie-detail-page .movie-detail-content section>h2{color:#fff}
+        .movie-detail-page .movie-detail-content .snap-x>div{transition:transform .25s ease}
+        .movie-detail-page .movie-detail-content .snap-x>div:active{transform:scale(.97)}
+        html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:radial-gradient(ellipse 78% 22% at 50% 0%,rgba(167,139,250,.2),transparent 72%),linear-gradient(180deg,#f2effb 0%,#f7f6fc 40%,#f7f6fc 100%);color:#28243a}
+        html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:transparent!important;border:0!important;box-shadow:none!important}
+        html[data-theme="light"] .movie-poster-glass,html[data-mobile-theme="light"] .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important}
+        html[data-theme="light"] .movie-tabs,html[data-mobile-theme="light"] .movie-tabs{border-color:transparent}
+        html[data-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(2) button,html[data-mobile-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(2) button{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(225,215,255,.55));border-color:rgba(139,92,246,.16);color:#55447d;box-shadow:inset 0 1px 0 #fff,0 5px 18px rgba(90,65,150,.06)}
+        html[data-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(3)>a,html[data-mobile-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(3)>a{background:linear-gradient(110deg,rgba(255,255,255,.72),rgba(226,217,255,.48));box-shadow:inset 0 1px 0 #fff}
       `}</style>
 
       {/* HERO — shorter + lighter overlay so image shows */}
