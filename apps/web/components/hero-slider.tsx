@@ -48,7 +48,17 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
   if (!movies || movies.length === 0) return null;
 
   return (
-    <section className="relative isolate w-full h-[570px] sm:h-[620px] md:h-[650px] lg:h-[700px] overflow-hidden bg-[#080a10]">
+    <style jsx global>{`
+      .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:inherit; }
+      .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(9,11,19,.25) 30%,#090b13 100%); }
+      html[data-mobile-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-theme="light"] .home-feature-hero .home-hero-side-shade { background:linear-gradient(105deg,rgba(248,246,255,.97) 0%,rgba(245,241,255,.88) 55%,rgba(245,241,255,.18) 100%); }
+      html[data-mobile-theme="light"] .home-feature-hero .home-hero-top-shade,html[data-theme="light"] .home-feature-hero .home-hero-top-shade { background:linear-gradient(180deg,rgba(248,246,255,.16),transparent 45%,rgba(245,243,251,.82)); }
+      html[data-mobile-theme="light"] .home-feature-hero .hero-bottom-fade,html[data-theme="light"] .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(245,243,251,.35) 35%,#f5f3fb 100%); }
+      html[data-mobile-theme="light"] .home-feature-hero h1,html[data-theme="light"] .home-feature-hero h1 { color:#29223d !important;text-shadow:none !important; }
+      html[data-mobile-theme="light"] .home-feature-hero p,html[data-theme="light"] .home-feature-hero p { color:rgba(41,34,61,.76) !important; }
+      html[data-mobile-theme="light"] .home-feature-hero .hero-source-badge,html[data-theme="light"] .home-feature-hero .hero-source-badge,html[data-mobile-theme="light"] .home-feature-hero .hero-meta-badge,html[data-theme="light"] .home-feature-hero .hero-meta-badge { color:#51436f !important;background:rgba(255,255,255,.68) !important;border-color:rgba(112,84,170,.24) !important; }
+    `}</style>
+    <section className="home-feature-hero relative isolate mx-3 mt-3 h-[590px] overflow-hidden rounded-[26px] border border-violet-300/15 bg-[#090b13] sm:mx-6 sm:h-[640px] md:h-[660px] lg:mx-8 lg:h-[700px]">
       <Swiper
         modules={[Autoplay, EffectFade, Thumbs]}
         effect="fade"
@@ -75,16 +85,18 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   quality={92}
                   className="object-cover object-[center_28%] sm:object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/10" />
+                <div className="home-hero-top-shade absolute inset-0 bg-gradient-to-b from-black/30 via-black/5 to-[#090b13]/95" />
+                <div className="home-hero-side-shade absolute inset-0 bg-gradient-to-r from-[#090b13]/95 via-[#090b13]/65 to-transparent" />
               </div>
 
+              <div className="pointer-events-none absolute -right-16 -top-24 z-10 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-24 right-1/4 z-10 h-56 w-64 rounded-full bg-fuchsia-500/15 blur-3xl" />
               <div className="hero-bottom-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[90px] opacity-100 md:h-[120px]" />
 
               <div className="container relative z-20 flex h-full flex-col items-start justify-end px-5 pb-[142px] text-left sm:px-8 sm:pb-[150px] md:justify-center md:pb-10">
                 <div className="w-full max-w-[560px] animate-fade-up">
                   {movie.hero_source && (
-                    <span className={`hero-source-badge hero-source-${movie.hero_source} inline-flex items-center rounded-full border border-white/25 bg-black/35 px-3 py-1.5 text-[9px] font-bold tracking-[.13em] text-white/95 shadow-lg backdrop-blur-xl sm:text-[10px]`}>
+                    <span className={`hero-source-badge hero-source-${movie.hero_source} inline-flex items-center rounded-full border border-violet-300/30 bg-violet-400/15 px-3 py-1.5 text-[9px] font-extrabold tracking-[.16em] text-violet-100 backdrop-blur-xl sm:text-[10px]`}>
                       {movie.hero_source === "tmdb"
                         ? "TMDB TRENDING"
                         : movie.hero_source === "netflix"
@@ -95,7 +107,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
 
                   <Link
                     href={`/phim/${movie.slug}`}
-                    className="mt-3 block max-w-full text-white drop-shadow-[0_3px_12px_rgba(0,0,0,.8)] transition-colors hover:text-[#ffd875]"
+                    className="mt-3 block max-w-full text-white drop-shadow-[0_3px_12px_rgba(0,0,0,.8)] transition-colors hover:text-violet-200"
                     aria-label={`Xem phim ${movie.name}`}
                   >
                     <h1 className="line-clamp-2 text-[30px] font-black leading-[1.08] tracking-[-.04em] sm:text-4xl md:text-5xl lg:text-[56px]">
@@ -111,7 +123,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
 
                   <div className="mt-4 flex flex-wrap items-center gap-2">
                     {movie.quality && (
-                      <span className="hero-meta-badge hero-meta-quality rounded-md border border-[#ffd875]/65 bg-black/30 px-2.5 py-1 text-[10px] font-bold text-[#ffe19a] backdrop-blur-md">
+                      <span className="hero-meta-badge hero-meta-quality rounded-md border border-violet-300/45 bg-violet-400/15 px-2.5 py-1 text-[10px] font-bold text-violet-100 backdrop-blur-md">
                         {movie.quality}
                       </span>
                     )}
@@ -133,13 +145,13 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   <div className="mt-5 flex items-center gap-3">
                     <Link
                       href={`/phim/${movie.slug}`}
-                      className="inline-flex h-12 min-w-[142px] items-center justify-center gap-2 rounded-full bg-[#ffd875] px-6 text-[13px] font-extrabold text-[#171923] shadow-[0_8px_28px_rgba(255,216,117,.25)] transition-all hover:brightness-110 active:scale-[.97]"
+                      className="inline-flex h-12 min-w-[142px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#8b5cf6] via-[#a855f7] to-[#d946ef] px-6 text-[13px] font-extrabold text-white shadow-[0_8px_28px_rgba(168,85,247,.28)] transition-all hover:brightness-110 active:scale-[.97]"
                     >
                       <Play size={16} fill="currentColor" /> Xem ngay
                     </Link>
                     <Link
                       href={`/phim/${movie.slug}`}
-                      className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/30 bg-white/[.13] px-5 text-[13px] font-bold text-white shadow-lg backdrop-blur-xl transition-all hover:bg-white/20 active:scale-[.97]"
+                      className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-violet-200/30 bg-white/[.13] px-5 text-[13px] font-bold text-white shadow-lg backdrop-blur-xl transition-all hover:bg-white/20 active:scale-[.97]"
                     >
                       <Info size={17} /> Chi tiết
                     </Link>
@@ -271,7 +283,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           {movies.map((movie) => (
             <SwiperSlide
               key={movie._id}
-              className="!h-10 !w-10 cursor-pointer sm:!h-11 sm:!w-11 [&.swiper-slide-thumb-active>div]:scale-110 [&.swiper-slide-thumb-active>div]:border-[#ffd875] [&.swiper-slide-thumb-active>div]:shadow-[0_0_18px_rgba(255,216,117,.85)]"
+              className="!h-10 !w-10 cursor-pointer sm:!h-11 sm:!w-11 [&.swiper-slide-thumb-active>div]:scale-110 [&.swiper-slide-thumb-active>div]:border-violet-300 [&.swiper-slide-thumb-active>div]:shadow-[0_0_18px_rgba(167,139,250,.85)]"
             >
               <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-white/45 bg-[#292c38] shadow-[0_3px_12px_rgba(0,0,0,.35)] transition-all duration-300">
                 <Image
