@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, type CSSProperties } from "react";
 import Link from "next/link";
 import { Clapperboard, Tv, Sparkles, Play, ArrowUpRight, Film } from "lucide-react";
 import { InfiniteMovieGrid } from "@/components/infinite-movie-grid";
@@ -210,7 +210,7 @@ export function MovieListingScreen({ type }: { type: string }) {
         {isMainMovieType ? (
           <section
             className="listing-hero relative mb-6 overflow-hidden rounded-[26px] px-4 py-5 sm:mb-8 sm:px-7 sm:py-7"
-            style={{ "--listing-hero-image": heroImage ? `url("${heroImage}")` : "none" } as React.CSSProperties}
+            style={{ "--listing-hero-image": heroImage ? `url("${heroImage}")` : "none" } as CSSProperties}
           >
             <div className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-28 right-1/4 h-48 w-64 rounded-full bg-fuchsia-500/15 blur-3xl" />
