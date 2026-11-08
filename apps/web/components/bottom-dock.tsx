@@ -368,6 +368,168 @@ export function BottomDock() {
             color: #fff !important;
             box-shadow: 0 8px 24px rgba(114,87,245,.22) !important;
           }
+
+          /* Final mobile light-theme pass: cinematic imagery, crisp hierarchy, restrained accents. */
+          html[data-mobile-theme="light"] body {
+            background: linear-gradient(155deg, #f2f3fc 0%, #edf5ff 52%, #f8f5ff 100%) !important;
+            color: #252b40 !important;
+          }
+
+          /* Home hero: keep the artwork vivid and reserve the light fade for its bottom edge. */
+          html[data-mobile-theme="light"] body main > section:first-child {
+            background: #f2f3fc !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .swiper-slide img {
+            filter: brightness(.88) saturate(1.16) contrast(1.04);
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .swiper-slide > div.pointer-events-none {
+            background: linear-gradient(
+              to bottom,
+              rgba(20,24,43,.10) 0%,
+              rgba(20,24,43,.06) 34%,
+              rgba(20,24,43,.34) 56%,
+              rgba(242,243,252,.76) 86%,
+              #f2f3fc 100%
+            ) !important;
+            opacity: 1 !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .container h1 {
+            color: #fff !important;
+            text-shadow: 0 2px 5px rgba(12,17,35,.62), 0 8px 24px rgba(12,17,35,.38) !important;
+            -webkit-text-stroke: 0 !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .container p {
+            color: #f7f5ff !important;
+            text-shadow: 0 2px 7px rgba(12,17,35,.62) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-source-badge {
+            box-shadow: 0 4px 14px rgba(20,25,48,.2) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-badge {
+            background: rgba(250,251,255,.94) !important;
+            color: #34415c !important;
+            border-color: rgba(255,255,255,.78) !important;
+            box-shadow: 0 3px 10px rgba(18,25,49,.16) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child a[class*="bg-[#ffd875]"] {
+            background: linear-gradient(110deg, #7058ee 0%, #398fdf 100%) !important;
+            color: #fff !important;
+            box-shadow: 0 9px 24px rgba(91,88,220,.28) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child a[class*="bg-white/"] {
+            background: rgba(255,255,255,.2) !important;
+            border-color: rgba(255,255,255,.62) !important;
+            color: #fff !important;
+            text-shadow: 0 1px 5px rgba(12,17,35,.5);
+            box-shadow: 0 6px 18px rgba(12,17,35,.16) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child [aria-label="Thông báo"] {
+            color: #5545bd !important;
+            background: rgba(255,255,255,.94) !important;
+            border: 1px solid rgba(114,87,245,.22) !important;
+            box-shadow: 0 7px 22px rgba(35,43,92,.2), inset 0 1px 0 #fff !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child [aria-label="Thông báo"] svg {
+            color: #5847c4 !important;
+          }
+
+          /* Topic chips: pastel glass instead of competing neon blocks. */
+          html[data-mobile-theme="light"] body main a[href^="/the-loai/"] {
+            background: linear-gradient(135deg, #fff 0%, #edf2ff 100%) !important;
+            border: 1px solid rgba(114,87,245,.15) !important;
+            color: #4b4a78 !important;
+            box-shadow: 0 4px 14px rgba(75,82,140,.07) !important;
+          }
+          html[data-mobile-theme="light"] body main a[href^="/the-loai/"] span {
+            color: #4b4a78 !important;
+            text-shadow: none !important;
+          }
+
+          /* Movie detail: keep the poster cinematic, then blend naturally into the app surface. */
+          html[data-mobile-theme="light"] body main:has(.movie-detail-mobile) {
+            background: linear-gradient(155deg, #f2f3fc 0%, #e8f5ff 55%, #f8f4ff 100%) !important;
+            color: #252b40 !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child {
+            background: #20243a !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child img {
+            filter: brightness(.9) saturate(1.12) contrast(1.04);
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child > div.absolute.inset-0 {
+            background: linear-gradient(
+              to bottom,
+              rgba(13,18,38,.22) 0%,
+              rgba(13,18,38,.02) 27%,
+              rgba(13,18,38,.30) 48%,
+              rgba(13,18,38,.72) 68%,
+              rgba(242,243,252,.94) 94%,
+              #f2f3fc 100%
+            ) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile h1 {
+            color: #fff !important;
+            text-shadow: 0 2px 7px rgba(10,15,33,.72), 0 8px 24px rgba(10,15,33,.42) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child p {
+            color: #f8f7ff !important;
+            text-shadow: 0 2px 6px rgba(10,15,33,.65) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child span {
+            text-shadow: none !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child a[aria-label="Quay lại"],
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child button {
+            background: rgba(22,27,49,.46) !important;
+            border-color: rgba(255,255,255,.32) !important;
+            color: #fff !important;
+            backdrop-filter: blur(16px);
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) {
+            background: linear-gradient(155deg, #f2f3fc 0%, #e8f5ff 54%, #f8f4ff 100%) !important;
+            color: #303950 !important;
+            padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) p {
+            color: #58647d !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) h2,
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) h3 {
+            color: #28334d !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) button {
+            color: #5849b8 !important;
+            border-color: rgba(114,87,245,.2) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [aria-label="Thao tác phim"] button,
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [aria-label="Thao tác phim"] a {
+            background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(232,241,255,.94)) !important;
+            border: 1px solid rgba(114,87,245,.16) !important;
+            color: #5145a5 !important;
+            box-shadow: 0 7px 20px rgba(66,76,133,.09) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [aria-label="Thao tác phim"] svg {
+            color: #7257f5 !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) a {
+            border-color: rgba(114,87,245,.14);
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) a p,
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) a span {
+            color: #465574 !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [class*="bg-white/"],
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [class*="bg-[#080b12"],
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [class*="bg-[#1c1e2a"] {
+            background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(235,242,255,.9)) !important;
+            border-color: rgba(114,87,245,.16) !important;
+            box-shadow: 0 7px 22px rgba(65,75,130,.07) !important;
+          }
+
+          /* Keep the floating dock from covering the last content row. */
+          html[data-mobile-theme="light"] body main:not(:has(.movie-detail-mobile)) {
+            padding-bottom: calc(84px + env(safe-area-inset-bottom));
+          }
         }
       `}</style>
 
