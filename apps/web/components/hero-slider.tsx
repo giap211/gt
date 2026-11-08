@@ -56,6 +56,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       <style jsx global>{`
       .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:0 !important; }
       .home-feature-hero .hero-bottom-fade { background:radial-gradient(ellipse 88% 105% at 50% 100%,rgba(168,85,247,.42) 0%,rgba(139,92,246,.24) 34%,rgba(124,58,237,.08) 62%,transparent 82%),linear-gradient(180deg,rgba(7,8,17,.06) 0%,rgba(7,8,17,.12) 28%,rgba(7,8,17,.68) 76%,#090b13 100%); }
+      .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,#0b0d14 0%,rgba(11,13,20,.96) 18%,rgba(76,29,149,.20) 58%,rgba(11,13,20,0) 100%); }
+      .home-feature-hero .hero-top-transition::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse 76% 85% at 50% 100%,rgba(139,92,246,.16) 0%,rgba(168,85,247,.07) 42%,transparent 78%); }
       .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
       .home-feature-hero .hero-slide-dot[aria-current="true"] { width:17px;height:6px;background:linear-gradient(90deg,#e879f9,#8b5cf6);box-shadow:0 0 10px rgba(168,85,247,.85),0 0 20px rgba(168,85,247,.45); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-theme="light"] .home-feature-hero .home-hero-side-shade { background:linear-gradient(105deg,rgba(248,246,255,.97) 0%,rgba(245,241,255,.88) 55%,rgba(245,241,255,.18) 100%); }
@@ -92,6 +94,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   className="object-cover object-[58%_center] sm:object-center"
                 />
                 <div className="home-hero-top-shade absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#090b13]/75" />
+                <div aria-hidden="true" className="hero-top-transition pointer-events-none absolute inset-x-0 top-0 z-[1] h-[170px] sm:h-[220px]" />
                 <div className="home-hero-side-shade absolute inset-0 bg-gradient-to-r from-[#090b13]/95 via-[#090b13]/65 to-transparent" />
               </div>
 
