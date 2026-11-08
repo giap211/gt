@@ -4,8 +4,9 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Search, Play, Bookmark, X, Clock3, ArrowRight, Sparkles } from "lucide-react";
+import { Bell, Search, Play, Bookmark, Check, X, Clock3, ArrowRight, Sparkles } from "lucide-react";
 import { useMember } from "./member-provider";
+import { memberClient } from "@/lib/member-client";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -41,7 +42,37 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
   const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [savedSlugs, setSavedSlugs] = useState<Set<string>>(() => new Set());
+  const [savingSlug, setSavingSlug] = useState<string | null>(null);
   const { user, openAuth } = useMember();
+
+  useEffect(() => {
+    let cancelled = false;
+    void memberClient.favorites().then(({ items }) => {
+      if (!cancelled) setSavedSlugs(new Set(items.map((item) => item.movieSlug)));
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleToggleFavorite = async (movie: Movie) => {
+    if (savingSlug === movie.slug) return;
+    setSavingSlug(movie.slug);
+    try {
+      const result = await memberClient.toggleFavorite({
+        movieSlug: movie.slug,
+        movieTitle: movie.name,
+        posterUrl: movie.poster_url || movie.thumb_url,
+      });
+      setSavedSlugs((current) => {
+        const next = new Set(current);
+        if (result.favorited) next.add(movie.slug);
+        else next.delete(movie.slug);
+        return next;
+      });
+    } finally {
+      setSavingSlug(null);
+    }
+  };
 
   useEffect(() => {
     if (!notificationsOpen) return;
@@ -60,7 +91,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       .home-feature-hero .hero-short-black-fade { height:clamp(56px,14.4vw,102px);background:linear-gradient(180deg,rgba(5,6,12,0) 0%,rgba(5,6,12,.10) 20%,rgba(5,6,12,.26) 40%,rgba(5,6,12,.47) 60%,rgba(5,6,12,.70) 80%,rgba(5,6,12,.882) 100%); }
       .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,#0b0d14 0%,rgba(93,55,150,.92) 18%,rgba(124,58,237,.48) 38%,rgba(139,92,246,.16) 55%,transparent 72%); }\n      .home-feature-hero .hero-black-transition { height:clamp(105px,24vw,190px);background:linear-gradient(180deg,#090b13 0%,rgba(9,11,19,.92) 18%,rgba(9,11,19,.58) 48%,rgba(9,11,19,.16) 78%,transparent 100%); }
       .home-feature-hero .hero-top-transition::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse 88% 72% at 50% 0%,rgba(139,92,246,.14) 0%,rgba(168,85,247,.055) 43%,transparent 86%); }
-      .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
+      @keyframes heroSavedPop { 0%{transform:scale(.55) rotate(-18deg);opacity:.3} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }\n      .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
       .home-feature-hero .hero-slide-dot[aria-current="true"] { width:17px;height:6px;background:linear-gradient(90deg,#e879f9,#8b5cf6);box-shadow:0 0 10px rgba(168,85,247,.85),0 0 20px rgba(168,85,247,.45); }
       html[data-mobile-theme="light"] .home-feature-hero,html[data-theme="light"] .home-feature-hero { background:#f5f3fb; }
       html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition,html[data-theme="light"] .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,#f5f3fb 0%,rgba(190,164,235,.92) 18%,rgba(139,92,246,.48) 39%,rgba(139,92,246,.15) 56%,transparent 73%); }\n      html[data-mobile-theme="light"] .home-feature-hero .hero-black-transition,html[data-theme="light"] .home-feature-hero .hero-black-transition { background:linear-gradient(180deg,rgba(20,16,30,.92) 0%,rgba(20,16,30,.78) 20%,rgba(20,16,30,.42) 54%,rgba(20,16,30,.12) 82%,transparent 100%); }
@@ -148,10 +179,20 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                     </Link>
                     <button
                       type="button"
-                      aria-label="Lưu phim"
-                      className="inline-flex h-[42px] w-[42px] items-center justify-center rounded-full border border-violet-300/35 bg-violet-400/15 text-white shadow-[0_4px_18px_rgba(124,58,237,.24)] backdrop-blur-xl transition-all hover:bg-violet-400/25 active:scale-[.97] sm:h-12 sm:w-12"
+                      aria-label={savedSlugs.has(movie.slug) ? "Bỏ lưu phim" : "Lưu phim"}
+                      aria-pressed={savedSlugs.has(movie.slug)}
+                      disabled={savingSlug === movie.slug}
+                      onClick={() => void handleToggleFavorite(movie)}
+                      className={`group/save inline-flex h-[42px] min-w-[42px] items-center justify-center gap-2 rounded-full border px-3 text-white backdrop-blur-xl transition-all duration-300 active:scale-[.94] disabled:opacity-70 sm:h-12 ${savedSlugs.has(movie.slug) ? "border-emerald-300/45 bg-emerald-400/20 text-emerald-100 shadow-[0_0_22px_rgba(52,211,153,.22)]" : "border-violet-300/35 bg-violet-400/15 shadow-[0_4px_18px_rgba(124,58,237,.24)] hover:bg-violet-400/25"}`}
                     >
-                      <Bookmark size={19} />
+                      {savedSlugs.has(movie.slug) ? (
+                        <>
+                          <Check size={18} strokeWidth={2.6} className="animate-[heroSavedPop_.35s_ease-out]" />
+                          <span className="text-[12px] font-bold">Đã lưu</span>
+                        </>
+                      ) : (
+                        <Bookmark size={19} className="transition-transform duration-300 group-hover/save:scale-110" />
+                      )}
                     </button>
                   </div>
                 </div>
