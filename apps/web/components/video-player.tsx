@@ -537,7 +537,67 @@ export const VideoPlayer = ({
       if (art) {
         const container = art.template.$player as HTMLElement;
 
-        // Đã tắt thao tác chạm/nhấn hai lần trên hình video để tua.
+        // Gọi lại thanh tiêu đề ngay khi người dùng chạm player.
+        const onPlayerPointerDown = () => onUserInteraction?.();
+        container.addEventListener("pointerdown", onPlayerPointerDown, { passive: true });
+
+        // Giữ thao tác kéo thanh tiến trình để tua chính xác theo vị trí.
+        let progressDragging = false;
+        let progressPointerId: number | null = null;
+        const progressElement = (art.template as any).$progress as HTMLElement | undefined;
+
+        if (progressElement) {
+          progressElement.style.touchAction = "none";
+        }
+
+        const seekFromRotatedProgress = (clientY: number) => {
+          if (!progressElement || !art || !rotatedRef.current) return;
+          const rect = progressElement.getBoundingClientRect();
+          const duration = Number.isFinite(art.duration) ? art.duration : 0;
+          if (duration <= 0 || rect.height <= 0) return;
+          const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+          const seconds = fraction * duration;
+          art.emit("setBar", "played", fraction);
+          art.seek = seconds;
+        };
+
+        const onProgressPointerDown = (event: PointerEvent) => {
+          if (!rotatedRef.current || !progressElement) return;
+          const target = event.target as Node | null;
+          if (!target || !progressElement.contains(target)) return;
+
+          progressDragging = true;
+          progressPointerId = event.pointerId;
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          seekFromRotatedProgress(event.clientY);
+        };
+
+        const onProgressPointerMove = (event: PointerEvent) => {
+          if (!progressDragging || event.pointerId !== progressPointerId) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          seekFromRotatedProgress(event.clientY);
+        };
+
+        const onProgressPointerUp = (event: PointerEvent) => {
+          if (!progressDragging || event.pointerId !== progressPointerId) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          seekFromRotatedProgress(event.clientY);
+          progressDragging = false;
+          progressPointerId = null;
+        };
+
+        container.addEventListener("pointerdown", onProgressPointerDown, true);
+        document.addEventListener("pointermove", onProgressPointerMove, true);
+        document.addEventListener("pointerup", onProgressPointerUp, true);
+        document.addEventListener("pointercancel", onProgressPointerUp, true);
+
+        // Đã tắt thao tác chạm/nhấn hai lần trên vùng hình video để tua.
         // Người xem chỉ tua bằng thanh tiến trình hoặc các nút điều khiển.
 
 
