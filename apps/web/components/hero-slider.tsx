@@ -5,12 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bell, Play, Info } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, EffectFade, Pagination, Thumbs } from "swiper/modules";
+import { Autoplay, EffectFade, Thumbs } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
-import "swiper/css/pagination";
 import "swiper/css/thumbs";
 
 interface Movie {
@@ -41,11 +40,10 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
   return (
     <section className="relative isolate w-full h-[570px] sm:h-[620px] md:h-[650px] lg:h-[700px] overflow-hidden bg-[#080a10]">
       <Swiper
-        modules={[Autoplay, EffectFade, Pagination, Thumbs]}
+        modules={[Autoplay, EffectFade, Thumbs]}
         effect="fade"
         speed={700}
         autoplay={{ delay: 8000, disableOnInteraction: false }}
-        pagination={{ clickable: true, el: ".hero-pagination" }}
         thumbs={{
           swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
         }}
@@ -169,8 +167,6 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         </button>
       </div>
 
-      <div className="hero-pagination absolute bottom-[105px] left-1/2 z-40 flex w-fit -translate-x-1/2 items-center justify-center gap-1.5 [&_.swiper-pagination-bullet]:!m-0 [&_.swiper-pagination-bullet]:!h-1.5 [&_.swiper-pagination-bullet]:!w-1.5 [&_.swiper-pagination-bullet]:!bg-white/55 [&_.swiper-pagination-bullet-active]:!w-5 [&_.swiper-pagination-bullet-active]:!rounded-full [&_.swiper-pagination-bullet-active]:!bg-[#ffd875] sm:bottom-[112px] md:bottom-[105px]" />
-
       <div className="absolute bottom-7 left-1/2 z-40 w-fit max-w-[90%] -translate-x-1/2 sm:bottom-8">
         <Swiper
           onSwiper={setThumbsSwiper}
@@ -183,8 +179,11 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           className="hero-cast-slider !w-fit !overflow-visible [&_.swiper-wrapper]:!justify-center"
         >
           {movies.map((movie) => (
-            <SwiperSlide key={movie._id} className="!h-9 !w-9 cursor-pointer sm:!h-10 sm:!w-10">
-              <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-white/45 bg-[#292c38] shadow-[0_3px_12px_rgba(0,0,0,.35)] transition-all duration-300 group-[.swiper-slide-thumb-active]:scale-110 group-[.swiper-slide-thumb-active]:border-[#ffd875] group-[.swiper-slide-thumb-active]:shadow-[0_0_14px_rgba(255,216,117,.5)]">
+            <SwiperSlide
+              key={movie._id}
+              className="!h-10 !w-10 cursor-pointer sm:!h-11 sm:!w-11 [&.swiper-slide-thumb-active>div]:scale-110 [&.swiper-slide-thumb-active>div]:border-[#ffd875] [&.swiper-slide-thumb-active>div]:shadow-[0_0_18px_rgba(255,216,117,.85)]"
+            >
+              <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-white/45 bg-[#292c38] shadow-[0_3px_12px_rgba(0,0,0,.35)] transition-all duration-300">
                 <Image
                   src={movie.poster_url || movie.thumb_url}
                   alt={movie.name}
