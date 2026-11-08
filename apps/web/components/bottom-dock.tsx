@@ -706,6 +706,95 @@ export function BottomDock() {
             filter: none !important;
             box-shadow: none !important;
           }
+          /* Liquid Glass dock: moving lens, specular rim and responsive light/dark tint. */
+          html[data-mobile-theme] body .liquid-dock {
+            --dock-glass-bg: linear-gradient(135deg, rgba(255,255,255,.19), rgba(255,255,255,.075) 48%, rgba(180,190,255,.10));
+            --dock-glass-border: rgba(255,255,255,.34);
+            --dock-icon: rgba(245,247,255,.72);
+            --dock-label: rgba(239,242,255,.66);
+            --dock-active-icon: #fff;
+            position: relative;
+            isolation: isolate;
+            min-height: 68px;
+            padding: 6px;
+            border: 1px solid var(--dock-glass-border) !important;
+            border-radius: 25px !important;
+            background: var(--dock-glass-bg) !important;
+            box-shadow: 0 14px 38px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.48), inset 0 -1px 0 rgba(255,255,255,.08) !important;
+            -webkit-backdrop-filter: blur(30px) saturate(190%);
+            backdrop-filter: blur(30px) saturate(190%);
+            overflow: hidden;
+            transition: background .35s ease, border-color .35s ease, box-shadow .35s ease;
+          }
+          html[data-mobile-theme] body .liquid-dock::before {
+            content: ""; position: absolute; inset: 1px; z-index: -1; pointer-events: none;
+            border-radius: inherit;
+            background: linear-gradient(115deg, rgba(255,255,255,.28), transparent 26%, transparent 68%, rgba(174,190,255,.13));
+            opacity: .8;
+          }
+          html[data-mobile-theme] body .liquid-dock-indicator {
+            position: absolute; z-index: 0; top: 5px; bottom: 5px; left: 6px;
+            width: calc((100% - 12px) / 5);
+            border-radius: 19px;
+            background: linear-gradient(145deg, rgba(255,255,255,.32), rgba(255,255,255,.12));
+            border: 1px solid rgba(255,255,255,.42);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.56), inset 0 -1px 0 rgba(255,255,255,.12), 0 4px 16px rgba(0,0,0,.12);
+            transform: translateX(calc(var(--dock-active, 0) * 100%));
+            transition: transform .58s cubic-bezier(.2,.85,.2,1), border-radius .35s ease, background .35s ease;
+            pointer-events: none;
+          }
+          html[data-mobile-theme] body .liquid-dock-item {
+            position: relative; z-index: 1; min-width: 0; min-height: 54px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 3px; padding: 4px 1px;
+            color: var(--dock-icon) !important; background: transparent !important;
+            border: 0 !important; border-radius: 17px;
+            text-decoration: none; outline: none;
+            transform: translateY(0) scale(1);
+            transition: color .28s ease, transform .28s cubic-bezier(.2,.8,.2,1), filter .28s ease;
+            -webkit-tap-highlight-color: transparent;
+          }
+          html[data-mobile-theme] body .liquid-dock-item svg {
+            flex: 0 0 auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,.12));
+            transition: transform .42s cubic-bezier(.2,.9,.25,1), stroke-width .2s ease;
+          }
+          html[data-mobile-theme] body .liquid-dock-item span {
+            display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            font-size: 9px; line-height: 1.15; font-weight: 600; letter-spacing: -.01em;
+            color: var(--dock-label) !important; text-shadow: none !important;
+            transition: color .25s ease, opacity .25s ease;
+          }
+          html[data-mobile-theme] body .liquid-dock-item.is-active { color: var(--dock-active-icon) !important; }
+          html[data-mobile-theme] body .liquid-dock-item.is-active span { color: var(--dock-active-icon) !important; }
+          html[data-mobile-theme] body .liquid-dock-item.is-active svg { transform: translateY(-1px) scale(1.08); }
+          @media (hover: hover) and (pointer: fine) {
+            html[data-mobile-theme] body .liquid-dock-item:hover { transform: translateY(-4px) scale(1.08); color: #fff !important; }
+            html[data-mobile-theme] body .liquid-dock-item:hover svg { transform: translateY(-2px) scale(1.13); }
+            html[data-mobile-theme] body .liquid-dock-item:hover span { color: #fff !important; }
+          }
+          html[data-mobile-theme] body .liquid-dock-item:active { transform: translateY(-2px) scale(.92); }
+          html[data-mobile-theme="light"] body .liquid-dock {
+            --dock-glass-bg: linear-gradient(135deg, rgba(255,255,255,.82), rgba(241,245,255,.68) 52%, rgba(232,228,255,.62));
+            --dock-glass-border: rgba(255,255,255,.88);
+            --dock-icon: rgba(68,76,111,.78);
+            --dock-label: rgba(78,87,122,.72);
+            --dock-active-icon: #4d3ca5;
+            box-shadow: 0 12px 32px rgba(71,82,145,.17), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(104,112,175,.08) !important;
+          }
+          html[data-mobile-theme="light"] body .liquid-dock::before {
+            background: linear-gradient(115deg, rgba(255,255,255,.95), transparent 30%, transparent 70%, rgba(174,160,255,.15));
+            opacity: .95;
+          }
+          html[data-mobile-theme="light"] body .liquid-dock-indicator {
+            background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(233,235,255,.72));
+            border-color: rgba(126,105,220,.22);
+            box-shadow: inset 0 1px 0 #fff, 0 4px 13px rgba(91,82,160,.12);
+          }
+          @media (prefers-reduced-motion: reduce) {
+            html[data-mobile-theme] body .liquid-dock-indicator,
+            html[data-mobile-theme] body .liquid-dock-item,
+            html[data-mobile-theme] body .liquid-dock-item svg { transition: none !important; }
+          }
           html[data-mobile-theme] body .movie-carousel-view-more:active {
             transform: scale(.97);
           }
@@ -942,105 +1031,61 @@ export function BottomDock() {
         </div>
       )}
 
-      {/* Bottom dock */}
+      {/* Liquid Glass bottom dock */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-3 pb-2.5 pt-1">
           <nav
-            className="bottom-dock-surface pointer-events-auto grid grid-cols-5 items-center rounded-[26px] px-1.5 py-2 bg-white/[0.1] border border-white/20 shadow-[0_8px_36px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.22)] backdrop-blur-2xl"
-            style={{ WebkitBackdropFilter: "blur(28px) saturate(160%)" }}
+            className="bottom-dock-surface liquid-dock pointer-events-auto relative grid grid-cols-5 items-center"
+            style={{ "--dock-active": dockActiveIndex } as React.CSSProperties}
+            aria-label="Điều hướng chính"
           >
-            {/* Home */}
+            <span className="liquid-dock-indicator" aria-hidden="true" />
             <Link
               href="/"
               onClick={(event) => handleDockNavigation(event, isHome)}
-              className="flex flex-col items-center justify-center gap-0.5 py-1"
+              className={`liquid-dock-item ${isHome ? "is-active" : ""}`}
+              aria-current={isHome ? "page" : undefined}
             >
-              <Home
-                size={22}
-                strokeWidth={isHome ? 2.3 : 1.7}
-                className={isHome ? "text-[#ffd875]" : "text-white/65"}
-              />
-              <span
-                className={`text-[10px] font-medium ${
-                  isHome ? "text-[#ffd875]" : "text-white/55"
-                }`}
-              >
-                Trang chủ
-              </span>
+              <Home size={22} strokeWidth={isHome ? 2.25 : 1.8} />
+              <span>Trang chủ</span>
             </Link>
-
-            {/* Series */}
             <Link
               href="/danh-sach/phim-bo"
               onClick={(event) => handleDockNavigation(event, isSeries)}
-              className="flex flex-col items-center justify-center gap-0.5 py-1"
+              className={`liquid-dock-item ${isSeries ? "is-active" : ""}`}
+              aria-current={isSeries ? "page" : undefined}
             >
-              <Tv
-                size={22}
-                strokeWidth={isSeries ? 2.3 : 1.7}
-                className={isSeries ? "text-[#ffd875]" : "text-white/65"}
-              />
-              <span
-                className={`text-[10px] font-medium ${
-                  isSeries ? "text-[#ffd875]" : "text-white/55"
-                }`}
-              >
-                Phim bộ
-              </span>
+              <Tv size={22} strokeWidth={isSeries ? 2.25 : 1.8} />
+              <span>Phim bộ</span>
             </Link>
-
-            {/* Search — center raised */}
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="flex h-full flex-col items-center justify-center py-1"
+              className={`liquid-dock-item liquid-dock-search ${searchOpen ? "is-active" : ""}`}
               aria-label="Tìm kiếm"
+              aria-pressed={searchOpen}
             >
-              <div
-                className="flex h-[44px] w-[44px] items-center justify-center rounded-full bg-gradient-to-br from-white/25 to-white/10 border border-white/35 shadow-[0_6px_20px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.45)] backdrop-blur-md active:scale-90 transition-transform"
-              >
-                <Search size={24} strokeWidth={2.2} className="text-white" />
-              </div>
+              <Search size={23} strokeWidth={2} />
+              <span>Tìm kiếm</span>
             </button>
-
-            {/* Movies */}
             <Link
               href="/danh-sach/phim-le"
               onClick={(event) => handleDockNavigation(event, isSingle)}
-              className="flex flex-col items-center justify-center gap-0.5 py-1"
+              className={`liquid-dock-item ${isSingle ? "is-active" : ""}`}
+              aria-current={isSingle ? "page" : undefined}
             >
-              <Clapperboard
-                size={22}
-                strokeWidth={isSingle ? 2.3 : 1.7}
-                className={isSingle ? "text-[#ffd875]" : "text-white/65"}
-              />
-              <span
-                className={`text-[10px] font-medium ${
-                  isSingle ? "text-[#ffd875]" : "text-white/55"
-                }`}
-              >
-                Phim lẻ
-              </span>
+              <Clapperboard size={22} strokeWidth={isSingle ? 2.25 : 1.8} />
+              <span>Phim lẻ</span>
             </Link>
-
-            {/* Account */}
             <button
               type="button"
               onClick={handleAccount}
-              className="flex flex-col items-center justify-center gap-0.5 py-1"
+              className={`liquid-dock-item ${accountOpen ? "is-active" : ""}`}
+              aria-label="Tài khoản"
+              aria-pressed={accountOpen}
             >
-              <UserCircle
-                size={22}
-                strokeWidth={user ? 2.3 : 1.7}
-                className={user ? "text-[#ffd875]" : "text-white/65"}
-              />
-              <span
-                className={`text-[10px] font-medium ${
-                  user ? "text-[#ffd875]" : "text-white/55"
-                }`}
-              >
-                Tài khoản
-              </span>
+              <UserCircle size={22} strokeWidth={user || accountOpen ? 2.2 : 1.8} />
+              <span>Tài khoản</span>
             </button>
           </nav>
         </div>
