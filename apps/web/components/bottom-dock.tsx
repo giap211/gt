@@ -823,13 +823,12 @@ export function BottomDock() {
               opacity: 1;
             }
             html[data-mobile-theme] body .liquid-dock-indicator {
-              top: 50%;
-              bottom: auto;
-              left: calc(10% - 20px + var(--dock-active, 0) * 20%);
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              transform: translateY(-50%);
+              top: 5px;
+              bottom: 5px;
+              left: 0;
+              width: 20%;
+              border-radius: 999px;
+              transform: translateX(calc(var(--dock-active, 0) * 100%)) scaleX(.62);
               background: rgba(22, 25, 32, .09);
               border: 0;
               box-shadow: inset 0 1px 1px rgba(255,255,255,.58), 0 1px 3px rgba(20,25,35,.05);
