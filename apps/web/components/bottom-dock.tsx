@@ -763,7 +763,7 @@ export function BottomDock() {
               --rln-glass-bg:linear-gradient(120deg,rgba(255,255,255,.64),rgba(247,241,255,.56) 52%,rgba(255,255,255,.66));
               --rln-glass-border:rgba(255,255,255,.64);--rln-glass-outer:rgba(91,75,150,.14);
               --rln-pill-bg:linear-gradient(135deg,rgba(168,85,247,.17),rgba(217,70,239,.10) 55%,rgba(99,102,241,.14));
-              --rln-pill-shadow:rgba(168,85,247,.38);--rln-icon:rgba(91,69,132,.86);--rln-active:rgba(255,255,255,1);
+              --rln-pill-shadow:rgba(168,85,247,.38);--rln-icon:rgba(91,69,132,.86);--rln-active:rgba(91,33,182,1);
             }
             html[data-mobile-theme="light"] body .rophim-liquid-nav:before{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(216,180,254,.24) 55%,transparent);}
             html[data-mobile-theme="light"] body .rophim-liquid-nav:after{background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(168,85,247,.18),transparent 70%);}
