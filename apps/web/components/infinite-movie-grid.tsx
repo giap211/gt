@@ -95,7 +95,7 @@ export const InfiniteMovieGrid = ({
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-10">
+      <div className="listing-movie-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-10">
         {movies.map((movie, index) => (
           <div
             key={`${movie._id}-${index}`}
