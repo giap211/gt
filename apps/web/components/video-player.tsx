@@ -593,6 +593,39 @@ export const VideoPlayer = ({
         };
 
         container.addEventListener("pointerdown", onProgressPointerDown, true);
+
+        // Chặn gesture tua mặc định của Artplayer trên vùng hình video.
+        // Chỉ vùng progress bar được phép nhận thao tác kéo để seek.
+        const isProgressTarget = (target: EventTarget | null) =>
+          target instanceof Element &&
+          !!target.closest(".art-progress, .art-progress-played, .art-progress-loaded");
+
+        const blockVideoSwipePointerMove = (event: PointerEvent) => {
+          if (progressDragging || isProgressTarget(event.target)) return;
+
+          // Vẫn ghi nhận ngưỡng di chuyển để không biến thao tác vuốt thành double-tap.
+          if (event.pointerId === tapPointerId && !tapMoved &&
+              Math.hypot(event.clientX - tapStartX, event.clientY - tapStartY) > 12) {
+            tapMoved = true;
+            lastTap = 0;
+            lastSide = null;
+          }
+
+          event.stopImmediatePropagation();
+        };
+
+        const blockVideoSwipeTouchMove = (event: TouchEvent) => {
+          if (progressDragging || isProgressTarget(event.target)) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        };
+
+        container.addEventListener("pointermove", blockVideoSwipePointerMove, true);
+        container.addEventListener("touchmove", blockVideoSwipeTouchMove, {
+          capture: true,
+          passive: false,
+        });
+
         document.addEventListener("pointermove", onProgressPointerMove, true);
         document.addEventListener("pointerup", onProgressPointerUp, true);
         document.addEventListener("pointercancel", onProgressPointerUp, true);
@@ -696,6 +729,8 @@ export const VideoPlayer = ({
         (art as any).__seekCleanup = () => {
           container.removeEventListener("pointerdown", onPlayerPointerDown);
           container.removeEventListener("pointerdown", onProgressPointerDown, true);
+          container.removeEventListener("pointermove", blockVideoSwipePointerMove, true);
+          container.removeEventListener("touchmove", blockVideoSwipeTouchMove, true);
           document.removeEventListener("pointermove", onProgressPointerMove, true);
           document.removeEventListener("pointerup", onProgressPointerUp, true);
           document.removeEventListener("pointercancel", onProgressPointerUp, true);
