@@ -233,13 +233,10 @@ export function BottomDock() {
             border-color: #ead7a8 !important;
           }
           /* Fade the home hero into the soft light page surface, not over the thumbnail dots. */
-          html[data-mobile-theme="light"] body main > section:first-child .swiper-slide > div.pointer-events-none {
-            background: linear-gradient(
-              to bottom,
-              rgba(238,241,245,0) 0%,
-              rgba(238,241,245,.76) 52%,
-              #f2f3fc 100%
-            ) !important;
+          html[data-mobile-theme="light"] body main > section:first-child .hero-bottom-fade {
+            background:
+              radial-gradient(ellipse 78% 95% at 50% 100%, rgba(168,85,247,.14), transparent 72%),
+              linear-gradient(to bottom, rgba(242,243,252,0) 0%, rgba(229,218,255,.2) 38%, rgba(242,243,252,.88) 78%, #f2f3fc 100%) !important;
           }
           html[data-mobile-theme="light"] body main > section:first-child .hero-cast-slider .swiper-slide > div {
             background-color: #292c38 !important;
@@ -375,14 +372,9 @@ export function BottomDock() {
             filter: brightness(.88) saturate(1.16) contrast(1.04);
           }
           html[data-mobile-theme="light"] body main > section:first-child .swiper-slide > div.pointer-events-none {
-            background: linear-gradient(
-              to bottom,
-              rgba(20,24,43,.10) 0%,
-              rgba(20,24,43,.06) 34%,
-              rgba(20,24,43,.34) 56%,
-              rgba(242,243,252,.76) 86%,
-              #f2f3fc 100%
-            ) !important;
+            background:
+              radial-gradient(ellipse 82% 90% at 50% 100%, rgba(168,85,247,.16), transparent 72%),
+              linear-gradient(to bottom, rgba(20,24,43,.08) 0%, rgba(20,24,43,.05) 28%, rgba(114,87,245,.10) 52%, rgba(242,243,252,.82) 84%, #f2f3fc 100%) !important;
             opacity: 1 !important;
           }
           html[data-mobile-theme="light"] body main > section:first-child .container h1 {
