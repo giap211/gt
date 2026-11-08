@@ -20,7 +20,6 @@ import {
   Moon,
   ChevronRight,
   History,
-  Settings2,
 } from "lucide-react";
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
