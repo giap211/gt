@@ -175,6 +175,12 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white shadow-[0_5px_20px_rgba(0,0,0,.25)] backdrop-blur-2xl transition-colors active:bg-white/20"
         >
           <Bell size={19} strokeWidth={1.9} />
+          {!user && (
+            <span
+              aria-label="Có thông báo mới"
+              className="absolute right-[7px] top-[7px] h-[9px] w-[9px] rounded-full border-2 border-[#171923] bg-[#ff3b4f] shadow-[0_0_0_2px_rgba(255,59,79,.18)]"
+            />
+          )}
         </button>
       </div>
 
