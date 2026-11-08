@@ -30,7 +30,7 @@ export const TopicGrid = () => {
             <Link
               key={topic.slug}
               href={topic.href}
-              className="topic-grid-chip group inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-[12px] md:text-sm font-bold tracking-tight transition-all duration-200 active:scale-[.97]"
+              className="topic-grid-chip group inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-[12px] md:text-sm font-bold tracking-tight !shadow-none !drop-shadow-none transition-all duration-200 active:scale-[.97]"
             >
               <span aria-hidden="true" className="topic-grid-icon text-[16px] leading-none">
                 {topic.icon}
