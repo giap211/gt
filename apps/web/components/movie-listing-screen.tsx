@@ -216,7 +216,7 @@ export function MovieListingScreen({ type }: { type: string }) {
             <div className="pointer-events-none absolute -bottom-28 right-1/4 h-48 w-64 rounded-full bg-fuchsia-500/15 blur-3xl" />
             <div className="relative z-10 max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-300/25 bg-violet-400/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.18em] text-violet-200">
-                <Sparkles size={12} /> ROPHIM · KHÔNG GIAN ĐIỆN ẢNH
+                <Sparkles size={12} /> PHIM LẬU · KHÔNG GIAN ĐIỆN ẢNH
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-300/25 bg-violet-400/15 text-violet-200 sm:h-14 sm:w-14">
