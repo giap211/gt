@@ -597,7 +597,61 @@ export const VideoPlayer = ({
         document.addEventListener("pointerup", onProgressPointerUp, true);
         document.addEventListener("pointercancel", onProgressPointerUp, true);
 
-        // Đã tắt thao tác chạm/nhấn hai lần trên vùng hình video để tua.
+        // Vuốt trên vùng hình video không thay đổi thời gian phát.
+        // Chỉ nhấn hai lần cùng một nửa màn hình mới tua ±30 giây.
+        let lastTap = 0;
+        let lastSide: "left" | "right" | null = null;
+
+        const skipBy = (seconds: number) => {
+          const video = art!.video as HTMLVideoElement | undefined;
+          if (!video || !Number.isFinite(video.duration)) return;
+
+          const next = Math.max(0, Math.min(video.duration, video.currentTime + seconds));
+          video.currentTime = next;
+
+          try {
+            const hls = (art as any).hls as Hls | undefined;
+            hls?.startLoad(next);
+          } catch {
+            // ignore
+          }
+
+          art!.notice.show = seconds < 0 ? "⏪  -30s" : "+30s  ⏩";
+          video.play().catch(() => {});
+        };
+
+        const onPointerUp = (event: PointerEvent) => {
+          const target = event.target as HTMLElement | null;
+          if (
+            target?.closest(
+              ".art-controls, .art-bottom, .art-settings, .art-mask, .art-control, .art-progress, button, input",
+            )
+          ) {
+            return;
+          }
+
+          const rect = container.getBoundingClientRect();
+          const isLandscapePlayer =
+            rotatedRef.current ||
+            window.matchMedia("(orientation: landscape)").matches;
+          const half: "left" | "right" = isLandscapePlayer
+            ? (event.clientY < rect.top + rect.height / 2 ? "left" : "right")
+            : (event.clientX < rect.left + rect.width / 2 ? "left" : "right");
+
+          const now = Date.now();
+          if (now - lastTap < 320 && lastSide === half) {
+            skipBy(half === "left" ? -30 : 30);
+            lastTap = 0;
+            lastSide = null;
+          } else {
+            lastTap = now;
+            lastSide = half;
+          }
+        };
+
+        container.addEventListener("pointerup", onPointerUp);
+
+
         // Người xem chỉ tua bằng thanh tiến trình hoặc các nút điều khiển.
 
 
@@ -612,6 +666,7 @@ export const VideoPlayer = ({
           document.removeEventListener("pointerup", onProgressPointerUp, true);
           document.removeEventListener("pointercancel", onProgressPointerUp, true);
           if (progressElement) progressElement.style.touchAction = "";
+          container.removeEventListener("pointerup", onPointerUp);
 
           prevCleanup?.();
         };
