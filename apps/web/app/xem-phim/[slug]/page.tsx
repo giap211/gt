@@ -498,7 +498,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-top { position:absolute; z-index:50; top:max(14px,env(safe-area-inset-top)); left:max(16px,env(safe-area-inset-left)); right:max(16px,env(safe-area-inset-right)); display:flex; align-items:center; justify-content:space-between; pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
         .watch-player-top > * { pointer-events:auto; }
         .watch-player-glass { background:rgba(15,18,27,.58); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
-        .watch-player-menu { position:absolute; z-index:60; top:50%; right:18px; transform:translateY(-50%); width:min(390px,42vw); max-height:min(82dvh,720px); overflow:auto; border-radius:28px; padding:18px; background:linear-gradient(145deg,rgba(28,32,44,.94),rgba(12,15,23,.9)); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.16); }
+        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); border-radius:0; background:linear-gradient(145deg,rgba(22,26,37,.97),rgba(7,9,15,.97)); border:0; color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:none; }\n        .watch-player-episode-grid { flex:1 1 auto; min-height:0; max-height:none !important; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); align-content:start; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.22) transparent; padding:4px 2px 12px 0; }\n        .watch-player-server-list { display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; padding:2px 2px 8px; scrollbar-width:none; }\n        .watch-player-server-list::-webkit-scrollbar { display:none; }\n        .watch-player-menu .watch-player-menu-header { flex:0 0 auto; }\n        .watch-player-menu .watch-player-menu-footer { flex:0 0 auto; padding-top:10px; background:linear-gradient(180deg,transparent,rgba(8,10,16,.98) 22%); }\n        .watch-player-menu .watch-player-menu-divider { flex:0 0 auto; margin:10px 0; }
         .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
         .watch-player-menu .active-choice { color:#171717; background:#ffd875; border-color:#ffd875; }
@@ -548,7 +548,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           .watch-player-top { top:12px; left:16px; right:16px; }
           .watch-player-rotate-hint { display:none !important; }
         }
-        @media (min-width:1024px) { .watch-player-menu { right:32px; } }
+        @media (min-width:1024px) { .watch-player-menu { padding:28px clamp(28px,5vw,80px); } .watch-player-episode-grid { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; } }
       `}</style>
 
       <div
@@ -597,7 +597,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         <>
           <button aria-label="Đóng bảng tùy chọn" onClick={() => setOverlayOpen(false)} className="absolute inset-0 z-40 bg-black/25" />
           <section className="watch-player-menu">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="watch-player-menu-header mb-4 flex items-center justify-between">
               <div><p className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/45">Đang phát</p><h2 className="mt-1 text-lg font-bold">{formatEpisodeName(currentEpisode?.name)}</h2></div>
               <button onClick={() => setOverlayOpen(false)} className="grid h-9 w-9 place-items-center rounded-full bg-white/10"><X size={18}/></button>
             </div>
