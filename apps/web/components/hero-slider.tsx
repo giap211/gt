@@ -192,7 +192,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-[340px] bg-[radial-gradient(ellipse_at_top,rgba(255,216,117,.14),transparent_68%)]" />
           <header className="relative flex items-center justify-between border-b border-white/[0.08] px-5 pb-4 pt-[max(18px,env(safe-area-inset-top))] sm:px-8">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[.22em] text-[#ffd875]">GIAPTRAN</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.22em] text-[#a78bfa]">GIAPTRAN</p>
               <h2 id="notification-title" className="mt-1 text-[25px] font-black tracking-tight">Thông báo</h2>
             </div>
             <button
@@ -207,12 +207,12 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
 
           <div className="relative mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 pb-10 pt-7 sm:px-8">
             {!user ? (
-              <article className="overflow-hidden rounded-[28px] border border-[#ffd875]/20 bg-gradient-to-br from-[#24202a] via-[#171923] to-[#11131b] shadow-[0_22px_70px_rgba(0,0,0,.35)]">
+              <article className="overflow-hidden rounded-[28px] border border-[#a78bfa]/20 bg-gradient-to-br from-[#24202a] via-[#171923] to-[#11131b] shadow-[0_22px_70px_rgba(0,0,0,.35)]">
                 <div className="p-5 sm:p-7">
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#ffd875]/20 bg-[#ffd875]/10 text-[#ffd875]">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#a78bfa]/20 bg-gradient-to-r from-fuchsia-500 to-violet-600/10 text-[#a78bfa]">
                     <Clock3 size={23} />
                   </div>
-                  <span className="inline-flex rounded-full border border-[#ffd875]/20 bg-[#ffd875]/10 px-3 py-1 text-[9px] font-extrabold uppercase tracking-[.16em] text-[#ffd875]">
+                  <span className="inline-flex rounded-full border border-[#a78bfa]/20 bg-[#a78bfa]/10 px-3 py-1 text-[9px] font-extrabold uppercase tracking-[.16em] text-[#a78bfa]">
                     Dành cho thành viên
                   </span>
                   <h3 className="mt-4 text-[22px] font-black leading-tight sm:text-[26px]">
@@ -224,14 +224,14 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   <button
                     type="button"
                     onClick={() => openAuth("login")}
-                    className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#ffd875] px-5 text-[13px] font-extrabold text-[#171923] shadow-[0_8px_28px_rgba(255,216,117,.18)] transition hover:brightness-110 active:scale-[.98] sm:w-auto sm:min-w-[190px]"
+                    className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#a78bfa] px-5 text-[13px] font-extrabold text-white shadow-[0_8px_28px_rgba(168,85,247,.18)] transition hover:brightness-110 active:scale-[.98] sm:w-auto sm:min-w-[190px]"
                   >
                     Đăng nhập ngay <ArrowRight size={17} />
                   </button>
                   <button
                     type="button"
                     onClick={() => openAuth("register")}
-                    className="mt-4 block w-full text-center text-[12px] font-semibold text-white/45 transition hover:text-[#ffd875] sm:text-left"
+                    className="mt-4 block w-full text-center text-[12px] font-semibold text-white/45 transition hover:text-[#a78bfa] sm:text-left"
                   >
                     Chưa có tài khoản? Đăng ký miễn phí
                   </button>
@@ -259,7 +259,6 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         {movies.map((movie, index) => (
           <button key={movie._id} type="button" aria-label={`Chuyển đến phim ${index + 1}: ${movie.name}`} aria-current={activeSlide === index ? "true" : "false"} onClick={() => mainSwiper?.slideTo(index)} className="hero-slide-dot" />
         ))}
-      </div>
       </div>
       </section>
     </>
