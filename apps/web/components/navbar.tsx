@@ -89,7 +89,7 @@ const AnimatedBrand = () => {
         if (frame >= 9) {
           if (interval) clearInterval(interval);
           setLetters((current) =>
-            current.map((char, i) => (i === currentIndex ? target[currentIndex] : char)),
+            current.map((char, i) => (i === currentIndex ? target[currentIndex] ?? char : char)),
           );
           index = currentIndex + 1;
           timeout = setTimeout(revealNext, 85);
