@@ -526,6 +526,63 @@ export function BottomDock() {
             box-shadow: 0 7px 22px rgba(65,75,130,.07) !important;
           }
 
+          /* Movie detail hero metadata: give year, runtime and episode count a solid readable surface. */
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap {
+            color: #f8faff !important;
+            gap: 7px !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap > span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 27px;
+            padding: 4px 9px !important;
+            border: 1px solid rgba(255,255,255,.28) !important;
+            border-radius: 8px !important;
+            background: rgba(15,22,43,.78) !important;
+            color: #fff !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,.35) !important;
+            box-shadow: 0 3px 10px rgba(0,0,0,.16) !important;
+            backdrop-filter: blur(12px);
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap > span.rounded-md.border-amber-300\\/50 {
+            background: rgba(111,75,17,.9) !important;
+            color: #fff0c5 !important;
+            border-color: rgba(255,220,140,.55) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap > span.rounded.bg-white\\/90 {
+            background: #e8f1ff !important;
+            color: #243653 !important;
+            border-color: rgba(255,255,255,.7) !important;
+            text-shadow: none !important;
+          }
+          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap > span.text-white\\/35 {
+            min-height: 0;
+            padding: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+            color: rgba(255,255,255,.75) !important;
+            box-shadow: none !important;
+          }
+
+          /* Make every interest tile distinct from the page surface, including special category links. */
+          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a {
+            background: linear-gradient(135deg, #ffffff 0%, #e4eaff 100%) !important;
+            border: 1px solid rgba(91,78,190,.24) !important;
+            color: #3d3b70 !important;
+            box-shadow: 0 5px 16px rgba(57,66,120,.12), inset 0 1px 0 rgba(255,255,255,.95) !important;
+          }
+          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a span {
+            color: #3d3b70 !important;
+            text-shadow: none !important;
+          }
+          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a:active {
+            filter: brightness(.96);
+            transform: scale(.98);
+          }
+
           /* Keep the floating dock from covering the last content row. */
           html[data-mobile-theme="light"] body main:not(:has(.movie-detail-mobile)) {
             padding-bottom: calc(84px + env(safe-area-inset-bottom));
