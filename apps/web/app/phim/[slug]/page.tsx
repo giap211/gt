@@ -503,7 +503,7 @@ export default function MovieDetailPage({
             <div className="space-y-2">
               {mobileVisibleEpisodes.map((ep, idx) => (
                 <Link key={ep.slug || ep.name} href={"/xem-phim/" + movie.slug + "?sv=" + selectedServer + "&tap=" + encodeURIComponent(ep.slug || ep.name)} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-2.5 transition-colors active:bg-white/10">
-                  <div className="relative h-[76px] w-[118px] shrink-0 overflow-hidden rounded-xl bg-white/10">
+                  <div className="movie-poster-frame relative h-[76px] w-[118px] shrink-0 overflow-hidden rounded-xl bg-white/10">
                     <Image src={movie.thumb_url || movie.poster_url} alt="" fill sizes="118px" className="object-cover" />
                     <span className="absolute inset-0 flex items-center justify-center bg-black/25"><Play size={22} fill="white" /></span>
                   </div>
