@@ -451,7 +451,7 @@ export default function MovieDetailPage({
             </div>
             <div className="mb-3 flex gap-2 overflow-x-auto no-scrollbar">
               {episodes.map((ep, idx) => (
-                <button key={idx} type="button" onClick={() => setSelectedServer(idx)} className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] ${selectedServer === idx ? "border-white/60 bg-white text-slate-900" : "border-white/15 bg-white/[0.06] text-white/65"}`}>{ep.server_name || `Server ${idx + 1}`}</button>
+                <button key={idx} type="button" onClick={() => { setSelectedServer(idx); setEpisodePage(0); setEpisodeSearch(""); }} className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] ${selectedServer === idx ? "border-white/60 bg-white text-slate-900" : "border-white/15 bg-white/[0.06] text-white/65"}`}>{ep.server_name || `Server ${idx + 1}`}</button>
               ))}
             </div>
             <div className="space-y-2">
@@ -681,7 +681,7 @@ function TabContent({
             {episodes.map((ep, idx) => (
               <button
                 key={idx}
-                onClick={() => setSelectedServer(idx)}
+                onClick={() => { setSelectedServer(idx); setEpisodePage(0); setEpisodeSearch(""); }}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-medium border ${
                   selectedServer === idx
                     ? "bg-violet-400/15 border-violet-300/40 text-violet-200"
@@ -792,7 +792,7 @@ function TabContent({
             <button
               key={`${version.server_name}-${idx}`}
               type="button"
-              onClick={() => setSelectedServer(idx)}
+              onClick={() => { setSelectedServer(idx); setEpisodePage(0); setEpisodeSearch(""); }}
               className={`rounded-lg border px-2.5 py-1.5 text-[13px] font-medium transition-all sm:text-sm ${
                 selectedServer === idx
                   ? "border-violet-300/50 bg-violet-400/15 text-violet-200 shadow-[0_0_18px_rgba(139,92,246,.16)]"
