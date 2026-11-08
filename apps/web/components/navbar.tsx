@@ -53,6 +53,98 @@ const COUNTRIES = [
   { name: "Hồng Kông", slug: "hong-kong", flag: "🇭🇰" },
 ];
 
+const AnimatedBrand = () => {
+  const target = Array.from("PHIM LẬU");
+  const glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+  const [letters, setLetters] = useState<string[]>(() =>
+    target.map((char) => (char === " " ? " " : "·")),
+  );
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      setLetters(target);
+      return;
+    }
+
+    let index = 0;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
+
+    const revealNext = () => {
+      if (cancelled || index >= target.length) return;
+      if (target[index] === " ") {
+        setLetters((current) => current.map((char, i) => (i === index ? " " : char)));
+        index += 1;
+        timeout = setTimeout(revealNext, 70);
+        return;
+      }
+
+      const currentIndex = index;
+      let frame = 0;
+      interval = setInterval(() => {
+        if (cancelled) return;
+        frame += 1;
+        if (frame >= 9) {
+          if (interval) clearInterval(interval);
+          setLetters((current) =>
+            current.map((char, i) => (i === currentIndex ? target[currentIndex] : char)),
+          );
+          index = currentIndex + 1;
+          timeout = setTimeout(revealNext, 85);
+          return;
+        }
+
+        const randomGlyph = glyphs[Math.floor(Math.random() * glyphs.length)];
+        setLetters((current) =>
+          current.map((char, i) => (i === currentIndex ? randomGlyph : char)),
+        );
+      }, 42);
+    };
+
+    timeout = setTimeout(revealNext, 180);
+    return () => {
+      cancelled = true;
+      if (interval) clearInterval(interval);
+      if (timeout) clearTimeout(timeout);
+    };
+  }, []);
+
+  return (
+    <span
+      aria-label="PHIM LẬU"
+      role="img"
+      className="inline-flex items-center whitespace-nowrap select-none"
+      style={{
+        fontFamily: "var(--font-oswald), sans-serif",
+        fontSize: "clamp(20px, 2vw, 27px)",
+        fontWeight: 700,
+        lineHeight: 1,
+        letterSpacing: "-0.045em",
+        filter: "drop-shadow(0 2px 10px rgba(139,92,246,.22))",
+      }}
+    >
+      {letters.map((letter, index) => (
+        <span
+          key={index}
+          aria-hidden="true"
+          className="inline-flex justify-center"
+          style={{
+            width: target[index] === " " ? "0.28em" : "0.62em",
+            background: "linear-gradient(112deg, #c4b5fd 0%, #a78bfa 38%, #e879f9 72%, #818cf8 100%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+          }}
+        >
+          {letter}
+        </span>
+      ))}
+    </span>
+  );
+};
+
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
@@ -153,14 +245,7 @@ export const Navbar = () => {
         <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-6">
           <div className="flex items-center gap-3 sm:gap-8">
             <Link href="/" className="shrink-0 flex items-center gap-2 group">
-              <Image
-                alt="Phim Lậu Logo"
-                width={110}
-                height={32}
-                src="/images/logo.svg"
-                className="h-6 sm:h-7 md:h-8 w-auto drop-shadow transition-transform group-hover:scale-105"
-                priority
-              />
+              <AnimatedBrand />
             </Link>
 
             <nav className="hidden lg:flex items-center gap-1">
