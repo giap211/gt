@@ -41,6 +41,7 @@ export function BottomDock() {
   const isSeries = pathname.startsWith("/danh-sach/phim-bo");
   const isSingle = pathname.startsWith("/danh-sach/phim-le");
   const isWatchPage = pathname.startsWith("/xem-phim/");
+  const dockActiveIndex = searchOpen ? 2 : accountOpen ? 4 : isSeries ? 1 : isSingle ? 3 : 0;
 
   useEffect(() => {
     setSearchOpen(false);
