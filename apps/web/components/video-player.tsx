@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Artplayer from "artplayer";
-import { Play } from "lucide-react";
+import { Play, Rewind, FastForward } from "lucide-react";
 import Hls from "hls.js";
 
 // Tắt double-click fullscreen / play mặc định
@@ -71,6 +71,8 @@ export const VideoPlayer = ({
 
   const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [seekFeedback, setSeekFeedback] = useState<{ side: "left" | "right"; vertical: boolean; seconds: number; key: number } | null>(null);
+  const seekFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showDebug, setShowDebug] = useState(() => {
     try {
       return typeof window !== "undefined" && window.localStorage.getItem("player-skip-intro-debug") === "on";
@@ -676,7 +678,16 @@ export const VideoPlayer = ({
             // ignore
           }
 
-          art!.notice.show = seconds < 0 ? "⏪  -30s" : "+30s  ⏩";
+          // YouTube-style visual feedback centered in the tapped half.
+          if (seekFeedbackTimerRef.current) clearTimeout(seekFeedbackTimerRef.current);
+          const vertical = rotatedRef.current || window.matchMedia("(orientation: landscape)").matches;
+          setSeekFeedback({
+            side: seconds < 0 ? "left" : "right",
+            vertical,
+            seconds: Math.abs(seconds),
+            key: Date.now(),
+          });
+          seekFeedbackTimerRef.current = setTimeout(() => setSeekFeedback(null), 850);
           video.play().catch(() => {});
         };
 
@@ -739,6 +750,10 @@ export const VideoPlayer = ({
           container.removeEventListener("pointermove", onTapPointerMove);
           container.removeEventListener("pointerup", onPointerUp);
           container.removeEventListener("pointercancel", onTapPointerCancel);
+          if (seekFeedbackTimerRef.current) {
+            clearTimeout(seekFeedbackTimerRef.current);
+            seekFeedbackTimerRef.current = null;
+          }
 
           prevCleanup?.();
         };
@@ -824,6 +839,42 @@ export const VideoPlayer = ({
   return (
     <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10 ${showResumeChoice ? "[&_.art-state]:!hidden [&_.art-controls]:!hidden [&_.art-bottom]:!hidden" : ""}`}>
       <div ref={artRef} className="w-full h-full" />
+      {seekFeedback && (
+        <div
+          key={seekFeedback.key}
+          aria-hidden="true"
+          className="pointer-events-none absolute z-30 flex items-center justify-center"
+          style={seekFeedback.vertical
+            ? {
+                left: "50%",
+                top: seekFeedback.side === "left" ? "25%" : "75%",
+                transform: "translate(-50%, -50%)",
+              }
+            : {
+                left: seekFeedback.side === "left" ? "25%" : "75%",
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+        >
+          <div className="flex min-w-[104px] flex-col items-center gap-2 rounded-2xl border border-white/15 bg-black/45 px-5 py-4 text-white shadow-[0_8px_36px_rgba(0,0,0,.38)] backdrop-blur-xl animate-[seek-feedback-in_.18s_cubic-bezier(.2,.8,.2,1)_both]">
+            <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,.2)]">
+              {seekFeedback.side === "left"
+                ? <Rewind size={29} strokeWidth={2.2} />
+                : <FastForward size={29} strokeWidth={2.2} />}
+              <span className="absolute -bottom-1 rounded-full bg-white px-1.5 py-0.5 text-[9px] font-black leading-none text-black">30</span>
+            </div>
+            <span className="text-base font-bold tracking-wide">
+              {seekFeedback.side === "left" ? "−30 giây" : "+30 giây"}
+            </span>
+          </div>
+          <style jsx>{`
+            @keyframes seek-feedback-in {
+              0% { opacity: 0; scale: .72; filter: blur(5px); }
+              100% { opacity: 1; scale: 1; filter: blur(0); }
+            }
+          `}</style>
+        </div>
+      )}
       {showDebug && (
       <div className="absolute left-2 top-2 z-40 max-w-[min(92%,420px)] rounded-lg border border-cyan-300/40 bg-black/90 p-2.5 text-[10px] leading-relaxed text-white shadow-xl sm:left-3 sm:top-3 sm:text-xs">
         <div className="mb-1 flex items-center justify-between gap-3">
