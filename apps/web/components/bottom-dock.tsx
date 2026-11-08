@@ -724,14 +724,14 @@ export function BottomDock() {
           @media(max-width:1023px){
             html[data-mobile-theme] body .rophim-liquid-nav{
               --rln-glass-bg:linear-gradient(120deg,rgba(22,15,48,.60),rgba(35,18,62,.50) 52%,rgba(25,15,48,.62));
-              --rln-glass-border:rgba(192,132,252,.48);--rln-glass-outer:rgba(91,33,182,.34);
-              --rln-pill-bg:linear-gradient(115deg,#8b5cf6 0%,#a855f7 52%,#d946ef 100%);
+              --rln-glass-border:rgba(255,255,255,.20);--rln-glass-outer:rgba(0,0,0,.22);
+              --rln-pill-bg:linear-gradient(135deg,rgba(168,85,247,.20),rgba(217,70,239,.13) 55%,rgba(99,102,241,.18));
               --rln-pill-shadow:rgba(168,85,247,.48);--rln-icon:rgba(221,210,255,.78);--rln-active:rgba(255,255,255,1);
               position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:4px;
               width:min(100%,430px);min-height:62px;margin-inline:auto;padding:8px 10px;overflow:hidden;border-radius:9999px;
               background:var(--rln-glass-bg)!important;border:1px solid var(--rln-glass-border)!important;
               -webkit-backdrop-filter:blur(52px) saturate(210%) brightness(1.04);backdrop-filter:blur(52px) saturate(210%) brightness(1.04);
-              box-shadow:0 18px 48px -8px var(--rln-glass-outer),0 5px 22px rgba(139,92,246,.16),0 0 0 1px rgba(192,132,252,.12),
+              box-shadow:0 18px 48px -8px var(--rln-glass-outer),0 5px 22px rgba(0,0,0,.10),
                 inset 0 1.5px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(217,70,239,.14)!important;
               transition:background .6s ease,border-color .6s ease,box-shadow .6s ease;
             }
@@ -746,7 +746,7 @@ export function BottomDock() {
             }
             html[data-mobile-theme] body .rophim-liquid-pill{
               position:absolute;z-index:3;top:8px;bottom:8px;left:10px;width:calc((100% - 20px - 16px)/5);border-radius:9999px;
-              background:var(--rln-pill-bg);border:1px solid rgba(255,255,255,.34);box-shadow:0 5px 18px -2px var(--rln-pill-shadow),0 0 18px rgba(168,85,247,.24),inset 0 1px 0 rgba(255,255,255,.58),inset 0 -1px 0 rgba(80,20,120,.12);
+              background:var(--rln-pill-bg);border:1px solid rgba(216,180,254,.82);box-shadow:0 0 0 1px rgba(168,85,247,.16),0 0 16px rgba(168,85,247,.34),0 0 28px rgba(217,70,239,.16),inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(80,20,120,.08);
               transform:translateX(calc(var(--rln-active,0)*(100% + 4px)));transition:transform .48s cubic-bezier(.34,1.2,.64,1),background .5s ease,box-shadow .5s ease;pointer-events:none;
             }
             html[data-mobile-theme] body .rophim-liquid-item{
@@ -761,8 +761,8 @@ export function BottomDock() {
             html[data-mobile-theme] body .rophim-liquid-item:active svg{transform:scale(.88);}
             html[data-mobile-theme="light"] body .rophim-liquid-nav{
               --rln-glass-bg:linear-gradient(120deg,rgba(255,255,255,.64),rgba(247,241,255,.56) 52%,rgba(255,255,255,.66));
-              --rln-glass-border:rgba(168,85,247,.3);--rln-glass-outer:rgba(139,92,246,.2);
-              --rln-pill-bg:linear-gradient(115deg,#8b5cf6 0%,#a855f7 52%,#d946ef 100%);
+              --rln-glass-border:rgba(255,255,255,.64);--rln-glass-outer:rgba(91,75,150,.14);
+              --rln-pill-bg:linear-gradient(135deg,rgba(168,85,247,.17),rgba(217,70,239,.10) 55%,rgba(99,102,241,.14));
               --rln-pill-shadow:rgba(168,85,247,.38);--rln-icon:rgba(91,69,132,.86);--rln-active:rgba(255,255,255,1);
             }
             html[data-mobile-theme="light"] body .rophim-liquid-nav:before{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(216,180,254,.24) 55%,transparent);}
