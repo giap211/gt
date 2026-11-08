@@ -568,6 +568,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             introDebugStatus={introDebugStatus}
             onProgress={handlePlaybackProgress}
             onUserInteraction={handlePlayerInteraction}
+            rotated={isPlayerRotated}
           />
         )}
       </div>
