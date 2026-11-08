@@ -57,12 +57,12 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       <style jsx global>{`
       .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:0 !important; }
       .home-feature-hero .hero-bottom-fade { background:radial-gradient(ellipse 88% 105% at 50% 100%,rgba(168,85,247,.38) 0%,rgba(139,92,246,.20) 34%,rgba(124,58,237,.06) 62%,transparent 82%),linear-gradient(180deg,rgba(7,8,17,0) 0%,rgba(7,8,17,.10) 28%,rgba(7,8,17,.62) 76%,#0b0d14 100%); }
-      .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,rgba(9,11,20,.72) 0%,rgba(9,11,20,.46) 12%,rgba(9,11,20,.24) 27%,rgba(9,11,20,.10) 43%,rgba(9,11,20,.035) 58%,transparent 76%); }
+      .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,#0b0d14 0%,rgba(93,55,150,.92) 18%,rgba(124,58,237,.48) 38%,rgba(139,92,246,.16) 55%,transparent 72%); }\n      .home-feature-hero .hero-black-transition { height:clamp(105px,24vw,190px);background:linear-gradient(180deg,#090b13 0%,rgba(9,11,19,.92) 18%,rgba(9,11,19,.58) 48%,rgba(9,11,19,.16) 78%,transparent 100%); }
       .home-feature-hero .hero-top-transition::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse 88% 72% at 50% 0%,rgba(139,92,246,.14) 0%,rgba(168,85,247,.055) 43%,transparent 86%); }
       .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
       .home-feature-hero .hero-slide-dot[aria-current="true"] { width:17px;height:6px;background:linear-gradient(90deg,#e879f9,#8b5cf6);box-shadow:0 0 10px rgba(168,85,247,.85),0 0 20px rgba(168,85,247,.45); }
       html[data-mobile-theme="light"] .home-feature-hero,html[data-theme="light"] .home-feature-hero { background:#f5f3fb; }
-      html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition,html[data-theme="light"] .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,rgba(245,243,251,.96) 0%,rgba(245,243,251,.78) 12%,rgba(139,92,246,.24) 28%,rgba(139,92,246,.11) 44%,rgba(139,92,246,.035) 60%,transparent 78%); }
+      html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition,html[data-theme="light"] .home-feature-hero .hero-top-transition { background:linear-gradient(180deg,#f5f3fb 0%,rgba(190,164,235,.92) 18%,rgba(139,92,246,.48) 39%,rgba(139,92,246,.15) 56%,transparent 73%); }\n      html[data-mobile-theme="light"] .home-feature-hero .hero-black-transition,html[data-theme="light"] .home-feature-hero .hero-black-transition { background:linear-gradient(180deg,rgba(20,16,30,.92) 0%,rgba(20,16,30,.78) 20%,rgba(20,16,30,.42) 54%,rgba(20,16,30,.12) 82%,transparent 100%); }
       html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition::after,html[data-theme="light"] .home-feature-hero .hero-top-transition::after { background:radial-gradient(ellipse 88% 72% at 50% 0%,rgba(139,92,246,.15) 0%,rgba(168,85,247,.06) 45%,transparent 86%); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-mobile-theme="light"] .home-feature-hero .home-hero-top-shade,html[data-theme="light"] .home-feature-hero .home-hero-top-shade { background:transparent; }
       html[data-mobile-theme="light"] .home-feature-hero .hero-bottom-fade,html[data-theme="light"] .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(245,243,251,.35) 35%,#f5f3fb 100%); }
@@ -97,7 +97,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                   className="object-cover object-[58%_center] sm:object-center"
                 />
                 <div className="home-hero-top-shade absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#090b13]/75" />
-                <div aria-hidden="true" className="hero-top-transition pointer-events-none absolute inset-0 z-[1]" />
+                <div aria-hidden="true" className="hero-top-transition pointer-events-none absolute inset-0 z-[1]" />\n                <div aria-hidden="true" className="hero-black-transition pointer-events-none absolute left-0 right-0 top-0 z-[2]" />
                 <div className="home-hero-side-shade absolute inset-0 bg-gradient-to-r from-[#090b13]/95 via-[#090b13]/65 to-transparent" />
               </div>
 
