@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { Bell, Search, Play, Bookmark, X, Clock3, ArrowRight, Sparkles } from "lucide-react";
@@ -185,9 +186,9 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         </div>
       </div>
 
-      {notificationsOpen && (
+      {notificationsOpen && typeof document !== "undefined" && createPortal(
         <div
-          className="fixed inset-0 z-[180] flex min-h-[100dvh] flex-col overflow-y-auto bg-[#090b12] text-white"
+          className="fixed inset-0 z-[9999] flex min-h-[100dvh] flex-col overflow-y-auto overscroll-contain bg-[#090b12] text-white"
           role="dialog"
           aria-modal="true"
           aria-labelledby="notification-title"
@@ -255,7 +256,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
               GIAPTRAN · XEM PHIM THEO CÁCH CỦA BẠN
             </p>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       <div className="absolute bottom-[18px] left-1/2 z-40 flex -translate-x-1/2 items-center justify-center gap-[7px] sm:bottom-7 sm:gap-2">
