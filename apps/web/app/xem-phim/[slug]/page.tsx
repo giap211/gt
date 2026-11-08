@@ -68,6 +68,41 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [deviceRotation, setDeviceRotation] = useState<"portrait" | "left" | "right">("portrait");
+  const orientationPermissionRequestedRef = useRef(false);
+
+  useEffect(() => {
+    const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
+      if (event.gamma == null) return;
+      const gamma = event.gamma;
+      setDeviceRotation((current) => {
+        // Dùng ngưỡng khác nhau để tránh giao diện rung khi nghiêng máy gần ranh giới.
+        if (Math.abs(gamma) >= 55) return gamma > 0 ? "right" : "left";
+        if (Math.abs(gamma) <= 35) return "portrait";
+        return current;
+      });
+    };
+
+    window.addEventListener("deviceorientation", handleDeviceOrientation);
+    return () => window.removeEventListener("deviceorientation", handleDeviceOrientation);
+  }, []);
+
+  const requestOrientationSensor = useCallback(() => {
+    if (orientationPermissionRequestedRef.current) return;
+    orientationPermissionRequestedRef.current = true;
+
+    // iOS 13+ yêu cầu xin quyền cảm biến từ một thao tác chạm của người dùng.
+    const OrientationEvent = DeviceOrientationEvent as typeof DeviceOrientationEvent & {
+      requestPermission?: () => Promise<"granted" | "denied">;
+    };
+    if (typeof OrientationEvent.requestPermission === "function") {
+      void OrientationEvent.requestPermission().catch(() => {
+        orientationPermissionRequestedRef.current = false;
+      }).then((permission) => {
+        if (permission === "denied") orientationPermissionRequestedRef.current = false;
+      });
+    }
+  }, []);
   useEffect(() => {
     if (overlayOpen || !showPlayerChrome) return;
     const timeout = window.setTimeout(() => setShowPlayerChrome(false), 3200);
@@ -75,10 +110,11 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   }, [overlayOpen, showPlayerChrome]);
 
   const handlePlayerInteraction = useCallback(() => {
-    // Chạm vào player luôn gọi lại tiêu đề; không toggle khiến tiêu đề biến mất
-    // ngay ở lần chạm đầu tiên khi nó đang hiển thị.
+    // Chạm player cũng là thao tác hợp lệ để xin quyền cảm biến trên iPhone.
+    requestOrientationSensor();
+    // Chạm vào player luôn gọi lại tiêu đề.
     setShowPlayerChrome(true);
-  }, []);
+  }, [requestOrientationSensor]);
 
   const changePlaybackRate = (rate: number) => {
     setPlaybackRate(rate);
@@ -488,7 +524,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const suggestedMovies = transformListMovies(latestMovies);
 
   return (
-    <main className="watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white">
+    <main className={`watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white ${deviceRotation === "left" ? "watch-device-landscape-left" : deviceRotation === "right" ? "watch-device-landscape-right" : ""}`}>
       <style jsx global>{`
         .watch-player-page { width:100vw; height:100dvh; }
         .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
@@ -511,25 +547,28 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           .watch-player-shell .artplayer-app { height:100% !important; }
         }
         @media (orientation:portrait) and (max-width:1023px) {
-          /* Xoay toàn bộ giao diện 90° bằng CSS, không phụ thuộc khóa xoay iPhone. */
-          .watch-player-page {
+          /* Chỉ xoay khi cảm biến xác nhận người dùng đang cầm máy ngang. */
+          .watch-player-page.watch-device-landscape-right,
+          .watch-player-page.watch-device-landscape-left {
             position:fixed !important;
             inset:auto !important;
             top:50% !important;
             left:50% !important;
             right:auto !important;
             bottom:auto !important;
-            width:100vh !important;
-            height:100vw !important;
             width:100dvh !important;
-            height:100vw !important;
             height:100dvw !important;
             max-width:none !important;
             max-height:none !important;
             margin:0 !important;
-            transform:translate(-50%,-50%) rotate(90deg);
             transform-origin:center center;
             overflow:hidden !important;
+          }
+          .watch-player-page.watch-device-landscape-right {
+            transform:translate(-50%,-50%) rotate(90deg);
+          }
+          .watch-player-page.watch-device-landscape-left {
+            transform:translate(-50%,-50%) rotate(-90deg);
           }
           .watch-player-shell > div,
           .watch-player-shell .artplayer-app {
