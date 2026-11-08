@@ -522,7 +522,6 @@ export default function MovieDetailPage({
                 <button type="button" disabled={safeMobileEpisodePage >= mobileEpisodePageCount - 1} onClick={() => setMobileEpisodePage((page) => Math.min(mobileEpisodePageCount - 1, page + 1))} className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs text-white/65 disabled:opacity-25">Tiếp <ChevronRight size={15} /></button>
               </div>
             )}
-            </div>
           </section>
 
           <div className="movie-glass-panel p-4">
