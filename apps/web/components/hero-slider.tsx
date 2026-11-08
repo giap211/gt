@@ -56,9 +56,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       <style jsx global>{`
       .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:0 !important; }
       .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,rgba(7,8,17,.12) 0%,rgba(7,8,17,.08) 35%,rgba(7,8,17,.62) 76%,#090b13 100%); }
-      .home-feature-hero .hero-thumb { width:46px;height:30px;overflow:hidden;border-radius:7px;border:1px solid rgba(255,255,255,.22);opacity:.58;filter:saturate(.72);transform:translateY(0);transition:all .28s ease; }
-      .home-feature-hero .hero-thumb[aria-current="true"] { width:58px;height:36px;opacity:1;filter:saturate(1);border:2px solid #c084fc;box-shadow:0 0 0 2px rgba(168,85,247,.2),0 0 18px rgba(168,85,247,.55);transform:translateY(-2px); }
-      @media (min-width:640px) { .home-feature-hero .hero-thumb { width:58px;height:38px;border-radius:9px; } .home-feature-hero .hero-thumb[aria-current="true"] { width:72px;height:46px; } }
+      .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
+      .home-feature-hero .hero-slide-dot[aria-current="true"] { width:17px;height:6px;background:linear-gradient(90deg,#e879f9,#8b5cf6);box-shadow:0 0 10px rgba(168,85,247,.85),0 0 20px rgba(168,85,247,.45); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-theme="light"] .home-feature-hero .home-hero-side-shade { background:linear-gradient(105deg,rgba(248,246,255,.97) 0%,rgba(245,241,255,.88) 55%,rgba(245,241,255,.18) 100%); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-top-shade,html[data-theme="light"] .home-feature-hero .home-hero-top-shade { background:linear-gradient(180deg,rgba(248,246,255,.16),transparent 45%,rgba(245,243,251,.82)); }
       html[data-mobile-theme="light"] .home-feature-hero .hero-bottom-fade,html[data-theme="light"] .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(245,243,251,.35) 35%,#f5f3fb 100%); }
@@ -256,7 +255,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         </div>
       )}
 
-      <div className="absolute bottom-[17px] left-1/2 z-40 flex max-w-[calc(100%-32px)] -translate-x-1/2 items-end justify-center gap-2 sm:bottom-7 sm:gap-2.5">
+      <div className="absolute bottom-[18px] left-1/2 z-40 flex -translate-x-1/2 items-center justify-center gap-[7px] sm:bottom-7 sm:gap-2">
         {movies.slice(0, 6).map((movie, index) => (
           <button
             key={movie._id}
@@ -264,16 +263,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
             aria-label={`Chuyển đến phim ${index + 1}: ${movie.name}`}
             aria-current={activeSlide === index ? "true" : "false"}
             onClick={() => mainSwiper?.slideTo(index)}
-            className="hero-thumb relative shrink-0 bg-white/10"
-          >
-            <Image
-              src={movie.poster_url || movie.thumb_url}
-              alt=""
-              fill
-              sizes="72px"
-              className="object-cover"
-            />
-          </button>
+            className="hero-slide-dot"
+          />
         ))}
       </div>
       </section>
