@@ -825,8 +825,8 @@ export function BottomDock() {
             html[data-mobile-theme] body .liquid-dock-indicator {
               top: 5px;
               bottom: 5px;
-              left: 0;
-              width: 20%;
+              left: 8px;
+              width: calc((100% - 16px) / 5);
               border-radius: 999px;
               transform: translateX(calc(var(--dock-active, 0) * 100%)) scaleX(.62);
               background: rgba(22, 25, 32, .09);
