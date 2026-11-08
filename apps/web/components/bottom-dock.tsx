@@ -123,7 +123,7 @@ export function BottomDock() {
     <>
       <style jsx global>{`
         @media (max-width: 1023px) {
-          html[data-mobile-theme="light"] body { background: #eef1f5 !important; color: #252a36 !important; }
+          html[data-mobile-theme="light"] body { background: #f2f3fc !important; color: #252a36 !important; }
           html[data-mobile-theme="light"] body [class~="text-white"],
           html[data-mobile-theme="light"] body [class~="text-white/90"],
           html[data-mobile-theme="light"] body [class~="text-white/85"],
@@ -140,7 +140,7 @@ export function BottomDock() {
           html[data-mobile-theme="light"] body [class~="text-white/30"] { color: #687184 !important; }
           html[data-mobile-theme="light"] body [class*="bg-[#0"],
           html[data-mobile-theme="light"] body [class*="bg-[#1"],
-          html[data-mobile-theme="light"] body [class*="bg-[#2"] { background-color: #eef1f5 !important; }
+          html[data-mobile-theme="light"] body [class*="bg-[#2"] { background-color: #f2f3fc !important; }
           html[data-mobile-theme="light"] body [class*="border-white/"] { border-color: rgba(40,48,65,.14) !important; }
           html[data-mobile-theme="light"] header.fixed {
             background: rgba(250,251,255,.9) !important; border-color: rgba(40,48,65,.12) !important;
@@ -161,11 +161,11 @@ export function BottomDock() {
             background: rgba(255,255,255,.95) !important; border-color: rgba(40,48,65,.15) !important;
           }
           html[data-mobile-theme="light"] body .mobile-account-sheet button { color: #303746; }
-          html[data-mobile-theme="light"] body .mobile-search-overlay { background: #eef1f5 !important; }
+          html[data-mobile-theme="light"] body .mobile-search-overlay { background: #f2f3fc !important; }
 
           /* Home hero: preserve readable cinematic text over the image. */
           html[data-mobile-theme="light"] body main > section:first-child {
-            background: #eef1f5 !important;
+            background: #f2f3fc !important;
           }
           html[data-mobile-theme="light"] body main > section:first-child a {
             color: #fff !important;
@@ -241,7 +241,7 @@ export function BottomDock() {
               to bottom,
               rgba(238,241,245,0) 0%,
               rgba(238,241,245,.76) 52%,
-              #eef1f5 100%
+              #f2f3fc 100%
             ) !important;
           }
           html[data-mobile-theme="light"] body main > section:first-child .hero-cast-slider .swiper-slide > div {
@@ -250,7 +250,7 @@ export function BottomDock() {
           }
           /* Detail-page hero fades into the same light surface as its content. */
           html[data-mobile-theme="light"] body .movie-detail-hero {
-            background: #eef1f5 !important;
+            background: #f2f3fc !important;
           }
           html[data-mobile-theme="light"] body .movie-detail-hero-fade {
             background: linear-gradient(
@@ -258,7 +258,7 @@ export function BottomDock() {
               rgba(238,241,245,0) 0%,
               rgba(238,241,245,.38) 38%,
               rgba(238,241,245,.88) 72%,
-              #eef1f5 100%
+              #f2f3fc 100%
             ) !important;
           }
           html[data-mobile-theme="light"] body .movie-detail-content h1 {
@@ -300,6 +300,78 @@ export function BottomDock() {
           html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a span {
             color: #fff !important;
             text-shadow: 0 1px 2px rgba(0,0,0,.22);
+          }
+
+          /* Refined lavender / ice-blue light palette. Layout and component geometry stay unchanged. */
+          html[data-mobile-theme="light"] body {
+            background: linear-gradient(145deg, #f2f3fc 0%, #edf5ff 48%, #f7f3ff 100%) !important;
+            color: #252b40 !important;
+          }
+          html[data-mobile-theme="light"] body main {
+            background-color: transparent !important;
+            color: #252b40 !important;
+          }
+          html[data-mobile-theme="light"] body main > div:not(:first-child) {
+            background: transparent !important;
+          }
+          html[data-mobile-theme="light"] body [class*="bg-[#0"],
+          html[data-mobile-theme="light"] body [class*="bg-[#1"],
+          html[data-mobile-theme="light"] body [class*="bg-[#2"] {
+            background-color: rgba(255,255,255,.76) !important;
+          }
+          html[data-mobile-theme="light"] body [class*="shadow-"] {
+            --tw-shadow-color: rgba(75,82,130,.12);
+          }
+          html[data-mobile-theme="light"] body .bottom-dock-surface {
+            background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(239,244,255,.82)) !important;
+            border-color: rgba(114,87,245,.16) !important;
+            box-shadow: 0 12px 34px rgba(65,75,130,.16), inset 0 1px 0 rgba(255,255,255,.96) !important;
+          }
+          html[data-mobile-theme="light"] body .mobile-account-sheet,
+          html[data-mobile-theme="light"] body .mobile-search-overlay {
+            background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(239,245,255,.97)) !important;
+            border-color: rgba(114,87,245,.15) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:not(:first-child) h2,
+          html[data-mobile-theme="light"] body main > div section h2 {
+            color: #252b40 !important;
+          }
+          html[data-mobile-theme="light"] body main > section:not(:first-child) a,
+          html[data-mobile-theme="light"] body main > div section a {
+            border-color: rgba(114,87,245,.12);
+          }
+          html[data-mobile-theme="light"] body main > section:first-child a[class*="bg-[#ffd875]"] {
+            background: linear-gradient(110deg, #7257f5, #42bdeb) !important;
+            color: #fff !important;
+            box-shadow: 0 9px 26px rgba(114,87,245,.28) !important;
+          }
+          html[data-mobile-theme="light"] body main > section:first-child .hero-cast-slider .swiper-slide > div {
+            border-color: rgba(255,255,255,.88) !important;
+            box-shadow: 0 4px 14px rgba(45,55,95,.2);
+          }
+          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] {
+            background: linear-gradient(145deg, #f2f3fc, #e8f5ff 58%, #f7f2ff) !important;
+            color: #252b40 !important;
+          }
+          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] header {
+            border-color: rgba(114,87,245,.14) !important;
+          }
+          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] article {
+            background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(237,244,255,.94)) !important;
+            border-color: rgba(114,87,245,.16) !important;
+            box-shadow: 0 18px 48px rgba(75,82,140,.13) !important;
+          }
+          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] h2,
+          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] h3 {
+            color: #252b40 !important;
+          }
+          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] p {
+            color: #68738c !important;
+          }
+          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] button[class*="bg-[#ffd875]"] {
+            background: linear-gradient(110deg, #7257f5, #42bdeb) !important;
+            color: #fff !important;
+            box-shadow: 0 8px 24px rgba(114,87,245,.22) !important;
           }
         }
       `}</style>
