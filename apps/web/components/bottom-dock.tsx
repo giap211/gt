@@ -48,6 +48,16 @@ export function BottomDock() {
     setAccountOpen(false);
   }, [pathname]);
 
+  // Allow entry points outside the dock (such as the hero search button) to open the same search panel.
+  useEffect(() => {
+    const openSearchFromOutside = () => {
+      setAccountOpen(false);
+      setSearchOpen(true);
+    };
+    window.addEventListener("gt:open-search", openSearchFromOutside);
+    return () => window.removeEventListener("gt:open-search", openSearchFromOutside);
+  }, []);
+
   // Prefetch the main dock destinations while the current page is idle.
   useEffect(() => {
     ["/", "/danh-sach/phim-bo", "/danh-sach/phim-le"].forEach((href) => {
