@@ -589,26 +589,25 @@ export const VideoPlayer = ({
             return;
           }
 
-          // Dựa trên vị trí trái/phải đang nhìn thấy sau mọi phép xoay CSS.
-          // Nửa trái = lùi 30 giây; nửa phải = tua tới 30 giây.
+          // Player nằm ngang (do xoay thủ công hoặc điện thoại đang ở landscape):
+          // nửa trên = tua tới 30 giây, nửa dưới = lùi 30 giây.
+          // Player dọc: nửa trái = lùi 30 giây, nửa phải = tua tới 30 giây.
           const rect = container.getBoundingClientRect();
-          const half: "left" | "right" =
-            e.clientX < rect.left + rect.width / 2 ? "left" : "right";
+          const isLandscapePlayer =
+            rotatedRef.current ||
+            window.matchMedia("(orientation: landscape)").matches;
+          const half: "left" | "right" = isLandscapePlayer
+            ? (e.clientY < rect.top + rect.height / 2 ? "left" : "right")
+            : (e.clientX < rect.left + rect.width / 2 ? "left" : "right");
 
           const now = Date.now();
 
-          // Hai lần nhấn cùng một nửa trong 320ms mới tua.
-          if (
-            now - lastTap < 320 &&
-            lastSide === half
-          ) {
-            // Khi player xoay 90 độ, chiều tua theo vùng chạm bị đảo so với player dọc.
-            const reversed = rotatedRef.current;
-            skipBy(
-              half === "left"
-                ? (reversed ? 30 : -30)
-                : (reversed ? -30 : 30),
-            );
+          // Hai lần nhấn cùng một vùng trong 320ms mới tua.
+          if (now - lastTap < 320 && lastSide === half) {
+            const seconds = isLandscapePlayer
+              ? (half === "left" ? 30 : -30)
+              : (half === "left" ? -30 : 30);
+            skipBy(seconds);
 
             lastTap = 0;
             lastSide = null;
