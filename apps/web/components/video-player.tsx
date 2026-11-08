@@ -576,32 +576,35 @@ export const VideoPlayer = ({
         const onPlayerPointerDown = () => onUserInteraction?.();
         container.addEventListener("pointerdown", onPlayerPointerDown, { passive: true });
 
-        // Khi xoay player bằng CSS 90 độ, tọa độ clientX/clientY của trình duyệt
-        // không còn trùng với trục ngang mà thanh tiến trình Artplayer tính toán.
-        // Tự xử lý thao tác chạm/kéo trên thanh tiến trình theo trục dọc hiển thị.
+        // Artplayer dùng .art-control-progress làm vùng tương tác;
+        // các lớp con là art-progress-played/loaded, không có .art-progress.
+        // Khi CSS xoay 90 độ, trục tiến trình ngang chuyển thành trục Y trên màn hình.
         let progressDragging = false;
         let progressPointerId: number | null = null;
-        let progressElement: HTMLElement | null = null;
+        const progressElement = (art.template as any).$progress as HTMLElement | undefined;
+
+        if (progressElement) {
+          progressElement.style.touchAction = "none";
+        }
 
         const seekFromRotatedProgress = (clientY: number) => {
           if (!progressElement || !art || !rotatedRef.current) return;
           const rect = progressElement.getBoundingClientRect();
-          const video = art.video as HTMLVideoElement;
-          const duration = Number.isFinite(video.duration) ? video.duration : 0;
+          const duration = Number.isFinite(art.duration) ? art.duration : 0;
           if (duration <= 0 || rect.height <= 0) return;
           const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-          art.seek = fraction * duration;
+          const seconds = fraction * duration;
+          art.emit("setBar", "played", fraction);
+          art.seek = seconds;
         };
 
         const onProgressPointerDown = (event: PointerEvent) => {
-          if (!rotatedRef.current) return;
-          const target = event.target as HTMLElement | null;
-          const progress = target?.closest(".art-progress") as HTMLElement | null;
-          if (!progress) return;
+          if (!rotatedRef.current || !progressElement) return;
+          const target = event.target as Node | null;
+          if (!target || !progressElement.contains(target)) return;
 
           progressDragging = true;
           progressPointerId = event.pointerId;
-          progressElement = progress;
           event.preventDefault();
           event.stopPropagation();
           event.stopImmediatePropagation();
@@ -624,7 +627,6 @@ export const VideoPlayer = ({
           seekFromRotatedProgress(event.clientY);
           progressDragging = false;
           progressPointerId = null;
-          progressElement = null;
         };
 
         container.addEventListener("pointerdown", onProgressPointerDown, true);
@@ -688,6 +690,7 @@ export const VideoPlayer = ({
           document.removeEventListener("pointermove", onProgressPointerMove, true);
           document.removeEventListener("pointerup", onProgressPointerUp, true);
           document.removeEventListener("pointercancel", onProgressPointerUp, true);
+          if (progressElement) progressElement.style.touchAction = "";
           container.removeEventListener(
             "pointerup",
             onPointerUp,
