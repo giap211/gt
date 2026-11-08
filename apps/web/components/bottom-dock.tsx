@@ -154,10 +154,6 @@ export function BottomDock() {
             color: #252a36 !important; background-color: #fff !important; border-color: rgba(40,48,65,.18) !important;
           }
           html[data-mobile-theme="light"] body input::placeholder { color: #8992a3 !important; }
-          html[data-mobile-theme="light"] body .bottom-dock-surface {
-            background: rgba(255,255,255,.84) !important; border-color: rgba(40,48,65,.15) !important;
-            box-shadow: 0 8px 30px rgba(35,45,65,.14), inset 0 1px 0 rgba(255,255,255,.9) !important;
-          }
           html[data-mobile-theme="light"] body .mobile-account-sheet {
             background: rgba(255,255,255,.95) !important; border-color: rgba(40,48,65,.15) !important;
           }
@@ -317,11 +313,6 @@ export function BottomDock() {
           }
           html[data-mobile-theme="light"] body [class*="shadow-"] {
             --tw-shadow-color: rgba(75,82,130,.12);
-          }
-          html[data-mobile-theme="light"] body .bottom-dock-surface {
-            background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(239,244,255,.82)) !important;
-            border-color: rgba(114,87,245,.16) !important;
-            box-shadow: 0 12px 34px rgba(65,75,130,.16), inset 0 1px 0 rgba(255,255,255,.96) !important;
           }
           html[data-mobile-theme="light"] body .mobile-account-sheet,
           html[data-mobile-theme="light"] body .mobile-search-overlay {
@@ -707,172 +698,56 @@ export function BottomDock() {
             filter: none !important;
             box-shadow: none !important;
           }
-          /* Liquid Glass dock: moving lens, specular rim and responsive light/dark tint. */
-          html[data-mobile-theme] body .liquid-dock {
-            --dock-glass-bg: linear-gradient(135deg, rgba(255,255,255,.19), rgba(255,255,255,.075) 48%, rgba(180,190,255,.10));
-            --dock-glass-border: rgba(255,255,255,.34);
-            --dock-icon: rgba(245,247,255,.72);
-            --dock-label: rgba(239,242,255,.66);
-            --dock-active-icon: #fff;
-            position: relative;
-            isolation: isolate;
-            min-height: 68px;
-            padding: 6px;
-            border: 1px solid var(--dock-glass-border) !important;
-            border-radius: 25px !important;
-            background: var(--dock-glass-bg) !important;
-            box-shadow: 0 14px 38px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.48), inset 0 -1px 0 rgba(255,255,255,.08) !important;
-            -webkit-backdrop-filter: blur(30px) saturate(190%);
-            backdrop-filter: blur(30px) saturate(190%);
-            overflow: hidden;
-            transition: background .35s ease, border-color .35s ease, box-shadow .35s ease;
-          }
-          html[data-mobile-theme] body .liquid-dock::before {
-            content: ""; position: absolute; inset: 1px; z-index: -1; pointer-events: none;
-            border-radius: inherit;
-            background: linear-gradient(115deg, rgba(255,255,255,.28), transparent 26%, transparent 68%, rgba(174,190,255,.13));
-            opacity: .8;
-          }
-          html[data-mobile-theme] body .liquid-dock-indicator {
-            position: absolute; z-index: 0; top: 5px; bottom: 5px; left: 6px;
-            width: calc((100% - 12px) / 5);
-            border-radius: 19px;
-            background: linear-gradient(145deg, rgba(255,255,255,.32), rgba(255,255,255,.12));
-            border: 1px solid rgba(255,255,255,.42);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.56), inset 0 -1px 0 rgba(255,255,255,.12), 0 4px 16px rgba(0,0,0,.12);
-            transform: translateX(calc(var(--dock-active, 0) * 100%));
-            transition: transform .58s cubic-bezier(.2,.85,.2,1), border-radius .35s ease, background .35s ease;
-            pointer-events: none;
-          }
-          html[data-mobile-theme] body .liquid-dock-item {
-            position: relative; z-index: 1; min-width: 0; min-height: 54px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 3px; padding: 4px 1px;
-            color: var(--dock-icon) !important; background: transparent !important;
-            border: 0 !important; border-radius: 17px;
-            text-decoration: none; outline: none;
-            transform: translateY(0) scale(1);
-            transition: color .28s ease, transform .28s cubic-bezier(.2,.8,.2,1), filter .28s ease;
-            -webkit-tap-highlight-color: transparent;
-          }
-          html[data-mobile-theme] body .liquid-dock-item svg {
-            flex: 0 0 auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,.12));
-            transition: transform .42s cubic-bezier(.2,.9,.25,1), stroke-width .2s ease;
-          }
-          html[data-mobile-theme] body .liquid-dock-item span {
-            display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            font-size: 9px; line-height: 1.15; font-weight: 600; letter-spacing: -.01em;
-            color: var(--dock-label) !important; text-shadow: none !important;
-            transition: color .25s ease, opacity .25s ease;
-          }
-          html[data-mobile-theme] body .liquid-dock-item.is-active { color: var(--dock-active-icon) !important; }
-          html[data-mobile-theme] body .liquid-dock-item.is-active span { color: var(--dock-active-icon) !important; }
-          html[data-mobile-theme] body .liquid-dock-item.is-active svg { transform: translateY(-1px) scale(1.08); }
-          @media (hover: hover) and (pointer: fine) {
-            html[data-mobile-theme] body .liquid-dock-item:hover { transform: translateY(-4px) scale(1.08); color: #fff !important; }
-            html[data-mobile-theme] body .liquid-dock-item:hover svg { transform: translateY(-2px) scale(1.13); }
-            html[data-mobile-theme] body .liquid-dock-item:hover span { color: #fff !important; }
-          }
-          html[data-mobile-theme] body .liquid-dock-item:active { transform: translateY(-2px) scale(.92); }
-          html[data-mobile-theme="light"] body .liquid-dock {
-            --dock-glass-bg: linear-gradient(135deg, rgba(255,255,255,.82), rgba(241,245,255,.68) 52%, rgba(232,228,255,.62));
-            --dock-glass-border: rgba(255,255,255,.88);
-            --dock-icon: rgba(68,76,111,.78);
-            --dock-label: rgba(78,87,122,.72);
-            --dock-active-icon: #4d3ca5;
-            box-shadow: 0 12px 32px rgba(71,82,145,.17), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(104,112,175,.08) !important;
-          }
-          html[data-mobile-theme="light"] body .liquid-dock::before {
-            background: linear-gradient(115deg, rgba(255,255,255,.95), transparent 30%, transparent 70%, rgba(174,160,255,.15));
-            opacity: .95;
-          }
-          html[data-mobile-theme="light"] body .liquid-dock-indicator {
-            background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(233,235,255,.72));
-            border-color: rgba(126,105,220,.22);
-            box-shadow: inset 0 1px 0 #fff, 0 4px 13px rgba(91,82,160,.12);
-          }
-          @media (prefers-reduced-motion: reduce) {
-            html[data-mobile-theme] body .liquid-dock-indicator,
-            html[data-mobile-theme] body .liquid-dock-item,
-            html[data-mobile-theme] body .liquid-dock-item svg { transition: none !important; }
-          }
           html[data-mobile-theme] body .movie-carousel-view-more:active {
             transform: scale(.97);
           }
 
-          /* Instagram-inspired compact floating dock: geometry matched to the supplied reference video. */
-          @media (max-width: 1023px) {
-            html[data-mobile-theme] body .liquid-dock {
-              width: min(84vw, 390px);
-              min-height: 50px !important;
-              height: 50px;
-              margin-inline: auto;
-              padding: 4px 7px !important;
-              border-radius: 999px !important;
-              background: rgba(246, 247, 249, .78) !important;
-              border: 1px solid rgba(255,255,255,.72) !important;
-              box-shadow: 0 7px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.92) !important;
-              -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
-              backdrop-filter: blur(24px) saturate(165%) !important;
-              overflow: visible;
+
+          /* Rophim Liquid Glass navigation: isolated selectors, no legacy dock cascade. */
+          @media(max-width:1023px){
+            html[data-mobile-theme] body .rophim-liquid-nav{
+              --rln-glass-bg:rgba(20,25,60,.38);--rln-glass-border:rgba(160,180,255,.22);--rln-glass-outer:rgba(0,0,30,.55);
+              --rln-pill-bg:rgba(80,90,160,.52);--rln-pill-shadow:rgba(0,0,80,.35);--rln-icon:rgba(180,190,255,.75);--rln-active:rgba(230,235,255,1);
+              position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:4px;
+              width:min(100%,430px);min-height:62px;margin-inline:auto;padding:8px 10px;overflow:hidden;border-radius:9999px;
+              background:var(--rln-glass-bg)!important;border:1px solid var(--rln-glass-border)!important;
+              -webkit-backdrop-filter:blur(52px) saturate(210%) brightness(1.04);backdrop-filter:blur(52px) saturate(210%) brightness(1.04);
+              box-shadow:0 20px 60px -8px var(--rln-glass-outer),0 8px 24px -4px var(--rln-glass-outer),0 2px 0 rgba(80,100,255,.12),
+                inset 0 1.5px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(100,120,255,.08)!important;
+              transition:background .6s ease,border-color .6s ease,box-shadow .6s ease;
             }
-            html[data-mobile-theme] body .liquid-dock::before {
-              inset: 1px;
-              border-radius: inherit;
-              background: linear-gradient(115deg, rgba(255,255,255,.48), transparent 38%, rgba(210,218,232,.12));
-              opacity: 1;
+            html[data-mobile-theme] body .rophim-liquid-nav:before{
+              content:"";position:absolute;top:1px;left:12%;right:12%;height:48%;border-radius:9999px 9999px 60% 60%/9999px 9999px 80% 80%;
+              background:linear-gradient(180deg,rgba(200,210,255,.22),rgba(180,200,255,.06) 55%,transparent);pointer-events:none;z-index:1;
             }
-            html[data-mobile-theme] body .liquid-dock-indicator {
-              top: 5px;
-              bottom: 5px;
-              left: 8px;
-              width: calc((100% - 16px) / 5);
-              border-radius: 999px;
-              transform: translateX(calc(var(--dock-active, 0) * 100%)) scaleX(.62);
-              background: rgba(22, 25, 32, .09);
-              border: 0;
-              box-shadow: inset 0 1px 1px rgba(255,255,255,.58), 0 1px 3px rgba(20,25,35,.05);
-              transition: left .48s cubic-bezier(.2,.85,.2,1), background .25s ease;
+            html[data-mobile-theme] body .rophim-liquid-nav:after{
+              content:"";position:absolute;inset:0;border-radius:inherit;
+              background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(180,200,255,.3),transparent 70%);
+              mix-blend-mode:screen;pointer-events:none;z-index:2;
             }
-            html[data-mobile-theme] body .liquid-dock-item {
-              min-height: 40px !important;
-              height: 40px;
-              gap: 0 !important;
-              padding: 0 !important;
-              border-radius: 50%;
-              color: rgba(25, 28, 35, .78) !important;
-              transform: none;
+            html[data-mobile-theme] body .rophim-liquid-pill{
+              position:absolute;z-index:3;top:8px;bottom:8px;left:10px;width:calc((100% - 20px - 16px)/5);border-radius:9999px;
+              background:var(--rln-pill-bg);box-shadow:0 4px 16px -2px var(--rln-pill-shadow),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(0,0,20,.06);
+              transform:translateX(calc(var(--rln-active,0)*(100% + 4px)));transition:transform .48s cubic-bezier(.34,1.2,.64,1),background .5s ease,box-shadow .5s ease;pointer-events:none;
             }
-            html[data-mobile-theme] body .liquid-dock-item span {
-              display: none !important;
+            html[data-mobile-theme] body .rophim-liquid-item{
+              position:relative;z-index:4;display:flex;min-width:0;min-height:44px;flex-direction:column;align-items:center;justify-content:center;
+              gap:4px;padding:5px 2px;border:0!important;border-radius:9999px;background:transparent!important;color:var(--rln-icon)!important;
+              font-family:inherit;font-size:10px;line-height:1.1;font-weight:500;letter-spacing:.01em;white-space:nowrap;text-decoration:none;outline:none;
+              -webkit-tap-highlight-color:transparent;user-select:none;transition:color .3s ease,transform .15s ease;
             }
-            html[data-mobile-theme] body .liquid-dock-item svg {
-              width: 22px;
-              height: 22px;
-              filter: none;
-              stroke-width: 2;
-              color: inherit;
+            html[data-mobile-theme] body .rophim-liquid-item svg{width:19px;height:19px;flex:0 0 auto;filter:none;transition:transform .3s cubic-bezier(.34,1.2,.64,1),color .3s ease;}
+            html[data-mobile-theme] body .rophim-liquid-item.is-active{color:var(--rln-active)!important;}
+            html[data-mobile-theme] body .rophim-liquid-item:active{transform:scale(.92);}
+            html[data-mobile-theme] body .rophim-liquid-item:active svg{transform:scale(.88);}
+            html[data-mobile-theme="light"] body .rophim-liquid-nav{
+              --rln-glass-bg:rgba(255,255,255,.18);--rln-glass-border:rgba(255,255,255,.55);--rln-glass-outer:rgba(100,100,180,.18);
+              --rln-pill-bg:rgba(255,255,255,.72);--rln-pill-shadow:rgba(80,100,200,.18);--rln-icon:rgba(30,30,60,.8);--rln-active:rgba(20,20,50,1);
             }
-            html[data-mobile-theme] body .liquid-dock-item.is-active {
-              color: #17191e !important;
-            }
-            html[data-mobile-theme] body .liquid-dock-item.is-active svg {
-              transform: scale(1.04);
-            }
-            html[data-mobile-theme="light"] body .liquid-dock {
-              background: rgba(250, 251, 255, .78) !important;
-              border-color: rgba(255,255,255,.88) !important;
-              box-shadow: 0 8px 25px rgba(55,65,100,.14), inset 0 1px 0 rgba(255,255,255,.98) !important;
-            }
-            html[data-mobile-theme="light"] body .liquid-dock-indicator {
-              background: rgba(70, 76, 96, .10);
-              box-shadow: inset 0 1px 1px rgba(255,255,255,.9), 0 1px 3px rgba(55,65,100,.06);
-            }
-            html[data-mobile-theme] body .liquid-dock-item:active {
-              transform: scale(.9);
-            }
-            @media (prefers-reduced-motion: reduce) {
-              html[data-mobile-theme] body .liquid-dock-indicator { transition: none !important; }
+            html[data-mobile-theme="light"] body .rophim-liquid-nav:before{background:linear-gradient(180deg,rgba(255,255,255,.68),rgba(255,255,255,.22) 55%,transparent);}
+            html[data-mobile-theme="light"] body .rophim-liquid-nav:after{background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(255,255,255,.22),transparent 70%);}
+            @media(prefers-reduced-motion:reduce){
+              html[data-mobile-theme] body .rophim-liquid-pill,html[data-mobile-theme] body .rophim-liquid-item,html[data-mobile-theme] body .rophim-liquid-item svg{transition:none!important;}
             }
           }
       `}</style>
@@ -1112,15 +987,15 @@ export function BottomDock() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-3 pb-2.5 pt-1">
           <nav
-            className="bottom-dock-surface liquid-dock pointer-events-auto relative grid grid-cols-5 items-center"
-            style={{ "--dock-active": dockActiveIndex } as React.CSSProperties}
+            className="rophim-liquid-nav pointer-events-auto"
+            style={{ "--rln-active": dockActiveIndex } as React.CSSProperties}
             aria-label="Điều hướng chính"
           >
-            <span className="liquid-dock-indicator" aria-hidden="true" />
+            <span className="rophim-liquid-pill" aria-hidden="true" />
             <Link
               href="/"
               onClick={(event) => handleDockNavigation(event, isHome)}
-              className={`liquid-dock-item ${isHome ? "is-active" : ""}`}
+              className={`rophim-liquid-item ${isHome ? "is-active" : ""}`}
               aria-current={isHome ? "page" : undefined}
             >
               <Home size={22} strokeWidth={isHome ? 2.25 : 1.8} />
@@ -1129,7 +1004,7 @@ export function BottomDock() {
             <Link
               href="/danh-sach/phim-bo"
               onClick={(event) => handleDockNavigation(event, isSeries)}
-              className={`liquid-dock-item ${isSeries ? "is-active" : ""}`}
+              className={`rophim-liquid-item ${isSeries ? "is-active" : ""}`}
               aria-current={isSeries ? "page" : undefined}
             >
               <Tv size={22} strokeWidth={isSeries ? 2.25 : 1.8} />
@@ -1138,7 +1013,7 @@ export function BottomDock() {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className={`liquid-dock-item liquid-dock-search ${searchOpen ? "is-active" : ""}`}
+              className={`rophim-liquid-item ${searchOpen ? "is-active" : ""}`}
               aria-label="Tìm kiếm"
               aria-pressed={searchOpen}
             >
@@ -1148,7 +1023,7 @@ export function BottomDock() {
             <Link
               href="/danh-sach/phim-le"
               onClick={(event) => handleDockNavigation(event, isSingle)}
-              className={`liquid-dock-item ${isSingle ? "is-active" : ""}`}
+              className={`rophim-liquid-item ${isSingle ? "is-active" : ""}`}
               aria-current={isSingle ? "page" : undefined}
             >
               <Clapperboard size={22} strokeWidth={isSingle ? 2.25 : 1.8} />
@@ -1157,7 +1032,7 @@ export function BottomDock() {
             <button
               type="button"
               onClick={handleAccount}
-              className={`liquid-dock-item ${accountOpen ? "is-active" : ""}`}
+              className={`rophim-liquid-item ${accountOpen ? "is-active" : ""}`}
               aria-label="Tài khoản"
               aria-pressed={accountOpen}
             >
