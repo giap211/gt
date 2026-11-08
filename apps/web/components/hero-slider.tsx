@@ -55,7 +55,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
     <>
       <style jsx global>{`
       .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:0 !important; }
-      .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,rgba(7,8,17,.12) 0%,rgba(7,8,17,.08) 35%,rgba(7,8,17,.62) 76%,#090b13 100%); }
+      .home-feature-hero .hero-bottom-fade { background:radial-gradient(ellipse 88% 105% at 50% 100%,rgba(168,85,247,.42) 0%,rgba(139,92,246,.24) 34%,rgba(124,58,237,.08) 62%,transparent 82%),linear-gradient(180deg,rgba(7,8,17,.06) 0%,rgba(7,8,17,.12) 28%,rgba(7,8,17,.68) 76%,#090b13 100%); }
       .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
       .home-feature-hero .hero-slide-dot[aria-current="true"] { width:17px;height:6px;background:linear-gradient(90deg,#e879f9,#8b5cf6);box-shadow:0 0 10px rgba(168,85,247,.85),0 0 20px rgba(168,85,247,.45); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-theme="light"] .home-feature-hero .home-hero-side-shade { background:linear-gradient(105deg,rgba(248,246,255,.97) 0%,rgba(245,241,255,.88) 55%,rgba(245,241,255,.18) 100%); }
