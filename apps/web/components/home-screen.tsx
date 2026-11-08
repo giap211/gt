@@ -243,6 +243,13 @@ export function HomeScreen() {
           <>
             <TopicGrid />
 
+            <MovieCarousel
+              title="Phim nổi bật"
+              titleGradient="linear-gradient(235deg, #ffffff 20%, #a78bfa 125%)"
+              layout="poster"
+              items={transformMovies(data.latest)}
+            />
+
             <div className="space-y-1 md:space-y-2">
               <MovieCarousel
                 title="Điện ảnh Hàn Quốc"
