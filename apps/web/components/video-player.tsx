@@ -534,7 +534,7 @@ export const VideoPlayer = ({
         const container = art.template.$player as HTMLElement;
 
         let lastTap = 0;
-        let lastSide: "left" | "right" | null = null;
+        let lastSide: "top" | "bottom" | null = null;
 
         const skipBy = (seconds: number) => {
           const video = art!.video as
