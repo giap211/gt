@@ -585,12 +585,11 @@ export const VideoPlayer = ({
             return;
           }
 
-          // Player được xoay 90 độ trên điện thoại ở chế độ dọc.
-          // Vì vậy vùng tua được xác định theo trục Y trên màn hình:
-          // chạm 2 lần nửa TRÊN = tua tới 30 giây, nửa DƯỚI = lùi 30 giây.
+          // Dựa trên vị trí trái/phải đang nhìn thấy sau mọi phép xoay CSS.
+          // Nửa trái = lùi 30 giây; nửa phải = tua tới 30 giây.
           const rect = container.getBoundingClientRect();
-          const half: "top" | "bottom" =
-            e.clientY < rect.top + rect.height / 2 ? "top" : "bottom";
+          const half: "left" | "right" =
+            e.clientX < rect.left + rect.width / 2 ? "left" : "right";
 
           const now = Date.now();
 
@@ -599,7 +598,7 @@ export const VideoPlayer = ({
             now - lastTap < 320 &&
             lastSide === half
           ) {
-            skipBy(half === "top" ? -30 : 30);
+            skipBy(half === "left" ? -30 : 30);
 
             lastTap = 0;
             lastSide = null;
