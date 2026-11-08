@@ -771,6 +771,49 @@ export function BottomDock() {
               html[data-mobile-theme] body .rophim-liquid-pill,html[data-mobile-theme] body .rophim-liquid-item,html[data-mobile-theme] body .rophim-liquid-item svg{transition:none!important;}
             }
           }
+
+          /* Account sheet: layered Liquid Glass surfaces in both themes. */
+          html[data-mobile-theme] body .mobile-account-sheet{
+            background:linear-gradient(145deg,rgba(27,22,48,.78),rgba(22,27,43,.72) 52%,rgba(43,24,62,.76))!important;
+            border:1px solid rgba(216,180,254,.34)!important;
+            -webkit-backdrop-filter:blur(42px) saturate(190%)!important;
+            backdrop-filter:blur(42px) saturate(190%)!important;
+            box-shadow:0 28px 90px rgba(0,0,0,.48),0 0 36px rgba(139,92,246,.13),inset 0 1px 0 rgba(255,255,255,.28)!important;
+          }
+          html[data-mobile-theme] body .mobile-account-sheet .account-glass-card{
+            background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(168,85,247,.10) 55%,rgba(255,255,255,.055))!important;
+            border-color:rgba(216,180,254,.28)!important;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 12px 30px rgba(0,0,0,.12);
+          }
+          html[data-mobile-theme] body .mobile-account-sheet .account-glass-group{
+            background:rgba(255,255,255,.065)!important;
+            border-color:rgba(216,180,254,.22)!important;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.12);
+            -webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);
+          }
+          html[data-mobile-theme] body .mobile-account-sheet .account-glass-icon{
+            color:#e9d5ff!important;background:linear-gradient(145deg,rgba(168,85,247,.36),rgba(99,102,241,.2))!important;
+            border:1px solid rgba(216,180,254,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 4px 14px rgba(139,92,246,.16);
+          }
+          html[data-mobile-theme] body .mobile-account-sheet .account-glass-title{color:#e9d5ff!important;}
+          html[data-mobile-theme="light"] body .mobile-account-sheet{
+            background:linear-gradient(145deg,rgba(255,255,255,.76),rgba(242,237,255,.68) 52%,rgba(232,243,255,.72))!important;
+            border-color:rgba(139,92,246,.3)!important;
+            box-shadow:0 28px 80px rgba(73,65,125,.2),0 0 34px rgba(139,92,246,.12),inset 0 1px 0 rgba(255,255,255,.92)!important;
+          }
+          html[data-mobile-theme="light"] body .mobile-account-sheet .account-glass-card{
+            background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(226,217,255,.5) 55%,rgba(255,255,255,.58))!important;
+            border-color:rgba(139,92,246,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 10px 28px rgba(91,75,150,.09);
+          }
+          html[data-mobile-theme="light"] body .mobile-account-sheet .account-glass-group{
+            background:rgba(255,255,255,.48)!important;border-color:rgba(139,92,246,.2)!important;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 22px rgba(91,75,150,.07);
+          }
+          html[data-mobile-theme="light"] body .mobile-account-sheet .account-glass-icon{
+            color:#7048cf!important;background:linear-gradient(145deg,rgba(196,181,253,.62),rgba(224,231,255,.68))!important;
+            border-color:rgba(139,92,246,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 4px 12px rgba(139,92,246,.12);
+          }
+          html[data-mobile-theme="light"] body .mobile-account-sheet .account-glass-title{color:#6741c6!important;}
       `}</style>
 
       {/* Full-screen search overlay */}
@@ -915,7 +958,7 @@ export function BottomDock() {
             role="dialog"
             aria-modal="true"
             aria-label="Tài khoản"
-            className="mobile-account-sheet flex w-full max-w-md flex-col overflow-hidden rounded-[30px] border border-white/20 bg-[#171923]/95 shadow-[0_24px_80px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,.18)] backdrop-blur-2xl"
+            className="mobile-account-sheet flex w-full max-w-md flex-col overflow-hidden rounded-[30px] border border-violet-200/30 bg-[#171923]/70 shadow-[0_24px_80px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,.22)] backdrop-blur-2xl"
             style={{
               maxHeight: "calc(100dvh - env(safe-area-inset-top) - 124px)",
               WebkitBackdropFilter: "blur(30px) saturate(175%)",
@@ -925,7 +968,7 @@ export function BottomDock() {
             <div className="shrink-0 px-5 pt-4">
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#ffd875]">Không gian của bạn</p>
+                  <p className="account-glass-title text-[10px] font-bold uppercase tracking-[0.22em] text-violet-200">Không gian của bạn</p>
                   <h2 className="mt-1 text-xl font-bold tracking-tight text-white">Tài khoản</h2>
                 </div>
                 <button
@@ -938,10 +981,10 @@ export function BottomDock() {
                 </button>
               </div>
 
-              <div className="relative mb-4 overflow-hidden rounded-[22px] border border-white/15 bg-gradient-to-br from-white/[0.13] via-white/[0.07] to-[#ffd875]/[0.08] p-4">
+              <div className="account-glass-card relative mb-4 overflow-hidden rounded-[22px] border border-violet-200/25 p-4 backdrop-blur-xl">
                 <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#ffd875]/10 blur-2xl" />
                 <div className="relative flex items-center gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#ffd875]/30 bg-[#ffd875]/15 text-[#ffd875] shadow-inner">
+                  <div className="account-glass-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-200/30 bg-violet-400/15 text-violet-100 shadow-inner">
                     <UserCircle size={27} strokeWidth={1.7} />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -964,15 +1007,15 @@ export function BottomDock() {
               {user && (
                 <div className="mb-4">
                   <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">Thư viện cá nhân</p>
-                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045]">
+                  <div className="account-glass-group overflow-hidden rounded-2xl border border-violet-200/15 bg-white/[0.045]">
                     <button type="button" onClick={() => { setAccountOpen(false); openLibrary("favorites"); }} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffd875]/12 text-[#ffd875]"><Bookmark size={18} /></span>
+                      <span className="account-glass-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-400/15 text-violet-100"><Bookmark size={21} strokeWidth={2.2} /></span>
                       <span className="min-w-0 flex-1"><span className="block font-semibold">Tủ phim của tôi</span><span className="mt-0.5 block text-xs text-white/40">Phim đã lưu và yêu thích</span></span>
                       <ChevronRight size={17} className="text-white/35" />
                     </button>
                     <div className="mx-3.5 border-t border-white/[0.08]" />
                     <button type="button" onClick={() => { setAccountOpen(false); openLibrary("history"); }} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400/10 text-sky-300"><History size={18} /></span>
+                      <span className="account-glass-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-400/15 text-violet-100"><History size={20} /></span>
                       <span className="min-w-0 flex-1"><span className="block font-semibold">Phim đang xem</span><span className="mt-0.5 block text-xs text-white/40">Tiếp tục từ nơi bạn đã dừng</span></span>
                       <ChevronRight size={17} className="text-white/35" />
                     </button>
@@ -984,7 +1027,7 @@ export function BottomDock() {
                 <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">Tùy chỉnh ứng dụng</p>
                 <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045]">
                   <button type="button" onClick={toggleMobileTheme} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-400/10 text-violet-300">{mobileTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</span>
+                    <span className="account-glass-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-400/10 text-violet-200">{mobileTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</span>
                     <span className="min-w-0 flex-1"><span className="block font-semibold">Giao diện</span><span className="mt-0.5 block text-xs text-white/40">Chuyển sang chế độ {mobileTheme === "dark" ? "sáng" : "tối"}</span></span>
                     <span className="rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-white/65">{mobileTheme === "dark" ? "Tối" : "Sáng"}</span>
                   </button>
