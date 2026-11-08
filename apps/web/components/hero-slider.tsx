@@ -172,7 +172,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           aria-label="Thông báo"
           title="Thông báo"
           onClick={() => setNotificationsOpen(true)}
-          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white shadow-[0_5px_20px_rgba(0,0,0,.25)] backdrop-blur-2xl transition-colors active:bg-white/20"
+          className="pointer-events-auto relative flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white shadow-[0_5px_20px_rgba(0,0,0,.25)] backdrop-blur-2xl transition-colors active:bg-white/20"
         >
           <Bell size={19} strokeWidth={1.9} />
           {!user && (
