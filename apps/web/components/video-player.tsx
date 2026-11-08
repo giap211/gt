@@ -675,13 +675,15 @@ export const VideoPlayer = ({
 
         container.addEventListener("pointerdown", onTapPointerDown);
         container.addEventListener("pointermove", onTapPointerMove, { passive: true });
-        container.addEventListener("pointerup", onPointerUp);
-        container.addEventListener("pointercancel", () => {
+        const onTapPointerCancel = () => {
           tapPointerId = null;
           tapMoved = false;
           lastTap = 0;
           lastSide = null;
-        });
+        };
+
+        container.addEventListener("pointerup", onPointerUp);
+        container.addEventListener("pointercancel", onTapPointerCancel);
 
 
         // Người xem chỉ tua bằng thanh tiến trình hoặc các nút điều khiển.
@@ -701,6 +703,7 @@ export const VideoPlayer = ({
           container.removeEventListener("pointerdown", onTapPointerDown);
           container.removeEventListener("pointermove", onTapPointerMove);
           container.removeEventListener("pointerup", onPointerUp);
+          container.removeEventListener("pointercancel", onTapPointerCancel);
 
           prevCleanup?.();
         };
