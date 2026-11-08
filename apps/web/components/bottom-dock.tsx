@@ -706,28 +706,30 @@ export function BottomDock() {
           /* Rophim Liquid Glass navigation: isolated selectors, no legacy dock cascade. */
           @media(max-width:1023px){
             html[data-mobile-theme] body .rophim-liquid-nav{
-              --rln-glass-bg:rgba(20,25,60,.38);--rln-glass-border:rgba(160,180,255,.22);--rln-glass-outer:rgba(0,0,30,.55);
-              --rln-pill-bg:rgba(80,90,160,.52);--rln-pill-shadow:rgba(0,0,80,.35);--rln-icon:rgba(180,190,255,.75);--rln-active:rgba(230,235,255,1);
+              --rln-glass-bg:linear-gradient(120deg,rgba(22,15,48,.76),rgba(35,18,62,.68) 52%,rgba(25,15,48,.78));
+              --rln-glass-border:rgba(192,132,252,.48);--rln-glass-outer:rgba(91,33,182,.34);
+              --rln-pill-bg:linear-gradient(115deg,#8b5cf6 0%,#a855f7 52%,#d946ef 100%);
+              --rln-pill-shadow:rgba(168,85,247,.48);--rln-icon:rgba(221,210,255,.78);--rln-active:rgba(255,255,255,1);
               position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:4px;
               width:min(100%,430px);min-height:62px;margin-inline:auto;padding:8px 10px;overflow:hidden;border-radius:9999px;
               background:var(--rln-glass-bg)!important;border:1px solid var(--rln-glass-border)!important;
               -webkit-backdrop-filter:blur(52px) saturate(210%) brightness(1.04);backdrop-filter:blur(52px) saturate(210%) brightness(1.04);
-              box-shadow:0 20px 60px -8px var(--rln-glass-outer),0 8px 24px -4px var(--rln-glass-outer),0 2px 0 rgba(80,100,255,.12),
-                inset 0 1.5px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(100,120,255,.08)!important;
+              box-shadow:0 18px 48px -8px var(--rln-glass-outer),0 5px 22px rgba(139,92,246,.16),0 0 0 1px rgba(192,132,252,.12),
+                inset 0 1.5px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(217,70,239,.14)!important;
               transition:background .6s ease,border-color .6s ease,box-shadow .6s ease;
             }
             html[data-mobile-theme] body .rophim-liquid-nav:before{
               content:"";position:absolute;top:1px;left:12%;right:12%;height:48%;border-radius:9999px 9999px 60% 60%/9999px 9999px 80% 80%;
-              background:linear-gradient(180deg,rgba(200,210,255,.22),rgba(180,200,255,.06) 55%,transparent);pointer-events:none;z-index:1;
+              background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(192,132,252,.12) 55%,transparent);pointer-events:none;z-index:1;
             }
             html[data-mobile-theme] body .rophim-liquid-nav:after{
               content:"";position:absolute;inset:0;border-radius:inherit;
-              background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(180,200,255,.3),transparent 70%);
+              background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(192,132,252,.38),transparent 70%);
               mix-blend-mode:screen;pointer-events:none;z-index:2;
             }
             html[data-mobile-theme] body .rophim-liquid-pill{
               position:absolute;z-index:3;top:8px;bottom:8px;left:10px;width:calc((100% - 20px - 16px)/5);border-radius:9999px;
-              background:var(--rln-pill-bg);box-shadow:0 4px 16px -2px var(--rln-pill-shadow),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(0,0,20,.06);
+              background:var(--rln-pill-bg);border:1px solid rgba(255,255,255,.34);box-shadow:0 5px 18px -2px var(--rln-pill-shadow),0 0 18px rgba(168,85,247,.24),inset 0 1px 0 rgba(255,255,255,.58),inset 0 -1px 0 rgba(80,20,120,.12);
               transform:translateX(calc(var(--rln-active,0)*(100% + 4px)));transition:transform .48s cubic-bezier(.34,1.2,.64,1),background .5s ease,box-shadow .5s ease;pointer-events:none;
             }
             html[data-mobile-theme] body .rophim-liquid-item{
@@ -741,11 +743,13 @@ export function BottomDock() {
             html[data-mobile-theme] body .rophim-liquid-item:active{transform:scale(.92);}
             html[data-mobile-theme] body .rophim-liquid-item:active svg{transform:scale(.88);}
             html[data-mobile-theme="light"] body .rophim-liquid-nav{
-              --rln-glass-bg:rgba(255,255,255,.18);--rln-glass-border:rgba(255,255,255,.55);--rln-glass-outer:rgba(100,100,180,.18);
-              --rln-pill-bg:rgba(255,255,255,.72);--rln-pill-shadow:rgba(80,100,200,.18);--rln-icon:rgba(30,30,60,.8);--rln-active:rgba(20,20,50,1);
+              --rln-glass-bg:linear-gradient(120deg,rgba(255,255,255,.76),rgba(247,241,255,.7) 52%,rgba(255,255,255,.78));
+              --rln-glass-border:rgba(168,85,247,.3);--rln-glass-outer:rgba(139,92,246,.2);
+              --rln-pill-bg:linear-gradient(115deg,#8b5cf6 0%,#a855f7 52%,#d946ef 100%);
+              --rln-pill-shadow:rgba(168,85,247,.38);--rln-icon:rgba(91,69,132,.86);--rln-active:rgba(255,255,255,1);
             }
-            html[data-mobile-theme="light"] body .rophim-liquid-nav:before{background:linear-gradient(180deg,rgba(255,255,255,.68),rgba(255,255,255,.22) 55%,transparent);}
-            html[data-mobile-theme="light"] body .rophim-liquid-nav:after{background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(255,255,255,.22),transparent 70%);}
+            html[data-mobile-theme="light"] body .rophim-liquid-nav:before{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(216,180,254,.24) 55%,transparent);}
+            html[data-mobile-theme="light"] body .rophim-liquid-nav:after{background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(168,85,247,.18),transparent 70%);}
             @media(prefers-reduced-motion:reduce){
               html[data-mobile-theme] body .rophim-liquid-pill,html[data-mobile-theme] body .rophim-liquid-item,html[data-mobile-theme] body .rophim-liquid-item svg{transition:none!important;}
             }
