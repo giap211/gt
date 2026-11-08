@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Play, Info } from "lucide-react";
+import { Bell, Play, Info, X, Clock3, ArrowRight, Sparkles } from "lucide-react";
+import { useMember } from "./member-provider";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Thumbs } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -34,6 +35,15 @@ interface HeroSliderProps {
 
 export const HeroSlider = ({ movies }: HeroSliderProps) => {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const { user, openAuth } = useMember();
+
+  useEffect(() => {
+    if (!notificationsOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [notificationsOpen]);
 
   if (!movies || movies.length === 0) return null;
 
@@ -161,11 +171,85 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           type="button"
           aria-label="Thông báo"
           title="Thông báo"
+          onClick={() => setNotificationsOpen(true)}
           className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white shadow-[0_5px_20px_rgba(0,0,0,.25)] backdrop-blur-2xl transition-colors active:bg-white/20"
         >
           <Bell size={19} strokeWidth={1.9} />
         </button>
       </div>
+
+      {notificationsOpen && (
+        <div
+          className="fixed inset-0 z-[180] flex min-h-[100dvh] flex-col overflow-y-auto bg-[#090b12] text-white"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="notification-title"
+        >
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[340px] bg-[radial-gradient(ellipse_at_top,rgba(255,216,117,.14),transparent_68%)]" />
+          <header className="relative flex items-center justify-between border-b border-white/[0.08] px-5 pb-4 pt-[max(18px,env(safe-area-inset-top))] sm:px-8">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[.22em] text-[#ffd875]">GIAPTRAN</p>
+              <h2 id="notification-title" className="mt-1 text-[25px] font-black tracking-tight">Thông báo</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNotificationsOpen(false)}
+              aria-label="Đóng thông báo"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white/75 transition hover:bg-white/10"
+            >
+              <X size={20} />
+            </button>
+          </header>
+
+          <div className="relative mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 pb-10 pt-7 sm:px-8">
+            {!user ? (
+              <article className="overflow-hidden rounded-[28px] border border-[#ffd875]/20 bg-gradient-to-br from-[#24202a] via-[#171923] to-[#11131b] shadow-[0_22px_70px_rgba(0,0,0,.35)]">
+                <div className="p-5 sm:p-7">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#ffd875]/20 bg-[#ffd875]/10 text-[#ffd875]">
+                    <Clock3 size={23} />
+                  </div>
+                  <span className="inline-flex rounded-full border border-[#ffd875]/20 bg-[#ffd875]/10 px-3 py-1 text-[9px] font-extrabold uppercase tracking-[.16em] text-[#ffd875]">
+                    Dành cho thành viên
+                  </span>
+                  <h3 className="mt-4 text-[22px] font-black leading-tight sm:text-[26px]">
+                    Đừng bỏ lỡ bộ phim bạn đang xem
+                  </h3>
+                  <p className="mt-3 max-w-lg text-[14px] leading-7 text-white/60">
+                    Đăng nhập để đồng bộ phim đang xem, tập phim và thời gian đã xem. Bạn có thể tiếp tục thưởng thức ngay tại vị trí đã dừng trên các thiết bị.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => openAuth("login")}
+                    className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#ffd875] px-5 text-[13px] font-extrabold text-[#171923] shadow-[0_8px_28px_rgba(255,216,117,.18)] transition hover:brightness-110 active:scale-[.98] sm:w-auto sm:min-w-[190px]"
+                  >
+                    Đăng nhập ngay <ArrowRight size={17} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openAuth("register")}
+                    className="mt-4 block w-full text-center text-[12px] font-semibold text-white/45 transition hover:text-[#ffd875] sm:text-left"
+                  >
+                    Chưa có tài khoản? Đăng ký miễn phí
+                  </button>
+                </div>
+              </article>
+            ) : (
+              <article className="rounded-[28px] border border-white/10 bg-white/[0.045] p-5 sm:p-7">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-emerald-300">
+                  <Sparkles size={22} />
+                </div>
+                <h3 className="text-xl font-extrabold">Bạn đã đăng nhập</h3>
+                <p className="mt-2 text-sm leading-7 text-white/55">
+                  Phim đang xem và tiến trình xem của bạn được đồng bộ với tài khoản để có thể tiếp tục trên thiết bị khác.
+                </p>
+              </article>
+            )}
+            <p className="mt-auto pt-10 text-center text-[10px] font-medium tracking-[.14em] text-white/25">
+              GIAPTRAN · XEM PHIM THEO CÁCH CỦA BẠN
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="absolute bottom-7 left-1/2 z-40 w-fit max-w-[90%] -translate-x-1/2 sm:bottom-8">
         <Swiper
