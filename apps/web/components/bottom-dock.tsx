@@ -723,7 +723,7 @@ export function BottomDock() {
           /* Rophim Liquid Glass navigation: isolated selectors, no legacy dock cascade. */
           @media(max-width:1023px){
             html[data-mobile-theme] body .rophim-liquid-nav{
-              --rln-glass-bg:linear-gradient(120deg,rgba(22,15,48,.76),rgba(35,18,62,.68) 52%,rgba(25,15,48,.78));
+              --rln-glass-bg:linear-gradient(120deg,rgba(22,15,48,.60),rgba(35,18,62,.50) 52%,rgba(25,15,48,.62));
               --rln-glass-border:rgba(192,132,252,.48);--rln-glass-outer:rgba(91,33,182,.34);
               --rln-pill-bg:linear-gradient(115deg,#8b5cf6 0%,#a855f7 52%,#d946ef 100%);
               --rln-pill-shadow:rgba(168,85,247,.48);--rln-icon:rgba(221,210,255,.78);--rln-active:rgba(255,255,255,1);
@@ -760,7 +760,7 @@ export function BottomDock() {
             html[data-mobile-theme] body .rophim-liquid-item:active{transform:scale(.92);}
             html[data-mobile-theme] body .rophim-liquid-item:active svg{transform:scale(.88);}
             html[data-mobile-theme="light"] body .rophim-liquid-nav{
-              --rln-glass-bg:linear-gradient(120deg,rgba(255,255,255,.76),rgba(247,241,255,.7) 52%,rgba(255,255,255,.78));
+              --rln-glass-bg:linear-gradient(120deg,rgba(255,255,255,.64),rgba(247,241,255,.56) 52%,rgba(255,255,255,.66));
               --rln-glass-border:rgba(168,85,247,.3);--rln-glass-outer:rgba(139,92,246,.2);
               --rln-pill-bg:linear-gradient(115deg,#8b5cf6 0%,#a855f7 52%,#d946ef 100%);
               --rln-pill-shadow:rgba(168,85,247,.38);--rln-icon:rgba(91,69,132,.86);--rln-active:rgba(255,255,255,1);
