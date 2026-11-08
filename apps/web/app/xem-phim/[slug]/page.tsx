@@ -625,7 +625,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           </div>
         </div>
       </div>
-      <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass absolute right-4 top-4 z-[70] hover:border-[#ffd875]/70">
+      <button type="button" aria-label={overlayOpen ? "Đóng tùy chọn phát" : "Mở tùy chọn phát"} onClick={(event) => { event.stopPropagation(); requestOrientationSensor(); setOverlayOpen((open) => !open); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass absolute right-4 top-4 z-[70] hover:border-[#ffd875]/70">
         {overlayOpen ? <X size={23}/> : <Settings2 size={23}/>}
       </button>
 
