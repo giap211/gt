@@ -21,6 +21,7 @@ interface VideoPlayerProps {
   introDebugStatus?: string;
   onProgress?: (seconds: number, durationSeconds: number, force?: boolean) => void;
   onUserInteraction?: () => void;
+  rotated?: boolean;
 }
 
 export const VideoPlayer = ({
@@ -34,8 +35,11 @@ export const VideoPlayer = ({
   introDebugStatus = "Chưa có trạng thái API",
   onProgress,
   onUserInteraction,
+  rotated = false,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
+  const rotatedRef = useRef(rotated);
+  rotatedRef.current = rotated;
   const introSegmentRef = useRef({
     startSeconds: introStartSeconds,
     endSeconds: introEndSeconds,
@@ -598,7 +602,13 @@ export const VideoPlayer = ({
             now - lastTap < 320 &&
             lastSide === half
           ) {
-            skipBy(half === "left" ? -30 : 30);
+            // Khi player xoay 90 độ, chiều tua theo vùng chạm bị đảo so với player dọc.
+            const reversed = rotatedRef.current;
+            skipBy(
+              half === "left"
+                ? (reversed ? 30 : -30)
+                : (reversed ? -30 : 30),
+            );
 
             lastTap = 0;
             lastSide = null;
