@@ -780,3 +780,43 @@ html[data-theme="light"] .hero-bottom-fade {
 @media (prefers-reduced-motion: reduce) {
   .hero-bottom-fade { transition: none !important; }
 }
+
+
+/* Scroll-reactive violet highlight for movie poster frames.
+   A single root scroll listener drives the shared angle; the poster itself never moves. */
+.movie-poster-frame {
+  isolation: isolate;
+}
+.movie-poster-frame::after {
+  content: "";
+  position: absolute;
+  z-index: 40;
+  inset: 0;
+  padding: 1.35px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: conic-gradient(
+    from var(--poster-scroll-angle, 0deg),
+    transparent 0deg 238deg,
+    rgba(139, 92, 246, .08) 258deg,
+    rgba(192, 132, 252, .82) 282deg,
+    rgba(255, 255, 255, .9) 296deg,
+    rgba(217, 70, 239, .72) 310deg,
+    rgba(139, 92, 246, .12) 332deg,
+    transparent 350deg 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  transition: opacity .18s ease;
+}
+html.poster-scroll-active .movie-poster-frame::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .movie-poster-frame::after {
+    transition: none;
+  }
+}
