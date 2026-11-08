@@ -286,7 +286,19 @@ export default function MovieDetailPage({
   );
 
   return (
-    <main className="min-h-screen bg-[#0f111a] text-white">
+    <main className="movie-detail-page min-h-screen bg-[#0b0d16] text-white">
+      <style jsx global>{`
+        .movie-detail-content{background:radial-gradient(ellipse 90% 24% at 50% 0%,rgba(139,92,246,.16),transparent 72%),linear-gradient(180deg,#101321 0%,#0b0d16 42%,#090b12 100%)}
+        .movie-glass-panel{background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1px solid rgba(196,181,253,.14);border-radius:24px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 38px rgba(0,0,0,.16);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+        .movie-poster-glass{background:linear-gradient(145deg,rgba(167,139,250,.2),rgba(255,255,255,.035));border-color:rgba(196,181,253,.2);box-shadow:0 18px 48px rgba(0,0,0,.35),0 0 32px rgba(139,92,246,.08)}
+        .movie-tabs{border-color:rgba(196,181,253,.16)}
+        .movie-detail-page a,.movie-detail-page button{-webkit-tap-highlight-color:transparent}
+        .movie-detail-page :is(button,a){transition-duration:220ms}
+        html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:radial-gradient(ellipse 90% 24% at 50% 0%,rgba(167,139,250,.16),transparent 72%),linear-gradient(180deg,#f2effb 0%,#f7f6fc 42%,#f2f1f8 100%);color:#28243a}
+        html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(255,255,255,.56));border-color:rgba(139,92,246,.16);box-shadow:inset 0 1px 0 #fff,0 12px 32px rgba(70,55,110,.07)}
+        html[data-theme="light"] .movie-tabs,html[data-mobile-theme="light"] .movie-tabs{border-color:rgba(139,92,246,.16)}
+      `}</style>
+
       {/* HERO — shorter + lighter overlay so image shows */}
       <div className="movie-detail-hero relative hidden w-full h-[420px] lg:block">
         <Image
@@ -369,7 +381,7 @@ export default function MovieDetailPage({
           </div>
         </div>
 
-        <div className="relative -mt-1 space-y-7 bg-[#080b12] px-4 pb-10 pt-5">
+        <div className="movie-detail-content relative -mt-1 space-y-7 px-4 pb-10 pt-5">
           <div>
             <div className="flex items-center justify-between gap-3">
               <p className="text-[14px] leading-6 text-white/75 line-clamp-3" dangerouslySetInnerHTML={{ __html: movie.content || "Nội dung phim đang được cập nhật." }} />
@@ -386,7 +398,7 @@ export default function MovieDetailPage({
             )}
           </div>
 
-          <section aria-label="Thao tác phim" className="py-1">
+          <section aria-label="Thao tác phim" className="movie-glass-panel px-3 py-3">
             <MemberMovieActions
               variant="mobile"
               movie={{ movieSlug: movie.slug, movieTitle: movie.name, posterUrl: movie.poster_url }}
@@ -412,7 +424,7 @@ export default function MovieDetailPage({
             </section>
           )}
 
-          <section id="movie-episodes" className="scroll-mt-5">
+          <section id="movie-episodes" className="movie-glass-panel scroll-mt-5 p-4">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-[17px] font-semibold tracking-tight text-white">Danh sách tập</h2>
               <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] text-white/70">{episodes[selectedServer]?.server_name || "Bản chiếu"}</span>
@@ -439,7 +451,7 @@ export default function MovieDetailPage({
             </div>
           </section>
 
-          <div className="border-t border-white/10 pt-5">
+          <div className="movie-glass-panel p-4">
             <div className="mb-4 flex gap-4 overflow-x-auto no-scrollbar">
               {TABS.map((tab) => {
                 const key = tab.toLowerCase();
@@ -463,7 +475,7 @@ export default function MovieDetailPage({
             {/* LEFT column */}
             <div className="w-[240px] shrink-0 -mt-16">
               {/* poster floats higher into hero */}
-              <div className="rounded-2xl bg-[#161822]/90 border border-white/8 p-2.5 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
+              <div className="movie-poster-glass rounded-[26px] border p-2.5">
                 <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden">
                   <Image
                     src={movie.poster_url}
@@ -494,7 +506,7 @@ export default function MovieDetailPage({
                         <Image src={m.poster_url} alt={m.name} fill sizes="40px" className="object-cover" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-white/80 line-clamp-1 group-hover:text-[#ffd875]">
+                        <p className="text-xs font-medium text-white/80 line-clamp-1 group-hover:text-violet-300">
                           {m.name}
                         </p>
                         <p className="text-[10px] text-white/35 line-clamp-1">
@@ -510,10 +522,10 @@ export default function MovieDetailPage({
             {/* RIGHT column */}
             <div className="flex-1 min-w-0 pt-2">
               {/* Action bar — aligns with top of poster card area */}
-              <div className="flex items-center gap-4 bg-[#161822]/95 backdrop-blur-md border border-white/8 rounded-2xl px-5 py-3 shadow-xl">
+              <div className="movie-glass-panel flex items-center gap-4 rounded-[24px] border px-5 py-3 backdrop-blur-2xl">
                 <Link
                   href={watchHref}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ffd875] to-[#f0c24d] text-[#1a1a1a] font-bold text-[15px] px-6 py-2.5 rounded-full shrink-0 hover:brightness-105"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-fuchsia-500 via-violet-500 to-indigo-600 text-white font-bold text-[15px] px-6 py-2.5 rounded-full shrink-0 hover:brightness-105"
                 >
                   <Play size={16} className="fill-current" />
                   Xem Ngay
@@ -528,7 +540,7 @@ export default function MovieDetailPage({
                     }}
                   />
                   <button className="flex items-center gap-1.5 rounded-full bg-[#282b3a] px-3 py-1.5">
-                    <Star size={14} className="fill-[#ffd875] text-[#ffd875]" />
+                    <Star size={14} className="fill-fuchsia-300 text-fuchsia-300" />
                     <span className="text-sm font-bold">0</span>
                     <span className="text-[11px] text-white/50">Đánh giá</span>
                   </button>
@@ -545,7 +557,7 @@ export default function MovieDetailPage({
               </div>
 
               {/* Tabs */}
-              <div className="mt-4 border-b border-white/10">
+              <div className="movie-tabs mt-4 border-b">
                 <div className="flex gap-6">
                   {TABS.map((tab) => {
                     const key = tab.toLowerCase();
@@ -553,11 +565,11 @@ export default function MovieDetailPage({
                       <button
                         key={tab}
                         onClick={() => setActiveTab(key)}
-                        className={`relative pb-3 text-sm font-medium ${activeTab === key ? "text-[#ffd875]" : "text-white/40 hover:text-white/70"}`}
+                        className={`relative pb-3 text-sm font-medium ${activeTab === key ? "text-violet-300" : "text-white/45 hover:text-white/80"}`}
                       >
                         {tab}
                         {activeTab === key && (
-                          <span className="absolute bottom-0 inset-x-0 h-0.5 bg-[#ffd875] rounded-full" />
+                          <span className="absolute bottom-0 inset-x-0 h-0.5 bg-gradient-to-r from-fuchsia-400 to-violet-500 rounded-full" />
                         )}
                       </button>
                     );
@@ -634,7 +646,7 @@ function TabContent({
                 onClick={() => setSelectedServer(idx)}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-medium border ${
                   selectedServer === idx
-                    ? "bg-[#ffd875]/15 border-[#ffd875]/45 text-[#ffd875]"
+                    ? "bg-violet-400/15 border-violet-300/40 text-violet-200"
                     : "bg-white/5 border-white/10 text-white/50"
                 }`}
               >
@@ -647,7 +659,7 @@ function TabContent({
               <Link
                 key={ep.slug || ep.name}
                 href={`/xem-phim/${movie.slug}?sv=${selectedServer}&tap=${encodeURIComponent(ep.slug || ep.name)}`}
-                className="flex items-center justify-center gap-1 py-2.5 px-2 rounded-lg bg-[#1c1e2a] border border-white/5 text-[13px] text-white/75 hover:bg-[#ffd875]/10 hover:border-[#ffd875]/30 hover:text-[#ffd875]"
+                className="flex items-center justify-center gap-1 py-2.5 px-2 rounded-lg bg-[#1c1e2a] border border-white/5 text-[13px] text-white/75 hover:bg-violet-400/15 hover:border-violet-300/40 hover:text-violet-200"
               >
                 <Play size={11} className="opacity-40" />
                 {formatEpisodeName(ep.name)}
@@ -679,7 +691,7 @@ function TabContent({
               onClick={() => setSelectedServer(idx)}
               className={`rounded-lg border px-2.5 py-1.5 text-[13px] font-medium transition-all sm:text-sm ${
                 selectedServer === idx
-                  ? "border-[#ffd15a] bg-[#202331] text-[#ffd15a] shadow-[0_0_14px_rgba(255,209,90,0.12)]"
+                  ? "border-violet-300/50 bg-violet-400/15 text-violet-200 shadow-[0_0_18px_rgba(139,92,246,.16)]"
                   : "border-white/15 bg-[#202331] text-white/85 hover:border-white/30"
               }`}
             >
@@ -694,7 +706,7 @@ function TabContent({
 
         <Link
           href={versionHref}
-          className="group relative flex min-h-[148px] w-full items-center overflow-hidden rounded-xl border border-white/[0.06] bg-[#626474] transition-colors hover:border-[#ffd15a]/40 sm:min-h-[164px]"
+          className="group relative flex min-h-[148px] w-full items-center overflow-hidden rounded-xl border border-white/[0.06] bg-[#626474] transition-colors hover:border-violet-300/40 sm:min-h-[164px]"
         >
           <div className="absolute inset-y-0 right-0 w-[40%] sm:w-[32%]">
             <Image
@@ -724,7 +736,7 @@ function TabContent({
             <p className="max-w-[72%] text-lg font-bold leading-snug text-white sm:text-xl">
               {movie.name}
             </p>
-            <span className="mt-3 inline-flex items-center rounded-md bg-white px-3.5 py-2 text-xs font-semibold text-[#171923] shadow-sm transition-colors group-hover:bg-[#ffd15a]">
+            <span className="mt-3 inline-flex items-center rounded-md bg-white px-3.5 py-2 text-xs font-semibold text-[#171923] shadow-sm transition-colors group-hover:bg-violet-300">
               Xem bản này
             </span>
           </div>
@@ -779,7 +791,7 @@ function TabContent({
                 className="object-cover group-hover:scale-105 transition-transform"
               />
             </div>
-            <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-[#ffd875]">
+            <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-violet-300">
               {m.name}
             </p>
           </Link>
@@ -826,7 +838,7 @@ function RelatedSection({ related }: { related: ListMovie[] }) {
                 Song ngữ
               </span>
             </div>
-            <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-[#ffd875]">
+            <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-violet-300">
               {m.name}
             </p>
             <p className="text-[11px] text-white/35 line-clamp-1">{m.origin_name}</p>
