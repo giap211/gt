@@ -18,6 +18,9 @@ import {
   LogOut,
   Sun,
   Moon,
+  ChevronRight,
+  History,
+  Settings2,
 } from "lucide-react";
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
@@ -436,29 +439,100 @@ export function BottomDock() {
 
       {/* Account menu overlay */}
       {accountOpen && (
-        <div className="lg:hidden fixed inset-0 z-[70] flex items-end justify-center bg-black/65 px-4 pb-[calc(env(safe-area-inset-bottom)+92px)] backdrop-blur-md" onClick={() => setAccountOpen(false)}>
-          <div className="mobile-account-sheet w-full max-w-sm overflow-hidden rounded-[26px] border border-white/20 bg-[#171923]/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl" style={{ WebkitBackdropFilter: "blur(30px) saturate(170%)" }} onClick={(event) => event.stopPropagation()}>
-            <div className="mb-3 flex items-center justify-between border-b border-white/10 px-1 pb-3">
-              <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ffd875]">Tài khoản</p><p className="mt-1 truncate text-sm font-semibold text-white">{user ? user.username : "Chào mừng bạn"}</p></div>
-              <button type="button" onClick={() => setAccountOpen(false)} aria-label="Đóng menu tài khoản" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70"><X size={18} /></button>
+        <div
+          className="lg:hidden fixed inset-0 z-[70] flex items-end justify-center bg-black/60 px-3 pt-[max(16px,env(safe-area-inset-top))] pb-[calc(env(safe-area-inset-bottom)+104px)] backdrop-blur-md"
+          onClick={() => setAccountOpen(false)}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-label="Tài khoản"
+            className="mobile-account-sheet flex w-full max-w-md flex-col overflow-hidden rounded-[30px] border border-white/20 bg-[#171923]/95 shadow-[0_24px_80px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,.18)] backdrop-blur-2xl"
+            style={{
+              maxHeight: "calc(100dvh - env(safe-area-inset-top) - 124px)",
+              WebkitBackdropFilter: "blur(30px) saturate(175%)",
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="shrink-0 px-5 pt-4">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#ffd875]">Không gian của bạn</p>
+                  <h2 className="mt-1 text-xl font-bold tracking-tight text-white">Tài khoản</h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAccountOpen(false)}
+                  aria-label="Đóng menu tài khoản"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.08] text-white/75 transition active:scale-95 active:bg-white/15"
+                >
+                  <X size={19} />
+                </button>
+              </div>
+
+              <div className="relative mb-4 overflow-hidden rounded-[22px] border border-white/15 bg-gradient-to-br from-white/[0.13] via-white/[0.07] to-[#ffd875]/[0.08] p-4">
+                <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#ffd875]/10 blur-2xl" />
+                <div className="relative flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#ffd875]/30 bg-[#ffd875]/15 text-[#ffd875] shadow-inner">
+                    <UserCircle size={27} strokeWidth={1.7} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-medium text-white/50">{user ? "Chào mừng trở lại" : "Trải nghiệm xem phim của bạn"}</p>
+                    <p className="mt-0.5 truncate text-base font-bold text-white">{user ? user.username : "Chào mừng bạn!"}</p>
+                    <p className="mt-0.5 text-xs text-white/50">{user ? "Tài khoản GiapTran" : "Đăng nhập để đồng bộ lịch sử và tủ phim"}</p>
+                  </div>
+                  {user && <span className="rounded-full border border-[#ffd875]/25 bg-[#ffd875]/10 px-2.5 py-1 text-[10px] font-semibold text-[#ffd875]">Thành viên</span>}
+                </div>
+                {!user && (
+                  <div className="relative mt-4 grid grid-cols-2 gap-2">
+                    <button type="button" onClick={() => { setAccountOpen(false); openAuth("login"); }} className="rounded-full bg-[#ffd875] px-3 py-2.5 text-sm font-bold text-[#171923] shadow-[0_5px_18px_rgba(255,216,117,.18)] active:scale-[.98]">Đăng nhập</button>
+                    <button type="button" onClick={() => { setAccountOpen(false); openAuth("register"); }} className="rounded-full border border-white/20 bg-white/[0.08] px-3 py-2.5 text-sm font-semibold text-white active:bg-white/15">Tạo tài khoản</button>
+                  </div>
+                )}
+              </div>
             </div>
-            <button type="button" onClick={toggleMobileTheme} className="mb-2 flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.07] px-3 py-3 text-left text-sm text-white/90 active:bg-white/10">
-              <span className="flex items-center gap-3">{mobileTheme === "dark" ? <Sun size={18} className="text-[#ffd875]" /> : <Moon size={18} className="text-[#ffd875]" />} Giao diện {mobileTheme === "dark" ? "sáng" : "tối"}</span>
-              <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs">{mobileTheme === "dark" ? "Tối" : "Sáng"}</span>
-            </button>
-            {user ? (
-              <div className="space-y-1">
-                <button type="button" onClick={() => { setAccountOpen(false); openLibrary("favorites"); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm text-white/85 active:bg-white/10"><Bookmark size={18} className="text-[#ffd875]" /> Tủ phim của tôi</button>
-                <button type="button" onClick={() => { setAccountOpen(false); openLibrary("history"); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm text-white/85 active:bg-white/10"><Clock3 size={18} className="text-[#ffd875]" /> Phim đang xem</button>
-                <button type="button" onClick={async () => { setAccountOpen(false); await logout(); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm text-red-300 active:bg-white/10"><LogOut size={18} /> Đăng xuất</button>
+
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4">
+              {user && (
+                <div className="mb-4">
+                  <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">Thư viện cá nhân</p>
+                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045]">
+                    <button type="button" onClick={() => { setAccountOpen(false); openLibrary("favorites"); }} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffd875]/12 text-[#ffd875]"><Bookmark size={18} /></span>
+                      <span className="min-w-0 flex-1"><span className="block font-semibold">Tủ phim của tôi</span><span className="mt-0.5 block text-xs text-white/40">Phim đã lưu và yêu thích</span></span>
+                      <ChevronRight size={17} className="text-white/35" />
+                    </button>
+                    <div className="mx-3.5 border-t border-white/[0.08]" />
+                    <button type="button" onClick={() => { setAccountOpen(false); openLibrary("history"); }} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400/10 text-sky-300"><History size={18} /></span>
+                      <span className="min-w-0 flex-1"><span className="block font-semibold">Phim đang xem</span><span className="mt-0.5 block text-xs text-white/40">Tiếp tục từ nơi bạn đã dừng</span></span>
+                      <ChevronRight size={17} className="text-white/35" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="mb-3">
+                <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">Tùy chỉnh ứng dụng</p>
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045]">
+                  <button type="button" onClick={toggleMobileTheme} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-400/10 text-violet-300">{mobileTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</span>
+                    <span className="min-w-0 flex-1"><span className="block font-semibold">Giao diện</span><span className="mt-0.5 block text-xs text-white/40">Chuyển sang chế độ {mobileTheme === "dark" ? "sáng" : "tối"}</span></span>
+                    <span className="rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-white/65">{mobileTheme === "dark" ? "Tối" : "Sáng"}</span>
+                  </button>
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => { setAccountOpen(false); openAuth("login"); }} className="rounded-full bg-[#ffd875] px-3 py-3 text-sm font-bold text-black">Đăng nhập</button>
-                <button type="button" onClick={() => { setAccountOpen(false); openAuth("register"); }} className="rounded-full border border-white/20 bg-white/10 px-3 py-3 text-sm font-bold text-white">Đăng ký</button>
-              </div>
-            )}
-          </div>
+
+              {user && (
+                <button type="button" onClick={async () => { setAccountOpen(false); await logout(); }} className="flex w-full items-center gap-3 rounded-2xl border border-red-400/15 bg-red-400/[0.055] px-3.5 py-3 text-left text-sm font-semibold text-red-300 transition active:bg-red-400/10">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-400/10"><LogOut size={18} /></span>
+                  Đăng xuất
+                  <ChevronRight size={17} className="ml-auto text-red-300/50" />
+                </button>
+              )}
+              <p className="px-1 pt-3 text-center text-[10px] text-white/25">GIAPTRAN · XEM PHIM THEO CÁCH CỦA BẠN</p>
+            </div>
+          </section>
         </div>
       )}
 
