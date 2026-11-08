@@ -764,3 +764,19 @@ html[data-theme="light"] .listing-page .listing-movie-grid a:hover img {
     transition: none !important;
   }
 }
+
+/* Cinematic hero-to-page transition, coordinated with the violet brand palette. */
+.hero-bottom-fade {
+  background:
+    radial-gradient(ellipse 76% 100% at 50% 100%, rgba(139,92,246,.19) 0%, rgba(168,85,247,.08) 42%, transparent 76%),
+    linear-gradient(to bottom, rgba(11,13,20,0) 0%, rgba(30,18,52,.18) 38%, rgba(15,17,26,.82) 78%, #0f111a 100%);
+}
+html[data-mobile-theme="light"] .hero-bottom-fade,
+html[data-theme="light"] .hero-bottom-fade {
+  background:
+    radial-gradient(ellipse 78% 100% at 50% 100%, rgba(168,85,247,.16) 0%, rgba(192,132,252,.07) 46%, transparent 76%),
+    linear-gradient(to bottom, rgba(242,243,252,0) 0%, rgba(232,224,255,.16) 42%, rgba(242,243,252,.84) 80%, #f2f3fc 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-bottom-fade { transition: none !important; }
+}
