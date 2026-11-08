@@ -513,6 +513,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         @media (orientation:portrait) and (max-width:1023px) {
           /* Xoay toàn bộ giao diện 90° bằng CSS, không phụ thuộc khóa xoay iPhone. */
           .watch-player-page {
+            position:fixed !important;
             inset:auto !important;
             top:50% !important;
             left:50% !important;
@@ -522,6 +523,10 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             height:100vw !important;
             width:100dvh !important;
             height:100vw !important;
+            height:100dvw !important;
+            max-width:none !important;
+            max-height:none !important;
+            margin:0 !important;
             transform:translate(-50%,-50%) rotate(90deg);
             transform-origin:center center;
             overflow:hidden !important;
