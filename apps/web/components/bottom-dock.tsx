@@ -45,6 +45,7 @@ export function BottomDock() {
 
   useEffect(() => {
     setSearchOpen(false);
+    setAccountOpen(false);
   }, [pathname]);
 
   // Prefetch the main dock destinations while the current page is idle.
@@ -105,11 +106,25 @@ export function BottomDock() {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
+  const closeDockPanels = () => {
+    setSearchOpen(false);
+    setAccountOpen(false);
+  };
+
   const handleDockNavigation = (event: React.MouseEvent<HTMLAnchorElement>, active: boolean) => {
+    closeDockPanels();
     if (active) { event.preventDefault(); scrollToTop(); }
   };
 
-  const handleAccount = () => setAccountOpen(true);
+  const handleSearch = () => {
+    setAccountOpen(false);
+    setSearchOpen((open) => !open);
+  };
+
+  const handleAccount = () => {
+    setSearchOpen(false);
+    setAccountOpen((open) => !open);
+  };
 
   const submitSearch = () => {
     const q = query.trim();
@@ -1008,7 +1023,7 @@ export function BottomDock() {
             </Link>
             <button
               type="button"
-              onClick={() => setSearchOpen(true)}
+              onClick={handleSearch}
               className={`rophim-liquid-item ${searchOpen ? "is-active" : ""}`}
               aria-label="Tìm kiếm"
               aria-pressed={searchOpen}
