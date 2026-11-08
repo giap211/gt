@@ -736,7 +736,7 @@ export function BottomDock() {
               transition:background .6s ease,border-color .6s ease,box-shadow .6s ease;
             }
             html[data-mobile-theme] body .rophim-liquid-nav:before{
-              content:"";position:absolute;top:1px;left:12%;right:12%;height:48%;border-radius:9999px 9999px 60% 60%/9999px 9999px 80% 80%;
+              content:"";position:absolute;top:1px;left:1px;right:1px;height:58%;border-radius:9999px 9999px 60% 60%/9999px 9999px 80% 80%;
               background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(192,132,252,.12) 55%,transparent);pointer-events:none;z-index:1;
             }
             html[data-mobile-theme] body .rophim-liquid-nav:after{
