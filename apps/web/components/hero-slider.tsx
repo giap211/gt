@@ -48,7 +48,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
   if (!movies || movies.length === 0) return null;
 
   return (
-    <style jsx global>{`
+    <>
+      <style jsx global>{`
       .home-feature-hero .swiper,.home-feature-hero .swiper-wrapper,.home-feature-hero .swiper-slide { border-radius:inherit; }
       .home-feature-hero .hero-bottom-fade { background:linear-gradient(180deg,transparent 0%,rgba(9,11,19,.25) 30%,#090b13 100%); }
       html[data-mobile-theme="light"] .home-feature-hero .home-hero-side-shade,html[data-theme="light"] .home-feature-hero .home-hero-side-shade { background:linear-gradient(105deg,rgba(248,246,255,.97) 0%,rgba(245,241,255,.88) 55%,rgba(245,241,255,.18) 100%); }
@@ -57,8 +58,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       html[data-mobile-theme="light"] .home-feature-hero h1,html[data-theme="light"] .home-feature-hero h1 { color:#29223d !important;text-shadow:none !important; }
       html[data-mobile-theme="light"] .home-feature-hero p,html[data-theme="light"] .home-feature-hero p { color:rgba(41,34,61,.76) !important; }
       html[data-mobile-theme="light"] .home-feature-hero .hero-source-badge,html[data-theme="light"] .home-feature-hero .hero-source-badge,html[data-mobile-theme="light"] .home-feature-hero .hero-meta-badge,html[data-theme="light"] .home-feature-hero .hero-meta-badge { color:#51436f !important;background:rgba(255,255,255,.68) !important;border-color:rgba(112,84,170,.24) !important; }
-    `}</style>
-    <section className="home-feature-hero relative isolate mx-3 mt-3 h-[590px] overflow-hidden rounded-[26px] border border-violet-300/15 bg-[#090b13] sm:mx-6 sm:h-[640px] md:h-[660px] lg:mx-8 lg:h-[700px]">
+      `}</style>
+      <section className="home-feature-hero relative isolate mx-3 mt-3 h-[590px] overflow-hidden rounded-[26px] border border-violet-300/15 bg-[#090b13] sm:mx-6 sm:h-[640px] md:h-[660px] lg:mx-8 lg:h-[700px]">
       <Swiper
         modules={[Autoplay, EffectFade, Thumbs]}
         effect="fade"
@@ -299,6 +300,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           ))}
         </Swiper>
       </div>
-    </section>
+      </section>
+    </>
   );
 };
