@@ -631,6 +631,59 @@ export function BottomDock() {
             box-shadow: 0 4px 13px rgba(71,86,150,.13), inset 0 1px 0 rgba(255,255,255,.98) !important;
           }
           html[data-mobile-theme="light"] body .topic-grid-chip:active { filter: brightness(.97); }
+
+          /* Visible violet ambient glow on the interest chips, not just a flat glass fill. */
+          html[data-mobile-theme="dark"] body .topic-grid-chip {
+            border-color: rgba(177,145,255,.42) !important;
+            box-shadow:
+              0 0 0 1px rgba(139,92,246,.12),
+              0 0 15px rgba(139,92,246,.34),
+              0 0 30px rgba(99,102,241,.22),
+              0 7px 18px rgba(0,0,0,.28),
+              inset 0 1px 0 rgba(255,255,255,.18) !important;
+          }
+          html[data-mobile-theme="dark"] body .topic-grid-chip:active {
+            box-shadow: 0 0 18px rgba(167,139,250,.55), 0 0 34px rgba(99,102,241,.32) !important;
+          }
+          html[data-mobile-theme="light"] body .topic-grid-chip {
+            border-color: rgba(139,92,246,.34) !important;
+            box-shadow:
+              0 0 0 1px rgba(139,92,246,.08),
+              0 0 13px rgba(139,92,246,.24),
+              0 0 25px rgba(99,102,241,.13),
+              0 6px 16px rgba(71,86,150,.14),
+              inset 0 1px 0 rgba(255,255,255,.98) !important;
+          }
+
+          /* The "Xem toàn bộ" action becomes a compact glass capsule with a glowing arrow. */
+          html[data-mobile-theme="dark"] body .movie-carousel-view-more {
+            color: #e6dcff !important;
+            border: 1px solid rgba(167,139,250,.42) !important;
+            background: linear-gradient(135deg, rgba(139,92,246,.22), rgba(79,70,229,.12)) !important;
+            box-shadow: 0 0 14px rgba(139,92,246,.2), inset 0 1px 0 rgba(255,255,255,.12) !important;
+            text-shadow: 0 0 12px rgba(167,139,250,.28);
+            white-space: nowrap;
+          }
+          html[data-mobile-theme="dark"] body .movie-carousel-view-more-icon {
+            color: #fff !important;
+            background: linear-gradient(135deg, #9b7aff, #6557df) !important;
+            box-shadow: 0 0 12px rgba(139,92,246,.52), inset 0 1px 0 rgba(255,255,255,.35) !important;
+          }
+          html[data-mobile-theme="light"] body .movie-carousel-view-more {
+            color: #55449e !important;
+            border: 1px solid rgba(125,95,220,.27) !important;
+            background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(236,231,255,.94)) !important;
+            box-shadow: 0 0 12px rgba(139,92,246,.17), 0 4px 12px rgba(71,86,150,.1), inset 0 1px 0 #fff !important;
+            white-space: nowrap;
+          }
+          html[data-mobile-theme="light"] body .movie-carousel-view-more-icon {
+            color: #fff !important;
+            background: linear-gradient(135deg, #9877f5, #6557d8) !important;
+            box-shadow: 0 0 10px rgba(139,92,246,.38) !important;
+          }
+          html[data-mobile-theme] body .movie-carousel-view-more:active {
+            transform: scale(.97);
+          }
       `}</style>
 
       {/* Full-screen search overlay */}

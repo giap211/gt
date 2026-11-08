@@ -69,10 +69,12 @@ export const MovieCarousel = ({
             {viewMoreLink && (
               <Link
                 href={viewMoreLink}
-                className="inline-flex items-center gap-1 text-sm text-white/50 hover:text-[#ffd875] transition-colors mt-1"
+                className="movie-carousel-view-more group inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs md:text-sm font-semibold transition-all duration-200 mt-1"
               >
-                Xem toàn bộ
-                <ChevronRight size={14} />
+                <span>Xem toàn bộ</span>
+                <span className="movie-carousel-view-more-icon flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-0.5">
+                  <ChevronRight size={15} strokeWidth={2.4} />
+                </span>
               </Link>
             )}
           </div>
