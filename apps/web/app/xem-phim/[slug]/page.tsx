@@ -595,44 +595,45 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
 
       {overlayOpen && (
         <>
-          <button aria-label="Đóng bảng tùy chọn" onClick={() => setOverlayOpen(false)} className="absolute inset-0 z-40 bg-black/25" />
-          <section className="watch-player-menu">
+          <button aria-label="Đóng bảng tùy chọn" onClick={() => setOverlayOpen(false)} className="fixed inset-0 z-[90] bg-black/70" />
+          <section className="watch-player-menu" role="dialog" aria-modal="true" aria-label="Chọn máy chủ và tập phim">
             <div className="watch-player-menu-header mb-4 flex items-center justify-between">
-              <div><p className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/45">Đang phát</p><h2 className="mt-1 text-lg font-bold">{formatEpisodeName(currentEpisode?.name)}</h2></div>
-              <button onClick={() => setOverlayOpen(false)} className="grid h-9 w-9 place-items-center rounded-full bg-white/10"><X size={18}/></button>
+              <div className="min-w-0"><p className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/45">Đang phát</p><h2 className="mt-1 truncate text-lg font-bold">{formatEpisodeName(currentEpisode?.name)}</h2></div>
+              <button aria-label="Đóng" onClick={() => setOverlayOpen(false)} className="ml-3 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/10"><X size={18}/></button>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between px-1 text-xs font-semibold text-white/55"><span className="flex items-center gap-2"><MonitorPlay size={15}/> Máy chủ</span><span>{episodes[currentServer]?.server_name || "SV 1"}</span></div>
-              <div className="flex flex-wrap gap-2">
-                {episodes.map((server, index) => <button key={`${server.server_name}-${index}`} onClick={() => handleServerChange(index)} className={`rounded-full border px-3.5 py-2 text-xs font-semibold ${currentServer === index ? "active-choice" : "border-white/15 bg-white/[.06] text-white/75"}`}>{server.server_name}</button>)}
+            <div className="watch-player-server-section shrink-0">
+              <div className="mb-2 flex items-center justify-between px-1 text-xs font-semibold text-white/55"><span className="flex items-center gap-2"><MonitorPlay size={15}/> Máy chủ</span><span>{episodes[currentServer]?.server_name || "SV 1"}</span></div>
+              <div className="watch-player-server-list">
+                {episodes.map((server, index) => <button key={`${server.server_name}-${index}`} onClick={() => handleServerChange(index)} className={`shrink-0 rounded-full border px-4 py-2.5 text-xs font-semibold ${currentServer === index ? "active-choice" : "border-white/15 bg-white/[.06] text-white/75"}`}>{server.server_name}</button>)}
               </div>
             </div>
-            <div className="my-4 h-px bg-white/10"/>
-            <div className="mb-2 flex items-center justify-between px-1"><span className="flex items-center gap-2 text-xs font-semibold text-white/55"><List size={15}/> Danh sách tập</span><span className="text-[10px] text-white/40">{currentServerEpisodes.length} tập</span></div>
-            <div className="grid max-h-[min(34dvh,300px)] grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3">
-              {currentServerEpisodes.map((episode, index) => {
+            <div className="watch-player-menu-divider my-3 h-px bg-white/10"/>
+            <div className="mb-2 flex shrink-0 items-center justify-between px-1"><span className="flex items-center gap-2 text-xs font-semibold text-white/65"><List size={15}/> Danh sách tập</span><span className="text-[10px] text-white/45">{currentServerEpisodes.length} tập</span></div>
+            <div className="watch-player-episode-grid grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {currentServerEpisodes.length > 0 ? currentServerEpisodes.map((episode, index) => {
                 const active = episode.slug === currentEpisode?.slug;
                 const match = episode.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) || episode.name.match(/^0*(\d+)$/);
                 const number = Number(match?.[1] || index + 1);
                 const still = episodeStills[number];
-                return <button key={episode.slug} onClick={() => { setOverlayOpen(false); router.push(`/xem-phim/${movie.slug}?tap=${episode.slug}&sv=${currentServer}`); }} className={`overflow-hidden rounded-xl border text-left ${active ? "border-[#ffd875] bg-[#ffd875]/10" : "border-white/10 bg-white/[.045]"}`}>
-                  <div className="relative aspect-video bg-white/5">{still && <Image src={still} alt={formatEpisodeName(episode.name)} fill sizes="160px" className="object-cover"/>}<div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"/><span className="absolute bottom-1.5 left-2 text-[10px] font-bold text-white">{formatEpisodeName(episode.name) || `Tập ${index + 1}`}</span>{active && <span className="absolute right-1.5 top-1.5 rounded-full bg-[#ffd875] px-1.5 py-0.5 text-[8px] font-black text-black">ĐANG XEM</span>}</div>
+                return <button key={episode.slug} onClick={() => { setOverlayOpen(false); router.push(`/xem-phim/${movie.slug}?tap=${episode.slug}&sv=${currentServer}`); }} className={`min-w-0 overflow-hidden rounded-xl border text-left ${active ? "border-[#ffd875] bg-[#ffd875]/10" : "border-white/10 bg-white/[.045]"}`}>
+                  <div className="relative aspect-video bg-white/5">{still && <Image src={still} alt={formatEpisodeName(episode.name)} fill sizes="(max-width: 700px) 30vw, 180px" className="object-cover"/>}<div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"/><span className="absolute bottom-1.5 left-2 text-[10px] font-bold text-white">{formatEpisodeName(episode.name) || `Tập ${index + 1}`}</span>{active && <span className="absolute right-1.5 top-1.5 rounded-full bg-[#ffd875] px-1.5 py-0.5 text-[8px] font-black text-black">ĐANG XEM</span>}</div>
                 </button>;
-              })}
+              }) : <p className="col-span-full rounded-xl border border-white/10 bg-white/[.04] px-4 py-6 text-center text-sm text-white/55">{episodes.length === 0 ? "Đang tải danh sách máy chủ…" : "Máy chủ này chưa có danh sách tập."}</p>}
             </div>
-            <div className="my-4 h-px bg-white/10"/>
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => changePlaybackRate(playbackRate === 1 ? 1.25 : playbackRate === 1.25 ? 1.5 : playbackRate === 1.5 ? 2 : 1)} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[.06] px-3 py-3 text-xs"><span className="flex items-center gap-2 text-white/65"><Gauge size={15}/> Tốc độ</span><b>{playbackRate.toFixed(2).replace(/0$/, "")}x</b></button>
-              <button onClick={enterPlayerFullscreen} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[.06] px-3 py-3 text-xs"><span className="flex items-center gap-2 text-white/65"><MonitorPlay size={15}/> Toàn màn hình</span><b>⛶</b></button>
-            </div>
-            <p className="mt-3 text-[10px] leading-relaxed text-white/35">Chất lượng và phụ đề chọn trong cài đặt gốc của trình phát nếu máy chủ hỗ trợ.</p>
-            <div className="mt-4 flex gap-2">
-              <button disabled={!prevEp} onClick={() => prevEp && router.push(`/xem-phim/${movie.slug}?tap=${prevEp.slug}&sv=${currentServer}`)} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[.06] py-3 text-xs font-semibold disabled:opacity-30"><SkipBack size={14}/> Tập trước</button>
-              <button disabled={!nextEp} onClick={() => nextEp && router.push(`/xem-phim/${movie.slug}?tap=${nextEp.slug}&sv=${currentServer}`)} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#ffd875] py-3 text-xs font-bold text-black disabled:opacity-30">Tập tiếp <SkipForward size={14}/></button>
+            <div className="watch-player-menu-footer shrink-0">
+              <div className="mb-3 grid grid-cols-2 gap-2">
+                <button onClick={() => changePlaybackRate(playbackRate === 1 ? 1.25 : playbackRate === 1.25 ? 1.5 : playbackRate === 1.5 ? 2 : 1)} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[.06] px-3 py-3 text-xs"><span className="flex items-center gap-2 text-white/65"><Gauge size={15}/> Tốc độ</span><b>{playbackRate.toFixed(2).replace(/0$/, "")}x</b></button>
+                <button onClick={enterPlayerFullscreen} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[.06] px-3 py-3 text-xs"><span className="flex items-center gap-2 text-white/65"><MonitorPlay size={15}/> Toàn màn hình</span><b>⛶</b></button>
+              </div>
+              <p className="mb-3 text-[10px] leading-relaxed text-white/35">Chất lượng và phụ đề chọn trong cài đặt gốc của trình phát nếu máy chủ hỗ trợ.</p>
+              <div className="flex gap-2">
+                <button disabled={!prevEp} onClick={() => prevEp && router.push(`/xem-phim/${movie.slug}?tap=${prevEp.slug}&sv=${currentServer}`)} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[.06] py-3 text-xs font-semibold disabled:opacity-30"><SkipBack size={14}/> Tập trước</button>
+                <button disabled={!nextEp} onClick={() => nextEp && router.push(`/xem-phim/${movie.slug}?tap=${nextEp.slug}&sv=${currentServer}`)} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#ffd875] py-3 text-xs font-bold text-black disabled:opacity-30">Tập tiếp <SkipForward size={14}/></button>
+              </div>
             </div>
           </section>
         </>
-      )}
+      )}}
 
     </main>
   );
