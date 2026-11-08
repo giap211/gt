@@ -305,7 +305,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         document.body,
       )}
 
-      <div className="absolute bottom-[18px] left-1/2 z-40 flex -translate-x-1/2 items-center justify-center gap-[7px] sm:bottom-7 sm:gap-2">
+      <div className="pointer-events-auto absolute bottom-[28px] left-1/2 z-[60] flex -translate-x-1/2 items-center justify-center gap-[7px] drop-shadow-[0_1px_5px_rgba(0,0,0,.9)] sm:bottom-9 sm:gap-2">
         {movies.slice(0, 6).map((movie, index) => (
           <button
             key={movie._id}
