@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { Clapperboard, Tv, Sparkles } from "lucide-react";
+import { Clapperboard, Tv, Sparkles, Play, ArrowUpRight, Film } from "lucide-react";
 import { InfiniteMovieGrid } from "@/components/infinite-movie-grid";
 import { FilterBar } from "@/components/filter-bar";
 import {
@@ -18,8 +18,8 @@ export function MovieListingScreen({ type }: { type: string }) {
   const [totalPages, setTotalPages] = useState(1);
 
   const titleMap: Record<string, string> = {
-    "phim-le": "Phim Lẻ Mới",
-    "phim-bo": "Phim Bộ Mới",
+    "phim-le": "Phim Lẻ",
+    "phim-bo": "Phim Bộ",
     "hoat-hinh": "Phim Hoạt Hình",
     "tv-shows": "TV Shows",
     "phim-moi": "Phim Mới Cập Nhật",
@@ -30,43 +30,27 @@ export function MovieListingScreen({ type }: { type: string }) {
   const isMainMovieType = isSeries || isSingle;
   const pageTitle = isSeries ? "Phim Bộ" : isSingle ? "Phim Lẻ" : titleMap[type] || "Danh sách phim";
   const pageSubtitle = isSeries
-    ? "Khám phá những series hấp dẫn, cập nhật tập mới mỗi ngày."
-    : "Tuyển chọn phim điện ảnh đặc sắc, xem trọn vẹn mọi khoảnh khắc.";
+    ? "Theo chân những câu chuyện dài tập, cập nhật những tập mới mỗi ngày."
+    : "Những bộ phim điện ảnh nổi bật, tuyển chọn dành riêng cho bạn.";
 
   const fetchMoviesFromAPI = useCallback(
-    (page: number) => {
-      if (type === "phim-moi") {
-        return getLatestMovies(page);
-      }
-      return getMoviesByType(type, page);
-    },
+    (page: number) => type === "phim-moi" ? getLatestMovies(page) : getMoviesByType(type, page),
     [type],
   );
 
   useEffect(() => {
     let cancelled = false;
-
     const fetchInitial = async () => {
       setIsLoading(true);
       try {
-        // Load several pages together for a full first screen.
-        const pages = [1, 2, 3, 4, 5];
-        const responses = await Promise.all(
-          pages.map((page) => fetchMoviesFromAPI(page)),
-        );
-
+        const responses = await Promise.all([1, 2, 3, 4, 5].map((page) => fetchMoviesFromAPI(page)));
         if (cancelled) return;
-
         const validResults = responses.filter((result) => result && result.status);
         if (validResults.length > 0) {
           const allItems = validResults.flatMap((result) => result.items || []);
-          const unique = Array.from(
-            new Map(allItems.map((movie) => [movie._id, movie])).values(),
-          );
-
+          const unique = Array.from(new Map(allItems.map((movie) => [movie._id, movie])).values());
           setMovies(unique.slice(0, 200));
-          const firstResult = validResults[0];
-          setTotalPages(firstResult?.pagination?.totalPages || 1);
+          setTotalPages(validResults[0]?.pagination?.totalPages || 1);
         } else {
           setMovies([]);
           setTotalPages(1);
@@ -84,15 +68,12 @@ export function MovieListingScreen({ type }: { type: string }) {
         }
       }
     };
-
     void fetchInitial();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [fetchMoviesFromAPI]);
 
   const renderSkeleton = () => (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8" aria-label="Đang tải danh sách phim">
+    <div className="listing-movie-grid" aria-label="Đang tải danh sách phim">
       {Array.from({ length: 12 }).map((_, index) => (
         <div key={index} className="animate-pulse">
           <div className="aspect-[2/3] rounded-2xl bg-white/[0.07] border border-white/[0.06]" />
@@ -103,146 +84,194 @@ export function MovieListingScreen({ type }: { type: string }) {
     </div>
   );
 
+  const heroImage = movies[0]?.poster_url || "";
   return (
-    <main className="min-h-screen bg-[#0b0d14] text-white">
+    <main className="listing-page min-h-screen">
       <style jsx global>{`
-        @media (max-width: 1023px) {
-          html[data-mobile-theme="light"] .listing-hero-card {
-            background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(242,245,250,.96)) !important;
-            border-color: rgba(45,57,78,.12) !important;
-            box-shadow: 0 14px 34px rgba(37,49,69,.08) !important;
-          }
-          html[data-mobile-theme="light"] .listing-hero-eyebrow {
-            color: #9a762d !important;
-          }
-          html[data-mobile-theme="light"] .listing-hero-title {
-            color: #263247 !important;
-            text-shadow: none !important;
-          }
-          html[data-mobile-theme="light"] .listing-hero-subtitle {
-            color: #687184 !important;
-          }
-          html[data-mobile-theme="light"] .listing-tab-inactive {
-            color: #596477 !important;
-            background: rgba(40,52,72,.055) !important;
-            border-color: rgba(40,52,72,.08) !important;
-          }
+        .listing-page {
+          --listing-bg: #090b13;
+          --listing-panel: rgba(22, 24, 38, .78);
+          --listing-panel-solid: #151827;
+          --listing-text: #f7f7fc;
+          --listing-muted: #a1a4b7;
+          --listing-soft: rgba(255,255,255,.07);
+          --listing-border: rgba(255,255,255,.10);
+          --listing-accent: #a78bfa;
+          --listing-accent-2: #d946ef;
+          color: var(--listing-text);
+          background: var(--listing-bg);
+          min-height: 100vh;
+        }
+        .listing-hero {
+          isolation: isolate;
+          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(13,13,29,.91) 48%, rgba(20,12,35,.56) 100%), var(--listing-hero-image);
+          background-size: cover;
+          background-position: center 35%;
+          border: 1px solid var(--listing-border);
+        }
+        .listing-gradient-text {
+          background: linear-gradient(105deg,#c4b5fd 0%,#a78bfa 48%,#e879f9 100%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        }
+        .listing-page .listing-movie-grid {
+          display: grid;
+          grid-template-columns: repeat(3,minmax(0,1fr));
+          column-gap: 11px;
+          row-gap: 25px;
+        }
+        .listing-page .listing-movie-grid > div { min-width: 0; }
+        .listing-page .listing-movie-grid a:first-child {
+          border-radius: 13px;
+        }
+        .listing-page .listing-movie-grid h3 {
+          color: var(--listing-text);
+          font-size: 12px;
+          line-height: 1.45;
+          font-weight: 650;
+        }
+        .listing-page .listing-movie-grid p { color: var(--listing-muted); }
+        .listing-page .listing-filter-shell > div {
+          background: var(--listing-panel) !important;
+          border: 1px solid var(--listing-border) !important;
+          border-radius: 18px !important;
+          box-shadow: none !important;
+          color: var(--listing-text) !important;
+          backdrop-filter: blur(22px) saturate(150%) !important;
+        }
+        .listing-page .listing-filter-shell button { color: var(--listing-text); }
+        .listing-page .listing-filter-shell button:hover { border-color: rgba(167,139,250,.45); }
+        .listing-page .listing-filter-shell [class*="bg-[#0b0d14]"] {
+          background: var(--listing-panel-solid) !important;
+          border-color: var(--listing-border) !important;
+        }
+        .listing-page .listing-filter-shell a:hover {
+          background: linear-gradient(110deg,#8b5cf6,#a855f7,#d946ef) !important;
+          color: white !important;
+        }
+        .listing-page .listing-chip {
+          border: 1px solid var(--listing-border);
+          background: var(--listing-soft);
+          color: var(--listing-muted);
+          white-space: nowrap;
+        }
+        .listing-page .listing-chip-active {
+          color: white;
+          border-color: rgba(192,132,252,.65);
+          background: linear-gradient(110deg,#8b5cf6,#a855f7,#d946ef);
+        }
+        @media (min-width: 640px) {
+          .listing-page .listing-movie-grid { grid-template-columns: repeat(4,minmax(0,1fr)); column-gap: 16px; row-gap: 32px; }
+          .listing-page .listing-movie-grid h3 { font-size: 14px; }
+        }
+        @media (min-width: 1024px) {
+          .listing-page .listing-movie-grid { grid-template-columns: repeat(6,minmax(0,1fr)); }
+        }
+        html[data-mobile-theme="light"] .listing-page,
+        html[data-theme="light"] .listing-page {
+          --listing-bg: #f5f4fa;
+          --listing-panel: rgba(255,255,255,.82);
+          --listing-panel-solid: #ffffff;
+          --listing-text: #242137;
+          --listing-muted: #77758a;
+          --listing-soft: rgba(83,68,120,.055);
+          --listing-border: rgba(70,55,110,.12);
+          background: var(--listing-bg) !important;
+          color: var(--listing-text) !important;
+        }
+        html[data-mobile-theme="light"] .listing-hero,
+        html[data-theme="light"] .listing-hero {
+          background: linear-gradient(105deg,rgba(250,249,255,.97) 0%,rgba(245,241,255,.91) 55%,rgba(232,220,255,.62) 100%), var(--listing-hero-image);
+          border-color: rgba(100,75,150,.14);
+        }
+        html[data-mobile-theme="light"] .listing-page .listing-filter-shell [class*="text-white"],
+        html[data-theme="light"] .listing-page .listing-filter-shell [class*="text-white"] {
+          color: var(--listing-text) !important;
+        }
+        html[data-mobile-theme="light"] .listing-page .listing-filter-shell [class*="bg-white/"],
+        html[data-theme="light"] .listing-page .listing-filter-shell [class*="bg-white/"] {
+          background: rgba(80,65,120,.055) !important;
+        }
+        html[data-mobile-theme="light"] .listing-page .listing-filter-shell [class*="text-white/"],
+        html[data-theme="light"] .listing-page .listing-filter-shell [class*="text-white/"] {
+          color: var(--listing-muted) !important;
+        }
+        html[data-mobile-theme="light"] .listing-page .listing-movie-grid h3,
+        html[data-theme="light"] .listing-page .listing-movie-grid h3 { color: var(--listing-text) !important; }
+        html[data-mobile-theme="light"] .listing-page .listing-movie-grid p,
+        html[data-theme="light"] .listing-page .listing-movie-grid p { color: var(--listing-muted) !important; }
+        @media (prefers-reduced-motion: reduce) {
+          .listing-page * { scroll-behavior: auto !important; transition-duration: .01ms !important; }
         }
       `}</style>
 
-      <div className="pt-24 container mx-auto px-4 lg:px-8 pb-20">
+      <div className="mx-auto max-w-[1400px] px-3 pb-24 pt-24 sm:px-6 lg:px-8">
         {isMainMovieType ? (
-          <section className="listing-hero-card relative mb-6 sm:mb-8 overflow-hidden rounded-[26px] border border-white/10 bg-gradient-to-br from-[#1a1e2c] via-[#141824] to-[#10131d] px-4 py-5 sm:px-6 sm:py-6 shadow-[0_18px_48px_rgba(0,0,0,.24)]">
-            <div className="pointer-events-none absolute -right-12 -top-20 h-52 w-52 rounded-full bg-[#ffd875]/[0.09] blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 left-1/3 h-40 w-56 rounded-full bg-indigo-400/[0.08] blur-3xl" />
-
-            <div className="relative flex items-center gap-3 sm:gap-4">
-              <div className="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-2xl border border-[#ffd875]/25 bg-[#ffd875]/[0.12] text-[#ffd875] shadow-[inset_0_1px_0_rgba(255,255,255,.12)]">
-                {isSeries ? <Tv size={25} strokeWidth={1.8} /> : <Clapperboard size={25} strokeWidth={1.8} />}
+          <section
+            className="listing-hero relative mb-6 overflow-hidden rounded-[26px] px-4 py-5 sm:mb-8 sm:px-7 sm:py-7"
+            style={{ "--listing-hero-image": heroImage ? `url("${heroImage}")` : "none" } as React.CSSProperties}
+          >
+            <div className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-28 right-1/4 h-48 w-64 rounded-full bg-fuchsia-500/15 blur-3xl" />
+            <div className="relative z-10 max-w-2xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-300/25 bg-violet-400/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.18em] text-violet-200">
+                <Sparkles size={12} /> ROPHIM · KHÔNG GIAN ĐIỆN ẢNH
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="listing-hero-eyebrow flex items-center gap-1.5 text-[9px] sm:text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#ffd875]/80">
-                  <Sparkles size={11} />
-                  GIAPTRAN · THƯ VIỆN PHIM
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-300/25 bg-violet-400/15 text-violet-200 sm:h-14 sm:w-14">
+                  {isSeries ? <Tv size={25} /> : <Clapperboard size={25} />}
                 </div>
-                <h1 className="listing-hero-title mt-1 text-[26px] sm:text-3xl font-black tracking-tight text-white">
-                  {pageTitle}
-                  <span className="ml-2 align-middle rounded-md border border-[#ffd875]/30 bg-[#ffd875]/10 px-1.5 py-1 text-[9px] font-extrabold uppercase tracking-wider text-[#ffd875]">
-                    {isSeries ? "Series" : "Movies"}
-                  </span>
-                </h1>
-                <p className="listing-hero-subtitle mt-1 max-w-xl text-[11px] sm:text-xs leading-relaxed text-white/50">
-                  {pageSubtitle}
-                </p>
+                <div>
+                  <h1 className="text-[30px] font-black leading-none tracking-tight sm:text-4xl">{pageTitle}</h1>
+                  <p className="mt-2 max-w-lg text-[11px] leading-relaxed text-white/65 sm:text-sm">{pageSubtitle}</p>
+                </div>
               </div>
-              <div className="hidden sm:flex shrink-0 flex-col items-end rounded-2xl border border-white/10 bg-white/[0.045] px-4 py-2.5">
-                <span className="text-xl font-black tabular-nums text-[#ffd875]">
-                  {movies.length ? movies.length.toLocaleString("vi-VN") : "—"}
-                </span>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-white/35">Phim hiển thị</span>
+              <div className="mt-5 flex flex-wrap items-center gap-2 text-[10px] font-semibold text-white/65 sm:text-xs">
+                <span className="rounded-full border border-white/15 bg-black/20 px-3 py-1.5">{movies.length ? `${movies.length.toLocaleString("vi-VN")} tựa phim` : "Tuyển tập dành cho bạn"}</span>
+                <span className="rounded-full border border-white/15 bg-black/20 px-3 py-1.5">Cập nhật liên tục</span>
               </div>
-            </div>
-
-            <div className="relative mt-5 grid grid-cols-2 gap-2 rounded-2xl border border-white/[0.08] bg-black/10 p-1.5">
-              <Link
-                href="/danh-sach/phim-bo"
-                scroll={false}
-                prefetch
-                aria-current={isSeries ? "page" : undefined}
-                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs sm:text-sm font-bold transition-all duration-200 active:scale-[0.98] ${
-                  isSeries
-                    ? "border-[#ffd875]/35 bg-gradient-to-r from-[#ffd875] to-[#f2bd4e] text-[#171923] shadow-[0_4px_16px_rgba(255,216,117,.18)]"
-                    : "listing-tab-inactive border-transparent bg-white/[0.045] text-white/55 hover:bg-white/[0.08] hover:text-white"
-                }`}
-              >
-                <Tv size={16} />
-                Phim bộ
-                {isSeries && <span className="h-1.5 w-1.5 rounded-full bg-[#171923]" />}
-              </Link>
-              <Link
-                href="/danh-sach/phim-le"
-                scroll={false}
-                prefetch
-                aria-current={isSingle ? "page" : undefined}
-                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs sm:text-sm font-bold transition-all duration-200 active:scale-[0.98] ${
-                  isSingle
-                    ? "border-[#ffd875]/35 bg-gradient-to-r from-[#ffd875] to-[#f2bd4e] text-[#171923] shadow-[0_4px_16px_rgba(255,216,117,.18)]"
-                    : "listing-tab-inactive border-transparent bg-white/[0.045] text-white/55 hover:bg-white/[0.08] hover:text-white"
-                }`}
-              >
-                <Clapperboard size={16} />
-                Phim lẻ
-                {isSingle && <span className="h-1.5 w-1.5 rounded-full bg-[#171923]" />}
-              </Link>
-            </div>
-
-            <div className="relative mt-3 flex items-center justify-between text-[10px] text-white/35 sm:hidden">
-              <span>{movies.length ? `${movies.length.toLocaleString("vi-VN")} phim đang hiển thị` : "Danh sách phim dành cho bạn"}</span>
-              <span className="flex items-center gap-1"><Sparkles size={11} className="text-[#ffd875]" /> Cập nhật liên tục</span>
+              <div className="mt-5 grid max-w-md grid-cols-2 gap-2 rounded-2xl border border-white/15 bg-black/20 p-1.5 backdrop-blur-xl">
+                <Link href="/danh-sach/phim-le" scroll={false} prefetch aria-current={isSingle ? "page" : undefined} className={`flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-xs font-extrabold transition-all ${isSingle ? "listing-chip-active" : "text-white/70 hover:bg-white/10"}`}>
+                  <Clapperboard size={16} /> Phim lẻ
+                </Link>
+                <Link href="/danh-sach/phim-bo" scroll={false} prefetch aria-current={isSeries ? "page" : undefined} className={`flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-xs font-extrabold transition-all ${isSeries ? "listing-chip-active" : "text-white/70 hover:bg-white/10"}`}>
+                  <Tv size={16} /> Phim bộ
+                </Link>
+              </div>
+              {movies[0] && (
+                <Link href={`/phim/${movies[0].slug}`} className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-violet-200 transition-colors hover:text-fuchsia-200">
+                  <Play size={13} fill="currentColor" /> Khám phá phim nổi bật <ArrowUpRight size={13} />
+                </Link>
+              )}
             </div>
           </section>
         ) : (
-          <div className="mb-8 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-8 bg-[#ffd875] rounded-full shadow-[0_0_15px_rgba(255,216,117,0.4)]"></div>
-              <h1 className="text-3xl md:text-4xl font-black tracking-tighter italic uppercase text-white drop-shadow-md">
-                {titleMap[type] || "Danh sách phim"}
-              </h1>
-            </div>
-            {movies.length > 0 && (
-              <div className="text-sm font-bold text-white/30 uppercase tracking-[0.2em]">
-                {movies.length.toLocaleString("vi-VN")} phim
-              </div>
-            )}
+          <div className="mb-6 flex items-end justify-between gap-3">
+            <div><p className="mb-1 text-[10px] font-extrabold uppercase tracking-[.2em] text-violet-400">Rophim · Thư viện</p><h1 className="text-2xl font-black tracking-tight sm:text-4xl">{pageTitle}</h1></div>
+            <span className="text-xs text-[var(--listing-muted)]">{movies.length.toLocaleString("vi-VN")} phim</span>
           </div>
         )}
 
-        <FilterBar />
+        <div className="listing-filter-shell"><FilterBar /></div>
 
-        {isLoading && !hasLoaded ? (
-          renderSkeleton()
-        ) : movies.length > 0 ? (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Film size={17} className="text-violet-400" />
+            <h2 className="text-base font-extrabold tracking-tight sm:text-lg">{isSeries ? "Series nổi bật" : isSingle ? "Phim điện ảnh" : "Danh sách phim"}</h2>
+          </div>
+          <span className="text-[10px] font-semibold text-[var(--listing-muted)] sm:text-xs">Mới cập nhật</span>
+        </div>
+
+        {isLoading && !hasLoaded ? renderSkeleton() : movies.length > 0 ? (
           <div className="relative">
-            {isLoading && hasLoaded && (
-              <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold text-[#ffd875]/70" role="status">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ffd875]" />
-                Đang chuyển danh mục...
-              </div>
-            )}
+            {isLoading && hasLoaded && <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold text-violet-400" role="status"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-violet-400" /> Đang chuyển danh mục...</div>}
             <div className={`transition-opacity duration-200 ${isLoading && hasLoaded ? "opacity-75" : "opacity-100"}`}>
-              <InfiniteMovieGrid
-                initialItems={movies}
-                initialTotalPages={totalPages}
-                initialPage={5}
-                fetchMore={fetchMoviesFromAPI}
-                type={type}
-              />
+              <InfiniteMovieGrid initialItems={movies} initialTotalPages={totalPages} initialPage={5} fetchMore={fetchMoviesFromAPI} type={type} />
             </div>
           </div>
         ) : (
-          <div className="py-24 text-center text-sm font-medium text-white/40">
-            Không tìm thấy phim trong danh mục này.
-          </div>
+          <div className="py-24 text-center text-sm font-medium text-[var(--listing-muted)]">Không tìm thấy phim trong danh mục này.</div>
         )}
       </div>
     </main>
