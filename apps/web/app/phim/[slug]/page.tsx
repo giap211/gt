@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { Play, ChevronDown, MessageCircle, Star } from "lucide-react";
+import { Play, ChevronDown, MessageCircle, Star, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -655,6 +655,24 @@ function TabContent({
   related: ListMovie[];
   actorImages: Record<string, string>;
 }) {
+  const [episodeSearch, setEpisodeSearch] = useState("");
+  const [episodePage, setEpisodePage] = useState(0);
+  const EPISODES_PER_PAGE = 50;
+  const normalizedSearch = episodeSearch.trim().toLocaleLowerCase("vi");
+  const filteredEpisodes = normalizedSearch
+    ? currentServerData.filter((ep) =>
+        `${ep.name || ""} ${formatEpisodeName(ep.name)}`.toLocaleLowerCase("vi").includes(normalizedSearch)
+      )
+    : currentServerData;
+  const episodePageCount = Math.max(1, Math.ceil(filteredEpisodes.length / EPISODES_PER_PAGE));
+  const safeEpisodePage = Math.min(episodePage, episodePageCount - 1);
+  const visibleEpisodes = filteredEpisodes.slice(
+    safeEpisodePage * EPISODES_PER_PAGE,
+    (safeEpisodePage + 1) * EPISODES_PER_PAGE
+  );
+  const episodeRangeStart = filteredEpisodes.length ? safeEpisodePage * EPISODES_PER_PAGE + 1 : 0;
+  const episodeRangeEnd = Math.min((safeEpisodePage + 1) * EPISODES_PER_PAGE, filteredEpisodes.length);
+
   if (activeTab === "tập phim") {
     if (isSeries && currentServerData.length > 1) {
       return (
@@ -674,17 +692,83 @@ function TabContent({
               </button>
             ))}
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
-            {currentServerData.map((ep) => (
-              <Link
-                key={ep.slug || ep.name}
-                href={`/xem-phim/${movie.slug}?sv=${selectedServer}&tap=${encodeURIComponent(ep.slug || ep.name)}`}
-                className="flex items-center justify-center gap-1 py-2.5 px-2 rounded-lg bg-[#1c1e2a] border border-white/5 text-[13px] text-white/75 hover:bg-violet-400/15 hover:border-violet-300/40 hover:text-violet-200"
-              >
-                <Play size={11} className="opacity-40" />
-                {formatEpisodeName(ep.name)}
-              </Link>
-            ))}
+          <div className="flex flex-col gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 sm:p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-white">Danh sách tập</p>
+                <p className="mt-0.5 text-[11px] text-white/40">
+                  {filteredEpisodes.length.toLocaleString("vi-VN")} tập{normalizedSearch ? " phù hợp" : ""}
+                  {filteredEpisodes.length > EPISODES_PER_PAGE ? ` · Đang hiển thị ${episodeRangeStart}–${episodeRangeEnd}` : ""}
+                </p>
+              </div>
+              <label className="flex h-10 w-full items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 text-white/45 sm:max-w-[250px]">
+                <Search size={15} className="shrink-0" />
+                <input
+                  value={episodeSearch}
+                  onChange={(event) => { setEpisodeSearch(event.target.value); setEpisodePage(0); }}
+                  placeholder="Tìm số tập..."
+                  inputMode="search"
+                  aria-label="Tìm tập phim"
+                  className="min-w-0 flex-1 bg-transparent text-[13px] text-white outline-none placeholder:text-white/35"
+                />
+              </label>
+            </div>
+            {episodePageCount > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {Array.from({ length: episodePageCount }, (_, page) => {
+                  const start = page * EPISODES_PER_PAGE + 1;
+                  const end = Math.min((page + 1) * EPISODES_PER_PAGE, filteredEpisodes.length);
+                  return (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => setEpisodePage(page)}
+                      aria-pressed={safeEpisodePage === page}
+                      className={`shrink-0 rounded-full border px-3.5 py-2 text-[11px] font-semibold transition-all ${safeEpisodePage === page ? "border-violet-300/50 bg-gradient-to-r from-fuchsia-500/20 to-violet-500/20 text-violet-200 shadow-[0_0_16px_rgba(139,92,246,.12)]" : "border-white/10 bg-white/[0.035] text-white/50 hover:border-violet-300/30 hover:text-white/80"}`}
+                    >
+                      {start}–{end}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {visibleEpisodes.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+                {visibleEpisodes.map((ep) => (
+                  <Link
+                    key={ep.slug || ep.name}
+                    href={`/xem-phim/${movie.slug}?sv=${selectedServer}&tap=${encodeURIComponent(ep.slug || ep.name)}`}
+                    className="flex min-h-10 items-center justify-center gap-1 rounded-xl border border-white/[0.06] bg-[#1c1e2a]/80 px-2 py-2.5 text-[12px] text-white/75 transition-colors hover:border-violet-300/40 hover:bg-violet-400/15 hover:text-violet-200"
+                  >
+                    <Play size={10} className="shrink-0 opacity-40" />
+                    <span className="truncate">{formatEpisodeName(ep.name)}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="py-8 text-center text-sm text-white/40">Không tìm thấy tập phù hợp.</p>
+            )}
+            {episodePageCount > 1 && (
+              <div className="flex items-center justify-between border-t border-white/[0.06] pt-3">
+                <button
+                  type="button"
+                  disabled={safeEpisodePage === 0}
+                  onClick={() => setEpisodePage((page) => Math.max(0, page - 1))}
+                  className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-medium text-white/65 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-25"
+                >
+                  <ChevronLeft size={15} /> Trước
+                </button>
+                <span className="text-[11px] tabular-nums text-white/40">{safeEpisodePage + 1} / {episodePageCount}</span>
+                <button
+                  type="button"
+                  disabled={safeEpisodePage >= episodePageCount - 1}
+                  onClick={() => setEpisodePage((page) => Math.min(episodePageCount - 1, page + 1))}
+                  className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-medium text-white/65 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-25"
+                >
+                  Tiếp <ChevronRight size={15} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       );
