@@ -782,8 +782,8 @@ html[data-theme="light"] .hero-bottom-fade {
 }
 
 
-/* Scroll-reactive violet highlight for movie poster frames.
-   A single root scroll listener drives the shared angle; the poster itself never moves. */
+/* Fixed violet highlight for movie posters on homepage and movie listings.
+   The light stays at one angle and never reacts to page scrolling. */
 .movie-poster-frame {
   isolation: isolate;
 }
@@ -795,9 +795,9 @@ html[data-theme="light"] .hero-bottom-fade {
   padding: 1.35px;
   border-radius: inherit;
   pointer-events: none;
-  opacity: .62;
+  opacity: 1;
   background: conic-gradient(
-    from var(--poster-scroll-angle, 0deg),
+    from 0deg,
     transparent 0deg 238deg,
     rgba(139, 92, 246, .08) 258deg,
     rgba(192, 132, 252, .82) 282deg,
@@ -810,13 +810,4 @@ html[data-theme="light"] .hero-bottom-fade {
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
-  transition: opacity .18s ease;
-}
-html.poster-scroll-active .movie-poster-frame::after {
-  opacity: 1;
-}
-@media (prefers-reduced-motion: reduce) {
-  .movie-poster-frame::after {
-    transition: none;
-  }
 }
