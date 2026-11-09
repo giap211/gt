@@ -795,7 +795,7 @@ html[data-theme="light"] .hero-bottom-fade {
   padding: 1.35px;
   border-radius: inherit;
   pointer-events: none;
-  opacity: 0;
+  opacity: .62;
   background: conic-gradient(
     from var(--poster-scroll-angle, 0deg),
     transparent 0deg 238deg,
