@@ -91,8 +91,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       .home-feature-hero .hero-short-black-fade { height:clamp(64px,16vw,116px);background:linear-gradient(180deg,rgba(11,13,20,0) 0%,rgba(11,13,20,.12) 20%,rgba(11,13,20,.30) 40%,rgba(11,13,20,.55) 60%,rgba(11,13,20,.82) 80%,#0b0d14 100%); }
       .home-feature-hero .hero-top-transition { background:radial-gradient(ellipse 360px 190px at 0% 0%,rgba(139,92,246,.20) 0%,rgba(168,85,247,.10) 28%,rgba(124,58,237,.035) 55%,transparent 78%); }\n      .home-feature-hero .hero-black-transition { height:clamp(105px,24vw,190px);background:linear-gradient(180deg,#090b13 0%,rgba(9,11,19,.92) 18%,rgba(9,11,19,.58) 48%,rgba(9,11,19,.16) 78%,transparent 100%); }
       .home-feature-hero .hero-top-transition::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse 300px 145px at 0% 0%,rgba(192,132,252,.10) 0%,rgba(168,85,247,.035) 42%,transparent 78%); }
-      @keyframes heroSavedPop { 0%{transform:scale(.55) rotate(-18deg);opacity:.3} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }\n      .home-feature-hero .hero-slide-dot { width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 5px rgba(255,255,255,.2);transition:all .28s ease; }
-      .home-feature-hero .hero-slide-dot[aria-current="true"] { width:17px;height:6px;background:linear-gradient(90deg,#e879f9,#8b5cf6);box-shadow:0 0 10px rgba(168,85,247,.85),0 0 20px rgba(168,85,247,.45); }
+      @keyframes heroSavedPop { 0%{transform:scale(.55) rotate(-18deg);opacity:.3} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }\n      .home-feature-hero .hero-slide-dot { width:5px;height:5px;min-width:5px;border-radius:999px;background:rgba(255,255,255,.48);box-shadow:none;transition:opacity .22s ease; }
+      .home-feature-hero .hero-slide-dot[aria-current="true"] { width:5px;min-width:5px;height:5px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.13); }
       html[data-mobile-theme="light"] .home-feature-hero,html[data-theme="light"] .home-feature-hero { background:#f5f3fb; }
       html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition,html[data-theme="light"] .home-feature-hero .hero-top-transition { background:radial-gradient(ellipse 360px 190px at 0% 0%,rgba(139,92,246,.17) 0%,rgba(168,85,247,.08) 30%,rgba(139,92,246,.025) 56%,transparent 78%); }\n      html[data-mobile-theme="light"] .home-feature-hero .hero-black-transition,html[data-theme="light"] .home-feature-hero .hero-black-transition { background:linear-gradient(180deg,rgba(20,16,30,.92) 0%,rgba(20,16,30,.78) 20%,rgba(20,16,30,.42) 54%,rgba(20,16,30,.12) 82%,transparent 100%); }
       html[data-mobile-theme="light"] .home-feature-hero .hero-top-transition::after,html[data-theme="light"] .home-feature-hero .hero-top-transition::after { background:radial-gradient(ellipse 300px 145px at 0% 0%,rgba(139,92,246,.08) 0%,rgba(168,85,247,.025) 42%,transparent 78%); }
@@ -196,13 +196,13 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       </Swiper>
 
       {/* Compact app header: brand and a single notification icon. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between px-5 pt-[max(48px,env(safe-area-inset-top))] sm:px-10 sm:pt-8 md:px-16 lg:hidden">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between px-6 pt-[max(52px,env(safe-area-inset-top))] sm:px-10 sm:pt-8 md:px-16 lg:hidden">
         <Link
           href="/"
           aria-label="PHIM LẬU - Trang chủ"
           className="pointer-events-auto inline-flex items-center"
         >
-          <span className="flex items-center gap-2.5 text-[23px] font-black tracking-[-.06em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,.6)]"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-violet-700 shadow-[0_4px_18px_rgba(168,85,247,.45)]"><Play size={19} fill="white" strokeWidth={0} /></span><span>PHIM <span className="bg-gradient-to-r from-fuchsia-300 to-violet-400 bg-clip-text text-transparent">LẬU</span></span></span>
+          <span className="text-[22px] font-semibold tracking-[-.055em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,.55)]">PHIM LẬU</span>
         </Link>
         <div className="pointer-events-auto flex items-center gap-2">
         <button type="button" aria-label="Tìm kiếm" onClick={() => window.dispatchEvent(new Event("gt:open-search"))} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-[0_5px_20px_rgba(0,0,0,.2)] backdrop-blur-2xl"><Search size={20} /></button>
@@ -298,7 +298,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
         document.body,
       )}
 
-      <div className="pointer-events-auto absolute bottom-[28px] left-1/2 z-[60] flex -translate-x-1/2 items-center justify-center gap-[7px] drop-shadow-[0_1px_5px_rgba(0,0,0,.9)] sm:bottom-9 sm:gap-2">
+      <div className="pointer-events-auto absolute bottom-[28px] left-1/2 z-[60] flex -translate-x-1/2 items-center justify-center gap-[11px] drop-shadow-[0_1px_5px_rgba(0,0,0,.9)] sm:bottom-9 sm:gap-3">
         {movies.slice(0, 6).map((movie, index) => (
           <button
             key={movie._id}
