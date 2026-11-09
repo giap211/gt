@@ -15,7 +15,6 @@ export function PosterScrollMotion() {
     let lastY = window.scrollY;
     let angle = 0;
     let frame = 0;
-    let idleTimer: number | undefined;
 
     const onScroll = () => {
       if (frame) return;
@@ -30,10 +29,6 @@ export function PosterScrollMotion() {
         root.style.setProperty("--poster-scroll-angle", `${angle.toFixed(1)}deg`);
         root.classList.add("poster-scroll-active");
 
-        if (idleTimer !== undefined) window.clearTimeout(idleTimer);
-        idleTimer = window.setTimeout(() => {
-          root.classList.remove("poster-scroll-active");
-        }, 170);
       });
     };
 
@@ -41,8 +36,6 @@ export function PosterScrollMotion() {
     return () => {
       window.removeEventListener("scroll", onScroll);
       if (frame) window.cancelAnimationFrame(frame);
-      if (idleTimer !== undefined) window.clearTimeout(idleTimer);
-      root.classList.remove("poster-scroll-active");
     };
   }, []);
 
