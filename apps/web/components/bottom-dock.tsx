@@ -747,7 +747,7 @@ export function BottomDock() {
             html[data-mobile-theme] body .rophim-liquid-pill{
               position:absolute;z-index:3;top:8px;bottom:8px;left:10px;width:calc((100% - 20px - 16px)/5);border-radius:9999px;
               background:var(--rln-pill-bg);border:1px solid rgba(216,180,254,.82);box-shadow:0 0 0 1px rgba(168,85,247,.16),0 0 16px rgba(168,85,247,.34),0 0 28px rgba(217,70,239,.16),inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(80,20,120,.08);
-              transform:translateX(calc(var(--rln-active,0)*(100% + 4px)));transition:transform .48s cubic-bezier(.34,1.2,.64,1),background .5s ease,box-shadow .5s ease;pointer-events:none;
+              transform:translateX(calc(var(--rln-index,0)*(100% + 4px)));transition:transform .48s cubic-bezier(.34,1.2,.64,1),background .5s ease,box-shadow .5s ease;pointer-events:none;
             }
             html[data-mobile-theme] body .rophim-liquid-item{
               position:relative;z-index:4;display:flex;min-width:0;min-height:44px;flex-direction:column;align-items:center;justify-content:center;
@@ -1052,7 +1052,7 @@ export function BottomDock() {
         <div className="mx-auto max-w-md px-3 pb-2.5 pt-1">
           <nav
             className="rophim-liquid-nav pointer-events-auto"
-            style={{ "--rln-active": dockActiveIndex } as React.CSSProperties}
+            style={{ "--rln-index": dockActiveIndex } as React.CSSProperties}
             aria-label="Điều hướng chính"
           >
             <span className="rophim-liquid-pill" aria-hidden="true" />
