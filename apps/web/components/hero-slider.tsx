@@ -202,7 +202,28 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           aria-label="XemPhim - Trang chủ"
           className="pointer-events-auto inline-flex items-center"
         >
-          <span className="text-[22px] font-semibold tracking-[-.055em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,.55)]">XEMPHIM</span>
+          <svg viewBox="0 0 190 42" role="img" aria-label="XEMPHIM" className="h-[29px] w-[132px] overflow-visible select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="xp-mobile-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#c4b5fd"><animate attributeName="stop-color" values="#c4b5fd;#e879f9;#818cf8;#c4b5fd" dur="5s" repeatCount="indefinite" /></stop>
+                <stop offset="48%" stopColor="#a78bfa"><animate attributeName="stop-color" values="#a78bfa;#818cf8;#e879f9;#a78bfa" dur="5s" repeatCount="indefinite" /></stop>
+                <stop offset="100%" stopColor="#e879f9"><animate attributeName="stop-color" values="#e879f9;#c4b5fd;#a78bfa;#e879f9" dur="5s" repeatCount="indefinite" /></stop>
+              </linearGradient>
+              <linearGradient id="xp-mobile-sweep" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#fff" stopOpacity="0" /><stop offset="50%" stopColor="#fff" stopOpacity=".9" /><stop offset="100%" stopColor="#fff" stopOpacity="0" />
+                <animate attributeName="x1" values="-100%;100%" dur="3.8s" repeatCount="indefinite" /><animate attributeName="x2" values="0%;200%" dur="3.8s" repeatCount="indefinite" />
+              </linearGradient>
+            </defs>
+            <g transform="translate(2 4)">
+              <rect x="1" y="1" width="33" height="33" rx="10" fill="url(#xp-mobile-gradient)" opacity=".16" />
+              <rect x="1" y="1" width="33" height="33" rx="10" fill="none" stroke="url(#xp-mobile-gradient)" strokeWidth="1.7" />
+              <path d="M14 10.5 24 17.5 14 24.5Z" fill="url(#xp-mobile-gradient)" />
+              <path d="M5 8.5V5.5Q5 4 6.5 4H9" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth="1.2" strokeLinecap="round" />
+              <circle cx="29" cy="6" r="1.6" fill="#e879f9"><animate attributeName="opacity" values=".35;1;.35" dur="2s" repeatCount="indefinite" /></circle>
+            </g>
+            <text x="43" y="29.5" fill="url(#xp-mobile-gradient)" fontFamily="var(--font-oswald), Impact, sans-serif" fontSize="26" fontWeight="800" letterSpacing="-.9">XEMPHIM</text>
+            <text x="43" y="29.5" fill="url(#xp-mobile-sweep)" fontFamily="var(--font-oswald), Impact, sans-serif" fontSize="26" fontWeight="800" letterSpacing="-.9" opacity=".32" pointerEvents="none">XEMPHIM</text>
+          </svg>
         </Link>
         <div className="pointer-events-auto flex items-center gap-2">
         <button type="button" aria-label="Tìm kiếm" onClick={() => window.dispatchEvent(new Event("gt:open-search"))} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-[0_5px_20px_rgba(0,0,0,.2)] backdrop-blur-2xl"><Search size={20} /></button>
