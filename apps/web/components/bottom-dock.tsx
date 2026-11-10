@@ -66,7 +66,7 @@ function createKubeDockDisplacement(width: number, height: number): KubeDockDisp
     const y2 = bezelHeightFn(x + dx);
     const derivative = (y2 - y) / dx;
     const magnitude = Math.sqrt(derivative * derivative + 1);
-    const normal = [-derivative / magnitude, -1 / magnitude];
+    const normal: [number, number] = [-derivative / magnitude, -1 / magnitude];
     const refracted = refract(normal[0], normal[1]);
     if (!refracted) return 0;
     const remainingHeightOnBezel = y * bezelWidth;
