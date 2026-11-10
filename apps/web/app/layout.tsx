@@ -31,8 +31,8 @@ import { PersistentTabShell } from "@/components/persistent-tab-shell";
 import { PosterScrollMotion } from "@/components/poster-scroll-motion";
 
 export const metadata: Metadata = {
-  title: "GiapTran - Xem phim chất lượng cao",
-  description: "giaptran web phim",
+  title: "XemPhim",
+  description: "XemPhim",
   verification: {
     google: "1Uk4kBlg_7_euGY9J1Irc0qfh8rwNNNkChREUVxnja8",
   },
