@@ -35,6 +35,7 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
   const isSeries = pathname === "/danh-sach/phim-bo";
   const isSingle = pathname === "/danh-sach/phim-le";
   const isTabRoute = isTabPath(pathname);
+  const isWatchRoute = pathname === "/xem-phim" || pathname.startsWith("/xem-phim/");
 
   useEffect(() => {
     const markBackNavigation = () => { navigationDirection.current = -1; };
@@ -86,7 +87,7 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
       </div>
 
       <AnimatePresence initial={false} mode="sync" custom={navigationDirection.current}>
-        {!isTabRoute ? (
+        {!isTabRoute && !isWatchRoute ? (
           <motion.div
             key={pathname}
             custom={navigationDirection.current}
@@ -105,6 +106,10 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
           </motion.div>
         ) : null}
       </AnimatePresence>
+
+      {isWatchRoute ? (
+        <div className="relative z-10 w-full min-w-0 bg-inherit">{children}</div>
+      ) : null}
     </div>
   );
 }
