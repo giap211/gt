@@ -3,43 +3,53 @@
 import Link from "next/link";
 
 const TOPICS = [
-  { name: "Phim 4K", slug: "phim-4k", href: "/danh-sach/phim-le", icon: "🔥" },
-  { name: "Chiếu Rạp", slug: "chieu-rap", href: "/the-loai/chieu-rap", icon: "🎬" },
-  { name: "Hàn Quốc", slug: "han-quoc", href: "/quoc-gia/han-quoc", icon: "🇰🇷" },
-  { name: "Cổ Trang", slug: "co-trang", href: "/the-loai/co-trang", icon: "⚔️" },
-  { name: "Hoạt Hình", slug: "hoat-hinh", href: "/danh-sach/hoat-hinh", icon: "🪄" },
-  { name: "Kinh Dị", slug: "kinh-di", href: "/the-loai/kinh-di", icon: "👻" },
-  { name: "Âu Mỹ", slug: "au-my", href: "/quoc-gia/au-my", icon: "🌎" },
-  { name: "Trung Quốc", slug: "trung-quoc", href: "/quoc-gia/trung-quoc", icon: "🐉" },
+  { name: "Hành động", href: "/the-loai/hanh-dong" },
+  { name: "Phiêu lưu", href: "/the-loai/phieu-luu" },
+  { name: "Tình cảm", href: "/the-loai/tinh-cam" },
+  { name: "Hài hước", href: "/the-loai/hai-huoc" },
+  { name: "Kinh dị", href: "/the-loai/kinh-di" },
+  { name: "Fantasy", href: "/the-loai/vien-tuong" },
 ];
 
 export const TopicGrid = () => {
   return (
-    <section className="topic-grid-section w-full py-4 md:py-6">
-      <div className="container mx-auto px-3 md:px-8">
-        <div className="topic-grid-heading mb-3.5 flex items-center justify-between gap-3">
-          <h2 className="topic-grid-title text-[17px] md:text-xl font-extrabold tracking-tight">
-            Bạn đang quan tâm gì?
+    <section className="topic-grid-section w-full py-3 md:py-5">
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="topic-grid-heading mb-3 flex items-center justify-between gap-3">
+          <h2 className="topic-grid-title text-[17px] md:text-xl font-bold tracking-tight text-[#1f1a2e] dark:text-white">
+            Bạn đang quan tâm gì
           </h2>
-          <span className="topic-grid-hint shrink-0 text-xs md:text-sm font-semibold">
-            Khám phá
-          </span>
         </div>
-        <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
-          {TOPICS.map((topic) => (
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {TOPICS.map((topic, index) => (
             <Link
-              key={topic.slug}
+              key={topic.name}
               href={topic.href}
-              className="topic-grid-chip group inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-[12px] md:text-sm font-bold tracking-tight !shadow-none !drop-shadow-none transition-all duration-200 active:scale-[.97]"
+              className={
+                "topic-grid-chip shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-all " +
+                (index === 0
+                  ? "bg-violet-600 text-white shadow-md shadow-violet-600/25"
+                  : "bg-white/90 text-[#4b4560] border border-violet-100 shadow-sm")
+              }
             >
-              <span aria-hidden="true" className="topic-grid-icon text-[16px] leading-none">
-                {topic.icon}
-              </span>
-              <span className="whitespace-nowrap">{topic.name}</span>
+              {topic.name}
             </Link>
           ))}
         </div>
       </div>
+      <style jsx global>{`
+        html[data-mobile-theme="dark"] .topic-grid-title {
+          color: #f5f5f7 !important;
+        }
+        html[data-mobile-theme="dark"] .topic-grid-chip:not(:first-child) {
+          background: rgba(255, 255, 255, 0.08) !important;
+          color: rgba(255, 255, 255, 0.75) !important;
+          border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        html[data-mobile-theme="light"] .topic-grid-title {
+          color: #1f1a2e !important;
+        }
+      `}</style>
     </section>
   );
 };
