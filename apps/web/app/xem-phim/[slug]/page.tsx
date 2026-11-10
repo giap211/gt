@@ -74,8 +74,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   // ra trang cha, vì vậy không tự ẩn các nút điều hướng của player.
   const isBackupEmbed = Boolean(
     currentEpisode?.url &&
-    /^https?:\\/\\//i.test(currentEpisode.url) &&
-    !/\\.(?:m3u8|mp4|webm|ogg|mp3)(?:$|[?#])/i.test(currentEpisode.url),
+    /^https?:\/\//i.test(currentEpisode.url) &&
+    !/\.(?:m3u8|mp4|webm|ogg|mp3)(?:$|[?#])/i.test(currentEpisode.url),
   );
   useEffect(() => {
     if (overlayOpen || isBackupEmbed || !showPlayerChrome) return;
@@ -592,7 +592,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           </div>
         </div>
       </div>
-      <div className={`absolute right-4 top-4 z-[70] flex items-center gap-2 transition-opacity duration-200 ${!showPlayerChrome && !overlayOpen ? "watch-player-hidden" : ""}`}>
+      <div className={`absolute right-4 top-4 z-[70] flex items-center gap-2 transition-opacity duration-200 ${!showPlayerChrome && !overlayOpen && !isBackupEmbed ? "watch-player-hidden" : ""}`}>
         <button type="button" aria-label={isPlayerRotated ? "Xoay player về dọc" : "Xoay player sang ngang"} title={isPlayerRotated ? "Xoay về dọc" : "Xoay sang ngang"} onClick={(event) => { event.stopPropagation(); setIsPlayerRotated((rotated) => !rotated); setShowPlayerChrome(true); }} className="watch-player-round watch-player-glass hover:border-[#ffd875]/70">
           <RotateCw size={21}/>
         </button>
