@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -20,6 +20,142 @@ import {
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
 
+/**
+ * Kube Playground refraction pipeline.
+ * Adapted from https://github.com/kube/kube.io/tree/main/app/data/articles/2025_10_04_liquid_glass_css_svg
+ * Keep the ray calculation, 512-sample profile, radial map and RG encoding unchanged.
+ */
+type KubeDockDisplacement = {
+  url: string;
+  width: number;
+  height: number;
+  scale: number;
+};
+
+function createKubeDockDisplacement(width: number, height: number): KubeDockDisplacement | null {
+  if (typeof window === "undefined" || width < 2 || height < 2) return null;
+
+  const dpr = window.devicePixelRatio || 1;
+  const glassThickness = 50;
+  const radius = Math.max(2, Math.min(28, height / 2 - 1));
+  const bezelWidth = Math.max(1, Math.min(18, radius - 1));
+  const refractiveIndex = 1.5;
+  const samples = 512;
+  const eta = 1 / refractiveIndex;
+
+  // Playground's default surface: Convex Circle.
+  const bezelHeightFn = (x: number) => Math.sqrt(1 - (1 - x) ** 2);
+
+  // Exact simplified Snell refraction used by Kube's Playground.
+  function refract(normalX: number, normalY: number): [number, number] | null {
+    const dot = normalY;
+    const k = 1 - eta * eta * (1 - dot * dot);
+    if (k < 0) return null;
+    const kSqrt = Math.sqrt(k);
+    return [
+      -(eta * dot + kSqrt) * normalX,
+      eta - (eta * dot + kSqrt) * normalY,
+    ];
+  }
+
+  // Exact 1D precomputed displacement profile from Kube's Playground.
+  const profile = Array.from({ length: samples }, (_, i) => {
+    const x = i / samples;
+    const y = bezelHeightFn(x);
+    const dx = x < 1 ? 0.0001 : -0.0001;
+    const y2 = bezelHeightFn(x + dx);
+    const derivative = (y2 - y) / dx;
+    const magnitude = Math.sqrt(derivative * derivative + 1);
+    const normal = [-derivative / magnitude, -1 / magnitude];
+    const refracted = refract(normal[0], normal[1]);
+    if (!refracted) return 0;
+    const remainingHeightOnBezel = y * bezelWidth;
+    const remainingHeight = remainingHeightOnBezel + glassThickness;
+    return refracted[0] * (remainingHeight / refracted[1]);
+  });
+
+  const maximumDisplacement = Math.max(...profile.map((value) => Math.abs(value))) || 1;
+  const bufferWidth = Math.max(1, Math.round(width * dpr));
+  const bufferHeight = Math.max(1, Math.round(height * dpr));
+  const imageDataCanvas = document.createElement("canvas");
+  imageDataCanvas.width = bufferWidth;
+  imageDataCanvas.height = bufferHeight;
+  const imageContext = imageDataCanvas.getContext("2d");
+  if (!imageContext) return null;
+
+  // Exact radial rounded-rectangle displacement-map generation from Kube.
+  const imageData = imageContext.createImageData(bufferWidth, bufferHeight);
+  const neutral = 0xff008080;
+  new Uint32Array(imageData.data.buffer).fill(neutral);
+
+  const radius_ = radius * dpr;
+  const bezel = bezelWidth * dpr;
+  const radiusSquared = radius_ ** 2;
+  const radiusPlusOneSquared = (radius_ + 1) ** 2;
+  const radiusMinusBezelSquared = (radius_ - bezel) ** 2;
+  const objectWidth_ = Math.max(1, (width - 2) * dpr);
+  const objectHeight_ = Math.max(1, (height - 2) * dpr);
+  const widthBetweenRadiuses = objectWidth_ - radius_ * 2;
+  const heightBetweenRadiuses = objectHeight_ - radius_ * 2;
+  const objectX = (bufferWidth - objectWidth_) / 2;
+  const objectY = (bufferHeight - objectHeight_) / 2;
+
+  for (let y1 = 0; y1 < objectHeight_; y1++) {
+    for (let x1 = 0; x1 < objectWidth_; x1++) {
+      const idx = ((objectY + y1) * bufferWidth + objectX + x1) * 4;
+      const isOnLeftSide = x1 < radius_;
+      const isOnRightSide = x1 >= objectWidth_ - radius_;
+      const isOnTopSide = y1 < radius_;
+      const isOnBottomSide = y1 >= objectHeight_ - radius_;
+      const x = isOnLeftSide
+        ? x1 - radius_
+        : isOnRightSide
+          ? x1 - radius_ - widthBetweenRadiuses
+          : 0;
+      const y = isOnTopSide
+        ? y1 - radius_
+        : isOnBottomSide
+          ? y1 - radius_ - heightBetweenRadiuses
+          : 0;
+      const distanceToCenterSquared = x * x + y * y;
+      const isInBezel =
+        distanceToCenterSquared <= radiusPlusOneSquared &&
+        distanceToCenterSquared >= radiusMinusBezelSquared;
+
+      if (isInBezel) {
+        const opacity =
+          distanceToCenterSquared < radiusSquared
+            ? 1
+            : 1 -
+              (Math.sqrt(distanceToCenterSquared) - Math.sqrt(radiusSquared)) /
+                (Math.sqrt(radiusPlusOneSquared) - Math.sqrt(radiusSquared));
+        const distanceFromCenter = Math.sqrt(distanceToCenterSquared);
+        const distanceFromSide = radius_ - distanceFromCenter;
+        const cos = x / distanceFromCenter;
+        const sin = y / distanceFromCenter;
+        const bezelIndex =
+          ((distanceFromSide / bezel) * profile.length) | 0;
+        const distance = profile[bezelIndex] ?? 0;
+        const dX = (-cos * distance) / maximumDisplacement;
+        const dY = (-sin * distance) / maximumDisplacement;
+        imageData.data[idx] = 128 + dX * 127 * opacity;
+        imageData.data[idx + 1] = 128 + dY * 127 * opacity;
+        imageData.data[idx + 2] = 0;
+        imageData.data[idx + 3] = 255;
+      }
+    }
+  }
+
+  imageContext.putImageData(imageData, 0, 0);
+  return {
+    url: imageDataCanvas.toDataURL("image/png"),
+    width: bufferWidth,
+    height: bufferHeight,
+    scale: maximumDisplacement,
+  };
+}
+
+
 export function BottomDock() {
   const pathname = usePathname();
   const router = useRouter();
@@ -32,6 +168,10 @@ export function BottomDock() {
   const [results, setResults] = useState<ListMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dockNavRef = useRef<HTMLElement>(null);
+  const refractionFilterId = `gt-kube-refraction-${useId().replace(/:/g, "")}`;
+  const [refractionMap, setRefractionMap] = useState<KubeDockDisplacement | null>(null);
+  const [supportsSvgBackdropFilter, setSupportsSvgBackdropFilter] = useState(false);
 
   const isHome = pathname === "/";
   const isList =
@@ -106,6 +246,45 @@ export function BottomDock() {
     }, 280);
     return () => clearTimeout(timer);
   }, [query]);
+
+
+  // Build the Kube displacement map once for the dock's measured size.
+  // ResizeObserver only rebuilds it when the dock dimensions actually change.
+  useEffect(() => {
+    const nav = dockNavRef.current;
+    if (!nav) return;
+
+    const supportsFilter =
+      typeof CSS !== "undefined" &&
+      CSS.supports("backdrop-filter", `url(#${refractionFilterId})`);
+    setSupportsSvgBackdropFilter(supportsFilter);
+
+    let frame = 0;
+    let lastSize = "";
+    const renderMap = () => {
+      const rect = nav.getBoundingClientRect();
+      const width = Math.round(rect.width);
+      const height = Math.round(rect.height);
+      if (!width || !height) return;
+      const sizeKey = `${width}x${height}x${window.devicePixelRatio || 1}`;
+      if (sizeKey === lastSize) return;
+      lastSize = sizeKey;
+      const nextMap = createKubeDockDisplacement(width, height);
+      setRefractionMap(nextMap);
+    };
+    const scheduleMap = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(renderMap);
+    };
+    const observer = new ResizeObserver(scheduleMap);
+    observer.observe(nav);
+    scheduleMap();
+
+    return () => {
+      observer.disconnect();
+      window.cancelAnimationFrame(frame);
+    };
+  }, [refractionFilterId]);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
   const closeDockPanels = () => {
@@ -245,7 +424,48 @@ export function BottomDock() {
 
       <div className="gt-dock lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-4 pb-3 pt-1">
-          <nav className="gt-dock-nav pointer-events-auto" aria-label="Điều hướng chính">
+          {refractionMap && (
+            <svg
+              aria-hidden="true"
+              className="gt-dock-filter-defs"
+              width="0"
+              height="0"
+              style={{ position: "absolute", overflow: "hidden" }}
+            >
+              <defs>
+                <filter id={refractionFilterId} colorInterpolationFilters="sRGB">
+                  <feImage
+                    href={refractionMap.url}
+                    x={0}
+                    y={0}
+                    width={refractionMap.width}
+                    height={refractionMap.height}
+                    result="displacement_map"
+                  />
+                  <feDisplacementMap
+                    in="SourceGraphic"
+                    in2="displacement_map"
+                    scale={refractionMap.scale}
+                    xChannelSelector="R"
+                    yChannelSelector="G"
+                  />
+                </filter>
+              </defs>
+            </svg>
+          )}
+          <nav
+            ref={dockNavRef}
+            className="gt-dock-nav pointer-events-auto"
+            aria-label="Điều hướng chính"
+            style={
+              refractionMap && supportsSvgBackdropFilter
+                ? {
+                    backdropFilter: `url(#${refractionFilterId}) blur(20px) saturate(160%)`,
+                    WebkitBackdropFilter: `url(#${refractionFilterId}) blur(20px) saturate(160%)`,
+                  }
+                : undefined
+            }
+          >
             <Link
               href="/"
               onClick={(e) => handleDockNavigation(e, isHome)}
