@@ -337,6 +337,9 @@ export default function MovieDetailPage({
         html[data-theme="light"] .movie-tabs,html[data-mobile-theme="light"] .movie-tabs{border-color:transparent}
         html[data-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(2) button,html[data-mobile-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(2) button{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(225,215,255,.55));border-color:rgba(139,92,246,.16);color:#55447d;box-shadow:inset 0 1px 0 #fff,0 5px 18px rgba(90,65,150,.06)}
         html[data-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(3)>a,html[data-mobile-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(3)>a{background:linear-gradient(110deg,rgba(255,255,255,.72),rgba(226,217,255,.48));box-shadow:inset 0 1px 0 #fff}
+        /* Final light-theme override: keep the detail hero fade connected to the light page surface. */
+        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-hero-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 34%,rgba(247,246,252,.08) 54%,rgba(247,246,252,.58) 78%,#f7f6fc 100%)!important}
+        html[data-theme="light"] .movie-detail-mobile-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.42) 68%,#f7f6fc 100%)!important}
       `}</style>
 
       {/* HERO — shorter + lighter overlay so image shows */}
