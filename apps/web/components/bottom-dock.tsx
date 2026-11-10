@@ -32,6 +32,7 @@ export function BottomDock() {
   const [results, setResults] = useState<ListMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
   const isHome = pathname === "/";
   const isList =
     pathname.startsWith("/danh-sach") ||
@@ -135,8 +136,6 @@ export function BottomDock() {
     setSearchOpen(false);
     router.push(`/tim-kiem?keyword=${encodeURIComponent(q)}`);
   };
-
-  const activeDockIndex = searchOpen ? 2 : accountOpen ? 3 : isList ? 1 : 0;
 
   if (isWatchPage) return null;
 
@@ -247,11 +246,6 @@ export function BottomDock() {
       <div className="gt-dock lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-4 pb-3 pt-1">
           <nav className="gt-dock-nav pointer-events-auto" aria-label="Điều hướng chính">
-            <span
-              className="gt-dock-active-indicator"
-              aria-hidden="true"
-              style={{ transform: `translateX(calc(${activeDockIndex} * (100% + 4px)))` }}
-            />
             <Link
               href="/"
               onClick={(e) => handleDockNavigation(e, isHome)}
@@ -353,75 +347,8 @@ export function BottomDock() {
         html[data-mobile-theme="dark"] .gt-dock-nav::before { opacity: .82; }
         html[data-mobile-theme="light"] .gt-dock-nav::before { opacity: .72; }
 
-        .gt-dock-active-indicator {
-          position: absolute;
-          z-index: 0;
-          pointer-events: none;
-          left: 10px;
-          top: 8px;
-          bottom: 8px;
-          width: calc((100% - 32px) / 4);
-          border-radius: 20px;
-          background: linear-gradient(135deg, rgba(255,255,255,.46), rgba(221,214,254,.20) 52%, rgba(255,255,255,.28));
-          border: 1px solid rgba(255,255,255,.58);
-          box-shadow: 0 5px 22px rgba(124,58,237,.18), inset 0 1px 0 rgba(255,255,255,.78), inset 0 -1px 0 rgba(196,181,253,.24);
-          backdrop-filter: blur(18px) saturate(190%);
-          -webkit-backdrop-filter: blur(18px) saturate(190%);
-          transition: transform .42s cubic-bezier(.22,1,.36,1);
-          will-change: transform;
-          overflow: visible;
-          isolation: isolate;
-        }
-        /* Specular rim and soft sheen travel with the selected glass capsule. */
-        .gt-dock-active-indicator::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          padding: 1.15px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: conic-gradient(
-            from -42deg,
-            rgba(255,255,255,.10) 0deg,
-            rgba(255,255,255,.96) 38deg,
-            rgba(221,214,254,.78) 68deg,
-            rgba(255,255,255,.12) 126deg,
-            rgba(167,139,250,.12) 208deg,
-            rgba(196,181,253,.72) 260deg,
-            rgba(255,255,255,.92) 296deg,
-            rgba(255,255,255,.10) 336deg,
-            rgba(255,255,255,.10) 360deg
-          );
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          opacity: .96;
-        }
-        .gt-dock-active-indicator::after {
-          content: "";
-          position: absolute;
-          inset: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background:
-            linear-gradient(115deg, rgba(255,255,255,.28), transparent 34%, transparent 70%, rgba(196,181,253,.16)),
-            radial-gradient(ellipse at 22% 0%, rgba(255,255,255,.22), transparent 58%);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,.24), inset 0 -1px 0 rgba(167,139,250,.18);
-          opacity: .92;
-        }
-        html[data-mobile-theme="dark"] .gt-dock-active-indicator::before { opacity: .88; }
-        html[data-mobile-theme="dark"] .gt-dock-active-indicator::after {
-          background:
-            linear-gradient(115deg, rgba(255,255,255,.22), transparent 36%, transparent 72%, rgba(196,181,253,.18)),
-            radial-gradient(ellipse at 22% 0%, rgba(255,255,255,.16), transparent 58%);
-        }
-        html[data-mobile-theme="dark"] .gt-dock-active-indicator {
-          background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(196,181,253,.18) 52%, rgba(255,255,255,.16));
-          border-color: rgba(255,255,255,.48);
-        }
         .gt-dock-item {
           position: relative;
-          z-index: 1;
           isolation: isolate;
           flex: 1;
           display: flex;
@@ -443,7 +370,45 @@ export function BottomDock() {
           text-decoration: none;
           -webkit-tap-highlight-color: transparent;
         }
-        .gt-dock-item.is-active { color: #fff; background: transparent; box-shadow: none; }
+        .gt-dock-item.is-active {
+          color: #fff;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.13) 0%, rgba(124, 58, 237, 0.075) 52%, rgba(196,181,253,.12) 100%);
+          box-shadow: 0 4px 18px rgba(124, 58, 237, 0.10), inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(167,139,250,.12);
+        }
+        /* The selected capsule gets its own matching specular edge and soft glass sheen. */
+        .gt-dock-item.is-active::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          padding: 1px;
+          border-radius: inherit;
+          pointer-events: none;
+          background: conic-gradient(
+            from -42deg,
+            rgba(255,255,255,.10) 0deg,
+            rgba(255,255,255,.92) 38deg,
+            rgba(221,214,254,.72) 68deg,
+            rgba(255,255,255,.12) 126deg,
+            rgba(167,139,250,.10) 208deg,
+            rgba(196,181,253,.62) 260deg,
+            rgba(255,255,255,.88) 296deg,
+            rgba(255,255,255,.10) 336deg,
+            rgba(255,255,255,.10) 360deg
+          );
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: .9;
+        }
+        .gt-dock-item.is-active::after {
+          content: "";
+          position: absolute;
+          inset: 1px;
+          border-radius: inherit;
+          pointer-events: none;
+          background: linear-gradient(115deg, rgba(255,255,255,.20), transparent 38%, transparent 72%, rgba(196,181,253,.10));
+          opacity: .8;
+        }
         .gt-dock-item > svg,
         .gt-dock-item > span { position: relative; z-index: 1; }
         html[data-mobile-theme="light"] .gt-dock-item:not(.is-active) { color: #9ca3af; }
