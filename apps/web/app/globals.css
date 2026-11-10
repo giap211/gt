@@ -686,34 +686,10 @@ svg[class*="text-yellow-400"] {
   --brand-highlight: rgba(192,132,252,.82);
 }
 
-/* Movie artwork: subtle violet rim, crisp edge, brighter highlight on hover.
-   Scope to movie routes and known listing grids to avoid avatars/logos. */
-a[href^="/phim/"],
-a[href*="/phim/"],
-a[href^="/xem-phim/"],
-.listing-movie-grid a {
-  position: relative;
-  isolation: isolate;
-}
-a[href^="/phim/"] img,
-a[href*="/phim/"] img,
-a[href^="/xem-phim/"] img,
-.listing-movie-grid img,
-.thumbs-slider img {
-  border: 1px solid rgba(167,139,250,.36);
-  border-radius: inherit;
-  box-shadow: 0 0 0 1px rgba(139,92,246,.08), 0 3px 14px rgba(91,33,182,.12);
-  transition: border-color .24s ease, box-shadow .24s ease, filter .24s ease;
-}
-a[href^="/phim/"]:hover img,
-a[href*="/phim/"]:hover img,
-a[href^="/xem-phim/"]:hover img,
-.listing-movie-grid a:hover img,
-.thumbs-slider .swiper-slide-thumb-active img {
-  border-color: rgba(216,180,254,.95);
-  box-shadow: 0 0 0 1px rgba(192,132,252,.42), 0 0 15px rgba(168,85,247,.28), 0 0 28px rgba(217,70,239,.12);
-}
-
+/* Violet edge highlight is reserved for landscape movie cards. */
+.movie-poster-frame-horizontal { position:relative; isolation:isolate; }
+.movie-poster-frame-horizontal img { border:1px solid rgba(167,139,250,.32); border-radius:inherit; box-shadow:0 0 0 1px rgba(139,92,246,.07),0 3px 14px rgba(91,33,182,.10); transition:border-color .24s ease,box-shadow .24s ease,filter .24s ease; }
+.movie-poster-frame-horizontal:hover img { border-color:rgba(216,180,254,.9); box-shadow:0 0 0 1px rgba(192,132,252,.34),0 0 15px rgba(168,85,247,.22); }
 /* Reusable gradient button treatment; existing gold CTA classes are migrated here too. */
 [class~="bg-[#ffd875]"],
 [class~="bg-[#f0c24d]"],
@@ -758,8 +734,7 @@ html[data-theme="light"] .listing-page .listing-movie-grid a:hover img {
   box-shadow: 0 0 0 1px rgba(168,85,247,.22), 0 0 18px rgba(168,85,247,.2);
 }
 @media (prefers-reduced-motion: reduce) {
-  a[href^="/phim/"] img, a[href*="/phim/"] img,
-  a[href^="/xem-phim/"] img, .listing-movie-grid img,
+  .movie-poster-frame-horizontal img,
   button[class*="bg-[#ffd875]"], a[class*="bg-[#ffd875]"] {
     transition: none !important;
   }
@@ -787,7 +762,7 @@ html[data-theme="light"] .hero-bottom-fade {
 .movie-poster-frame {
   isolation: isolate;
 }
-.movie-poster-frame::after {
+.movie-poster-frame-horizontal::after {
   content: "";
   position: absolute;
   z-index: 40;
@@ -909,3 +884,22 @@ html[data-mobile-theme="light"] .movie-detail-page .movie-detail-mobile .grid.gr
   border:1px solid rgba(139,92,246,.17) !important;
   color:#65558f !important;
 }
+
+/* Light theme surfaces for search, account and member overlays. */
+html[data-mobile-theme="light"] .mobile-search-overlay, html[data-mobile-theme="light"] .mobile-account-sheet { background:rgba(248,247,252,.98)!important; color:#29243b!important; -webkit-backdrop-filter:blur(24px) saturate(150%); backdrop-filter:blur(24px) saturate(150%); }
+html[data-mobile-theme="light"] .mobile-search-overlay>div:first-child, html[data-mobile-theme="light"] .mobile-account-sheet>div:first-child { border-color:rgba(105,86,145,.14)!important; }
+html[data-mobile-theme="light"] .mobile-search-overlay input { background:rgba(255,255,255,.9)!important; border-color:rgba(112,91,157,.2)!important; color:#29243b!important; }
+html[data-mobile-theme="light"] .mobile-search-overlay input::placeholder { color:#918aa4!important; }
+html[data-mobile-theme="light"] .mobile-search-overlay .text-white, html[data-mobile-theme="light"] .mobile-account-sheet .text-white { color:#29243b!important; }
+html[data-mobile-theme="light"] .mobile-search-overlay [class*="text-white/"], html[data-mobile-theme="light"] .mobile-account-sheet [class*="text-white/"] { color:#77718a!important; }
+html[data-mobile-theme="light"] .mobile-search-overlay [class*="border-white/"], html[data-mobile-theme="light"] .mobile-account-sheet [class*="border-white/"] { border-color:rgba(105,86,145,.16)!important; }
+html[data-mobile-theme="light"] .mobile-search-overlay [class*="bg-white/"], html[data-mobile-theme="light"] .mobile-account-sheet [class*="bg-white/"] { background-color:rgba(255,255,255,.76)!important; }
+html[data-mobile-theme="light"] .member-modal-backdrop, html[data-theme="light"] .member-modal-backdrop { background:rgba(42,34,66,.22)!important; }
+html[data-mobile-theme="light"] .member-modal-panel, html[data-theme="light"] .member-modal-panel { background:linear-gradient(145deg,#fff 0%,#f7f4ff 100%)!important; border-color:rgba(139,92,246,.18)!important; box-shadow:0 28px 80px rgba(54,40,94,.20),inset 0 1px 0 #fff!important; color:#29243b!important; }
+html[data-mobile-theme="light"] .member-modal-panel :is(h2,h3), html[data-theme="light"] .member-modal-panel :is(h2,h3) { color:#29243b!important; }
+html[data-mobile-theme="light"] .member-modal-panel [class*="text-white"], html[data-theme="light"] .member-modal-panel [class*="text-white"] { color:#5f5875!important; }
+html[data-mobile-theme="light"] .member-modal-panel input, html[data-theme="light"] .member-modal-panel input { background:rgba(255,255,255,.92)!important; color:#29243b!important; border-color:rgba(112,91,157,.2)!important; }
+html[data-mobile-theme="light"] .member-modal-panel input::placeholder, html[data-theme="light"] .member-modal-panel input::placeholder { color:#918aa4!important; }
+html[data-mobile-theme="light"] .ranked-poster-card a, html[data-theme="light"] .ranked-poster-card a { color:#302944!important; }
+html[data-mobile-theme="light"] .ranked-poster-card p, html[data-theme="light"] .ranked-poster-card p { color:#817990!important; }
+html[data-mobile-theme="light"] .ranked-poster-card>div.mt-1>span:first-child, html[data-theme="light"] .ranked-poster-card>div.mt-1>span:first-child { color:#8054dc!important; -webkit-text-fill-color:#8054dc!important; text-shadow:none!important; }
