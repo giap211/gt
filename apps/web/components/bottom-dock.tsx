@@ -21,9 +21,10 @@ import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
 
 /**
- * Kube Playground refraction pipeline.
- * Adapted from https://github.com/kube/kube.io/tree/main/app/data/articles/2025_10_04_liquid_glass_css_svg
- * Keep the ray calculation, 512-sample profile, radial map and RG encoding unchanged.
+ * Kube Playground's displacement-map implementation.
+ * Source: kube/kube.io, liquid_glass_css_svg/lib/displacementMap.ts
+ * and lib/surfaceEquations.ts (commit bd091c537fd502f2d1d4d60817e6f05626508e6b).
+ * The equations, sample count, pixel map generation and channel encoding are kept intact.
  */
 type KubeDockDisplacement = {
   url: string;
@@ -32,21 +33,17 @@ type KubeDockDisplacement = {
   scale: number;
 };
 
-function createKubeDockDisplacement(width: number, height: number): KubeDockDisplacement | null {
-  if (typeof window === "undefined" || width < 2 || height < 2) return null;
+const KUBE_CONVEX_CIRCLE = (x: number) => Math.sqrt(1 - (1 - x) ** 2);
 
-  const dpr = window.devicePixelRatio || 1;
-  const glassThickness = 50;
-  const radius = Math.max(2, Math.min(28, height / 2 - 1));
-  const bezelWidth = Math.max(1, Math.min(18, radius - 1));
-  const refractiveIndex = 1.5;
-  const samples = 512;
+function calculateDisplacementMap(
+  glassThickness = 50,
+  bezelWidth = 60,
+  bezelHeightFn: (x: number) => number = KUBE_CONVEX_CIRCLE,
+  refractiveIndex = 1.5,
+  samples = 512,
+): number[] {
   const eta = 1 / refractiveIndex;
 
-  // Playground's default surface: Convex Circle.
-  const bezelHeightFn = (x: number) => Math.sqrt(1 - (1 - x) ** 2);
-
-  // Exact simplified Snell refraction used by Kube's Playground.
   function refract(normalX: number, normalY: number): [number, number] | null {
     const dot = normalY;
     const k = 1 - eta * eta * (1 - dot * dot);
@@ -58,8 +55,7 @@ function createKubeDockDisplacement(width: number, height: number): KubeDockDisp
     ];
   }
 
-  // Exact 1D precomputed displacement profile from Kube's Playground.
-  const profile = Array.from({ length: samples }, (_, i) => {
+  return Array.from({ length: samples }, (_, i) => {
     const x = i / samples;
     const y = bezelHeightFn(x);
     const dx = x < 1 ? 0.0001 : -0.0001;
@@ -68,33 +64,42 @@ function createKubeDockDisplacement(width: number, height: number): KubeDockDisp
     const magnitude = Math.sqrt(derivative * derivative + 1);
     const normal: [number, number] = [-derivative / magnitude, -1 / magnitude];
     const refracted = refract(normal[0], normal[1]);
+
     if (!refracted) return 0;
+
     const remainingHeightOnBezel = y * bezelWidth;
     const remainingHeight = remainingHeightOnBezel + glassThickness;
     return refracted[0] * (remainingHeight / refracted[1]);
   });
+}
 
-  const maximumDisplacement = Math.max(...profile.map((value) => Math.abs(value))) || 1;
-  const bufferWidth = Math.max(1, Math.round(width * dpr));
-  const bufferHeight = Math.max(1, Math.round(height * dpr));
-  const imageDataCanvas = document.createElement("canvas");
-  imageDataCanvas.width = bufferWidth;
-  imageDataCanvas.height = bufferHeight;
-  const imageContext = imageDataCanvas.getContext("2d");
-  if (!imageContext) return null;
+function calculateDisplacementMap2(
+  canvasWidth: number,
+  canvasHeight: number,
+  objectWidth: number,
+  objectHeight: number,
+  radius: number,
+  bezelWidth: number,
+  maximumDisplacement: number,
+  precomputedDisplacementMap: number[] = [],
+  dpr?: number,
+): ImageData {
+  const devicePixelRatio =
+    dpr ?? (typeof window !== "undefined" ? (window.devicePixelRatio ?? 1) : 1);
+  const bufferWidth = Math.round(canvasWidth * devicePixelRatio);
+  const bufferHeight = Math.round(canvasHeight * devicePixelRatio);
+  const imageData = new ImageData(bufferWidth, bufferHeight);
 
-  // Exact radial rounded-rectangle displacement-map generation from Kube.
-  const imageData = imageContext.createImageData(bufferWidth, bufferHeight);
   const neutral = 0xff008080;
   new Uint32Array(imageData.data.buffer).fill(neutral);
 
-  const radius_ = radius * dpr;
-  const bezel = bezelWidth * dpr;
+  const radius_ = radius * devicePixelRatio;
+  const bezel = bezelWidth * devicePixelRatio;
   const radiusSquared = radius_ ** 2;
   const radiusPlusOneSquared = (radius_ + 1) ** 2;
   const radiusMinusBezelSquared = (radius_ - bezel) ** 2;
-  const objectWidth_ = Math.max(1, (width - 2) * dpr);
-  const objectHeight_ = Math.max(1, (height - 2) * dpr);
+  const objectWidth_ = objectWidth * devicePixelRatio;
+  const objectHeight_ = objectHeight * devicePixelRatio;
   const widthBetweenRadiuses = objectWidth_ - radius_ * 2;
   const heightBetweenRadiuses = objectHeight_ - radius_ * 2;
   const objectX = (bufferWidth - objectWidth_) / 2;
@@ -134,8 +139,8 @@ function createKubeDockDisplacement(width: number, height: number): KubeDockDisp
         const cos = x / distanceFromCenter;
         const sin = y / distanceFromCenter;
         const bezelIndex =
-          ((distanceFromSide / bezel) * profile.length) | 0;
-        const distance = profile[bezelIndex] ?? 0;
+          ((distanceFromSide / bezel) * precomputedDisplacementMap.length) | 0;
+        const distance = precomputedDisplacementMap[bezelIndex] ?? 0;
         const dX = (-cos * distance) / maximumDisplacement;
         const dY = (-sin * distance) / maximumDisplacement;
         imageData.data[idx] = 128 + dX * 127 * opacity;
@@ -146,15 +151,53 @@ function createKubeDockDisplacement(width: number, height: number): KubeDockDisp
     }
   }
 
-  imageContext.putImageData(imageData, 0, 0);
+  return imageData;
+}
+
+function createKubeDockDisplacement(width: number, height: number): KubeDockDisplacement | null {
+  if (typeof window === "undefined" || width < 2 || height < 2) return null;
+
+  // Same Playground defaults: Convex Circle, 50px glass thickness,
+  // 60px bezel width, refractive index 1.5 and 512 ray samples.
+  const bezelWidth = 60;
+  const glassThickness = 50;
+  const refractiveIndex = 1.5;
+  const samples = 512;
+  const radius = Math.min(width, height) / 2;
+  const precomputed = calculateDisplacementMap(
+    glassThickness,
+    bezelWidth,
+    KUBE_CONVEX_CIRCLE,
+    refractiveIndex,
+    samples,
+  );
+  const maximumDisplacement =
+    Math.max(...precomputed.map((value) => Math.abs(value))) || 1;
+
+  const imageData = calculateDisplacementMap2(
+    width,
+    height,
+    width,
+    height,
+    radius,
+    bezelWidth,
+    maximumDisplacement,
+    precomputed,
+  );
+  const canvas = document.createElement("canvas");
+  canvas.width = imageData.width;
+  canvas.height = imageData.height;
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+  context.putImageData(imageData, 0, 0);
+
   return {
-    url: imageDataCanvas.toDataURL("image/png"),
-    width: bufferWidth,
-    height: bufferHeight,
+    url: canvas.toDataURL("image/png"),
+    width: imageData.width,
+    height: imageData.height,
     scale: maximumDisplacement,
   };
 }
-
 
 export function BottomDock() {
   const pathname = usePathname();
@@ -171,7 +214,6 @@ export function BottomDock() {
   const dockNavRef = useRef<HTMLElement>(null);
   const refractionFilterId = `gt-kube-refraction-${useId().replace(/:/g, "")}`;
   const [refractionMap, setRefractionMap] = useState<KubeDockDisplacement | null>(null);
-  const [supportsSvgBackdropFilter, setSupportsSvgBackdropFilter] = useState(false);
 
   const isHome = pathname === "/";
   const isList =
@@ -253,11 +295,6 @@ export function BottomDock() {
   useEffect(() => {
     const nav = dockNavRef.current;
     if (!nav) return;
-
-    const supportsFilter =
-      typeof CSS !== "undefined" &&
-      CSS.supports("backdrop-filter", `url(#${refractionFilterId})`);
-    setSupportsSvgBackdropFilter(supportsFilter);
 
     let frame = 0;
     let lastSize = "";
@@ -458,10 +495,10 @@ export function BottomDock() {
             className="gt-dock-nav pointer-events-auto"
             aria-label="Điều hướng chính"
             style={
-              refractionMap && supportsSvgBackdropFilter
+              refractionMap
                 ? {
-                    backdropFilter: `url(#${refractionFilterId}) blur(20px) saturate(160%)`,
-                    WebkitBackdropFilter: `url(#${refractionFilterId}) blur(20px) saturate(160%)`,
+                    backdropFilter: `url(#${refractionFilterId})`,
+                    WebkitBackdropFilter: `url(#${refractionFilterId})`,
                   }
                 : undefined
             }
@@ -510,138 +547,35 @@ export function BottomDock() {
 
       <style jsx global>{`
         .gt-dock-nav {
-          position: relative;
-          isolation: isolate;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 4px;
+          min-height: 68px;
           padding: 8px 10px;
           border-radius: 28px;
-          background: rgba(255, 255, 255, 0.23);
-          border: 1px solid rgba(139, 92, 246, 0.06);
-          box-shadow: 0 10px 40px rgba(88, 28, 135, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
-          backdrop-filter: blur(20px) saturate(160%);
-          -webkit-backdrop-filter: blur(20px) saturate(160%);
+          background: transparent;
         }
-        /* Directional specular rim: concentrated highlights, not a flat white outline. */
-        .gt-dock-nav::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          padding: 1.15px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: conic-gradient(
-            from -38deg,
-            rgba(255,255,255,.08) 0deg,
-            rgba(255,255,255,.72) 34deg,
-            rgba(221,214,254,.48) 62deg,
-            rgba(255,255,255,.06) 108deg,
-            rgba(255,255,255,.02) 190deg,
-            rgba(196,181,253,.24) 248deg,
-            rgba(255,255,255,.82) 286deg,
-            rgba(255,255,255,.08) 322deg,
-            rgba(255,255,255,.08) 360deg
-          );
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          opacity: .9;
-        }
-        .gt-dock-nav::after {
-          content: "";
-          position: absolute;
-          inset: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: linear-gradient(115deg, rgba(255,255,255,.13), transparent 24%, transparent 72%, rgba(196,181,253,.07));
-          opacity: .55;
-          z-index: -1;
-        }
-        html[data-mobile-theme="dark"] .gt-dock-nav {
-          background: rgba(24, 24, 32, 0.24);
-          border-color: rgba(255, 255, 255, 0.08);
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,.035);
-        }
-        html[data-mobile-theme="dark"] .gt-dock-nav::before { opacity: .82; }
-        html[data-mobile-theme="light"] .gt-dock-nav::before { opacity: .72; }
-
         .gt-dock-item {
-          position: relative;
-          isolation: isolate;
           flex: 1;
+          min-width: 0;
+          min-height: 52px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           gap: 3px;
-          min-height: 52px;
-          padding: 6px 4px;
-          border-radius: 20px;
-          color: #9ca3af;
+          color: inherit;
           font-size: 10px;
           font-weight: 600;
-          letter-spacing: -0.01em;
-          transition: color .2s ease, background .25s ease, box-shadow .25s ease, transform .25s ease;
-          border: none;
-          background: transparent;
-          cursor: pointer;
           text-decoration: none;
+          border: 0;
+          background: transparent;
           -webkit-tap-highlight-color: transparent;
         }
-        .gt-dock-item.is-active {
-          color: #fff;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.13) 0%, rgba(124, 58, 237, 0.075) 52%, rgba(196,181,253,.12) 100%);
-          box-shadow: 0 4px 18px rgba(124, 58, 237, 0.10), inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(167,139,250,.12);
-        }
-        /* The selected capsule gets its own matching specular edge and soft glass sheen. */
-        .gt-dock-item.is-active::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          padding: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: conic-gradient(
-            from -42deg,
-            rgba(255,255,255,.10) 0deg,
-            rgba(255,255,255,.92) 38deg,
-            rgba(221,214,254,.72) 68deg,
-            rgba(255,255,255,.12) 126deg,
-            rgba(167,139,250,.10) 208deg,
-            rgba(196,181,253,.62) 260deg,
-            rgba(255,255,255,.88) 296deg,
-            rgba(255,255,255,.10) 336deg,
-            rgba(255,255,255,.10) 360deg
-          );
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          opacity: .9;
-        }
-        .gt-dock-item.is-active::after {
-          content: "";
-          position: absolute;
-          inset: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: linear-gradient(115deg, rgba(255,255,255,.20), transparent 38%, transparent 72%, rgba(196,181,253,.10));
-          opacity: .8;
-        }
-        .gt-dock-item > svg,
-        .gt-dock-item > span { position: relative; z-index: 1; }
-        html[data-mobile-theme="light"] .gt-dock-item:not(.is-active) { color: #9ca3af; }
-        html[data-mobile-theme="dark"] .gt-dock-item:not(.is-active) { color: rgba(255, 255, 255, 0.45); }
-        html[data-mobile-theme="light"] .gt-dock-item.is-active { color: #5b21b6; }
-        html[data-mobile-theme="dark"] .gt-dock-item.is-active { color: #fff; }
-        html[data-mobile-theme="light"] body {
-          background: linear-gradient(180deg, #f3f0ff 0%, #f8f7fc 40%, #f5f3fb 100%) !important;
-        }
-        html[data-mobile-theme="dark"] body { background: #0c0c12 !important; }
-        @media (prefers-reduced-motion: reduce) {
-          .gt-dock-item { transition: none; }
-        }
+        .gt-dock-item.is-active { color: #a78bfa; }
+        html[data-mobile-theme="dark"] .gt-dock-nav { color: #fff; }
+        html[data-mobile-theme="light"] .gt-dock-nav { color: #312e41; }
         @media (min-width: 1024px) { .gt-dock { display: none !important; } }
       `}</style>
     </>
