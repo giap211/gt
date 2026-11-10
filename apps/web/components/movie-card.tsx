@@ -127,7 +127,7 @@ export const MovieCard = ({
       <Link
         href={href || `/phim/${slug}`}
         onClick={handleLinkClick}
-        className={`movie-poster-frame block relative overflow-hidden rounded-lg ${
+        className={`movie-poster-frame ${isHorizontal ? "movie-poster-frame-horizontal" : "movie-poster-frame-vertical"} block relative overflow-hidden rounded-lg ${
           isHorizontal ? "aspect-[16/9]" : "aspect-[2/3]"
         }`}
       >

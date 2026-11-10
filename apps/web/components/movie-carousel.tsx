@@ -123,7 +123,7 @@ export const MovieCarousel = ({
               {items.map((movie, index) => (
                 <SwiperSlide key={movie.id} className="h-auto">
                   {layout === "ranked" ? (
-                    <div className="group/ranked flex h-full flex-col">
+                    <div className="group/ranked ranked-poster-card flex h-full flex-col">
                       <svg aria-hidden="true" className="absolute h-0 w-0" focusable="false">
                         <defs>
                           <clipPath id={`cinema-poster-clip-${index}`} clipPathUnits="objectBoundingBox">
