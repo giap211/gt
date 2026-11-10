@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft, Star } from "lucide-react";
 import { MovieCard } from "./movie-card";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -123,6 +123,12 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
                       <h3 className="text-[12px] md:text-[13px] font-semibold text-white line-clamp-1 group-hover/slide:text-[#ffd875] transition-colors leading-tight">
                         <Link href={`/phim/${movie.slug}`}>{movie.title}</Link>
                       </h3>
+                      {movie.rating && Number(movie.rating) > 0 && (
+                        <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold tabular-nums text-violet-400">
+                          <Star size={10} fill="currentColor" />
+                          <span>{Number(movie.rating).toFixed(1)}</span>
+                        </div>
+                      )}
                       {movie.originalTitle && (
                         <p className="text-[10px] text-white/35 line-clamp-1 mt-0.5">
                           {movie.originalTitle}
