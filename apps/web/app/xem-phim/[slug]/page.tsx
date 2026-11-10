@@ -70,46 +70,34 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isPlayerRotated, setIsPlayerRotated] = useState(false);
+  const [frameEl, setFrameEl] = useState<HTMLDivElement | null>(null);
+  const [frame, setFrame] = useState({ w: 0, h: 0 });
 
-  // Keep the manually rotated player in sync with the real iOS visual viewport.
-  // Safari's dynamic browser bars can make 100dvh smaller than the visible screen;
-  // listen to VisualViewport as well as window resize/orientation changes.
   useEffect(() => {
-    const playerPage = document.querySelector<HTMLElement>(".watch-player-page");
-    if (!playerPage) return;
-
-    let lastWidth = 0;
-    let lastHeight = 0;
-    const syncPlayerViewport = () => {
-      const viewport = window.visualViewport;
-      const width = Math.round(viewport?.width || document.documentElement.clientWidth || window.innerWidth);
-      const height = Math.round(viewport?.height || window.innerHeight);
-      playerPage.style.setProperty("--watch-viewport-width", `${width}px`);
-      playerPage.style.setProperty("--watch-viewport-height", `${height}px`);
-
-      // Notify Artplayer only when the viewport dimensions actually change.
-      if (width !== lastWidth || height !== lastHeight) {
-        lastWidth = width;
-        lastHeight = height;
-        window.dispatchEvent(new Event("resize"));
-      }
-    };
-
-    syncPlayerViewport();
-    window.addEventListener("resize", syncPlayerViewport);
-    window.addEventListener("orientationchange", syncPlayerViewport);
-    window.visualViewport?.addEventListener("resize", syncPlayerViewport);
-    window.visualViewport?.addEventListener("scroll", syncPlayerViewport);
-
+    if (!frameEl) return;
+    const measure = () =>
+      setFrame((prev) => {
+        const w = frameEl.clientWidth;
+        const h = frameEl.clientHeight;
+        return prev.w === w && prev.h === h ? prev : { w, h };
+      });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(frameEl);
+    window.addEventListener("orientationchange", measure);
     return () => {
-      window.removeEventListener("resize", syncPlayerViewport);
-      window.removeEventListener("orientationchange", syncPlayerViewport);
-      window.visualViewport?.removeEventListener("resize", syncPlayerViewport);
-      window.visualViewport?.removeEventListener("scroll", syncPlayerViewport);
-      playerPage.style.removeProperty("--watch-viewport-width");
-      playerPage.style.removeProperty("--watch-viewport-height");
+      ro.disconnect();
+      window.removeEventListener("orientationchange", measure);
     };
-  }, [isPlayerRotated]);
+  }, [frameEl]);
+
+  // Chỉ xoay khi điện thoại đang đứng dọc.
+  const rotateActive = isPlayerRotated && frame.h > frame.w;
+
+  // Báo cho Artplayer tính lại kích thước sau mỗi lần đổi khung.
+  useEffect(() => {
+    window.dispatchEvent(new Event("resize"));
+  }, [rotateActive, frame.w, frame.h]);
   // Embed ở server dự phòng chạy trong iframe: thao tác bên trong iframe không nổi bọt
   // ra trang cha, vì vậy không tự ẩn các nút điều hướng của player.
   const isBackupEmbed = Boolean(
@@ -535,9 +523,17 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const suggestedMovies = transformListMovies(latestMovies);
 
   return (
-    <main className={`watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white ${isPlayerRotated ? "watch-player-rotated" : ""}`}>
+    <div ref={setFrameEl} className="fixed inset-0 z-[80] overflow-hidden bg-black">
+    <main
+      className={`watch-page watch-player-page overflow-hidden bg-black text-white ${rotateActive ? "watch-player-rotated" : ""}`}
+      style={
+        rotateActive
+          ? { top: "50%", left: "50%", width: frame.h, height: frame.w, transform: "translate(-50%, -50%) rotate(90deg)" }
+          : undefined
+      }
+    >
       <style jsx global>{`
-        .watch-player-page { width:100vw; height:100dvh; }
+        .watch-player-page { position:absolute; top:0; left:0; width:100%; height:100%; }
         .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
         .watch-player-shell > div { width:100%; height:100%; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
         .watch-player-shell .artplayer-app { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
@@ -565,23 +561,6 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           .watch-player-shell .artplayer-app { height:100% !important; }
         }
         @media (orientation:portrait) and (max-width:1023px) {
-          /* Xoay thủ công bằng nút; không đọc cảm biến và không phụ thuộc khóa xoay iPhone. */
-          .watch-player-page.watch-player-rotated {
-            position:fixed !important;
-            inset:auto !important;
-            top:50% !important;
-            left:50% !important;
-            right:auto !important;
-            bottom:auto !important;
-            width:var(--watch-viewport-height, 100dvh) !important;
-            height:var(--watch-viewport-width, 100vw) !important;
-            max-width:none !important;
-            max-height:none !important;
-            margin:0 !important;
-            transform:translate(-50%,-50%) rotate(90deg);
-            transform-origin:center center;
-            overflow:hidden !important;
-          }
           .watch-player-shell > div,
           .watch-player-shell .artplayer-app {
             width:100% !important;
@@ -621,7 +600,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             introDebugStatus={introDebugStatus}
             onProgress={handlePlaybackProgress}
             onUserInteraction={handlePlayerInteraction}
-            rotated={isPlayerRotated}
+            rotated={rotateActive}
           />
         )}
       </div>
@@ -692,6 +671,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       )}
 
     </main>
+    </div>
   );
 }
 
