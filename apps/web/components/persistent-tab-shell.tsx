@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { HomeScreen } from "@/components/home-screen";
@@ -16,10 +17,22 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const scrollPositions = useRef(new Map<string, number>());
   const previousPath = useRef(pathname);
+  const navigationDirection = useRef<1 | -1>(1);
   const isHome = pathname === "/";
   const isSeries = pathname === "/danh-sach/phim-bo";
   const isSingle = pathname === "/danh-sach/phim-le";
   const isTabRoute = isTabPath(pathname);
+  const isWatchRoute = pathname.startsWith("/xem-phim/");
+
+  useEffect(() => {
+    const markBackNavigation = () => { navigationDirection.current = -1; };
+    window.addEventListener("popstate", markBackNavigation);
+    return () => window.removeEventListener("popstate", markBackNavigation);
+  }, []);
+
+  useEffect(() => {
+    navigationDirection.current = 1;
+  }, [pathname]);
 
   useEffect(() => {
     const rememberTabScroll = (event: MouseEvent) => {
@@ -64,7 +77,25 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
           <MovieListingScreen type="phim-le" />
         </div>
       </div>
-      {!isTabRoute ? children : null}
+      {!isTabRoute ? (
+        isWatchRoute ? children : (
+          <div className="relative w-full overflow-x-clip">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={pathname}
+                initial={{ x: navigationDirection.current === -1 ? "-100%" : "100%", opacity: 0.96 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: navigationDirection.current === -1 ? "18%" : "-18%", opacity: 0.94 }}
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full min-w-0"
+                style={{ willChange: "transform" }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        )
+      ) : null}
     </>
   );
 }
