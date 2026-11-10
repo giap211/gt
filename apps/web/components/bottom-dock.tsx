@@ -1047,7 +1047,7 @@ export function BottomDock() {
                   <ChevronRight size={17} className="ml-auto text-red-300/50" />
                 </button>
               )}
-              <p className="px-1 pt-3 text-center text-[10px] text-white/25">GIAPTRAN · XEM PHIM THEO CÁCH CỦA BẠN</p>
+              <p className="px-1 pt-3 text-center text-[10px] text-white/25">XEMPHIM</p>
             </div>
           </section>
         </div>
