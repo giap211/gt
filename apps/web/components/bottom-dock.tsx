@@ -244,7 +244,7 @@ export function BottomDock() {
         </div>
       )}
 
-      <div className="gt-dock lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
+      <div className="gt-dock lg:hidden fixed bottom-4 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-4 pb-3 pt-1">
           <nav className="gt-dock-nav pointer-events-auto" aria-label="Điều hướng chính">
             <LiquidGlassDockSurface />
