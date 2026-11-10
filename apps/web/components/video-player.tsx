@@ -548,67 +548,6 @@ export const VideoPlayer = ({
         let progressPointerId: number | null = null;
         const progressElement = (art.template as any).$progress as HTMLElement | undefined;
 
-        let progressGlassPointerId: number | null = null;
-        const progressGlassStyle = document.createElement("style");
-        progressGlassStyle.dataset.gtProgressGlass = "true";
-        progressGlassStyle.textContent = `
-          /* Keep Artplayer's own progress geometry: only skin the rail and thumb.
-             Oversized fixed dimensions/translate(50%) pushed the controls out of
-             the player bounds, especially after switching to landscape. */
-          .art-progress {
-            height: 4px !important;
-            min-height: 4px !important;
-            border-radius: 999px !important;
-            overflow: visible !important;
-            background: rgba(137,137,143,.42) !important;
-            touch-action: none;
-          }
-          .art-progress .art-progress-loaded,
-          .art-progress .art-progress-played {
-            height: 100% !important;
-            border-radius: 999px !important;
-          }
-          .art-progress .art-progress-played {
-            background: linear-gradient(90deg,#8b5cf6 0%,#a855f7 52%,#d946ef 100%) !important;
-          }
-          /* Do not override Artplayer's left/right/transform positioning. */
-          .art-progress .art-progress-indicator {
-            width: 12px !important;
-            height: 12px !important;
-            min-width: 12px !important;
-            min-height: 12px !important;
-            border-radius: 50% !important;
-            background: #fff !important;
-            border: 1px solid rgba(255,255,255,.9) !important;
-            box-shadow: 0 2px 9px rgba(0,0,0,.28), 0 0 0 3px rgba(139,92,246,.16) !important;
-            transition: width .18s ease, height .18s ease, box-shadow .18s ease !important;
-            pointer-events: none !important;
-          }
-          .art-progress.gt-progress-dragging .art-progress-indicator,
-          .art-progress:active .art-progress-indicator {
-            width: 16px !important;
-            height: 16px !important;
-            box-shadow: 0 3px 12px rgba(0,0,0,.3), 0 0 0 4px rgba(139,92,246,.24) !important;
-          }
-        `;
-        document.head.appendChild(progressGlassStyle);
-        const onProgressGlassPointerDown = (event: PointerEvent) => {
-          if (!progressElement || !progressElement.contains(event.target as Node)) return;
-          progressGlassPointerId = event.pointerId;
-          progressElement.classList.add("gt-progress-dragging");
-        };
-        const onProgressGlassPointerEnd = (event: PointerEvent) => {
-          if (progressGlassPointerId !== event.pointerId) return;
-          progressGlassPointerId = null;
-          progressElement?.classList.remove("gt-progress-dragging");
-        };
-        if (progressElement) {
-          progressElement.style.touchAction = "none";
-          progressElement.addEventListener("pointerdown", onProgressGlassPointerDown);
-        }
-        document.addEventListener("pointerup", onProgressGlassPointerEnd, true);
-        document.addEventListener("pointercancel", onProgressGlassPointerEnd, true);
-
         const seekFromRotatedProgress = (clientY: number) => {
           if (!progressElement || !art || !rotatedRef.current) return;
           const rect = progressElement.getBoundingClientRect();
@@ -627,8 +566,6 @@ export const VideoPlayer = ({
 
           progressDragging = true;
           progressPointerId = event.pointerId;
-          progressGlassPointerId = event.pointerId;
-          progressElement.classList.add("gt-progress-dragging");
           event.preventDefault();
           event.stopPropagation();
           event.stopImmediatePropagation();
@@ -651,8 +588,6 @@ export const VideoPlayer = ({
           seekFromRotatedProgress(event.clientY);
           progressDragging = false;
           progressPointerId = null;
-          progressGlassPointerId = null;
-          progressElement?.classList.remove("gt-progress-dragging");
         };
 
         container.addEventListener("pointerdown", onProgressPointerDown, true);
@@ -806,14 +741,6 @@ export const VideoPlayer = ({
           document.removeEventListener("pointermove", onProgressPointerMove, true);
           document.removeEventListener("pointerup", onProgressPointerUp, true);
           document.removeEventListener("pointercancel", onProgressPointerUp, true);
-          if (progressElement) {
-            progressElement.style.touchAction = "";
-            progressElement.removeEventListener("pointerdown", onProgressGlassPointerDown);
-            progressElement.classList.remove("gt-progress-dragging");
-          }
-          document.removeEventListener("pointerup", onProgressGlassPointerEnd, true);
-          document.removeEventListener("pointercancel", onProgressGlassPointerEnd, true);
-          progressGlassStyle.remove();
           container.removeEventListener("pointerdown", onTapPointerDown);
           container.removeEventListener("pointermove", onTapPointerMove);
           container.removeEventListener("pointerup", onPointerUp);

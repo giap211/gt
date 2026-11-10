@@ -32,19 +32,6 @@ export function BottomDock() {
   const [results, setResults] = useState<ListMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const dockNavRef = useRef<HTMLElement>(null);
-  const dockPointerRef = useRef<{
-    pointerId: number;
-    startX: number;
-    startY: number;
-    startIndex: number;
-    lastIndex: number;
-    dragging: boolean;
-  } | null>(null);
-  const suppressDockClickRef = useRef(false);
-  const [dockDragIndex, setDockDragIndex] = useState<number | null>(null);
-  const [dockDragRect, setDockDragRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
-
   const isHome = pathname === "/";
   const isList =
     pathname.startsWith("/danh-sach") ||
@@ -128,11 +115,6 @@ export function BottomDock() {
     event: React.MouseEvent<HTMLAnchorElement>,
     active: boolean,
   ) => {
-    if (suppressDockClickRef.current) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
     closeDockPanels();
     if (active) {
       event.preventDefault();
@@ -140,12 +122,10 @@ export function BottomDock() {
     }
   };
   const handleSearch = () => {
-    if (suppressDockClickRef.current) return;
     setAccountOpen(false);
     setSearchOpen((open) => !open);
   };
   const handleAccount = () => {
-    if (suppressDockClickRef.current) return;
     setSearchOpen(false);
     setAccountOpen((open) => !open);
   };
@@ -156,123 +136,7 @@ export function BottomDock() {
     router.push(`/tim-kiem?keyword=${encodeURIComponent(q)}`);
   };
 
-  const dockItemAtPoint = (clientX: number, clientY: number) => {
-    const nav = dockNavRef.current;
-    const target = document.elementFromPoint(clientX, clientY);
-    const item = target instanceof HTMLElement ? target.closest<HTMLElement>(".gt-dock-item") : null;
-    if (!nav || !item || !nav.contains(item)) return null;
-    const items = Array.from(nav.querySelectorAll<HTMLElement>(".gt-dock-item"));
-    const index = items.indexOf(item);
-    if (index < 0) return null;
-    const navRect = nav.getBoundingClientRect();
-    const itemRect = item.getBoundingClientRect();
-    return {
-      index,
-      rect: {
-        left: itemRect.left - navRect.left,
-        top: itemRect.top - navRect.top,
-        width: itemRect.width,
-        height: itemRect.height,
-      },
-    };
-  };
-
-  const activateDockItem = (index: number) => {
-    if (index === 0) {
-      closeDockPanels();
-      if (isHome) scrollToTop();
-      else router.push("/");
-    } else if (index === 1) {
-      closeDockPanels();
-      if (isList) scrollToTop();
-      else router.push("/danh-sach/phim-bo");
-    } else if (index === 2) {
-      setAccountOpen(false);
-      setSearchOpen(true);
-    } else if (index === 3) {
-      setSearchOpen(false);
-      setAccountOpen(true);
-    }
-  };
-
-  const handleDockPointerDown = (event: React.PointerEvent<HTMLElement>) => {
-    if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
-    const target = event.target as HTMLElement;
-    const item = target.closest<HTMLElement>(".gt-dock-item");
-    const nav = dockNavRef.current;
-    if (!item || !nav) return;
-    const items = Array.from(nav.querySelectorAll<HTMLElement>(".gt-dock-item"));
-    const index = items.indexOf(item);
-    if (index < 0) return;
-    dockPointerRef.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      startIndex: index,
-      lastIndex: index,
-      dragging: false,
-    };
-    const hit = dockItemAtPoint(event.clientX, event.clientY);
-    if (hit) {
-      setDockDragIndex(index);
-      setDockDragRect(hit.rect);
-    }
-    dockNavRef.current?.classList.add("is-pressing");
-  };
-
-  const handleDockPointerMove = (event: React.PointerEvent<HTMLElement>) => {
-    const pointer = dockPointerRef.current;
-    const nav = dockNavRef.current;
-    if (!pointer || !nav || pointer.pointerId !== event.pointerId) return;
-    if (!pointer.dragging) {
-      if (Math.hypot(event.clientX - pointer.startX, event.clientY - pointer.startY) < 8) return;
-      pointer.dragging = true;
-      suppressDockClickRef.current = true;
-      try { nav.setPointerCapture(event.pointerId); } catch { /* capture may be unavailable */ }
-      nav.classList.add("is-dragging");
-    }
-    event.preventDefault();
-    const hit = dockItemAtPoint(event.clientX, event.clientY);
-    if (!hit) {
-      pointer.lastIndex = -1;
-      setDockDragIndex(null);
-      setDockDragRect(null);
-      return;
-    }
-    pointer.lastIndex = hit.index;
-    setDockDragIndex(hit.index);
-    setDockDragRect(hit.rect);
-  };
-
-  const finishDockPointer = (event: React.PointerEvent<HTMLElement>, cancelled = false) => {
-    const pointer = dockPointerRef.current;
-    const nav = dockNavRef.current;
-    if (!pointer || pointer.pointerId !== event.pointerId) return;
-    dockPointerRef.current = null;
-    nav?.classList.remove("is-pressing");
-    if (pointer.dragging) {
-      event.preventDefault();
-      nav?.classList.remove("is-dragging");
-      try { if (nav?.hasPointerCapture(event.pointerId)) nav.releasePointerCapture(event.pointerId); } catch { /* ignore */ }
-      const finalHit = dockItemAtPoint(event.clientX, event.clientY);
-      const finalIndex = finalHit?.index ?? -1;
-      setDockDragIndex(null);
-      setDockDragRect(null);
-      if (!cancelled && finalIndex >= 0) activateDockItem(finalIndex);
-      // Keep the guard alive through the browser's synthetic click after pointerup.
-      window.setTimeout(() => { suppressDockClickRef.current = false; }, 180);
-    } else {
-      setDockDragIndex(null);
-      setDockDragRect(null);
-      suppressDockClickRef.current = false;
-    }
-  };
-
-  const handleDockClickCapture = (event: React.MouseEvent<HTMLElement>) => {
-    if (!suppressDockClickRef.current) return;
-    event.preventDefault();
-    event.stopPropagation();
-  };
+  const activeDockIndex = searchOpen ? 2 : accountOpen ? 3 : isList ? 1 : 0;
 
   if (isWatchPage) return null;
 
@@ -382,32 +246,16 @@ export function BottomDock() {
 
       <div className="gt-dock lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-4 pb-3 pt-1">
-          <nav
-            ref={dockNavRef}
-            className={`gt-dock-nav pointer-events-auto ${dockDragIndex !== null ? "is-dragging" : ""}`}
-            aria-label="Điều hướng chính"
-            onPointerDown={handleDockPointerDown}
-            onPointerMove={handleDockPointerMove}
-            onPointerUp={(event) => finishDockPointer(event)}
-            onPointerCancel={(event) => finishDockPointer(event, true)}
-            onClickCapture={handleDockClickCapture}
-          >
-            {dockDragRect && (
-              <span
-                className="gt-dock-drag-indicator"
-                aria-hidden="true"
-                style={{
-                  left: dockDragRect.left,
-                  top: dockDragRect.top,
-                  width: dockDragRect.width,
-                  height: dockDragRect.height,
-                }}
-              />
-            )}
+          <nav className="gt-dock-nav pointer-events-auto" aria-label="Điều hướng chính">
+            <span
+              className="gt-dock-active-indicator"
+              aria-hidden="true"
+              style={{ transform: `translateX(calc(${activeDockIndex} * (100% + 4px)))` }}
+            />
             <Link
               href="/"
               onClick={(e) => handleDockNavigation(e, isHome)}
-              className={`gt-dock-item ${isHome && !searchOpen && !accountOpen ? "is-active" : ""} ${dockDragIndex === 0 ? "is-drag-target" : ""}`}
+              className={`gt-dock-item ${isHome && !searchOpen && !accountOpen ? "is-active" : ""}`}
               aria-current={isHome && !searchOpen && !accountOpen ? "page" : undefined}
             >
               <Home size={22} strokeWidth={isHome && !searchOpen && !accountOpen ? 2.4 : 1.8} />
@@ -416,7 +264,7 @@ export function BottomDock() {
             <Link
               href="/danh-sach/phim-bo"
               onClick={(e) => handleDockNavigation(e, isList)}
-              className={`gt-dock-item ${isList && !searchOpen && !accountOpen ? "is-active" : ""} ${dockDragIndex === 1 ? "is-drag-target" : ""}`}
+              className={`gt-dock-item ${isList && !searchOpen && !accountOpen ? "is-active" : ""}`}
               aria-current={isList && !searchOpen && !accountOpen ? "page" : undefined}
             >
               <Clapperboard size={22} strokeWidth={isList && !searchOpen && !accountOpen ? 2.4 : 1.8} />
@@ -425,7 +273,7 @@ export function BottomDock() {
             <button
               type="button"
               onClick={handleSearch}
-              className={`gt-dock-item ${searchOpen ? "is-active" : ""} ${dockDragIndex === 2 ? "is-drag-target" : ""}`}
+              className={`gt-dock-item ${searchOpen ? "is-active" : ""}`}
               aria-label="Tìm kiếm"
               aria-pressed={searchOpen}
             >
@@ -435,7 +283,7 @@ export function BottomDock() {
             <button
               type="button"
               onClick={handleAccount}
-              className={`gt-dock-item ${accountOpen ? "is-active" : ""} ${dockDragIndex === 3 ? "is-drag-target" : ""}`}
+              className={`gt-dock-item ${accountOpen ? "is-active" : ""}`}
               aria-label="Cá nhân"
               aria-pressed={accountOpen}
             >
@@ -449,7 +297,6 @@ export function BottomDock() {
       <style jsx global>{`
         .gt-dock-nav {
           position: relative;
-          touch-action: pan-y;
           isolation: isolate;
           display: flex;
           align-items: center;
@@ -506,49 +353,26 @@ export function BottomDock() {
         html[data-mobile-theme="dark"] .gt-dock-nav::before { opacity: .82; }
         html[data-mobile-theme="light"] .gt-dock-nav::before { opacity: .72; }
 
-        .gt-dock-drag-indicator {
+        .gt-dock-active-indicator {
           position: absolute;
           z-index: 0;
           pointer-events: none;
+          left: 10px;
+          top: 8px;
+          bottom: 8px;
+          width: calc((100% - 32px) / 4);
           border-radius: 20px;
           background: linear-gradient(135deg, rgba(255,255,255,.46), rgba(221,214,254,.20) 52%, rgba(255,255,255,.28));
           border: 1px solid rgba(255,255,255,.58);
           box-shadow: 0 5px 22px rgba(124,58,237,.18), inset 0 1px 0 rgba(255,255,255,.78), inset 0 -1px 0 rgba(196,181,253,.24);
           backdrop-filter: blur(18px) saturate(190%);
           -webkit-backdrop-filter: blur(18px) saturate(190%);
-          transform: scale(1.055);
-          opacity: .82;
-          transition: left .075s linear, width .075s linear, top .075s linear, height .075s linear;
+          transition: transform .42s cubic-bezier(.22,1,.36,1);
+          will-change: transform;
         }
-        html[data-mobile-theme="dark"] .gt-dock-drag-indicator {
+        html[data-mobile-theme="dark"] .gt-dock-active-indicator {
           background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(196,181,253,.18) 52%, rgba(255,255,255,.16));
           border-color: rgba(255,255,255,.48);
-        }
-        .gt-dock-nav.is-pressing .gt-dock-item.is-active {
-          background: transparent;
-          box-shadow: none;
-        }
-        .gt-dock-nav.is-pressing .gt-dock-item.is-active::before,
-        .gt-dock-nav.is-pressing .gt-dock-item.is-active::after { opacity: 0; }
-        .gt-dock-nav.is-pressing .gt-dock-drag-indicator {
-          opacity: .78;
-          transform: scale(1.075);
-          filter: blur(.35px);
-        }
-        .gt-dock-nav.is-dragging .gt-dock-item.is-active {
-          background: transparent;
-          box-shadow: none;
-        }
-        .gt-dock-nav.is-dragging .gt-dock-item.is-active::before,
-        .gt-dock-nav.is-dragging .gt-dock-item.is-active::after { opacity: 0; }
-        .gt-dock-item.is-drag-target {
-          color: inherit;
-          transform: none;
-          text-shadow: none;
-        }
-        .gt-dock-nav.is-dragging .gt-dock-drag-indicator {
-          opacity: .92;
-          transform: scale(1.045);
         }
         .gt-dock-item {
           position: relative;
@@ -574,45 +398,7 @@ export function BottomDock() {
           text-decoration: none;
           -webkit-tap-highlight-color: transparent;
         }
-        .gt-dock-item.is-active {
-          color: #fff;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.13) 0%, rgba(124, 58, 237, 0.075) 52%, rgba(196,181,253,.12) 100%);
-          box-shadow: 0 4px 18px rgba(124, 58, 237, 0.10), inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(167,139,250,.12);
-        }
-        /* The selected capsule gets its own matching specular edge and soft glass sheen. */
-        .gt-dock-item.is-active::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          padding: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: conic-gradient(
-            from -42deg,
-            rgba(255,255,255,.10) 0deg,
-            rgba(255,255,255,.92) 38deg,
-            rgba(221,214,254,.72) 68deg,
-            rgba(255,255,255,.12) 126deg,
-            rgba(167,139,250,.10) 208deg,
-            rgba(196,181,253,.62) 260deg,
-            rgba(255,255,255,.88) 296deg,
-            rgba(255,255,255,.10) 336deg,
-            rgba(255,255,255,.10) 360deg
-          );
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          opacity: .9;
-        }
-        .gt-dock-item.is-active::after {
-          content: "";
-          position: absolute;
-          inset: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: linear-gradient(115deg, rgba(255,255,255,.20), transparent 38%, transparent 72%, rgba(196,181,253,.10));
-          opacity: .8;
-        }
+        .gt-dock-item.is-active { color: #fff; background: transparent; box-shadow: none; }
         .gt-dock-item > svg,
         .gt-dock-item > span { position: relative; z-index: 1; }
         html[data-mobile-theme="light"] .gt-dock-item:not(.is-active) { color: #9ca3af; }
