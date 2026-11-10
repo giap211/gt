@@ -180,10 +180,17 @@ export function MovieListingScreen({ type }: { type: string }) {
           background: var(--listing-bg) !important;
           color: var(--listing-text) !important;
         }
-        html[data-mobile-theme="light"] .listing-hero,
-        html[data-theme="light"] .listing-hero {
-          background: linear-gradient(105deg,rgba(250,249,255,.97) 0%,rgba(245,241,255,.91) 55%,rgba(232,220,255,.62) 100%), var(--listing-hero-image);
-          border-color: rgba(100,75,150,.14);
+        /* Keep the featured movie panel visually identical in light and dark themes. */
+        .listing-page .listing-hero {
+          color: #f7f7fc;
+          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(13,13,29,.91) 48%, rgba(20,12,35,.56) 100%), var(--listing-hero-image);
+          border-color: var(--listing-border);
+        }
+        html[data-mobile-theme="light"] .listing-page .listing-hero,
+        html[data-theme="light"] .listing-page .listing-hero {
+          color: #f7f7fc !important;
+          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(13,13,29,.91) 48%, rgba(20,12,35,.56) 100%), var(--listing-hero-image) !important;
+          border-color: rgba(255,255,255,.10) !important;
         }
         html[data-mobile-theme="light"] .listing-page .listing-filter-shell [class*="text-white"],
         html[data-theme="light"] .listing-page .listing-filter-shell [class*="text-white"] {
