@@ -68,7 +68,7 @@ export function CommentsPanel({ movie }: { movie: MoviePayload }) {
         <textarea
           value={body}
           onChange={(event) => setBody(event.target.value)}
-          className="min-h-[76px] w-full resize-none bg-transparent text-sm text-white outline-none placeholder:text-white/30"
+          className="min-h-[76px] w-full resize-none bg-transparent text-base leading-relaxed text-white outline-none placeholder:text-white/30"
           placeholder={
             user
               ? "Viết bình luận văn minh về phim..."
