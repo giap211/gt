@@ -811,3 +811,101 @@ html[data-theme="light"] .hero-bottom-fade {
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
 }
+
+
+/* ===== Light theme polish: home hero, Ghibli feature and movie detail ===== */
+html[data-theme="light"] .apple-tv-home .home-feature-hero .hero-bottom-fade,
+html[data-mobile-theme="light"] .apple-tv-home .home-feature-hero .hero-bottom-fade {
+  background: linear-gradient(180deg, rgba(8,9,13,.04) 0%, rgba(8,9,13,.18) 34%, rgba(8,9,13,.76) 76%, #f5f3fb 100%) !important;
+}
+html[data-theme="light"] .apple-tv-home .home-feature-hero .hero-short-black-fade,
+html[data-mobile-theme="light"] .apple-tv-home .home-feature-hero .hero-short-black-fade {
+  background: linear-gradient(180deg, transparent 0%, rgba(8,9,13,.16) 32%, rgba(8,9,13,.68) 78%, #f5f3fb 100%) !important;
+}
+html[data-theme="light"] .apple-tv-home .home-feature-hero .relative.z-20,
+html[data-mobile-theme="light"] .apple-tv-home .home-feature-hero .relative.z-20 {
+  color: #fff !important;
+}
+html[data-theme="light"] .apple-tv-home .home-feature-hero .relative.z-20 :is(h1,h2,p,span),
+html[data-mobile-theme="light"] .apple-tv-home .home-feature-hero .relative.z-20 :is(h1,h2,p,span) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  text-shadow: 0 2px 14px rgba(0,0,0,.48);
+}
+html[data-theme="light"] .apple-tv-home .home-feature-hero .relative.z-20 .hero-slide-dot,
+html[data-mobile-theme="light"] .apple-tv-home .home-feature-hero .relative.z-20 .hero-slide-dot {
+  text-shadow: none;
+}
+html[data-theme="light"] .apple-tv-home .topic-grid-section [class*="bg-[#ffd875]"],
+html[data-mobile-theme="light"] .apple-tv-home .topic-grid-section [class*="bg-[#ffd875]"] {
+  background: linear-gradient(180deg,#a78bfa,#d946ef) !important;
+}
+
+/* Ghibli editorial feature: legible white copy over artwork in both themes. */
+.ghibli-feature .ghibli-feature-title { color: #fff !important; -webkit-text-fill-color: #fff !important; }
+.ghibli-feature .ghibli-feature-copy { color: rgba(255,255,255,.82) !important; -webkit-text-fill-color: rgba(255,255,255,.82) !important; }
+.ghibli-feature .ghibli-feature-art { background: linear-gradient(90deg,rgba(5,6,12,.88) 0%,rgba(5,6,12,.66) 48%,rgba(5,6,12,.10) 100%),linear-gradient(0deg,rgba(5,6,12,.30),transparent 55%) !important; }
+html[data-theme="light"] .ghibli-feature > div > div:first-child h2,
+html[data-mobile-theme="light"] .ghibli-feature > div > div:first-child h2 { color:#28243a !important; -webkit-text-fill-color:#28243a !important; }
+.ghibli-feature .ghibli-accent { background: linear-gradient(180deg,#8b5cf6,#d946ef) !important; }
+
+/* Movie detail light theme: refined glass actions and clear episode controls. */
+html[data-theme="light"] .movie-detail-page .movie-detail-mobile,
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-mobile { color:#29243b; }
+html[data-theme="light"] .movie-detail-page .movie-detail-mobile [class*="text-white"],
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-mobile [class*="text-white"] {
+  color:#514a68;
+}
+html[data-theme="light"] .movie-detail-page .movie-detail-mobile .movie-glass-panel,
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-mobile .movie-glass-panel {
+  color:#29243b;
+}
+html[data-theme="light"] .movie-detail-page #movie-episodes,
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes {
+  color:#29243b;
+}
+html[data-theme="light"] .movie-detail-page #movie-episodes h2,
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes h2 { color:#28243a !important; }
+html[data-theme="light"] .movie-detail-page #movie-episodes > div:first-child > span,
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes > div:first-child > span {
+  color:#65558f !important; background:rgba(255,255,255,.78) !important;
+  border:1px solid rgba(139,92,246,.20) !important;
+}
+html[data-theme="light"] .movie-detail-page #movie-episodes > div:nth-child(3),
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes > div:nth-child(3) {
+  background:linear-gradient(135deg,#e4e5eb,#d9dbe4) !important;
+  border:1px solid rgba(117,111,143,.22) !important;
+  color:#626779 !important;
+}
+html[data-theme="light"] .movie-detail-page #movie-episodes input,
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes input {
+  color:#343047 !important; caret-color:#8b5cf6;
+}
+html[data-theme="light"] .movie-detail-page #movie-episodes input::placeholder,
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes input::placeholder { color:#77758a !important; }
+html[data-theme="light"] .movie-detail-page #movie-episodes > div.space-y-2 > a,
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes > div.space-y-2 > a {
+  background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(237,233,250,.88)) !important;
+  border:1px solid rgba(139,92,246,.18) !important;
+  box-shadow:0 7px 22px rgba(67,53,112,.055),inset 0 1px 0 #fff !important;
+}
+html[data-theme="light"] .movie-detail-page #movie-episodes > div.space-y-2 > a p:first-child,
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes > div.space-y-2 > a p:first-child {
+  color:#39324f !important;
+}
+html[data-theme="light"] .movie-detail-page #movie-episodes > div.space-y-2 > a p:last-child,
+html[data-mobile-theme="light"] .movie-detail-page #movie-episodes > div.space-y-2 > a p:last-child {
+  color:#6d6880 !important;
+}
+html[data-theme="light"] .movie-detail-page .movie-detail-mobile .grid.grid-cols-4,
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-mobile .grid.grid-cols-4 {
+  background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(236,232,249,.72)) !important;
+  border:1px solid rgba(139,92,246,.17) !important;
+  box-shadow:0 10px 28px rgba(70,55,120,.07),inset 0 1px 0 #fff !important;
+}
+html[data-theme="light"] .movie-detail-page .movie-detail-mobile .grid.grid-cols-4 button,
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-mobile .grid.grid-cols-4 button {
+  background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(237,233,250,.92)) !important;
+  border:1px solid rgba(139,92,246,.17) !important;
+  color:#65558f !important;
+}
