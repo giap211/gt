@@ -54,7 +54,7 @@ const COUNTRIES = [
 ];
 
 const AnimatedBrand = () => {
-  const target = Array.from("PHIM LẬU");
+  const target = Array.from("XEMPHIM");
   const glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
   const [letters, setLetters] = useState<string[]>(() =>
     target.map((char) => (char === " " ? " " : "·")),
@@ -113,7 +113,7 @@ const AnimatedBrand = () => {
 
   return (
     <span
-      aria-label="PHIM LẬU"
+      aria-label="XEMPHIM"
       role="img"
       className="inline-flex items-center whitespace-nowrap select-none"
       style={{
