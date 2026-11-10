@@ -548,6 +548,10 @@ export const VideoPlayer = ({
         let progressPointerId: number | null = null;
         const progressElement = (art.template as any).$progress as HTMLElement | undefined;
 
+        if (progressElement) {
+          progressElement.style.touchAction = "none";
+        }
+
         const seekFromRotatedProgress = (clientY: number) => {
           if (!progressElement || !art || !rotatedRef.current) return;
           const rect = progressElement.getBoundingClientRect();
@@ -741,6 +745,7 @@ export const VideoPlayer = ({
           document.removeEventListener("pointermove", onProgressPointerMove, true);
           document.removeEventListener("pointerup", onProgressPointerUp, true);
           document.removeEventListener("pointercancel", onProgressPointerUp, true);
+          if (progressElement) progressElement.style.touchAction = "";
           container.removeEventListener("pointerdown", onTapPointerDown);
           container.removeEventListener("pointermove", onTapPointerMove);
           container.removeEventListener("pointerup", onPointerUp);
