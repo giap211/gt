@@ -71,12 +71,38 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isPlayerRotated, setIsPlayerRotated] = useState(false);
 
-  // Recalculate Artplayer's internal video dimensions after the manual rotation.
+  // Keep the manually rotated player in sync with the real iOS visual viewport.
+  // Safari's dynamic browser bars can make 100dvh smaller than the visible screen;
+  // listen to VisualViewport as well as window resize/orientation changes.
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
+    const playerPage = document.querySelector<HTMLElement>(".watch-player-page");
+    if (!playerPage) return;
+
+    const syncPlayerViewport = () => {
+      const viewport = window.visualViewport;
+      const width = Math.round(viewport?.width || document.documentElement.clientWidth || window.innerWidth);
+      const height = Math.round(viewport?.height || window.innerHeight);
+      playerPage.style.setProperty("--watch-viewport-width", `${width}px`);
+      playerPage.style.setProperty("--watch-viewport-height", `${height}px`);
+
+      // Artplayer listens for resize to recalculate its video and control layout.
       window.dispatchEvent(new Event("resize"));
-    });
-    return () => window.cancelAnimationFrame(frame);
+    };
+
+    syncPlayerViewport();
+    window.addEventListener("resize", syncPlayerViewport);
+    window.addEventListener("orientationchange", syncPlayerViewport);
+    window.visualViewport?.addEventListener("resize", syncPlayerViewport);
+    window.visualViewport?.addEventListener("scroll", syncPlayerViewport);
+
+    return () => {
+      window.removeEventListener("resize", syncPlayerViewport);
+      window.removeEventListener("orientationchange", syncPlayerViewport);
+      window.visualViewport?.removeEventListener("resize", syncPlayerViewport);
+      window.visualViewport?.removeEventListener("scroll", syncPlayerViewport);
+      playerPage.style.removeProperty("--watch-viewport-width");
+      playerPage.style.removeProperty("--watch-viewport-height");
+    };
   }, [isPlayerRotated]);
   // Embed ở server dự phòng chạy trong iframe: thao tác bên trong iframe không nổi bọt
   // ra trang cha, vì vậy không tự ẩn các nút điều hướng của player.
@@ -541,8 +567,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             left:50% !important;
             right:auto !important;
             bottom:auto !important;
-            width:100dvh !important;
-            height:100dvw !important;
+            width:var(--watch-viewport-height, 100dvh) !important;
+            height:var(--watch-viewport-width, 100vw) !important;
             max-width:none !important;
             max-height:none !important;
             margin:0 !important;
