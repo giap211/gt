@@ -70,34 +70,6 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isPlayerRotated, setIsPlayerRotated] = useState(false);
-  const [frameEl, setFrameEl] = useState<HTMLDivElement | null>(null);
-  const [frame, setFrame] = useState({ w: 0, h: 0 });
-
-  useEffect(() => {
-    if (!frameEl) return;
-    const measure = () =>
-      setFrame((prev) => {
-        const w = frameEl.clientWidth;
-        const h = frameEl.clientHeight;
-        return prev.w === w && prev.h === h ? prev : { w, h };
-      });
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(frameEl);
-    window.addEventListener("orientationchange", measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("orientationchange", measure);
-    };
-  }, [frameEl]);
-
-  // Chỉ xoay khi điện thoại đang đứng dọc.
-  const rotateActive = isPlayerRotated && frame.h > frame.w;
-
-  // Báo cho Artplayer tính lại kích thước sau mỗi lần đổi khung.
-  useEffect(() => {
-    window.dispatchEvent(new Event("resize"));
-  }, [rotateActive, frame.w, frame.h]);
   // Embed ở server dự phòng chạy trong iframe: thao tác bên trong iframe không nổi bọt
   // ra trang cha, vì vậy không tự ẩn các nút điều hướng của player.
   const isBackupEmbed = Boolean(
@@ -493,29 +465,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     );
   }
 
-  if (!movie) {
-    return (
-      <main className="fixed inset-0 z-[90] flex min-h-screen items-center justify-center bg-[#080a11] px-6 text-white">
-        <div className="flex w-full max-w-md flex-col items-center text-center">
-          <div className="mb-5 grid h-16 w-16 place-items-center rounded-2xl border border-white/10 bg-white/[.06]">
-            <MonitorPlay size={30} className="text-violet-300" />
-          </div>
-          <h1 className="text-xl font-bold">Chưa tải được dữ liệu phim</h1>
-          <p className="mt-2 text-sm leading-6 text-white/55">
-            Máy chủ phim hiện chưa phản hồi hoặc dữ liệu đang tạm thời gián đoạn. Hãy thử tải lại; player sẽ xuất hiện khi dữ liệu phim được tải thành công.
-          </p>
-          <div className="mt-6 flex w-full gap-3">
-            <Link href="/" className="flex flex-1 items-center justify-center rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white/80">
-              Về trang chủ
-            </Link>
-            <button type="button" onClick={() => window.location.reload()} className="flex flex-1 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-3 text-sm font-bold text-white">
-              Thử tải lại
-            </button>
-          </div>
-        </div>
-      </main>
-    );
-  }
+  if (!movie) return null;
 
   const currentServerEpisodes = episodes[currentServer]?.server_data || [];
   const currentEpIndex = currentServerEpisodes.findIndex(
@@ -545,23 +495,13 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const suggestedMovies = transformListMovies(latestMovies);
 
   return (
-    <div ref={setFrameEl} className="fixed inset-0 z-[80] overflow-hidden bg-black">
-    <main
-      className={`watch-page watch-player-page overflow-hidden bg-black text-white ${rotateActive ? "watch-player-rotated" : ""}`}
-      style={
-        rotateActive
-          ? { top: "50%", left: "50%", width: frame.h, height: frame.w, transform: "translate(-50%, -50%) rotate(90deg)" }
-          : undefined
-      }
-    >
+    <main className={`watch-page watch-player-page fixed inset-0 z-[80] overflow-hidden bg-black text-white ${isPlayerRotated ? "watch-player-rotated" : ""}`}>
       <style jsx global>{`
-        .watch-player-page { position:absolute; top:0; left:0; width:100%; height:100%; }
+        .watch-player-page { width:100vw; height:100dvh; }
         .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
         .watch-player-shell > div { width:100%; height:100%; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
         .watch-player-shell .artplayer-app { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
         .watch-player-shell iframe { width:100% !important; height:100% !important; }
-        .watch-player-shell video,
-        .watch-player-shell .art-video { width:100% !important; height:100% !important; object-fit:contain !important; }
         .watch-player-top { position:absolute; z-index:50; top:max(14px,env(safe-area-inset-top)); left:max(16px,env(safe-area-inset-left)); right:max(16px,env(safe-area-inset-right)); display:flex; align-items:center; justify-content:space-between; pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
         .watch-player-top > * { pointer-events:auto; }
         .watch-player-top > div { min-width:0; max-width:calc(100% - 112px); }
@@ -583,6 +523,23 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           .watch-player-shell .artplayer-app { height:100% !important; }
         }
         @media (orientation:portrait) and (max-width:1023px) {
+          /* Xoay thủ công bằng nút; không đọc cảm biến và không phụ thuộc khóa xoay iPhone. */
+          .watch-player-page.watch-player-rotated {
+            position:fixed !important;
+            inset:auto !important;
+            top:50% !important;
+            left:50% !important;
+            right:auto !important;
+            bottom:auto !important;
+            width:100dvh !important;
+            height:100dvw !important;
+            max-width:none !important;
+            max-height:none !important;
+            margin:0 !important;
+            transform:translate(-50%,-50%) rotate(90deg);
+            transform-origin:center center;
+            overflow:hidden !important;
+          }
           .watch-player-shell > div,
           .watch-player-shell .artplayer-app {
             width:100% !important;
@@ -622,7 +579,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             introDebugStatus={introDebugStatus}
             onProgress={handlePlaybackProgress}
             onUserInteraction={handlePlayerInteraction}
-            rotated={rotateActive}
+            rotated={isPlayerRotated}
           />
         )}
       </div>
@@ -693,7 +650,6 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       )}
 
     </main>
-    </div>
   );
 }
 

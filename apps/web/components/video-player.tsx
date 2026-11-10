@@ -680,7 +680,7 @@ export const VideoPlayer = ({
 
           // YouTube-style visual feedback centered in the tapped half.
           if (seekFeedbackTimerRef.current) clearTimeout(seekFeedbackTimerRef.current);
-          const vertical = rotatedRef.current;
+          const vertical = rotatedRef.current || window.matchMedia("(orientation: landscape)").matches;
           setSeekFeedback({
             side: seconds < 0 ? "left" : "right",
             vertical,
@@ -699,7 +699,10 @@ export const VideoPlayer = ({
           if (wasSwipe || isControlTarget(event.target)) return;
 
           const rect = container.getBoundingClientRect();
-          const half: "left" | "right" = rotatedRef.current
+          const isLandscapePlayer =
+            rotatedRef.current ||
+            window.matchMedia("(orientation: landscape)").matches;
+          const half: "left" | "right" = isLandscapePlayer
             ? (event.clientY < rect.top + rect.height / 2 ? "left" : "right")
             : (event.clientX < rect.left + rect.width / 2 ? "left" : "right");
 
