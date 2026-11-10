@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import type { Variants } from "framer-motion";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { HomeScreen } from "@/components/home-screen";
@@ -12,6 +13,18 @@ const tabPaths = ["/", "/danh-sach/phim-bo", "/danh-sach/phim-le"];
 function isTabPath(pathname: string) {
   return tabPaths.includes(pathname);
 }
+
+const routeVariants: Variants = {
+  enter: (direction: number) => ({
+    x: direction === -1 ? "-100%" : "100%",
+    opacity: 0.98,
+  }),
+  center: { x: "0%", opacity: 1 },
+  exit: (direction: number) => ({
+    x: direction === -1 ? "100%" : "-22%",
+    opacity: 0.96,
+  }),
+};
 
 export function PersistentTabShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -77,15 +90,10 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
           <motion.div
             key={pathname}
             custom={navigationDirection.current}
-            initial={(direction: number) => ({
-              x: direction === -1 ? "-100%" : "100%",
-              opacity: 0.98,
-            })}
-            animate={{ x: "0%", opacity: 1 }}
-            exit={(direction: number) => ({
-              x: direction === -1 ? "100%" : "-22%",
-              opacity: 0.96,
-            })}
+            variants={routeVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
             transition={{
               x: { type: "tween", duration: 0.46, ease: [0.22, 1, 0.36, 1] },
               opacity: { duration: 0.3 },
