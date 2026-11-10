@@ -291,67 +291,45 @@ export function BottomDock() {
       </div>
 
       <style jsx global>{`
+        .gt-dock { padding-bottom: env(safe-area-inset-bottom); }
+        .gt-dock > div { width: min(92vw, 380px); max-width: 380px; margin-inline: auto; padding: 0; }
         .gt-dock-nav {
-          position: relative;
-          isolation: isolate;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 4px;
-          height: 72px;
-          padding: 0 6px;
-          overflow: hidden;
-          border-radius: 36px;
-          background: rgba(255,255,255,.035);
-          border: 1px solid rgba(255,255,255,.16);
-          box-shadow: 0 12px 32px rgba(0,0,0,.32);
+          position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between;
+          gap: 4px; width: 100%; height: 72px; padding: 7px 9px; overflow: hidden; border-radius: 9999px;
+          background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.2);
+          box-shadow: 0 18px 48px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(255,255,255,.04);
+          -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+          backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
           -webkit-tap-highlight-color: transparent;
         }
-        .gt-liquid-glass-canvas {
-          position:absolute;inset:0;width:100%;height:100%;
-          border-radius:inherit;pointer-events:none;z-index:0;
-        }
-        .gt-liquid-glass-rim {
-          position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
-          box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),inset 1.5px 1.5px 2px rgba(255,255,255,.5),inset -1.5px -1.5px 2px rgba(255,255,255,.2);
-          background:rgba(255,255,255,.035);
-          -webkit-backdrop-filter:blur(18px) saturate(1.6);
-          backdrop-filter:blur(18px) saturate(1.6);
-        }
+        .gt-liquid-glass-canvas { position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; border-radius:inherit; pointer-events:none; opacity:.42; }
+        .gt-liquid-glass-rim { display:none !important; }
         .gt-liquid-glass-bubble {
-          position:absolute;top:8px;bottom:8px;left:0;width:0;border-radius:28px;
-          background:rgba(255,255,255,.18);
-          box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
-          transition:left .35s cubic-bezier(.3,1.4,.5,1),width .35s;z-index:2;pointer-events:none;
+          position:absolute; top:7px; bottom:7px; left:0; width:0; z-index:1; pointer-events:none; border-radius:9999px;
+          background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18);
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 3px 16px rgba(0,0,0,.08);
+          transition:left .48s cubic-bezier(.34,1.2,.64,1), width .48s cubic-bezier(.34,1.2,.64,1);
         }
         .gt-dock-item {
-          position:relative;z-index:3;isolation:isolate;flex:1;display:flex;flex-direction:column;
-          align-items:center;justify-content:center;gap:3px;min-width:0;height:60px;
-          padding:6px 4px;border-radius:28px;color:rgba(255,255,255,.65);
-          font-size:10.5px;font-weight:500;letter-spacing:-.01em;
-          transition:transform .25s cubic-bezier(.3,1.6,.5,1),color .2s;
-          border:0;background:transparent;cursor:pointer;text-decoration:none;
-          -webkit-tap-highlight-color:transparent;
+          position:relative; z-index:2; isolation:isolate; flex:1; display:flex; flex-direction:column;
+          align-items:center; justify-content:center; gap:3px; min-width:0; height:58px; padding:5px 3px;
+          border:0; border-radius:9999px; background:transparent; color:rgba(255,255,255,.72);
+          font-size:10.5px; font-weight:500; letter-spacing:-.01em; text-decoration:none; cursor:pointer;
+          -webkit-tap-highlight-color:transparent; transition:color .22s ease, transform .3s cubic-bezier(.34,1.4,.64,1);
         }
-        .gt-dock-item > svg { width:24px;height:24px;stroke-width:1.8; }
-        .gt-dock-item.is-active { color:#fff; }
-        .gt-dock-item:active { transform:scale(1.12); }
+        .gt-dock-item > svg { width:23px; height:23px; stroke-width:1.8; }
+        .gt-dock-item.is-active { color:#fff; transform:translateY(-1px); }
+        .gt-dock-item:active { transform:scale(1.09); }
         html[data-mobile-theme="light"] .gt-dock-nav {
-          background:rgba(248,246,255,.08);border-color:rgba(255,255,255,.5);
-          box-shadow:0 12px 32px rgba(66,45,120,.18);
+          background:rgba(255,255,255,.075); border-color:rgba(255,255,255,.62);
+          box-shadow:0 18px 48px rgba(77,55,128,.14), inset 0 1px 0 rgba(255,255,255,.82);
+          -webkit-backdrop-filter:blur(32px) saturate(210%) brightness(1.1); backdrop-filter:blur(32px) saturate(210%) brightness(1.1);
         }
-        html[data-mobile-theme="light"] .gt-liquid-glass-rim {
-          background:rgba(255,255,255,.08);
-          box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),inset 1.5px 1.5px 2px rgba(255,255,255,.8),inset -1.5px -1.5px 2px rgba(124,58,237,.1);
-        }
-        html[data-mobile-theme="light"] .gt-liquid-glass-bubble {
-          background:rgba(124,58,237,.14);box-shadow:inset 0 0 0 1px rgba(124,58,237,.24);
-        }
-        html[data-mobile-theme="light"] .gt-dock-item { color:rgba(49,46,65,.62); }
+        html[data-mobile-theme="light"] .gt-liquid-glass-canvas { opacity:.3; }
+        html[data-mobile-theme="light"] .gt-liquid-glass-bubble { background:rgba(124,58,237,.11); border-color:rgba(124,58,237,.18); }
+        html[data-mobile-theme="light"] .gt-dock-item { color:rgba(48,39,67,.72); }
         html[data-mobile-theme="light"] .gt-dock-item.is-active { color:#6d28d9; }
-        @media (prefers-reduced-motion: reduce) {
-          .gt-dock-item,.gt-liquid-glass-bubble { transition:none; }
-        }
+        @media (prefers-reduced-motion:reduce) { .gt-dock-item,.gt-liquid-glass-bubble { transition:none; } }
         @media (min-width:1024px) { .gt-dock { display:none !important; } }
       `}</style>
     </>
