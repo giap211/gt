@@ -155,7 +155,10 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           letter-spacing: -1.6px;
           paint-order: stroke fill;
         }
-        .hero-card-title-svg tspan {
+        .hero-card-title-svg text > tspan {
+          fill: transparent;
+        }
+        .hero-card-title-svg text > tspan > tspan {
           fill: transparent;
           stroke: #fff;
           stroke-width: 1.5;
@@ -171,7 +174,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           100% { opacity: 1; fill: #fff; stroke-dashoffset: 0; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .hero-card-title-svg tspan {
+          .hero-card-title-svg text > tspan > tspan {
             animation: none;
             fill: #fff;
             stroke: none;
@@ -328,7 +331,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                                   {Array.from(line).map((character, characterIndex) => (
                                     <tspan
                                       key={`char-${lineIndex}-${characterIndex}`}
-                                      style={{ animationDelay: `${(lineIndex * 20 + characterIndex) * 35}ms` }}
+                                      style={{ animationDelay: `${(lineIndex * 20 + characterIndex) * 18}ms` }}
                                     >
                                       {character === " " ? "\u00a0" : character}
                                     </tspan>
