@@ -175,7 +175,7 @@ function MemberLibraryModal({
             </div>
           ) : items.length === 0 ? (
             <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-6 text-sm leading-relaxed text-white/45">
-              Chưa có dữ liệu. Hãy yêu thích phim hoặc xem phim để Phim Lậu lưu
+              Chưa có dữ liệu. Hãy yêu thích hoặc xem phim để lưu vào tài khoản
               lại cho bạn.
             </div>
           ) : (

@@ -24,7 +24,7 @@ interface MovieCardProps {
   hideInfo?: boolean;
   view?: number;
   rating?: number | string;
-  /** horizontal (Phim Lậu home) vs vertical (grids) */
+  /** horizontal landscape cards vs vertical posters */
   variant?: "horizontal" | "vertical";
 }
 

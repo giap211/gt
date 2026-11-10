@@ -14,7 +14,7 @@ interface MovieCarouselProps {
   title: string;
   icon?: string;
   viewMoreLink?: string;
-  /** gradient text color for title like Phim Lậu */
+  /** gradient text color for section title */
   titleGradient?: string;
   layout?: "standard" | "ranked" | "poster" | "compact";
   items: {
