@@ -552,16 +552,82 @@ export const VideoPlayer = ({
         const progressGlassStyle = document.createElement("style");
         progressGlassStyle.dataset.gtProgressGlass = "true";
         progressGlassStyle.textContent = `
+          .art-progress {
+            height: 14px !important;
+            min-height: 14px !important;
+            border-radius: 999px !important;
+            overflow: visible !important;
+            background: rgba(137,137,143,.40) !important;
+            touch-action: none;
+          }
+          .art-progress .art-progress-loaded,
+          .art-progress .art-progress-played {
+            height: 14px !important;
+            border-radius: 999px !important;
+          }
+          .art-progress .art-progress-played {
+            background: linear-gradient(90deg,#8b5cf6 0%,#a855f7 52%,#d946ef 100%) !important;
+          }
           .art-progress .art-progress-indicator,
           .art-progress .art-progress-thumb {
-            transform-origin: center;
-            transition: transform .18s cubic-bezier(.2,.8,.2,1), opacity .18s ease, filter .18s ease;
+            position: absolute !important;
+            z-index: 8 !important;
+            width: 90px !important;
+            height: 60px !important;
+            min-width: 90px !important;
+            min-height: 60px !important;
+            top: 50% !important;
+            right: 0 !important;
+            border-radius: 30px !important;
+            transform: translate(50%,-50%) scale(.6) !important;
+            transform-origin: center !important;
+            opacity: 1 !important;
+            background: rgba(255,255,255,.96) !important;
+            border: 1px solid rgba(255,255,255,.78) !important;
+            box-shadow: 0 3px 14px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(167,139,250,.18) !important;
+            -webkit-backdrop-filter: blur(0) saturate(700%) !important;
+            backdrop-filter: blur(0) saturate(700%) !important;
+            transition: transform .22s cubic-bezier(.2,.8,.2,1), background-color .22s ease, opacity .22s ease, box-shadow .22s ease !important;
+            pointer-events: none !important;
+          }
+          .art-progress .art-progress-indicator::before,
+          .art-progress .art-progress-thumb::before {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            border-top: 1px solid rgba(255,255,255,.98);
+            border-left: 1px solid rgba(255,255,255,.60);
+            border-right: 1px solid rgba(196,181,253,.32);
+            box-shadow: inset 0 1px 5px rgba(255,255,255,.58), inset 0 -2px 6px rgba(124,58,237,.10);
+          }
+          .art-progress .art-progress-indicator::after,
+          .art-progress .art-progress-thumb::after {
+            content: "";
+            position: absolute;
+            left: 15%;
+            right: 15%;
+            top: 2px;
+            height: 34%;
+            border-radius: 999px;
+            background: linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,0));
+            filter: blur(1px);
           }
           .art-progress.gt-progress-dragging .art-progress-indicator,
-          .art-progress.gt-progress-dragging .art-progress-thumb {
-            transform: scale(1.62) !important;
-            opacity: .68 !important;
-            filter: blur(.35px) !important;
+          .art-progress.gt-progress-dragging .art-progress-thumb,
+          .art-progress:active .art-progress-indicator,
+          .art-progress:active .art-progress-thumb {
+            transform: translate(50%,-50%) scale(1) !important;
+            background: rgba(255,255,255,.10) !important;
+            opacity: 1 !important;
+            box-shadow: 0 8px 26px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.86), inset 0 -1px 0 rgba(196,181,253,.38) !important;
+            -webkit-backdrop-filter: blur(12px) saturate(190%) !important;
+            backdrop-filter: blur(12px) saturate(190%) !important;
+          }
+          .art-progress.gt-progress-dragging .art-progress-indicator::before,
+          .art-progress.gt-progress-dragging .art-progress-thumb::before {
+            border-top-color: rgba(255,255,255,.98);
+            box-shadow: inset 0 1px 8px rgba(255,255,255,.62), inset 0 -3px 8px rgba(124,58,237,.18);
           }
           .art-progress.gt-progress-dragging .art-progress-played::after {
             opacity: .72;

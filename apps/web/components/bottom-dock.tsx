@@ -128,6 +128,11 @@ export function BottomDock() {
     event: React.MouseEvent<HTMLAnchorElement>,
     active: boolean,
   ) => {
+    if (suppressDockClickRef.current) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     closeDockPanels();
     if (active) {
       event.preventDefault();
@@ -135,10 +140,12 @@ export function BottomDock() {
     }
   };
   const handleSearch = () => {
+    if (suppressDockClickRef.current) return;
     setAccountOpen(false);
     setSearchOpen((open) => !open);
   };
   const handleAccount = () => {
+    if (suppressDockClickRef.current) return;
     setSearchOpen(false);
     setAccountOpen((open) => !open);
   };
@@ -252,10 +259,12 @@ export function BottomDock() {
       setDockDragIndex(null);
       setDockDragRect(null);
       if (!cancelled && finalIndex >= 0) activateDockItem(finalIndex);
-      window.setTimeout(() => { suppressDockClickRef.current = false; }, 0);
+      // Keep the guard alive through the browser's synthetic click after pointerup.
+      window.setTimeout(() => { suppressDockClickRef.current = false; }, 180);
     } else {
       setDockDragIndex(null);
       setDockDragRect(null);
+      suppressDockClickRef.current = false;
     }
   };
 
@@ -263,7 +272,6 @@ export function BottomDock() {
     if (!suppressDockClickRef.current) return;
     event.preventDefault();
     event.stopPropagation();
-    suppressDockClickRef.current = false;
   };
 
   if (isWatchPage) return null;
@@ -534,9 +542,13 @@ export function BottomDock() {
         .gt-dock-nav.is-dragging .gt-dock-item.is-active::before,
         .gt-dock-nav.is-dragging .gt-dock-item.is-active::after { opacity: 0; }
         .gt-dock-item.is-drag-target {
-          color: #fff !important;
-          transform: scale(1.055);
-          text-shadow: 0 1px 8px rgba(91,33,182,.28);
+          color: inherit;
+          transform: none;
+          text-shadow: none;
+        }
+        .gt-dock-nav.is-dragging .gt-dock-drag-indicator {
+          opacity: .92;
+          transform: scale(1.045);
         }
         .gt-dock-item {
           position: relative;
