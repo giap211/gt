@@ -118,7 +118,7 @@ export const MovieCarousel = ({
                 1280: { slidesPerView: layout === "ranked" ? 6.2 : layout === "poster" ? 5.8 : layout === "compact" ? 4.8 : 4.1, spaceBetween: 12 },
                 1536: { slidesPerView: layout === "ranked" ? 6.5 : layout === "poster" ? 6.2 : layout === "compact" ? 5.2 : 4.4, spaceBetween: 14 },
               }}
-              className={`movie-carousel-swiper w-full !overflow-visible ${layout === "poster" ? "movie-carousel-poster" : ""}`}
+              className={`movie-carousel-swiper w-full !overflow-hidden ${layout === "poster" ? "movie-carousel-poster" : ""}`}
             >
               {items.map((movie, index) => (
                 <SwiperSlide key={movie.id} className="h-auto">
