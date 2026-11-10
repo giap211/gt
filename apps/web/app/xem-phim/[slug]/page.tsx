@@ -70,6 +70,14 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isPlayerRotated, setIsPlayerRotated] = useState(false);
+
+  // Recalculate Artplayer's internal video dimensions after the manual rotation.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      window.dispatchEvent(new Event("resize"));
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [isPlayerRotated]);
   // Embed ở server dự phòng chạy trong iframe: thao tác bên trong iframe không nổi bọt
   // ra trang cha, vì vậy không tự ẩn các nút điều hướng của player.
   const isBackupEmbed = Boolean(
@@ -502,6 +510,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-shell > div { width:100%; height:100%; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
         .watch-player-shell .artplayer-app { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
         .watch-player-shell iframe { width:100% !important; height:100% !important; }
+        .watch-player-shell video,
+        .watch-player-shell .art-video { width:100% !important; height:100% !important; object-fit:contain !important; }
         .watch-player-top { position:absolute; z-index:50; top:max(14px,env(safe-area-inset-top)); left:max(16px,env(safe-area-inset-left)); right:max(16px,env(safe-area-inset-right)); display:flex; align-items:center; justify-content:space-between; pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
         .watch-player-top > * { pointer-events:auto; }
         .watch-player-top > div { min-width:0; max-width:calc(100% - 112px); }
