@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { Star } from "lucide-react";
 
 interface MovieCardProps {
   title: string;
@@ -89,6 +90,7 @@ export const MovieCard = ({
   quality = "HD",
   language,
   episodeCurrent,
+  rating,
   hideInfo = false,
   variant = "horizontal",
 }: MovieCardProps) => {
@@ -107,6 +109,8 @@ export const MovieCard = ({
     PLACEHOLDER;
   const langChip = buildLangChip(language, episodeCurrent);
   const qChip = qualityChip(quality);
+  const numericRating = typeof rating === "number" ? rating : Number.parseFloat(String(rating ?? ""));
+  const hasRating = Number.isFinite(numericRating) && numericRating > 0;
   const hasRuntime = Boolean(totalDurationSeconds && totalDurationSeconds > 0);
   const hasRealProgress = typeof progressSeconds === "number" && progressSeconds > 0;
   const displayProgressSeconds = hasRealProgress
