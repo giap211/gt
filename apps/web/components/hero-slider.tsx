@@ -293,7 +293,6 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                         {movies.map((_, i) => <button key={i} type="button" aria-label={`Slide ${i + 1}`} aria-current={i === activeSlide} onClick={() => mainSwiper?.slideToLoop(i)} className={`h-1.5 rounded-full transition-all ${i === activeSlide ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} />)}
                       </div>
                     </div>
-                    </div>
                   </div>
                 </SwiperSlide>
               );
