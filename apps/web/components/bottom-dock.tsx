@@ -996,7 +996,7 @@ export function BottomDock() {
                   <div className="min-w-0 flex-1">
                     <p className="text-[11px] font-medium text-white/50">{user ? "Chào mừng trở lại" : "Trải nghiệm xem phim của bạn"}</p>
                     <p className="mt-0.5 truncate text-base font-bold text-white">{user ? user.username : "Chào mừng bạn!"}</p>
-                    <p className="mt-0.5 text-xs text-white/50">{user ? "Tài khoản GiapTran" : "Đăng nhập để đồng bộ lịch sử và tủ phim"}</p>
+                    <p className="mt-0.5 text-xs text-white/50">{user ? "Tài khoản XemPhim" : "Đăng nhập để đồng bộ lịch sử và tủ phim"}</p>
                   </div>
                   {user && <span className="shrink-0 whitespace-nowrap rounded-full border border-violet-300/40 bg-gradient-to-r from-fuchsia-500 via-violet-500 to-violet-700 px-3 py-1.5 text-[10px] font-extrabold tracking-wide text-white shadow-[0_3px_14px_rgba(139,92,246,.35)]">Thành viên</span>}
                 </div>
