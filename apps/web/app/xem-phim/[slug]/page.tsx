@@ -70,11 +70,18 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isPlayerRotated, setIsPlayerRotated] = useState(false);
+  // Embed ở server dự phòng chạy trong iframe: thao tác bên trong iframe không nổi bọt
+  // ra trang cha, vì vậy không tự ẩn các nút điều hướng của player.
+  const isBackupEmbed = Boolean(
+    currentEpisode?.url &&
+    /^https?:\\/\\//i.test(currentEpisode.url) &&
+    !/\\.(?:m3u8|mp4|webm|ogg|mp3)(?:$|[?#])/i.test(currentEpisode.url),
+  );
   useEffect(() => {
-    if (overlayOpen || !showPlayerChrome) return;
+    if (overlayOpen || isBackupEmbed || !showPlayerChrome) return;
     const timeout = window.setTimeout(() => setShowPlayerChrome(false), 3200);
     return () => window.clearTimeout(timeout);
-  }, [overlayOpen, showPlayerChrome]);
+  }, [overlayOpen, showPlayerChrome, isBackupEmbed]);
 
   const handlePlayerInteraction = useCallback(() => {
     setShowPlayerChrome(true);
@@ -574,7 +581,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         )}
       </div>
 
-      <div className={`watch-player-top ${!showPlayerChrome && !overlayOpen ? "watch-player-hidden" : ""}`}>
+      <div className={`watch-player-top ${!showPlayerChrome && !overlayOpen && !isBackupEmbed ? "watch-player-hidden" : ""}`}>
         <div className="flex min-w-0 items-center gap-3 rounded-full px-4 py-2.5 watch-player-glass">
           <Link href={`/phim/${movie.slug}`} aria-label="Quay lại phim" className="grid h-8 w-8 shrink-0 place-items-center rounded-full hover:bg-white/10">
             <span className="text-2xl leading-none">‹</span>
