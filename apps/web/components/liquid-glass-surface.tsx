@@ -15,6 +15,7 @@ export function LiquidGlassSurface() {
     if (!canvas) return;
     const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: false });
     if (!gl) return;
+    gl.getExtension("OES_standard_derivatives");
 
     const vertexSource = `
       attribute vec2 position;
@@ -25,6 +26,7 @@ export function LiquidGlassSurface() {
       }
     `;
     const fragmentSource = `
+      #extension GL_OES_standard_derivatives : enable
       precision highp float;
       varying vec2 uv;
       uniform sampler2D tex;
