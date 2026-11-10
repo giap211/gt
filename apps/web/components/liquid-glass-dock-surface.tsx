@@ -190,9 +190,44 @@ export function LiquidGlassDockSurface() {
       scene.height = Math.max(2, Math.round(height * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = getComputedStyle(document.body).backgroundColor || "#0c0c12";
+
+      // Use the active app theme for a reliable base, then rebuild the
+      // actual colored surfaces behind the dock from the DOM.
+      const light = document.documentElement.dataset.mobileTheme === "light";
+      ctx.fillStyle = light ? "#f5f3fb" : "#0a0b10";
       ctx.fillRect(0, 0, width, height);
       ctx.translate(-ox, -oy);
+
+      const found = new Set<Element>();
+      for (let i = 0; i <= 4; i++) {
+        for (let j = 0; j <= 2; j++) {
+          const px = Math.min(
+            window.innerWidth - 1,
+            Math.max(0, ox + (width * i) / 4),
+          );
+          const py = Math.min(
+            window.innerHeight - 1,
+            Math.max(0, oy + (height * j) / 2),
+          );
+          document.elementsFromPoint(px, py).forEach((el) => {
+            if (!dock.contains(el) && !el.closest(".gt-dock")) found.add(el);
+          });
+        }
+      }
+
+      [...found]
+        .sort((a, b) => {
+          if (a === b) return 0;
+          return a.compareDocumentPosition(b) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+            ? -1
+            : 1;
+        })
+        .forEach((el) => {
+          const rect = el.getBoundingClientRect();
+          ctx.fillStyle = getComputedStyle(el).backgroundColor;
+          ctx.fillRect(rect.left, rect.top, rect.width, rect.height);
+        });
 
       document.querySelectorAll<HTMLElement>("h1,h2,h3").forEach((el) => {
         const rect = el.getBoundingClientRect();
