@@ -78,6 +78,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     const playerPage = document.querySelector<HTMLElement>(".watch-player-page");
     if (!playerPage) return;
 
+    let lastWidth = 0;
+    let lastHeight = 0;
     const syncPlayerViewport = () => {
       const viewport = window.visualViewport;
       const width = Math.round(viewport?.width || document.documentElement.clientWidth || window.innerWidth);
@@ -85,8 +87,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       playerPage.style.setProperty("--watch-viewport-width", `${width}px`);
       playerPage.style.setProperty("--watch-viewport-height", `${height}px`);
 
-      // Artplayer listens for resize to recalculate its video and control layout.
-      window.dispatchEvent(new Event("resize"));
+      // Notify Artplayer only when the viewport dimensions actually change.
+      if (width !== lastWidth || height !== lastHeight) {
+        lastWidth = width;
+        lastHeight = height;
+        window.dispatchEvent(new Event("resize"));
+      }
     };
 
     syncPlayerViewport();
