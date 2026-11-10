@@ -54,9 +54,9 @@ export const MovieCarousel = ({
     <section className="w-full relative py-3 md:py-5">
       <div className="container mx-auto px-3 md:px-6">
         <div className="flex flex-col gap-3">
-          <div className="flex w-full min-w-0 items-center justify-between gap-3">
+          <div className="flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden">
             <h2
-              className={`min-w-0 text-xl md:text-2xl font-bold leading-tight ${layout === "ranked" ? "md:text-2xl" : ""}`}
+              className={`min-w-0 flex-1 text-xl md:text-2xl font-bold leading-tight ${layout === "ranked" ? "md:text-2xl" : ""}`}
               style={{
                 backgroundImage: titleGradient,
                 WebkitBackgroundClip: "text",
@@ -69,10 +69,10 @@ export const MovieCarousel = ({
             {viewMoreLink && (
               <Link
                 href={viewMoreLink}
-                className="movie-carousel-view-more group inline-flex w-max shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-2 text-xs md:text-sm font-semibold transition-all duration-200 self-center mt-0"
+                className="movie-carousel-view-more group inline-flex max-w-[42%] min-w-0 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full px-2 py-1.5 text-[10px] md:max-w-none md:gap-2 md:px-3.5 md:py-2 md:text-sm font-semibold transition-all duration-200 self-center mt-0"
               >
-                <span>Xem toàn bộ</span>
-                <span className="movie-carousel-view-more-icon flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-0.5">
+                <span className="truncate">Xem toàn bộ</span>
+                <span className="movie-carousel-view-more-icon flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-0.5 md:h-6 md:w-6">
                   <ChevronRight size={15} strokeWidth={2.4} />
                 </span>
               </Link>
