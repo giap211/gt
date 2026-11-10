@@ -326,7 +326,7 @@ export default function MovieDetailPage({
         .movie-detail-page .movie-detail-content .snap-x>div{transition:transform .25s ease}
         .movie-detail-page .movie-detail-content .snap-x>div:active{transform:scale(.97)}
         html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:radial-gradient(ellipse 78% 14% at 50% 0%,rgba(167,139,250,.07),transparent 78%),linear-gradient(180deg,#f7f6fc 0%,#f7f6fc 100%);color:#28243a}
-        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 0%,rgba(247,246,252,.10) 48%,rgba(247,246,252,.58) 74%,#f7f6fc 100%)}
+        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.56) 72%,#100f1e 100%)!important}
         html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:transparent!important;border:0!important;box-shadow:none!important}
         html[data-theme="light"] .movie-poster-glass,html[data-mobile-theme="light"] .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important}
         html[data-theme="light"] .movie-tabs,html[data-mobile-theme="light"] .movie-tabs{border-color:transparent}
@@ -376,14 +376,7 @@ export default function MovieDetailPage({
             <Link href="/" aria-label="Quay lại" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white shadow-lg backdrop-blur-xl">
               <span className="text-[26px] leading-none">‹</span>
             </Link>
-            <div className="flex items-center gap-2">
-              <button type="button" aria-label="Truyền phát" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white backdrop-blur-xl">
-                <span className="text-lg">▣</span>
-              </button>
-              <button type="button" onClick={() => setShowInfo(!showInfo)} aria-label="Thông tin phim" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white backdrop-blur-xl">
-                <span className="text-xl leading-none">•••</span>
-              </button>
-            </div>
+
           </div>
 
           <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-7 pt-24">
@@ -534,8 +527,7 @@ export default function MovieDetailPage({
             <div className="space-y-5">
               {activeTab !== "tập phim" && <TabContent activeTab={activeTab} isSeries={isSeries} episodes={episodes} selectedServer={selectedServer} setSelectedServer={setSelectedServer} currentServerData={currentServerData} movie={movie} related={related} actorImages={actorImages} />}
               <div id="comments-section"><CommentsPanel movie={{ movieSlug: movie.slug, movieTitle: movie.name, posterUrl: movie.poster_url }} /></div>
-              <FaqSection name={movie.name} items={faqItems} />
-              <RelatedSection related={related} />
+
             </div>
           </div>
         </div>
@@ -674,8 +666,7 @@ export default function MovieDetailPage({
                         }}
                       />
                     </div>
-                    <FaqSection name={movie.name} items={faqItems} />
-                    <RelatedSection related={related} />
+
                   </>
                 )}
               </div>

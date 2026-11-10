@@ -253,7 +253,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                       </button>
                     </div>
 
-                    <div className="relative z-20 flex flex-col justify-end px-5 pb-6 pt-16 sm:px-8 sm:pb-8 lg:px-12 lg:pb-12">
+                    <div className="relative z-20 px-5 pb-32 pt-16 sm:px-8 lg:px-12">
                       <div className="max-w-[340px] sm:max-w-[420px]">
                         <Link
                           href={`/phim/${movie.slug}`}
@@ -277,54 +277,22 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                           </p>
                         )}
 
-                        <div className="mt-4 flex flex-wrap items-center gap-2.5">
-                          <Link
-                            href={`/phim/${movie.slug}`}
-                            className="hero-btn-primary"
-                          >
-                            <Play size={15} fill="currentColor" />
-                            Xem phim
-                          </Link>
-                          <button
-                            type="button"
-                            aria-label={
-                              savedSlugs.has(movie.slug)
-                                ? "Bỏ khỏi tủ phim"
-                                : "Thêm vào tủ phim"
-                            }
-                            aria-pressed={savedSlugs.has(movie.slug)}
-                            disabled={savingSlug === movie.slug}
-                            onClick={() => void handleToggleFavorite(movie)}
-                            className="hero-btn-secondary"
-                          >
-                            {savedSlugs.has(movie.slug) ? (
-                              <Bookmark size={15} fill="currentColor" />
-                            ) : (
-                              <Plus size={15} />
-                            )}
-                            {savedSlugs.has(movie.slug)
-                              ? "Đã lưu"
-                              : "Thêm vào tủ phim"}
-                          </button>
-                        </div>
+
                       </div>
 
-                      <div className="mt-5 flex items-center gap-1.5">
-                        {movies.map((_, i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            aria-label={`Slide ${i + 1}`}
-                            aria-current={i === activeSlide}
-                            onClick={() => mainSwiper?.slideToLoop(i)}
-                            className={`h-1.5 rounded-full transition-all ${
-                              i === activeSlide
-                                ? "w-5 bg-white"
-                                : "w-1.5 bg-white/40"
-                            }`}
-                          />
-                        ))}
+                    </div>
+                    <div className="absolute inset-x-5 bottom-5 z-30 flex flex-col gap-3 sm:inset-x-8 lg:inset-x-12">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <Link href={`/phim/${movie.slug}`} className="hero-btn-primary"><Play size={15} fill="currentColor" /> Xem phim</Link>
+                        <button type="button" aria-label={savedSlugs.has(movie.slug) ? "Bỏ khỏi tủ phim" : "Thêm vào tủ phim"} aria-pressed={savedSlugs.has(movie.slug)} disabled={savingSlug === movie.slug} onClick={() => void handleToggleFavorite(movie)} className="hero-btn-secondary">
+                          {savedSlugs.has(movie.slug) ? <Bookmark size={15} fill="currentColor" /> : <Plus size={15} />}
+                          {savedSlugs.has(movie.slug) ? "Đã lưu" : "Thêm vào tủ phim"}
+                        </button>
                       </div>
+                      <div className="flex items-center gap-1.5">
+                        {movies.map((_, i) => <button key={i} type="button" aria-label={`Slide ${i + 1}`} aria-current={i === activeSlide} onClick={() => mainSwiper?.slideToLoop(i)} className={`h-1.5 rounded-full transition-all ${i === activeSlide ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} />)}
+                      </div>
+                    </div>
                     </div>
                   </div>
                 </SwiperSlide>

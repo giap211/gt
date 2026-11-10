@@ -296,14 +296,14 @@ export function BottomDock() {
           gap: 4px;
           padding: 8px 10px;
           border-radius: 28px;
-          background: rgba(255, 255, 255, 0.92);
+          background: rgba(255, 255, 255, 0.46);
           border: 1px solid rgba(139, 92, 246, 0.12);
           box-shadow: 0 10px 40px rgba(88, 28, 135, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
           backdrop-filter: blur(20px) saturate(160%);
           -webkit-backdrop-filter: blur(20px) saturate(160%);
         }
         html[data-mobile-theme="dark"] .gt-dock-nav {
-          background: rgba(24, 24, 32, 0.92);
+          background: rgba(24, 24, 32, 0.48);
           border-color: rgba(255, 255, 255, 0.08);
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
         }
@@ -329,8 +329,8 @@ export function BottomDock() {
         }
         .gt-dock-item.is-active {
           color: #fff;
-          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-          box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.52) 0%, rgba(124, 58, 237, 0.52) 100%);
+          box-shadow: 0 4px 14px rgba(124, 58, 237, 0.18), inset 0 1px 0 rgba(255,255,255,.22);
         }
         html[data-mobile-theme="light"] .gt-dock-item:not(.is-active) {
           color: #9ca3af;
