@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
+import { LiquidGlassDockSurface } from "./liquid-glass-dock-surface";
 
 export function BottomDock() {
   const pathname = usePathname();
@@ -246,6 +247,7 @@ export function BottomDock() {
       <div className="gt-dock lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-4 pb-3 pt-1">
           <nav className="gt-dock-nav pointer-events-auto" aria-label="Điều hướng chính">
+            <LiquidGlassDockSurface />
             <Link
               href="/"
               onClick={(e) => handleDockNavigation(e, isHome)}
@@ -296,133 +298,61 @@ export function BottomDock() {
           align-items: center;
           justify-content: space-between;
           gap: 4px;
-          padding: 8px 10px;
-          border-radius: 28px;
-          background: rgba(255, 255, 255, 0.23);
-          border: 1px solid rgba(139, 92, 246, 0.06);
-          box-shadow: 0 10px 40px rgba(88, 28, 135, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
-          backdrop-filter: blur(20px) saturate(160%);
-          -webkit-backdrop-filter: blur(20px) saturate(160%);
-        }
-        /* Directional specular rim: concentrated highlights, not a flat white outline. */
-        .gt-dock-nav::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          padding: 1.15px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: conic-gradient(
-            from -38deg,
-            rgba(255,255,255,.08) 0deg,
-            rgba(255,255,255,.72) 34deg,
-            rgba(221,214,254,.48) 62deg,
-            rgba(255,255,255,.06) 108deg,
-            rgba(255,255,255,.02) 190deg,
-            rgba(196,181,253,.24) 248deg,
-            rgba(255,255,255,.82) 286deg,
-            rgba(255,255,255,.08) 322deg,
-            rgba(255,255,255,.08) 360deg
-          );
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          opacity: .9;
-        }
-        .gt-dock-nav::after {
-          content: "";
-          position: absolute;
-          inset: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: linear-gradient(115deg, rgba(255,255,255,.13), transparent 24%, transparent 72%, rgba(196,181,253,.07));
-          opacity: .55;
-          z-index: -1;
-        }
-        html[data-mobile-theme="dark"] .gt-dock-nav {
-          background: rgba(24, 24, 32, 0.24);
-          border-color: rgba(255, 255, 255, 0.08);
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,.035);
-        }
-        html[data-mobile-theme="dark"] .gt-dock-nav::before { opacity: .82; }
-        html[data-mobile-theme="light"] .gt-dock-nav::before { opacity: .72; }
-
-        .gt-dock-item {
-          position: relative;
-          isolation: isolate;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 3px;
-          min-height: 52px;
-          padding: 6px 4px;
-          border-radius: 20px;
-          color: #9ca3af;
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: -0.01em;
-          transition: color .2s ease, background .25s ease, box-shadow .25s ease, transform .25s ease;
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          text-decoration: none;
+          height: 72px;
+          padding: 0 6px;
+          overflow: hidden;
+          border-radius: 36px;
+          background: rgba(255,255,255,.035);
+          border: 1px solid rgba(255,255,255,.16);
+          box-shadow: 0 12px 32px rgba(0,0,0,.32);
           -webkit-tap-highlight-color: transparent;
         }
-        .gt-dock-item.is-active {
-          color: #fff;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.13) 0%, rgba(124, 58, 237, 0.075) 52%, rgba(196,181,253,.12) 100%);
-          box-shadow: 0 4px 18px rgba(124, 58, 237, 0.10), inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(167,139,250,.12);
+        .gt-liquid-glass-canvas {
+          position:absolute;inset:0;width:100%;height:100%;
+          border-radius:inherit;pointer-events:none;z-index:0;
         }
-        /* The selected capsule gets its own matching specular edge and soft glass sheen. */
-        .gt-dock-item.is-active::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          padding: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: conic-gradient(
-            from -42deg,
-            rgba(255,255,255,.10) 0deg,
-            rgba(255,255,255,.92) 38deg,
-            rgba(221,214,254,.72) 68deg,
-            rgba(255,255,255,.12) 126deg,
-            rgba(167,139,250,.10) 208deg,
-            rgba(196,181,253,.62) 260deg,
-            rgba(255,255,255,.88) 296deg,
-            rgba(255,255,255,.10) 336deg,
-            rgba(255,255,255,.10) 360deg
-          );
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          opacity: .9;
+        .gt-liquid-glass-rim {
+          position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+          box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),inset 1.5px 1.5px 2px rgba(255,255,255,.5),inset -1.5px -1.5px 2px rgba(255,255,255,.2);
+          background:rgba(255,255,255,.035);
+          -webkit-backdrop-filter:blur(18px) saturate(1.6);
+          backdrop-filter:blur(18px) saturate(1.6);
         }
-        .gt-dock-item.is-active::after {
-          content: "";
-          position: absolute;
-          inset: 1px;
-          border-radius: inherit;
-          pointer-events: none;
-          background: linear-gradient(115deg, rgba(255,255,255,.20), transparent 38%, transparent 72%, rgba(196,181,253,.10));
-          opacity: .8;
+        .gt-liquid-glass-bubble {
+          position:absolute;top:8px;bottom:8px;left:0;width:0;border-radius:28px;
+          background:rgba(255,255,255,.18);
+          box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
+          transition:left .35s cubic-bezier(.3,1.4,.5,1),width .35s;z-index:2;pointer-events:none;
         }
-        .gt-dock-item > svg,
-        .gt-dock-item > span { position: relative; z-index: 1; }
-        html[data-mobile-theme="light"] .gt-dock-item:not(.is-active) { color: #9ca3af; }
-        html[data-mobile-theme="dark"] .gt-dock-item:not(.is-active) { color: rgba(255, 255, 255, 0.45); }
-        html[data-mobile-theme="light"] .gt-dock-item.is-active { color: #5b21b6; }
-        html[data-mobile-theme="dark"] .gt-dock-item.is-active { color: #fff; }
-        html[data-mobile-theme="light"] body {
-          background: linear-gradient(180deg, #f3f0ff 0%, #f8f7fc 40%, #f5f3fb 100%) !important;
+        .gt-dock-item {
+          position:relative;z-index:3;isolation:isolate;flex:1;display:flex;flex-direction:column;
+          align-items:center;justify-content:center;gap:3px;min-width:0;height:60px;
+          padding:6px 4px;border-radius:28px;color:rgba(255,255,255,.65);
+          font-size:10.5px;font-weight:500;letter-spacing:-.01em;
+          transition:transform .25s cubic-bezier(.3,1.6,.5,1),color .2s;
+          border:0;background:transparent;cursor:pointer;text-decoration:none;
+          -webkit-tap-highlight-color:transparent;
         }
-        html[data-mobile-theme="dark"] body { background: #0c0c12 !important; }
+        .gt-dock-item > svg { width:24px;height:24px;stroke-width:1.8; }
+        .gt-dock-item.is-active { color:#fff; }
+        .gt-dock-item:active { transform:scale(1.12); }
+        html[data-mobile-theme="light"] .gt-dock-nav {
+          background:rgba(248,246,255,.08);border-color:rgba(255,255,255,.5);
+          box-shadow:0 12px 32px rgba(66,45,120,.18);
+        }
+        html[data-mobile-theme="light"] .gt-liquid-glass-rim {
+          background:rgba(255,255,255,.08);
+          box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),inset 1.5px 1.5px 2px rgba(255,255,255,.8),inset -1.5px -1.5px 2px rgba(124,58,237,.1);
+        }
+        html[data-mobile-theme="light"] .gt-liquid-glass-bubble {
+          background:rgba(124,58,237,.14);box-shadow:inset 0 0 0 1px rgba(124,58,237,.24);
+        }
+        html[data-mobile-theme="light"] .gt-dock-item { color:rgba(49,46,65,.62); }
+        html[data-mobile-theme="light"] .gt-dock-item.is-active { color:#6d28d9; }
         @media (prefers-reduced-motion: reduce) {
-          .gt-dock-item { transition: none; }
+          .gt-dock-item,.gt-liquid-glass-bubble { transition:none; }
         }
-        @media (min-width: 1024px) { .gt-dock { display: none !important; } }
+        @media (min-width:1024px) { .gt-dock { display:none !important; } }
       `}</style>
     </>
   );
