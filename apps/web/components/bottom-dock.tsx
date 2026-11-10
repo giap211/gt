@@ -193,8 +193,10 @@ function createKubeDockDisplacement(width: number, height: number): KubeDockDisp
 
   return {
     url: canvas.toDataURL("image/png"),
-    width: imageData.width,
-    height: imageData.height,
+    // The PNG is rasterized at DPR resolution, but SVG filter coordinates
+    // are CSS pixels. Keep the rendered feImage dimensions in CSS pixels.
+    width,
+    height,
     scale: maximumDisplacement,
   };
 }
@@ -470,7 +472,16 @@ export function BottomDock() {
               style={{ position: "absolute", overflow: "hidden" }}
             >
               <defs>
-                <filter id={refractionFilterId} colorInterpolationFilters="sRGB">
+                <filter
+                  id={refractionFilterId}
+                  filterUnits="userSpaceOnUse"
+                  primitiveUnits="userSpaceOnUse"
+                  x={0}
+                  y={0}
+                  width={refractionMap.width}
+                  height={refractionMap.height}
+                  colorInterpolationFilters="sRGB"
+                >
                   <feImage
                     href={refractionMap.url}
                     x={0}
