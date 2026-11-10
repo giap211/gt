@@ -30,6 +30,7 @@ interface Movie {
   hero_source?: "tmdb" | "netflix" | "latest";
   rating?: number | string;
   content?: string;
+  description?: string;
   category?: { name: string }[];
   tmdb?: { type?: "movie" | "tv" | string };
 }
@@ -139,6 +140,13 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           color: rgba(255, 255, 255, 0.7);
           font-size: 13px;
           line-height: 1.5;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          line-clamp: 2;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-height: 3em;
         }
         .hero-btn-primary {
           display: inline-flex;
@@ -217,7 +225,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
             {movies.map((movie, index) => {
               const heroImage =
                 movie.backdrop_url || movie.thumb_url || movie.poster_url;
-              const desc = cleanText(movie.content);
+              const desc = cleanText(movie.content || movie.description);
               const metaParts = [
                 movie.rating ? `★ ${movie.rating}` : null,
                 movie.year ? String(movie.year) : null,
@@ -273,7 +281,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                         )}
 
                         {desc && (
-                          <p className="hero-card-desc mt-2.5 line-clamp-2 max-w-[300px]">
+                          <p className="hero-card-desc mt-2.5 max-w-[300px]">
                             {desc}
                           </p>
                         )}
