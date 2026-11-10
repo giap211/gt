@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
+import { LiquidGlassSurface } from "./liquid-glass-surface";
 
 /**
  * Kube Playground's displacement-map implementation.
@@ -505,15 +506,8 @@ export function BottomDock() {
             ref={dockNavRef}
             className="gt-dock-nav pointer-events-auto"
             aria-label="Điều hướng chính"
-            style={
-              refractionMap
-                ? {
-                    backdropFilter: `url(#${refractionFilterId})`,
-                    WebkitBackdropFilter: `url(#${refractionFilterId})`,
-                  }
-                : undefined
-            }
           >
+            <LiquidGlassSurface />
             <Link
               href="/"
               onClick={(e) => handleDockNavigation(e, isHome)}
@@ -565,7 +559,14 @@ export function BottomDock() {
           min-height: 68px;
           padding: 8px 10px;
           border-radius: 28px;
-          background: transparent;
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
+          border: 1px solid rgba(255,255,255,.22);
+          background: rgba(22, 18, 43, .28);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 10px 34px rgba(10, 7, 28, .18);
+          backdrop-filter: blur(18px) saturate(1.35);
+          -webkit-backdrop-filter: blur(18px) saturate(1.35);
         }
         .gt-dock-item {
           flex: 1;
@@ -576,6 +577,8 @@ export function BottomDock() {
           align-items: center;
           justify-content: center;
           gap: 3px;
+          position: relative;
+          z-index: 1;
           color: inherit;
           font-size: 10px;
           font-weight: 600;
@@ -586,7 +589,9 @@ export function BottomDock() {
         }
         .gt-dock-item.is-active { color: #a78bfa; }
         html[data-mobile-theme="dark"] .gt-dock-nav { color: #fff; }
-        html[data-mobile-theme="light"] .gt-dock-nav { color: #312e41; }
+        html[data-mobile-theme="light"] .gt-dock-nav { color: #312e41; background: rgba(248,246,255,.34); border-color: rgba(255,255,255,.72); box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 10px 34px rgba(66,45,120,.12); }
+        html[data-mobile-theme="light"] .gt-dock-nav .gt-dock-item { color: #312e41; }
+        html[data-mobile-theme="light"] .gt-dock-nav .gt-dock-item.is-active { color: #7c3aed; }
         @media (min-width: 1024px) { .gt-dock { display: none !important; } }
       `}</style>
     </>
