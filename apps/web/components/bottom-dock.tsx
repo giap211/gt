@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -21,187 +21,6 @@ import { useMember } from "./member-provider";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
 import { LiquidGlassSurface } from "./liquid-glass-surface";
 
-/**
- * Kube Playground's displacement-map implementation.
- * Source: kube/kube.io, liquid_glass_css_svg/lib/displacementMap.ts
- * and lib/surfaceEquations.ts (commit bd091c537fd502f2d1d4d60817e6f05626508e6b).
- * The equations, sample count, pixel map generation and channel encoding are kept intact.
- */
-type KubeDockDisplacement = {
-  url: string;
-  width: number;
-  height: number;
-  scale: number;
-};
-
-const KUBE_CONVEX_CIRCLE = (x: number) => Math.sqrt(1 - (1 - x) ** 2);
-
-function calculateDisplacementMap(
-  glassThickness = 50,
-  bezelWidth = 60,
-  bezelHeightFn: (x: number) => number = KUBE_CONVEX_CIRCLE,
-  refractiveIndex = 1.5,
-  samples = 512,
-): number[] {
-  const eta = 1 / refractiveIndex;
-
-  function refract(normalX: number, normalY: number): [number, number] | null {
-    const dot = normalY;
-    const k = 1 - eta * eta * (1 - dot * dot);
-    if (k < 0) return null;
-    const kSqrt = Math.sqrt(k);
-    return [
-      -(eta * dot + kSqrt) * normalX,
-      eta - (eta * dot + kSqrt) * normalY,
-    ];
-  }
-
-  return Array.from({ length: samples }, (_, i) => {
-    const x = i / samples;
-    const y = bezelHeightFn(x);
-    const dx = x < 1 ? 0.0001 : -0.0001;
-    const y2 = bezelHeightFn(x + dx);
-    const derivative = (y2 - y) / dx;
-    const magnitude = Math.sqrt(derivative * derivative + 1);
-    const normal: [number, number] = [-derivative / magnitude, -1 / magnitude];
-    const refracted = refract(normal[0], normal[1]);
-
-    if (!refracted) return 0;
-
-    const remainingHeightOnBezel = y * bezelWidth;
-    const remainingHeight = remainingHeightOnBezel + glassThickness;
-    return refracted[0] * (remainingHeight / refracted[1]);
-  });
-}
-
-function calculateDisplacementMap2(
-  canvasWidth: number,
-  canvasHeight: number,
-  objectWidth: number,
-  objectHeight: number,
-  radius: number,
-  bezelWidth: number,
-  maximumDisplacement: number,
-  precomputedDisplacementMap: number[] = [],
-  dpr?: number,
-): ImageData {
-  const devicePixelRatio =
-    dpr ?? (typeof window !== "undefined" ? (window.devicePixelRatio ?? 1) : 1);
-  const bufferWidth = Math.round(canvasWidth * devicePixelRatio);
-  const bufferHeight = Math.round(canvasHeight * devicePixelRatio);
-  const imageData = new ImageData(bufferWidth, bufferHeight);
-
-  const neutral = 0xff008080;
-  new Uint32Array(imageData.data.buffer).fill(neutral);
-
-  const radius_ = radius * devicePixelRatio;
-  const bezel = bezelWidth * devicePixelRatio;
-  const radiusSquared = radius_ ** 2;
-  const radiusPlusOneSquared = (radius_ + 1) ** 2;
-  const radiusMinusBezelSquared = (radius_ - bezel) ** 2;
-  const objectWidth_ = objectWidth * devicePixelRatio;
-  const objectHeight_ = objectHeight * devicePixelRatio;
-  const widthBetweenRadiuses = objectWidth_ - radius_ * 2;
-  const heightBetweenRadiuses = objectHeight_ - radius_ * 2;
-  const objectX = (bufferWidth - objectWidth_) / 2;
-  const objectY = (bufferHeight - objectHeight_) / 2;
-
-  for (let y1 = 0; y1 < objectHeight_; y1++) {
-    for (let x1 = 0; x1 < objectWidth_; x1++) {
-      const idx = ((objectY + y1) * bufferWidth + objectX + x1) * 4;
-      const isOnLeftSide = x1 < radius_;
-      const isOnRightSide = x1 >= objectWidth_ - radius_;
-      const isOnTopSide = y1 < radius_;
-      const isOnBottomSide = y1 >= objectHeight_ - radius_;
-      const x = isOnLeftSide
-        ? x1 - radius_
-        : isOnRightSide
-          ? x1 - radius_ - widthBetweenRadiuses
-          : 0;
-      const y = isOnTopSide
-        ? y1 - radius_
-        : isOnBottomSide
-          ? y1 - radius_ - heightBetweenRadiuses
-          : 0;
-      const distanceToCenterSquared = x * x + y * y;
-      const isInBezel =
-        distanceToCenterSquared <= radiusPlusOneSquared &&
-        distanceToCenterSquared >= radiusMinusBezelSquared;
-
-      if (isInBezel) {
-        const opacity =
-          distanceToCenterSquared < radiusSquared
-            ? 1
-            : 1 -
-              (Math.sqrt(distanceToCenterSquared) - Math.sqrt(radiusSquared)) /
-                (Math.sqrt(radiusPlusOneSquared) - Math.sqrt(radiusSquared));
-        const distanceFromCenter = Math.sqrt(distanceToCenterSquared);
-        const distanceFromSide = radius_ - distanceFromCenter;
-        const cos = x / distanceFromCenter;
-        const sin = y / distanceFromCenter;
-        const bezelIndex =
-          ((distanceFromSide / bezel) * precomputedDisplacementMap.length) | 0;
-        const distance = precomputedDisplacementMap[bezelIndex] ?? 0;
-        const dX = (-cos * distance) / maximumDisplacement;
-        const dY = (-sin * distance) / maximumDisplacement;
-        imageData.data[idx] = 128 + dX * 127 * opacity;
-        imageData.data[idx + 1] = 128 + dY * 127 * opacity;
-        imageData.data[idx + 2] = 0;
-        imageData.data[idx + 3] = 255;
-      }
-    }
-  }
-
-  return imageData;
-}
-
-function createKubeDockDisplacement(width: number, height: number): KubeDockDisplacement | null {
-  if (typeof window === "undefined" || width < 2 || height < 2) return null;
-
-  // Same Playground defaults: Convex Circle, 50px glass thickness,
-  // 60px bezel width, refractive index 1.5 and 512 ray samples.
-  const bezelWidth = 60;
-  const glassThickness = 50;
-  const refractiveIndex = 1.5;
-  const samples = 512;
-  const radius = Math.min(width, height) / 2;
-  const precomputed = calculateDisplacementMap(
-    glassThickness,
-    bezelWidth,
-    KUBE_CONVEX_CIRCLE,
-    refractiveIndex,
-    samples,
-  );
-  const maximumDisplacement =
-    Math.max(...precomputed.map((value) => Math.abs(value))) || 1;
-
-  const imageData = calculateDisplacementMap2(
-    width,
-    height,
-    width,
-    height,
-    radius,
-    bezelWidth,
-    maximumDisplacement,
-    precomputed,
-  );
-  const canvas = document.createElement("canvas");
-  canvas.width = imageData.width;
-  canvas.height = imageData.height;
-  const context = canvas.getContext("2d");
-  if (!context) return null;
-  context.putImageData(imageData, 0, 0);
-
-  return {
-    url: canvas.toDataURL("image/png"),
-    // The PNG is rasterized at DPR resolution, but SVG filter coordinates
-    // are CSS pixels. Keep the rendered feImage dimensions in CSS pixels.
-    width,
-    height,
-    scale: maximumDisplacement,
-  };
-}
-
 export function BottomDock() {
   const pathname = usePathname();
   const router = useRouter();
@@ -214,9 +33,6 @@ export function BottomDock() {
   const [results, setResults] = useState<ListMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const dockNavRef = useRef<HTMLElement>(null);
-  const refractionFilterId = `gt-kube-refraction-${useId().replace(/:/g, "")}`;
-  const [refractionMap, setRefractionMap] = useState<KubeDockDisplacement | null>(null);
 
   const isHome = pathname === "/";
   const isList =
@@ -292,39 +108,6 @@ export function BottomDock() {
     return () => clearTimeout(timer);
   }, [query]);
 
-
-  // Build the Kube displacement map once for the dock's measured size.
-  // ResizeObserver only rebuilds it when the dock dimensions actually change.
-  useEffect(() => {
-    const nav = dockNavRef.current;
-    if (!nav) return;
-
-    let frame = 0;
-    let lastSize = "";
-    const renderMap = () => {
-      const rect = nav.getBoundingClientRect();
-      const width = Math.round(rect.width);
-      const height = Math.round(rect.height);
-      if (!width || !height) return;
-      const sizeKey = `${width}x${height}x${window.devicePixelRatio || 1}`;
-      if (sizeKey === lastSize) return;
-      lastSize = sizeKey;
-      const nextMap = createKubeDockDisplacement(width, height);
-      setRefractionMap(nextMap);
-    };
-    const scheduleMap = () => {
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(renderMap);
-    };
-    const observer = new ResizeObserver(scheduleMap);
-    observer.observe(nav);
-    scheduleMap();
-
-    return () => {
-      observer.disconnect();
-      window.cancelAnimationFrame(frame);
-    };
-  }, [refractionFilterId]);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
   const closeDockPanels = () => {
@@ -464,46 +247,7 @@ export function BottomDock() {
 
       <div className="gt-dock lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-md px-4 pb-3 pt-1">
-          {refractionMap && (
-            <svg
-              aria-hidden="true"
-              className="gt-dock-filter-defs"
-              width="0"
-              height="0"
-              style={{ position: "absolute", overflow: "hidden" }}
-            >
-              <defs>
-                <filter
-                  id={refractionFilterId}
-                  filterUnits="userSpaceOnUse"
-                  primitiveUnits="userSpaceOnUse"
-                  x={0}
-                  y={0}
-                  width={refractionMap.width}
-                  height={refractionMap.height}
-                  colorInterpolationFilters="sRGB"
-                >
-                  <feImage
-                    href={refractionMap.url}
-                    x={0}
-                    y={0}
-                    width={refractionMap.width}
-                    height={refractionMap.height}
-                    result="displacement_map"
-                  />
-                  <feDisplacementMap
-                    in="SourceGraphic"
-                    in2="displacement_map"
-                    scale={refractionMap.scale}
-                    xChannelSelector="R"
-                    yChannelSelector="G"
-                  />
-                </filter>
-              </defs>
-            </svg>
-          )}
           <nav
-            ref={dockNavRef}
             className="gt-dock-nav pointer-events-auto"
             aria-label="Điều hướng chính"
           >
