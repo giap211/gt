@@ -903,3 +903,6 @@ html[data-mobile-theme="light"] .member-modal-panel input::placeholder, html[dat
 html[data-mobile-theme="light"] .ranked-poster-card a, html[data-theme="light"] .ranked-poster-card a { color:#302944!important; }
 html[data-mobile-theme="light"] .ranked-poster-card p, html[data-theme="light"] .ranked-poster-card p { color:#817990!important; }
 html[data-mobile-theme="light"] .ranked-poster-card>div.mt-1>span:first-child, html[data-theme="light"] .ranked-poster-card>div.mt-1>span:first-child { color:#8054dc!important; -webkit-text-fill-color:#8054dc!important; text-shadow:none!important; }
+/* Portrait posters stay clean: no rim, glow or corner highlight. */
+.movie-poster-frame-vertical img { border:0!important; box-shadow:none!important; }
+.movie-poster-frame-vertical::after { content:none!important; display:none!important; }
