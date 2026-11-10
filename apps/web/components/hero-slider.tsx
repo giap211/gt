@@ -219,9 +219,10 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                 movie.backdrop_url || movie.thumb_url || movie.poster_url;
               const desc = cleanText(movie.content);
               const metaParts = [
+                movie.rating ? `★ ${movie.rating}` : null,
                 movie.year ? String(movie.year) : null,
                 movie.quality || null,
-                movie.time || movie.episode_current || null,
+                movie.episode_current || movie.time || null,
               ].filter(Boolean);
 
               return (
@@ -279,8 +280,6 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
 
 
                       </div>
-
-                    </div>
                     <div className="absolute inset-x-5 bottom-5 z-30 flex flex-col gap-3 sm:inset-x-8 lg:inset-x-12">
                       <div className="flex flex-wrap items-center gap-2.5">
                         <Link href={`/phim/${movie.slug}`} className="hero-btn-primary"><Play size={15} fill="currentColor" /> Xem phim</Link>
