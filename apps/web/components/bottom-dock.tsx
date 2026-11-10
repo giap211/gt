@@ -205,6 +205,12 @@ export function BottomDock() {
       lastIndex: index,
       dragging: false,
     };
+    const hit = dockItemAtPoint(event.clientX, event.clientY);
+    if (hit) {
+      setDockDragIndex(index);
+      setDockDragRect(hit.rect);
+    }
+    dockNavRef.current?.classList.add("is-pressing");
   };
 
   const handleDockPointerMove = (event: React.PointerEvent<HTMLElement>) => {
@@ -220,7 +226,12 @@ export function BottomDock() {
     }
     event.preventDefault();
     const hit = dockItemAtPoint(event.clientX, event.clientY);
-    if (!hit) return;
+    if (!hit) {
+      pointer.lastIndex = -1;
+      setDockDragIndex(null);
+      setDockDragRect(null);
+      return;
+    }
     pointer.lastIndex = hit.index;
     setDockDragIndex(hit.index);
     setDockDragRect(hit.rect);
@@ -231,14 +242,20 @@ export function BottomDock() {
     const nav = dockNavRef.current;
     if (!pointer || pointer.pointerId !== event.pointerId) return;
     dockPointerRef.current = null;
+    nav?.classList.remove("is-pressing");
     if (pointer.dragging) {
       event.preventDefault();
       nav?.classList.remove("is-dragging");
       try { if (nav?.hasPointerCapture(event.pointerId)) nav.releasePointerCapture(event.pointerId); } catch { /* ignore */ }
+      const finalHit = dockItemAtPoint(event.clientX, event.clientY);
+      const finalIndex = finalHit?.index ?? -1;
       setDockDragIndex(null);
       setDockDragRect(null);
-      if (!cancelled) activateDockItem(pointer.lastIndex);
+      if (!cancelled && finalIndex >= 0) activateDockItem(finalIndex);
       window.setTimeout(() => { suppressDockClickRef.current = false; }, 0);
+    } else {
+      setDockDragIndex(null);
+      setDockDragRect(null);
     }
   };
 
@@ -498,6 +515,17 @@ export function BottomDock() {
         html[data-mobile-theme="dark"] .gt-dock-drag-indicator {
           background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(196,181,253,.18) 52%, rgba(255,255,255,.16));
           border-color: rgba(255,255,255,.48);
+        }
+        .gt-dock-nav.is-pressing .gt-dock-item.is-active {
+          background: transparent;
+          box-shadow: none;
+        }
+        .gt-dock-nav.is-pressing .gt-dock-item.is-active::before,
+        .gt-dock-nav.is-pressing .gt-dock-item.is-active::after { opacity: 0; }
+        .gt-dock-nav.is-pressing .gt-dock-drag-indicator {
+          opacity: .78;
+          transform: scale(1.075);
+          filter: blur(.35px);
         }
         .gt-dock-nav.is-dragging .gt-dock-item.is-active {
           background: transparent;
