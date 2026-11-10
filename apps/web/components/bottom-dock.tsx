@@ -290,6 +290,8 @@ export function BottomDock() {
 
       <style jsx global>{`
         .gt-dock-nav {
+          position: relative;
+          isolation: isolate;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -302,12 +304,52 @@ export function BottomDock() {
           backdrop-filter: blur(20px) saturate(160%);
           -webkit-backdrop-filter: blur(20px) saturate(160%);
         }
+        /* Directional specular rim: concentrated highlights, not a flat white outline. */
+        .gt-dock-nav::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          padding: 1.15px;
+          border-radius: inherit;
+          pointer-events: none;
+          background: conic-gradient(
+            from -38deg,
+            rgba(255,255,255,.08) 0deg,
+            rgba(255,255,255,.72) 34deg,
+            rgba(221,214,254,.48) 62deg,
+            rgba(255,255,255,.06) 108deg,
+            rgba(255,255,255,.02) 190deg,
+            rgba(196,181,253,.24) 248deg,
+            rgba(255,255,255,.82) 286deg,
+            rgba(255,255,255,.08) 322deg,
+            rgba(255,255,255,.08) 360deg
+          );
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: .9;
+        }
+        .gt-dock-nav::after {
+          content: "";
+          position: absolute;
+          inset: 1px;
+          border-radius: inherit;
+          pointer-events: none;
+          background: linear-gradient(115deg, rgba(255,255,255,.13), transparent 24%, transparent 72%, rgba(196,181,253,.07));
+          opacity: .55;
+          z-index: -1;
+        }
         html[data-mobile-theme="dark"] .gt-dock-nav {
           background: rgba(24, 24, 32, 0.24);
           border-color: rgba(255, 255, 255, 0.08);
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,.035);
         }
+        html[data-mobile-theme="dark"] .gt-dock-nav::before { opacity: .82; }
+        html[data-mobile-theme="light"] .gt-dock-nav::before { opacity: .72; }
+
         .gt-dock-item {
+          position: relative;
+          isolation: isolate;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -321,32 +363,66 @@ export function BottomDock() {
           font-size: 10px;
           font-weight: 600;
           letter-spacing: -0.01em;
-          transition: all 0.2s ease;
+          transition: color .2s ease, background .25s ease, box-shadow .25s ease, transform .25s ease;
           border: none;
           background: transparent;
           cursor: pointer;
           text-decoration: none;
+          -webkit-tap-highlight-color: transparent;
         }
         .gt-dock-item.is-active {
           color: #fff;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.052) 0%, rgba(124, 58, 237, 0.052) 100%);
-          box-shadow: 0 4px 14px rgba(124, 58, 237, 0.018), inset 0 1px 0 rgba(255,255,255,.12);
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.13) 0%, rgba(124, 58, 237, 0.075) 52%, rgba(196,181,253,.12) 100%);
+          box-shadow: 0 4px 18px rgba(124, 58, 237, 0.10), inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(167,139,250,.12);
         }
-        html[data-mobile-theme="light"] .gt-dock-item:not(.is-active) {
-          color: #9ca3af;
+        /* The selected capsule gets its own matching specular edge and soft glass sheen. */
+        .gt-dock-item.is-active::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          padding: 1px;
+          border-radius: inherit;
+          pointer-events: none;
+          background: conic-gradient(
+            from -42deg,
+            rgba(255,255,255,.10) 0deg,
+            rgba(255,255,255,.92) 38deg,
+            rgba(221,214,254,.72) 68deg,
+            rgba(255,255,255,.12) 126deg,
+            rgba(167,139,250,.10) 208deg,
+            rgba(196,181,253,.62) 260deg,
+            rgba(255,255,255,.88) 296deg,
+            rgba(255,255,255,.10) 336deg,
+            rgba(255,255,255,.10) 360deg
+          );
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: .9;
         }
-        html[data-mobile-theme="dark"] .gt-dock-item:not(.is-active) {
-          color: rgba(255, 255, 255, 0.45);
+        .gt-dock-item.is-active::after {
+          content: "";
+          position: absolute;
+          inset: 1px;
+          border-radius: inherit;
+          pointer-events: none;
+          background: linear-gradient(115deg, rgba(255,255,255,.20), transparent 38%, transparent 72%, rgba(196,181,253,.10));
+          opacity: .8;
         }
+        .gt-dock-item > svg,
+        .gt-dock-item > span { position: relative; z-index: 1; }
+        html[data-mobile-theme="light"] .gt-dock-item:not(.is-active) { color: #9ca3af; }
+        html[data-mobile-theme="dark"] .gt-dock-item:not(.is-active) { color: rgba(255, 255, 255, 0.45); }
+        html[data-mobile-theme="light"] .gt-dock-item.is-active { color: #5b21b6; }
+        html[data-mobile-theme="dark"] .gt-dock-item.is-active { color: #fff; }
         html[data-mobile-theme="light"] body {
           background: linear-gradient(180deg, #f3f0ff 0%, #f8f7fc 40%, #f5f3fb 100%) !important;
         }
-        html[data-mobile-theme="dark"] body {
-          background: #0c0c12 !important;
+        html[data-mobile-theme="dark"] body { background: #0c0c12 !important; }
+        @media (prefers-reduced-motion: reduce) {
+          .gt-dock-item { transition: none; }
         }
-        @media (min-width: 1024px) {
-          .gt-dock { display: none !important; }
-        }
+        @media (min-width: 1024px) { .gt-dock { display: none !important; } }
       `}</style>
     </>
   );
