@@ -3,9 +3,8 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Liquid-glass dock renderer adapted from the supplied CineGlass shader.
- * The texture is a lightweight canvas reconstruction of visible page imagery
- * (same-origin/ CORS-enabled images, headings and page colors), not a DOM screenshot.
+ * WebGL liquid-glass surface. The scene texture is redrawn every frame so
+ * refraction tracks page scrolling and movement without a delayed capture.
  */
 export function LiquidGlassDockSurface() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,8 +16,17 @@ export function LiquidGlassDockSurface() {
     const dock = canvas?.parentElement;
     if (!canvas || !bubble || !dock) return;
 
-    const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false });
-    if (!gl) return;
+    const gl = canvas.getContext("webgl", {
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+    });
+    if (!gl) {
+      dock.classList.add("gt-fb");
+      return () => dock.classList.remove("gt-fb");
+    }
+
+    dock.classList.remove("gt-fb");
 
     const vertex = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
     const fragment = `
@@ -62,36 +70,114 @@ export function LiquidGlassDockSurface() {
       }
       return shader;
     };
+
     const vs = makeShader(gl.VERTEX_SHADER, vertex);
     const fs = makeShader(gl.FRAGMENT_SHADER, fragment);
-    if (!vs || !fs) return;
+    if (!vs || !fs) {
+      dock.classList.add("gt-fb");
+      return () => {
+        dock.classList.remove("gt-fb");
+        if (vs) gl.deleteShader(vs);
+        if (fs) gl.deleteShader(fs);
+      };
+    }
+
     const program = gl.createProgram();
-    if (!program) return;
+    if (!program) {
+      dock.classList.add("gt-fb");
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return () => dock.classList.remove("gt-fb");
+    }
+
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.warn("Liquid dock program:", gl.getProgramInfoLog(program));
+      dock.classList.add("gt-fb");
+      gl.deleteProgram(program);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return () => dock.classList.remove("gt-fb");
+    }
     gl.useProgram(program);
 
     const buffer = gl.createBuffer();
+    if (!buffer) {
+      dock.classList.add("gt-fb");
+      gl.deleteProgram(program);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return () => dock.classList.remove("gt-fb");
+    }
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
     const attribute = gl.getAttribLocation(program, "a");
     gl.enableVertexAttribArray(attribute);
     gl.vertexAttribPointer(attribute, 2, gl.FLOAT, false, 0, 0);
 
     const texture = gl.createTexture();
+    if (!texture) {
+      dock.classList.add("gt-fb");
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return () => dock.classList.remove("gt-fb");
+    }
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    ([[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]] as const).forEach(([p,v]) => gl.texParameteri(gl.TEXTURE_2D,p,v));
+    ([[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]] as const).forEach(([p, v]) => {
+      gl.texParameteri(gl.TEXTURE_2D, p, v);
+    });
 
     const scene = document.createElement("canvas");
     const ctx = scene.getContext("2d");
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const margin = 60;
-    const uniforms = (name: string) => gl.getUniformLocation(program, name);
-    const uRes = uniforms("res"), uTextureSize = uniforms("tres"), uOffset = uniforms("toff"), uPress = uniforms("press"), uTex = uniforms("tex");
-    let press = 0, pressed = 0, raf = 0, lastCapture = 0;
+    const uniform = (name: string) => gl.getUniformLocation(program, name);
+    const uRes = uniform("res");
+    const uTextureSize = uniform("tres");
+    const uOffset = uniform("toff");
+    const uPress = uniform("press");
+    const uTex = uniform("tex");
+
+    let press = 0;
+    let pressed = 0;
+    let raf = 0;
+    const imgCache = new Map<string, HTMLImageElement | null>();
+
+    const getCors = (src: string) => {
+      if (!src) return null;
+      if (imgCache.has(src)) return imgCache.get(src) ?? null;
+      imgCache.set(src, null);
+      const im = new window.Image();
+      im.crossOrigin = "anonymous";
+      im.onload = () => imgCache.set(src, im);
+      im.onerror = () => imgCache.set(src, null);
+      im.src = src;
+      return null;
+    };
+
+    const drawCover = (im: HTMLImageElement, rect: DOMRect) => {
+      if (!ctx || !im.naturalWidth || !im.naturalHeight || rect.width <= 0 || rect.height <= 0) return;
+      const imageRatio = im.naturalWidth / im.naturalHeight;
+      const boxRatio = rect.width / rect.height;
+      let sx = 0;
+      let sy = 0;
+      let sw = im.naturalWidth;
+      let sh = im.naturalHeight;
+      if (imageRatio > boxRatio) {
+        sw = sh * boxRatio;
+        sx = (im.naturalWidth - sw) / 2;
+      } else {
+        sh = sw / boxRatio;
+        sy = (im.naturalHeight - sh) / 2;
+      }
+      ctx.drawImage(im, sx, sy, sw, sh, rect.left, rect.top, rect.width, rect.height);
+    };
+
     const onDown = () => { pressed = 1; };
     const onUp = () => { pressed = 0; };
     dock.addEventListener("pointerdown", onDown);
@@ -100,88 +186,114 @@ export function LiquidGlassDockSurface() {
 
     const drawScene = (ox: number, oy: number, width: number, height: number) => {
       if (!ctx) return;
-      scene.width = Math.max(2, Math.round(width*dpr));
-      scene.height = Math.max(2, Math.round(height*dpr));
-      ctx.setTransform(dpr,0,0,dpr,0,0);
+      scene.width = Math.max(2, Math.round(width * dpr));
+      scene.height = Math.max(2, Math.round(height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = getComputedStyle(document.body).backgroundColor || "#0c0c12";
-      ctx.fillRect(0,0,width,height);
-      ctx.translate(-ox,-oy);
-
-      const hero = document.querySelector<HTMLElement>("[data-hero], .home-hero, #hero, main > section:first-child");
-      if (hero) {
-        const r = hero.getBoundingClientRect();
-        if (r.bottom > oy && r.top < oy+height) {
-          ctx.save(); ctx.beginPath(); ctx.rect(r.left,r.top,r.width,r.height); ctx.clip();
-          const bg = getComputedStyle(hero).backgroundImage;
-          const gradient = ctx.createLinearGradient(r.left,r.top,r.right,r.bottom);
-          gradient.addColorStop(0,"#39206b"); gradient.addColorStop(1,"#101522");
-          ctx.fillStyle = gradient; ctx.fillRect(r.left,r.top,r.width,r.height);
-          if (bg && bg !== "none") {
-            const glow = ctx.createRadialGradient(r.left+r.width*.72,r.top+r.height*.25,1,r.left+r.width*.72,r.top+r.height*.25,r.width*.75);
-            glow.addColorStop(0,"rgba(167,139,250,.7)"); glow.addColorStop(1,"rgba(167,139,250,0)");
-            ctx.fillStyle=glow;ctx.fillRect(r.left,r.top,r.width,r.height);
-          }
-          ctx.restore();
-        }
-      }
+      ctx.fillRect(0, 0, width, height);
+      ctx.translate(-ox, -oy);
 
       document.querySelectorAll<HTMLElement>("h1,h2,h3").forEach((el) => {
-        const r=el.getBoundingClientRect(); if(r.bottom<oy||r.top>oy+height||r.right<ox||r.left>ox+width)return;
-        const style=getComputedStyle(el);ctx.font=style.fontWeight+" "+style.fontSize+" "+style.fontFamily;
-        ctx.fillStyle=style.color || "#fff";ctx.textAlign="left";ctx.textBaseline="middle";
-        ctx.fillText((el.textContent||"").trim().slice(0,64),r.left,r.top+r.height/2,Math.max(20,r.width));
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom < oy || rect.top > oy + height || rect.right < ox || rect.left > ox + width) return;
+        const style = getComputedStyle(el);
+        ctx.font = style.fontWeight + " " + style.fontSize + " " + style.fontFamily;
+        ctx.fillStyle = style.color || "#fff";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText((el.textContent || "").trim().slice(0, 64), rect.left, rect.top + rect.height / 2, Math.max(20, rect.width));
       });
 
       document.querySelectorAll<HTMLImageElement>("main img, [data-movie-card] img, .movie-card img").forEach((img) => {
-        const r=img.getBoundingClientRect();if(!img.complete||!img.naturalWidth||r.bottom<oy||r.top>oy+height||r.right<ox||r.left>ox+width)return;
-        try { ctx.save();ctx.beginPath();ctx.roundRect(r.left,r.top,r.width,r.height,8);ctx.clip();ctx.drawImage(img,r.left,r.top,r.width,r.height);ctx.restore(); } catch { /* Cross-origin images are skipped safely. */ }
+        const rect = img.getBoundingClientRect();
+        if (rect.bottom < oy || rect.top > oy + height || rect.right < ox || rect.left > ox + width) return;
+        const im = getCors(img.currentSrc || img.src);
+        if (!im) return;
+        try {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(rect.left, rect.top, rect.width, rect.height, 8);
+          ctx.clip();
+          drawCover(im, rect);
+          ctx.restore();
+        } catch {
+          try { ctx.restore(); } catch { /* Ignore canvas drawing failures. */ }
+        }
       });
     };
 
     const placeBubble = () => {
       const active = dock.querySelector<HTMLElement>(".gt-dock-item.is-active");
       if (!active) return;
-      const navRect = dock.getBoundingClientRect(), itemRect = active.getBoundingClientRect();
-      bubble.style.left = (itemRect.left-navRect.left+4)+"px";
-      bubble.style.width = Math.max(0,itemRect.width-8)+"px";
+      const navRect = dock.getBoundingClientRect();
+      const itemRect = active.getBoundingClientRect();
+      bubble.style.left = itemRect.left - navRect.left + 4 + "px";
+      bubble.style.width = Math.max(0, itemRect.width - 8) + "px";
     };
+
     const observer = new MutationObserver(placeBubble);
-    observer.observe(dock,{subtree:true,attributes:true,attributeFilter:["class"]});
+    observer.observe(dock, { subtree: true, attributes: true, attributeFilter: ["class"] });
     const resizeObserver = new ResizeObserver(placeBubble);
     resizeObserver.observe(dock);
     placeBubble();
 
-    const render = (now: number) => {
-      const bounds=dock.getBoundingClientRect(), width=bounds.width, height=bounds.height;
-      const pixelWidth=Math.max(2,Math.round(width*dpr)),pixelHeight=Math.max(2,Math.round(height*dpr));
-      if(canvas.width!==pixelWidth||canvas.height!==pixelHeight){canvas.width=pixelWidth;canvas.height=pixelHeight;gl.viewport(0,0,pixelWidth,pixelHeight);}
-      const textureWidth=width+margin*2,textureHeight=height+margin*2;
-      if(now-lastCapture>90){
-        drawScene(bounds.left-margin,bounds.top-margin,textureWidth,textureHeight);
-        gl.bindTexture(gl.TEXTURE_2D,texture);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,scene);
-        lastCapture=now;
+    const render = () => {
+      const bounds = dock.getBoundingClientRect();
+      const width = bounds.width;
+      const height = bounds.height;
+      const pixelWidth = Math.max(2, Math.round(width * dpr));
+      const pixelHeight = Math.max(2, Math.round(height * dpr));
+      if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+        canvas.width = pixelWidth;
+        canvas.height = pixelHeight;
+        gl.viewport(0, 0, pixelWidth, pixelHeight);
       }
-      press+=(pressed-press)*.15;
-      gl.uniform1i(uTex,0);gl.uniform2f(uRes,pixelWidth,pixelHeight);
-      gl.uniform2f(uTextureSize,scene.width,scene.height);gl.uniform2f(uOffset,margin*dpr,margin*dpr);gl.uniform1f(uPress,press);
-      gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-      raf=requestAnimationFrame(render);
+
+      const textureWidth = width + margin * 2;
+      const textureHeight = height + margin * 2;
+      drawScene(bounds.left - margin, bounds.top - margin, textureWidth, textureHeight);
+
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      try {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scene);
+      } catch {
+        // A failed image/texture upload must never stop the animation loop.
+      }
+
+      press += (pressed - press) * 0.15;
+      gl.uniform1i(uTex, 0);
+      gl.uniform2f(uRes, pixelWidth, pixelHeight);
+      gl.uniform2f(uTextureSize, scene.width, scene.height);
+      gl.uniform2f(uOffset, margin * dpr, margin * dpr);
+      gl.uniform1f(uPress, press);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      raf = requestAnimationFrame(render);
     };
-    raf=requestAnimationFrame(render);
+
+    raf = requestAnimationFrame(render);
 
     return () => {
-      cancelAnimationFrame(raf);observer.disconnect();resizeObserver.disconnect();
-      dock.removeEventListener("pointerdown",onDown);window.removeEventListener("pointerup",onUp);window.removeEventListener("pointercancel",onUp);
-      gl.deleteTexture(texture);gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vs);gl.deleteShader(fs);
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      resizeObserver.disconnect();
+      dock.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      dock.classList.remove("gt-fb");
+      gl.deleteTexture(texture);
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
     };
   }, []);
 
   return (
     <>
       <canvas ref={canvasRef} aria-hidden="true" className="gt-liquid-glass-canvas" />
-      <div className="gt-liquid-glass-rim" aria-hidden="true" />
       <div ref={bubbleRef} className="gt-liquid-glass-bubble" aria-hidden="true" />
     </>
   );
