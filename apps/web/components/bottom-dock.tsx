@@ -369,6 +369,51 @@ export function BottomDock() {
           -webkit-backdrop-filter: blur(18px) saturate(190%);
           transition: transform .42s cubic-bezier(.22,1,.36,1);
           will-change: transform;
+          overflow: visible;
+          isolation: isolate;
+        }
+        /* Specular rim and soft sheen travel with the selected glass capsule. */
+        .gt-dock-active-indicator::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          padding: 1.15px;
+          border-radius: inherit;
+          pointer-events: none;
+          background: conic-gradient(
+            from -42deg,
+            rgba(255,255,255,.10) 0deg,
+            rgba(255,255,255,.96) 38deg,
+            rgba(221,214,254,.78) 68deg,
+            rgba(255,255,255,.12) 126deg,
+            rgba(167,139,250,.12) 208deg,
+            rgba(196,181,253,.72) 260deg,
+            rgba(255,255,255,.92) 296deg,
+            rgba(255,255,255,.10) 336deg,
+            rgba(255,255,255,.10) 360deg
+          );
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: .96;
+        }
+        .gt-dock-active-indicator::after {
+          content: "";
+          position: absolute;
+          inset: 1px;
+          border-radius: inherit;
+          pointer-events: none;
+          background:
+            linear-gradient(115deg, rgba(255,255,255,.28), transparent 34%, transparent 70%, rgba(196,181,253,.16)),
+            radial-gradient(ellipse at 22% 0%, rgba(255,255,255,.22), transparent 58%);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.24), inset 0 -1px 0 rgba(167,139,250,.18);
+          opacity: .92;
+        }
+        html[data-mobile-theme="dark"] .gt-dock-active-indicator::before { opacity: .88; }
+        html[data-mobile-theme="dark"] .gt-dock-active-indicator::after {
+          background:
+            linear-gradient(115deg, rgba(255,255,255,.22), transparent 36%, transparent 72%, rgba(196,181,253,.18)),
+            radial-gradient(ellipse at 22% 0%, rgba(255,255,255,.16), transparent 58%);
         }
         html[data-mobile-theme="dark"] .gt-dock-active-indicator {
           background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(196,181,253,.18) 52%, rgba(255,255,255,.16));
