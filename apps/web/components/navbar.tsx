@@ -53,97 +53,65 @@ const COUNTRIES = [
   { name: "Hồng Kông", slug: "hong-kong", flag: "🇭🇰" },
 ];
 
-const AnimatedBrand = () => {
-  const target = Array.from("XEMPHIM");
-  const glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
-  const [letters, setLetters] = useState<string[]>(() =>
-    target.map((char) => (char === " " ? " " : "·")),
-  );
-
-  useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) {
-      setLetters(target);
-      return;
-    }
-
-    let index = 0;
-    let interval: ReturnType<typeof setInterval> | undefined;
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-    let cancelled = false;
-
-    const revealNext = () => {
-      if (cancelled || index >= target.length) return;
-      if (target[index] === " ") {
-        setLetters((current) => current.map((char, i) => (i === index ? " " : char)));
-        index += 1;
-        timeout = setTimeout(revealNext, 70);
-        return;
-      }
-
-      const currentIndex = index;
-      let frame = 0;
-      interval = setInterval(() => {
-        if (cancelled) return;
-        frame += 1;
-        if (frame >= 9) {
-          if (interval) clearInterval(interval);
-          setLetters((current) =>
-            current.map((char, i) => (i === currentIndex ? target[currentIndex] ?? char : char)),
-          );
-          index = currentIndex + 1;
-          timeout = setTimeout(revealNext, 85);
-          return;
-        }
-
-        const randomGlyph = glyphs[Math.floor(Math.random() * glyphs.length)] ?? "A";
-        setLetters((current) =>
-          current.map((char, i) => (i === currentIndex ? randomGlyph : char)),
-        );
-      }, 42);
-    };
-
-    timeout = setTimeout(revealNext, 180);
-    return () => {
-      cancelled = true;
-      if (interval) clearInterval(interval);
-      if (timeout) clearTimeout(timeout);
-    };
-  }, []);
-
-  return (
-    <span
-      aria-label="XEMPHIM"
-      role="img"
-      className="inline-flex items-center whitespace-nowrap select-none"
-      style={{
-        fontFamily: "var(--font-oswald), sans-serif",
-        fontSize: "clamp(20px, 2vw, 27px)",
-        fontWeight: 700,
-        lineHeight: 1,
-        letterSpacing: "-0.045em",
-        filter: "drop-shadow(0 2px 10px rgba(139,92,246,.22))",
-      }}
-    >
-      {letters.map((letter, index) => (
-        <span
-          key={index}
-          aria-hidden="true"
-          className="inline-flex justify-center"
-          style={{
-            width: target[index] === " " ? "0.28em" : "0.62em",
-            background: "linear-gradient(112deg, #c4b5fd 0%, #a78bfa 38%, #e879f9 72%, #818cf8 100%)",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent",
-          }}
-        >
-          {letter}
-        </span>
-      ))}
-    </span>
-  );
-};
+const AnimatedBrand = () => (
+  <svg
+    viewBox="0 0 190 42"
+    role="img"
+    aria-label="XEMPHIM"
+    className="h-[29px] w-[132px] sm:h-[32px] sm:w-[145px] overflow-visible select-none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <linearGradient id="xp-brand-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#c4b5fd">
+          <animate attributeName="stop-color" values="#c4b5fd;#e879f9;#818cf8;#c4b5fd" dur="5s" repeatCount="indefinite" />
+        </stop>
+        <stop offset="48%" stopColor="#a78bfa">
+          <animate attributeName="stop-color" values="#a78bfa;#818cf8;#e879f9;#a78bfa" dur="5s" repeatCount="indefinite" />
+        </stop>
+        <stop offset="100%" stopColor="#e879f9">
+          <animate attributeName="stop-color" values="#e879f9;#c4b5fd;#a78bfa;#e879f9" dur="5s" repeatCount="indefinite" />
+        </stop>
+      </linearGradient>
+      <linearGradient id="xp-brand-sweep" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#fff" stopOpacity="0" />
+        <stop offset="50%" stopColor="#fff" stopOpacity=".9" />
+        <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        <animate attributeName="x1" values="-100%;100%" dur="3.8s" repeatCount="indefinite" />
+        <animate attributeName="x2" values="0%;200%" dur="3.8s" repeatCount="indefinite" />
+      </linearGradient>
+    </defs>
+    <g transform="translate(2 4)">
+      <rect x="1" y="1" width="33" height="33" rx="10" fill="url(#xp-brand-gradient)" opacity=".16" />
+      <rect x="1" y="1" width="33" height="33" rx="10" fill="none" stroke="url(#xp-brand-gradient)" strokeWidth="1.7" />
+      <path d="M14 10.5 24 17.5 14 24.5Z" fill="url(#xp-brand-gradient)" />
+      <path d="M5 8.5V5.5Q5 4 6.5 4H9" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth="1.2" strokeLinecap="round" />
+      <circle cx="29" cy="6" r="1.6" fill="#e879f9">
+        <animate attributeName="opacity" values=".35;1;.35" dur="2s" repeatCount="indefinite" />
+      </circle>
+    </g>
+    <text
+      x="43"
+      y="29.5"
+      fill="url(#xp-brand-gradient)"
+      fontFamily="var(--font-oswald), Impact, sans-serif"
+      fontSize="26"
+      fontWeight="800"
+      letterSpacing="-.9"
+    >XEMPHIM</text>
+    <text
+      x="43"
+      y="29.5"
+      fill="url(#xp-brand-sweep)"
+      fontFamily="var(--font-oswald), Impact, sans-serif"
+      fontSize="26"
+      fontWeight="800"
+      letterSpacing="-.9"
+      opacity=".32"
+      pointerEvents="none"
+    >XEMPHIM</text>
+  </svg>
+);
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
