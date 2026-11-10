@@ -44,6 +44,23 @@ function cleanText(html?: string) {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+function wrapHeroTitle(title: string, maxChars = 20) {
+  const words = title.trim().split(/\s+/);
+  const lines: string[] = [];
+  let line = "";
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (line && candidate.length > maxChars) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = candidate;
+    }
+  }
+  if (line) lines.push(line);
+  return lines.slice(0, 2);
+}
+
 export const HeroSlider = ({ movies }: HeroSliderProps) => {
   const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -123,44 +140,41 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
             rgba(12, 8, 24, 0.95) 100%
           );
         }
-        .hero-card-title {
-          font-size: clamp(26px, 7vw, 34px);
+        .hero-card-title-svg {
+          display: block;
+          width: 100%;
+          max-width: 420px;
+          height: auto;
+          overflow: visible;
+          filter: drop-shadow(0 2px 16px rgba(0, 0, 0, 0.35));
+        }
+        .hero-card-title-svg text {
+          font-family: inherit;
+          font-size: 52px;
           font-weight: 800;
-          letter-spacing: -0.03em;
-          line-height: 1.1;
-          color: #fff;
-          text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
-          position: relative;
-          width: fit-content;
-          max-width: 100%;
+          letter-spacing: -1.6px;
+          paint-order: stroke fill;
         }
-        .hero-card-title.is-active {
-          animation: hero-title-draw 900ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+        .hero-card-title-svg tspan {
+          fill: transparent;
+          stroke: #fff;
+          stroke-width: 1.5;
+          stroke-linejoin: round;
+          stroke-dasharray: 1200;
+          stroke-dashoffset: 1200;
+          animation: hero-svg-letter-draw 3s cubic-bezier(0, 0.23, 1, 0.1) both;
         }
-        @keyframes hero-title-draw {
-          0% {
-            opacity: 0;
-            clip-path: inset(0 100% 0 0);
-            filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.8));
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.9);
-          }
-          55% {
-            opacity: 1;
-            clip-path: inset(0 0 0 0);
-            color: rgba(255, 255, 255, 0.72);
-            -webkit-text-stroke: 0.7px rgba(196, 181, 253, 0.8);
-          }
-          100% {
-            opacity: 1;
-            clip-path: inset(0 0 0 0);
-            color: #fff;
-            filter: drop-shadow(0 0 0 rgba(167, 139, 250, 0));
-            -webkit-text-stroke: 0 transparent;
-          }
+        @keyframes hero-svg-letter-draw {
+          0% { opacity: 0; fill: transparent; stroke-dashoffset: 1200; }
+          30% { opacity: 1; fill: transparent; stroke-dashoffset: 1200; }
+          90% { fill: rgba(255, 255, 255, 0); }
+          100% { opacity: 1; fill: #fff; stroke-dashoffset: 0; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .hero-card-title.is-active {
+          .hero-card-title-svg tspan {
             animation: none;
+            fill: #fff;
+            stroke: none;
           }
         }
         .hero-card-meta {
@@ -301,12 +315,28 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                           className="block"
                           aria-label={`Xem phim ${movie.name}`}
                         >
-                          <h1
+                          <svg
                             key={movie.slug}
-                            className={`hero-card-title line-clamp-2 ${index === activeSlide ? "is-active" : ""}`}
+                            className="hero-card-title-svg"
+                            viewBox="0 0 680 120"
+                            role="img"
+                            aria-label={movie.name}
                           >
-                            {movie.name}
-                          </h1>
+                            <text x="0" y="48">
+                              {wrapHeroTitle(movie.name).map((line, lineIndex) => (
+                                <tspan key={`line-${lineIndex}`} x="0" dy={lineIndex === 0 ? 0 : 54}>
+                                  {Array.from(line).map((character, characterIndex) => (
+                                    <tspan
+                                      key={`char-${lineIndex}-${characterIndex}`}
+                                      style={{ animationDelay: `${(lineIndex * 20 + characterIndex) * 35}ms` }}
+                                    >
+                                      {character === " " ? "\u00a0" : character}
+                                    </tspan>
+                                  ))}
+                                </tspan>
+                              ))}
+                            </text>
+                          </svg>
                         </Link>
 
                         {metaParts.length > 0 && (
