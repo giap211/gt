@@ -51,7 +51,7 @@ export const Footer = () => {
           <Link href="/" className="inline-flex items-center gap-2">
             <Image
               src="/images/logo.svg"
-              alt="Phim Lậu Logo"
+              alt="XemPhim Logo"
               width={130}
               height={40}
               className="h-9 w-auto"
@@ -87,14 +87,14 @@ export const Footer = () => {
 
         {/* Description */}
         <p className="text-white/35 text-xs leading-relaxed max-w-3xl mb-4">
-          Phim Lậu – Phim hay cả rổ - Trang xem phim online chất lượng cao miễn phí
+          XemPhim – Nền tảng xem phim trực tuyến chất lượng cao miễn phí
           Vietsub, thuyết minh, lồng tiếng full HD. Kho phim mới khổng lồ, phim
           chiếu rạp, phim bộ, phim lẻ từ nhiều quốc gia như Việt Nam, Hàn Quốc,
           Trung Quốc, Thái Lan, Nhật Bản, Âu Mỹ… đa dạng thể loại. Khám phá nền
           tảng phim trực tuyến hay nhất 2026 chất lượng 4K!
         </p>
 
-        <p className="text-white/30 text-xs">© 2026 Phim Lậu</p>
+        <p className="text-white/30 text-xs">© 2026 XemPhim</p>
       </div>
     </footer>
   );
