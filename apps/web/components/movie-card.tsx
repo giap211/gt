@@ -178,22 +178,28 @@ export const MovieCard = ({
       )}
 
       {!hideInfo && (
-        <div className="mt-2 px-0.5">
+        <div className="movie-card-info mt-2 px-0.5">
           <Link
             href={href || `/phim/${slug}`}
             onClick={handleLinkClick}
             className="block"
             title={title}
           >
-            <h3 className="text-[13px] md:text-[14px] font-semibold text-white leading-snug line-clamp-1 group-hover:text-[#ffd875] transition-colors">
+            <h3 className="movie-card-title text-[12px] md:text-[14px] font-semibold leading-snug line-clamp-1 transition-colors">
               {title}
             </h3>
-            {originalTitle && originalTitle !== title && (
-              <p className="text-[12px] text-white/45 leading-tight line-clamp-1 mt-0.5">
-                {originalTitle}
-              </p>
-            )}
           </Link>
+          {hasRating && (
+            <div className="movie-card-rating mt-1 flex items-center gap-1 text-[10px] font-semibold tabular-nums" aria-label={`Đánh giá ${numericRating.toFixed(1)} trên 10`}>
+              <Star size={11} strokeWidth={1.8} fill="currentColor" />
+              <span>{numericRating.toFixed(1)}</span>
+            </div>
+          )}
+          {originalTitle && originalTitle !== title && (
+            <p className="movie-card-original mt-0.5 text-[10px] md:text-[11px] leading-tight line-clamp-1">
+              {originalTitle}
+            </p>
+          )}
         </div>
       )}
     </div>
