@@ -22,7 +22,6 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
   const isSeries = pathname === "/danh-sach/phim-bo";
   const isSingle = pathname === "/danh-sach/phim-le";
   const isTabRoute = isTabPath(pathname);
-  const isWatchRoute = pathname.startsWith("/xem-phim/");
 
   useEffect(() => {
     const markBackNavigation = () => { navigationDirection.current = -1; };
@@ -31,24 +30,17 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    navigationDirection.current = 1;
-  }, [pathname]);
-
-  useEffect(() => {
     const rememberTabScroll = (event: MouseEvent) => {
       if (!isTabPath(pathname)) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
       const anchor = target.closest("a[href]") as HTMLAnchorElement | null;
       if (!anchor) return;
-
       const destination = new URL(anchor.href, window.location.href);
-      if (destination.origin !== window.location.origin) return;
-      if (destination.pathname !== pathname) {
+      if (destination.origin === window.location.origin && destination.pathname !== pathname) {
         scrollPositions.current.set(pathname, window.scrollY);
       }
     };
-
     document.addEventListener("click", rememberTabScroll, true);
     return () => document.removeEventListener("click", rememberTabScroll, true);
   }, [pathname]);
@@ -57,45 +49,54 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
     const previous = previousPath.current;
     if (isTabPath(pathname) && previous !== pathname) {
       const top = scrollPositions.current.get(pathname) ?? 0;
-      requestAnimationFrame(() => {
-        window.scrollTo({ top, left: 0, behavior: "instant" });
-      });
+      requestAnimationFrame(() => window.scrollTo({ top, left: 0, behavior: "instant" }));
     }
     previousPath.current = pathname;
   }, [pathname]);
 
+  useEffect(() => {
+    // A completed navigation starts the next forward transition by default.
+    // popstate sets this to -1 before the pathname changes for browser Back.
+    const reset = window.setTimeout(() => { navigationDirection.current = 1; }, 450);
+    return () => window.clearTimeout(reset);
+  }, [pathname]);
+
   return (
-    <>
-      <div hidden={!isTabRoute}>
-        <div hidden={!isHome}>
-          <HomeScreen />
-        </div>
-        <div hidden={!isSeries}>
-          <MovieListingScreen type="phim-bo" />
-        </div>
-        <div hidden={!isSingle}>
-          <MovieListingScreen type="phim-le" />
-        </div>
+    <div className="relative w-full min-h-[60vh] overflow-x-clip">
+      <div
+        aria-hidden={!isTabRoute}
+        className={isTabRoute ? "block" : "hidden"}
+      >
+        <div hidden={!isHome}><HomeScreen /></div>
+        <div hidden={!isSeries}><MovieListingScreen type="phim-bo" /></div>
+        <div hidden={!isSingle}><MovieListingScreen type="phim-le" /></div>
       </div>
-      {!isTabRoute ? (
-        isWatchRoute ? children : (
-          <div className="relative w-full overflow-x-clip">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={pathname}
-                initial={{ x: navigationDirection.current === -1 ? "-100%" : "100%", opacity: 0.96 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: navigationDirection.current === -1 ? "18%" : "-18%", opacity: 0.94 }}
-                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full min-w-0"
-                style={{ willChange: "transform" }}
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        )
-      ) : null}
-    </>
+
+      <AnimatePresence initial={false} mode="sync" custom={navigationDirection.current}>
+        {!isTabRoute ? (
+          <motion.div
+            key={pathname}
+            custom={navigationDirection.current}
+            initial={(direction: number) => ({
+              x: direction === -1 ? "-100%" : "100%",
+              opacity: 0.98,
+            })}
+            animate={{ x: "0%", opacity: 1 }}
+            exit={(direction: number) => ({
+              x: direction === -1 ? "100%" : "-22%",
+              opacity: 0.96,
+            })}
+            transition={{
+              x: { type: "tween", duration: 0.46, ease: [0.22, 1, 0.36, 1] },
+              opacity: { duration: 0.3 },
+            }}
+            className="relative z-10 w-full min-w-0 bg-inherit"
+            style={{ willChange: "transform" }}
+          >
+            {children}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
   );
 }
