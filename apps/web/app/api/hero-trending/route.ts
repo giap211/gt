@@ -234,6 +234,58 @@ async function buildHeroItems(tmdbTitles: string[], netflixTvTitles: string[]) {
   return selected.slice(0, 6);
 }
 
+
+async function addHeroDescriptions(items: HeroItem[]): Promise<Array<HeroItem & { content?: string }>> {
+  const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
+  const apiKey = process.env.TMDB_API_KEY;
+
+  return Promise.all(items.map(async (item) => {
+    let content = "";
+
+    // Danh sách phim PhimAPI thường không có synopsis; lấy nội dung từ endpoint chi tiết.
+    for (const base of ["https://phimapi.com", "https://ophim.cc"]) {
+      try {
+        const response = await fetch(`${base}/phim/${encodeURIComponent(item.slug)}`, {
+          headers: { Accept: "application/json", "User-Agent": "PhimLau/1.0" },
+          next: { revalidate: 21600 },
+        });
+        if (!response.ok) continue;
+        const payload = await response.json() as { movie?: { content?: string } };
+        content = payload.movie?.content?.trim() || "";
+        if (content) break;
+      } catch {
+        // Thử nguồn dự phòng.
+      }
+    }
+
+    // Nếu nguồn phim không có mô tả, dùng overview từ TMDB.
+    const tmdbId = String(item.tmdb?.id ?? "").trim();
+    const tmdbType = item.tmdb?.type === "tv" ? "tv" : "movie";
+    if (!content && tmdbId && /^\d+$/.test(tmdbId) && (accessToken || apiKey)) {
+      try {
+        const url = new URL(`${TMDB_BASE_URL}/${tmdbType}/${tmdbId}`);
+        url.searchParams.set("language", "vi-VN");
+        if (!accessToken && apiKey) url.searchParams.set("api_key", apiKey);
+        const response = await fetch(url, {
+          headers: {
+            Accept: "application/json",
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          next: { revalidate: 21600 },
+        });
+        if (response.ok) {
+          const details = await response.json() as { overview?: string };
+          content = details.overview?.trim() || "";
+        }
+      } catch {
+        // Không làm hỏng hero nếu TMDB tạm thời lỗi.
+      }
+    }
+
+    return { ...item, content };
+  }));
+}
+
 export async function GET() {
   try {
     // Hai nguồn chạy độc lập: một nguồn lỗi không làm mất dữ liệu của nguồn còn lại.
@@ -256,7 +308,8 @@ export async function GET() {
       console.warn("Netflix Vietnam TV Top 10 unavailable:", netflixResult.reason);
     }
 
-    const items = await buildHeroItems(tmdbTitles, netflixTvTitles);
+    const selectedItems = await buildHeroItems(tmdbTitles, netflixTvTitles);
+    const items = await addHeroDescriptions(selectedItems);
 
     return NextResponse.json(
       {
@@ -278,10 +331,10 @@ export async function GET() {
     const fallback = await getLatestMovies(1);
     return NextResponse.json(
       {
-        items: fallback.items.slice(0, 6).map((movie) => ({
+        items: await addHeroDescriptions(fallback.items.slice(0, 6).map((movie) => ({
           ...movie,
           hero_source: "latest" as const,
-        })),
+        }))),
         source: "latest-movies-fallback",
       },
       {
