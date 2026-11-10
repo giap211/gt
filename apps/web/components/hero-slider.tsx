@@ -130,6 +130,38 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           line-height: 1.1;
           color: #fff;
           text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+          position: relative;
+          width: fit-content;
+          max-width: 100%;
+        }
+        .hero-card-title.is-active {
+          animation: hero-title-draw 900ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+        }
+        @keyframes hero-title-draw {
+          0% {
+            opacity: 0;
+            clip-path: inset(0 100% 0 0);
+            filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.8));
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.9);
+          }
+          55% {
+            opacity: 1;
+            clip-path: inset(0 0 0 0);
+            color: rgba(255, 255, 255, 0.72);
+            -webkit-text-stroke: 0.7px rgba(196, 181, 253, 0.8);
+          }
+          100% {
+            opacity: 1;
+            clip-path: inset(0 0 0 0);
+            color: #fff;
+            filter: drop-shadow(0 0 0 rgba(167, 139, 250, 0));
+            -webkit-text-stroke: 0 transparent;
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-card-title.is-active {
+            animation: none;
+          }
         }
         .hero-card-meta {
           color: rgba(255, 255, 255, 0.72);
@@ -269,7 +301,10 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                           className="block"
                           aria-label={`Xem phim ${movie.name}`}
                         >
-                          <h1 className="hero-card-title line-clamp-2">
+                          <h1
+                            key={movie.slug}
+                            className={`hero-card-title line-clamp-2 ${index === activeSlide ? "is-active" : ""}`}
+                          >
                             {movie.name}
                           </h1>
                         </Link>
