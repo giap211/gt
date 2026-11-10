@@ -493,7 +493,29 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     );
   }
 
-  if (!movie) return null;
+  if (!movie) {
+    return (
+      <main className="fixed inset-0 z-[90] flex min-h-screen items-center justify-center bg-[#080a11] px-6 text-white">
+        <div className="flex w-full max-w-md flex-col items-center text-center">
+          <div className="mb-5 grid h-16 w-16 place-items-center rounded-2xl border border-white/10 bg-white/[.06]">
+            <MonitorPlay size={30} className="text-violet-300" />
+          </div>
+          <h1 className="text-xl font-bold">Chưa tải được dữ liệu phim</h1>
+          <p className="mt-2 text-sm leading-6 text-white/55">
+            Máy chủ phim hiện chưa phản hồi hoặc dữ liệu đang tạm thời gián đoạn. Hãy thử tải lại; player sẽ xuất hiện khi dữ liệu phim được tải thành công.
+          </p>
+          <div className="mt-6 flex w-full gap-3">
+            <Link href="/" className="flex flex-1 items-center justify-center rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white/80">
+              Về trang chủ
+            </Link>
+            <button type="button" onClick={() => window.location.reload()} className="flex flex-1 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-3 text-sm font-bold text-white">
+              Thử tải lại
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   const currentServerEpisodes = episodes[currentServer]?.server_data || [];
   const currentEpIndex = currentServerEpisodes.findIndex(
