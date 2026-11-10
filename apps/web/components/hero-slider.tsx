@@ -291,7 +291,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
               </article>
             )}
             <p className="mt-auto pt-10 text-center text-[10px] font-medium tracking-[.14em] text-white/25">
-              GIAPTRAN · XEM PHIM THEO CÁCH CỦA BẠN
+              XEMPHIM
             </p>
           </div>
         </div>,
