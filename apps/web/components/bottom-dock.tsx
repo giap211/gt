@@ -8,17 +8,13 @@ import {
   Home,
   Clapperboard,
   Search,
-  Tv,
   UserCircle,
   X,
   Loader2,
-  Film,
   Bookmark,
-  Clock3,
   LogOut,
   Sun,
   Moon,
-  ChevronRight,
   History,
 } from "lucide-react";
 import { useMember } from "./member-provider";
@@ -38,17 +34,17 @@ export function BottomDock() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isHome = pathname === "/";
-  const isSeries = pathname.startsWith("/danh-sach/phim-bo");
-  const isSingle = pathname.startsWith("/danh-sach/phim-le");
+  const isList =
+    pathname.startsWith("/danh-sach") ||
+    pathname.startsWith("/the-loai") ||
+    pathname.startsWith("/quoc-gia");
   const isWatchPage = pathname.startsWith("/xem-phim/");
-  const dockActiveIndex = searchOpen ? 2 : accountOpen ? 4 : isSeries ? 1 : isSingle ? 3 : 0;
 
   useEffect(() => {
     setSearchOpen(false);
     setAccountOpen(false);
   }, [pathname]);
 
-  // Allow entry points outside the dock (such as the hero search button) to open the same search panel.
   useEffect(() => {
     const openSearchFromOutside = () => {
       setAccountOpen(false);
@@ -58,7 +54,6 @@ export function BottomDock() {
     return () => window.removeEventListener("gt:open-search", openSearchFromOutside);
   }, []);
 
-  // Prefetch the main dock destinations while the current page is idle.
   useEffect(() => {
     ["/", "/danh-sach/phim-bo", "/danh-sach/phim-le"].forEach((href) => {
       router.prefetch(href);
@@ -98,7 +93,6 @@ export function BottomDock() {
       setIsSearching(false);
       return;
     }
-
     setIsSearching(true);
     const timer = setTimeout(async () => {
       try {
@@ -110,32 +104,32 @@ export function BottomDock() {
         setIsSearching(false);
       }
     }, 280);
-
     return () => clearTimeout(timer);
   }, [query]);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
   const closeDockPanels = () => {
     setSearchOpen(false);
     setAccountOpen(false);
   };
-
-  const handleDockNavigation = (event: React.MouseEvent<HTMLAnchorElement>, active: boolean) => {
+  const handleDockNavigation = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    active: boolean,
+  ) => {
     closeDockPanels();
-    if (active) { event.preventDefault(); scrollToTop(); }
+    if (active) {
+      event.preventDefault();
+      scrollToTop();
+    }
   };
-
   const handleSearch = () => {
     setAccountOpen(false);
     setSearchOpen((open) => !open);
   };
-
   const handleAccount = () => {
     setSearchOpen(false);
     setAccountOpen((open) => !open);
   };
-
   const submitSearch = () => {
     const q = query.trim();
     if (!q) return;
@@ -147,971 +141,213 @@ export function BottomDock() {
 
   return (
     <>
-      <style jsx global>{`
-        @media (max-width: 1023px) {
-          html[data-mobile-theme="light"] body { background: #f2f3fc !important; color: #252a36 !important; }
-          html[data-mobile-theme="light"] body [class~="text-white"],
-          html[data-mobile-theme="light"] body [class~="text-white/90"],
-          html[data-mobile-theme="light"] body [class~="text-white/85"],
-          html[data-mobile-theme="light"] body [class~="text-white/80"],
-          html[data-mobile-theme="light"] body [class~="text-white/75"],
-          html[data-mobile-theme="light"] body [class~="text-white/70"],
-          html[data-mobile-theme="light"] body [class~="text-white/65"],
-          html[data-mobile-theme="light"] body [class~="text-white/60"],
-          html[data-mobile-theme="light"] body [class~="text-white/55"] { color: #303746 !important; }
-          html[data-mobile-theme="light"] body [class~="text-white/50"],
-          html[data-mobile-theme="light"] body [class~="text-white/45"],
-          html[data-mobile-theme="light"] body [class~="text-white/40"],
-          html[data-mobile-theme="light"] body [class~="text-white/35"],
-          html[data-mobile-theme="light"] body [class~="text-white/30"] { color: #687184 !important; }
-          html[data-mobile-theme="light"] body [class*="bg-[#0"],
-          html[data-mobile-theme="light"] body [class*="bg-[#1"],
-          html[data-mobile-theme="light"] body [class*="bg-[#2"] { background-color: #f2f3fc !important; }
-          html[data-mobile-theme="light"] body [class*="border-white/"] { border-color: rgba(40,48,65,.14) !important; }
-          html[data-mobile-theme="light"] header.fixed {
-            background: rgba(250,251,255,.9) !important; border-color: rgba(40,48,65,.12) !important;
-            box-shadow: 0 8px 28px rgba(35,45,65,.1) !important;
-          }
-          html[data-mobile-theme="light"] header.fixed a,
-          html[data-mobile-theme="light"] header.fixed button { color: #303746; }
-          html[data-mobile-theme="light"] body input,
-          html[data-mobile-theme="light"] body select {
-            color: #252a36 !important; background-color: #fff !important; border-color: rgba(40,48,65,.18) !important;
-          }
-          html[data-mobile-theme="light"] body input::placeholder { color: #8992a3 !important; }
-          html[data-mobile-theme="light"] body .mobile-account-sheet {
-            background: rgba(255,255,255,.95) !important; border-color: rgba(40,48,65,.15) !important;
-          }
-          html[data-mobile-theme="light"] body .mobile-account-sheet button { color: #303746; }
-          html[data-mobile-theme="light"] body .mobile-search-overlay { background: #f2f3fc !important; }
-
-          /* Home hero: preserve readable cinematic text over the image. */
-          html[data-mobile-theme="light"] body main > section:first-child {
-            background: #f2f3fc !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child a {
-            color: #fff !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child a h1 {
-            color: #fff !important;
-            text-shadow: 0 2px 5px rgba(0,0,0,.9), 0 5px 18px rgba(0,0,0,.72);
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .container p {
-            color: #ffe3a0 !important;
-            text-shadow: 0 2px 5px rgba(0,0,0,.9);
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .container span {
-            text-shadow: none;
-          }
-          /* Clear, coordinated hero labels for the light theme. */
-          html[data-mobile-theme="light"] body main > section:first-child .hero-source-badge {
-            border: 1px solid transparent !important;
-            box-shadow: 0 3px 10px rgba(15,23,42,.16) !important;
-            letter-spacing: .075em !important;
-            text-shadow: none !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-source-netflix {
-            color: #fff !important;
-            background: #e50914 !important;
-            border-color: rgba(255,255,255,.55) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-source-tmdb {
-            color: #eaf5ff !important;
-            background: #173b59 !important;
-            border-color: rgba(255,255,255,.35) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-source-latest {
-            color: #63440c !important;
-            background: #f8e7b8 !important;
-            border-color: #e6c46d !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-badge {
-            display: inline-flex;
-            align-items: center;
-            min-height: 22px;
-            padding: 3px 9px !important;
-            border-radius: 7px !important;
-            border: 1px solid rgba(42,55,78,.14) !important;
-            background: rgba(248,250,253,.94) !important;
-            color: #344258 !important;
-            font-weight: 700 !important;
-            letter-spacing: .025em;
-            box-shadow: 0 2px 7px rgba(15,23,42,.10);
-            text-shadow: none !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-quality {
-            color: #155b50 !important;
-            background: #dff4ed !important;
-            border-color: #a8dccc !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-year {
-            color: #344258 !important;
-            background: rgba(255,255,255,.96) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-episode {
-            color: #46536a !important;
-            background: #e9edf4 !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-language {
-            color: #654b19 !important;
-            background: #fbf0d7 !important;
-            border-color: #ead7a8 !important;
-          }
-          /* Fade the home hero into the soft light page surface, not over the thumbnail dots. */
-          html[data-mobile-theme="light"] body main > section:first-child .hero-bottom-fade {
-            background:
-              radial-gradient(ellipse 78% 95% at 50% 100%, rgba(168,85,247,.14), transparent 72%),
-              linear-gradient(to bottom, rgba(242,243,252,0) 0%, rgba(229,218,255,.2) 38%, rgba(242,243,252,.88) 78%, #f2f3fc 100%) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-cast-slider .swiper-slide > div {
-            background-color: #292c38 !important;
-            border-color: rgba(255,255,255,.45) !important;
-          }
-          /* Detail-page hero fades into the same light surface as its content. */
-          html[data-mobile-theme="light"] body .movie-detail-hero {
-            background: #f2f3fc !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-hero-fade {
-            background: linear-gradient(
-              to bottom,
-              rgba(238,241,245,0) 0%,
-              rgba(238,241,245,.38) 38%,
-              rgba(238,241,245,.88) 72%,
-              #f2f3fc 100%
-            ) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-content h1 {
-            color: #263247 !important;
-            text-shadow: none !important;
-            letter-spacing: -.025em;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-content > p {
-            color: #96702b !important;
-            font-weight: 600;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-content > button {
-            color: #8a641f !important;
-          }
-          /* Remove the heavy drop shadows from the topic chips in light mode. */
-          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a {
-            box-shadow: none !important;
-            border: 1px solid rgba(255,255,255,.32);
-          }
-
-          /* Give the topic heading a deliberate hierarchy in light mode. */
-          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) h2 {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            color: #263247 !important;
-            letter-spacing: -.01em;
-          }
-          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) h2::before {
-            content: "";
-            display: inline-block;
-            width: 3px;
-            height: 17px;
-            flex: 0 0 3px;
-            border-radius: 99px;
-            background: linear-gradient(180deg, #e8b94f, #d99a25);
-            box-shadow: 0 2px 8px rgba(217,154,37,.2);
-          }
-          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a span {
-            color: #fff !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,.22);
-          }
-
-          /* Refined lavender / ice-blue light palette. Layout and component geometry stay unchanged. */
-          html[data-mobile-theme="light"] body {
-            background: linear-gradient(145deg, #f2f3fc 0%, #edf5ff 48%, #f7f3ff 100%) !important;
-            color: #252b40 !important;
-          }
-          html[data-mobile-theme="light"] body main {
-            background-color: transparent !important;
-            color: #252b40 !important;
-          }
-          html[data-mobile-theme="light"] body main > div:not(:first-child) {
-            background: transparent !important;
-          }
-          html[data-mobile-theme="light"] body [class*="shadow-"] {
-            --tw-shadow-color: rgba(75,82,130,.12);
-          }
-          html[data-mobile-theme="light"] body .mobile-account-sheet,
-          html[data-mobile-theme="light"] body .mobile-search-overlay {
-            background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(239,245,255,.97)) !important;
-            border-color: rgba(114,87,245,.15) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:not(:first-child) h2,
-          html[data-mobile-theme="light"] body main > div section h2 {
-            color: #252b40 !important;
-          }
-          html[data-mobile-theme="light"] body main > section:not(:first-child) a,
-          html[data-mobile-theme="light"] body main > div section a {
-            border-color: rgba(114,87,245,.12);
-          }
-          html[data-mobile-theme="light"] body main > section:first-child a[class*="bg-[#ffd875]"] {
-            background: linear-gradient(110deg, #7257f5, #42bdeb) !important;
-            color: #fff !important;
-            box-shadow: 0 9px 26px rgba(114,87,245,.28) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-cast-slider .swiper-slide > div {
-            border-color: rgba(255,255,255,.88) !important;
-            box-shadow: 0 4px 14px rgba(45,55,95,.2);
-          }
-          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] {
-            background: linear-gradient(145deg, #f2f3fc, #e8f5ff 58%, #f7f2ff) !important;
-            color: #252b40 !important;
-          }
-          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] header {
-            border-color: rgba(114,87,245,.14) !important;
-          }
-          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] article {
-            background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(237,244,255,.94)) !important;
-            border-color: rgba(114,87,245,.16) !important;
-            box-shadow: 0 18px 48px rgba(75,82,140,.13) !important;
-          }
-          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] h2,
-          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] h3 {
-            color: #252b40 !important;
-          }
-          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] p {
-            color: #68738c !important;
-          }
-          html[data-mobile-theme="light"] body [role="dialog"][aria-labelledby="notification-title"] button[class*="bg-[#ffd875]"] {
-            background: linear-gradient(110deg, #7257f5, #42bdeb) !important;
-            color: #fff !important;
-            box-shadow: 0 8px 24px rgba(114,87,245,.22) !important;
-          }
-
-          /* Final mobile light-theme pass: cinematic imagery, crisp hierarchy, restrained accents. */
-          html[data-mobile-theme="light"] body {
-            background: linear-gradient(155deg, #f2f3fc 0%, #edf5ff 52%, #f8f5ff 100%) !important;
-            color: #252b40 !important;
-          }
-
-          /* Home hero: keep the artwork vivid and reserve the light fade for its bottom edge. */
-          html[data-mobile-theme="light"] body main > section:first-child {
-            background: #f2f3fc !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .swiper-slide img {
-            filter: brightness(.88) saturate(1.16) contrast(1.04);
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .swiper-slide > div.pointer-events-none {
-            background:
-              radial-gradient(ellipse 82% 90% at 50% 100%, rgba(168,85,247,.16), transparent 72%),
-              linear-gradient(to bottom, rgba(20,24,43,.08) 0%, rgba(20,24,43,.05) 28%, rgba(114,87,245,.10) 52%, rgba(242,243,252,.82) 84%, #f2f3fc 100%) !important;
-            opacity: 1 !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .container h1 {
-            color: #fff !important;
-            text-shadow: 0 2px 5px rgba(12,17,35,.62), 0 8px 24px rgba(12,17,35,.38) !important;
-            -webkit-text-stroke: 0 !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .container p {
-            color: #f7f5ff !important;
-            text-shadow: 0 2px 7px rgba(12,17,35,.62) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-source-badge {
-            box-shadow: 0 4px 14px rgba(20,25,48,.2) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child .hero-meta-badge {
-            background: rgba(250,251,255,.94) !important;
-            color: #34415c !important;
-            border-color: rgba(255,255,255,.78) !important;
-            box-shadow: 0 3px 10px rgba(18,25,49,.16) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child a[class*="bg-[#ffd875]"] {
-            background: linear-gradient(110deg, #7058ee 0%, #398fdf 100%) !important;
-            color: #fff !important;
-            box-shadow: 0 9px 24px rgba(91,88,220,.28) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child a[class*="bg-white/"] {
-            background: rgba(255,255,255,.2) !important;
-            border-color: rgba(255,255,255,.62) !important;
-            color: #fff !important;
-            text-shadow: 0 1px 5px rgba(12,17,35,.5);
-            box-shadow: 0 6px 18px rgba(12,17,35,.16) !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child [aria-label="Thông báo"] {
-            color: #5545bd !important;
-            background: rgba(255,255,255,.94) !important;
-            border: 1px solid rgba(114,87,245,.22) !important;
-            box-shadow: 0 7px 22px rgba(35,43,92,.2), inset 0 1px 0 #fff !important;
-          }
-          html[data-mobile-theme="light"] body main > section:first-child [aria-label="Thông báo"] svg {
-            color: #5847c4 !important;
-          }
-
-          /* Topic chips: pastel glass instead of competing neon blocks. */
-          html[data-mobile-theme="light"] body main a[href^="/the-loai/"] {
-            background: linear-gradient(135deg, #fff 0%, #edf2ff 100%) !important;
-            border: 1px solid rgba(114,87,245,.15) !important;
-            color: #4b4a78 !important;
-            box-shadow: 0 4px 14px rgba(75,82,140,.07) !important;
-          }
-          html[data-mobile-theme="light"] body main a[href^="/the-loai/"] span {
-            color: #4b4a78 !important;
-            text-shadow: none !important;
-          }
-
-          /* Movie detail: keep the poster cinematic, then blend naturally into the app surface. */
-          html[data-mobile-theme="light"] body main:has(.movie-detail-mobile) {
-            background: linear-gradient(155deg, #f2f3fc 0%, #e8f5ff 55%, #f8f4ff 100%) !important;
-            color: #252b40 !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child {
-            background: #20243a !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child img {
-            filter: brightness(.9) saturate(1.12) contrast(1.04);
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child > div.absolute.inset-0 {
-            background: linear-gradient(
-              to bottom,
-              rgba(13,18,38,.22) 0%,
-              rgba(13,18,38,.02) 27%,
-              rgba(13,18,38,.30) 48%,
-              rgba(13,18,38,.72) 68%,
-              rgba(242,243,252,.94) 94%,
-              #f2f3fc 100%
-            ) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile h1 {
-            color: #fff !important;
-            text-shadow: 0 2px 7px rgba(10,15,33,.72), 0 8px 24px rgba(10,15,33,.42) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child p {
-            color: #f8f7ff !important;
-            text-shadow: 0 2px 6px rgba(10,15,33,.65) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child span {
-            text-shadow: none !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child a[aria-label="Quay lại"],
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child button {
-            background: rgba(22,27,49,.46) !important;
-            border-color: rgba(255,255,255,.32) !important;
-            color: #fff !important;
-            backdrop-filter: blur(16px);
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) {
-            background: linear-gradient(155deg, #f2f3fc 0%, #e8f5ff 54%, #f8f4ff 100%) !important;
-            color: #303950 !important;
-            padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) p {
-            color: #58647d !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) h2,
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) h3 {
-            color: #28334d !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) button {
-            color: #5849b8 !important;
-            border-color: rgba(114,87,245,.2) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [aria-label="Thao tác phim"] button,
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [aria-label="Thao tác phim"] a {
-            background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(232,241,255,.94)) !important;
-            border: 1px solid rgba(114,87,245,.16) !important;
-            color: #5145a5 !important;
-            box-shadow: 0 7px 20px rgba(66,76,133,.09) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [aria-label="Thao tác phim"] svg {
-            color: #7257f5 !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) a {
-            border-color: rgba(114,87,245,.14);
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) a p,
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) a span {
-            color: #465574 !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [class*="bg-white/"],
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [class*="bg-[#080b12"],
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:nth-child(2) [class*="bg-[#1c1e2a"] {
-            background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(235,242,255,.9)) !important;
-            border-color: rgba(114,87,245,.16) !important;
-            box-shadow: 0 7px 22px rgba(65,75,130,.07) !important;
-          }
-
-          /* Movie detail hero metadata: give year, runtime and episode count a solid readable surface. */
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap {
-            color: #f8faff !important;
-            gap: 7px !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap > span {
-            display: inline-flex;
-            align-items: center;
-            min-height: 27px;
-            padding: 4px 9px !important;
-            border: 1px solid rgba(255,255,255,.28) !important;
-            border-radius: 8px !important;
-            background: rgba(15,22,43,.78) !important;
-            color: #fff !important;
-            font-size: 12px !important;
-            font-weight: 700 !important;
-            line-height: 1.2 !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,.35) !important;
-            box-shadow: 0 3px 10px rgba(0,0,0,.16) !important;
-            backdrop-filter: blur(12px);
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap > span.rounded-md.border-amber-300\\/50 {
-            background: rgba(111,75,17,.9) !important;
-            color: #fff0c5 !important;
-            border-color: rgba(255,220,140,.55) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap > span.rounded.bg-white\\/90 {
-            background: #e8f1ff !important;
-            color: #243653 !important;
-            border-color: rgba(255,255,255,.7) !important;
-            text-shadow: none !important;
-          }
-          html[data-mobile-theme="light"] body .movie-detail-mobile > div:first-child .absolute.inset-x-0.bottom-0 > div.mt-3.flex.flex-wrap > span.text-white\\/35 {
-            min-height: 0;
-            padding: 0 !important;
-            border: 0 !important;
-            background: transparent !important;
-            color: rgba(255,255,255,.75) !important;
-            box-shadow: none !important;
-          }
-
-          /* Make every interest tile distinct from the page surface, including special category links. */
-          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a {
-            background: linear-gradient(135deg, #ffffff 0%, #e4eaff 100%) !important;
-            border: 1px solid rgba(91,78,190,.24) !important;
-            color: #3d3b70 !important;
-            box-shadow: 0 5px 16px rgba(57,66,120,.12), inset 0 1px 0 rgba(255,255,255,.95) !important;
-          }
-          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a span {
-            color: #3d3b70 !important;
-            text-shadow: none !important;
-          }
-          html[data-mobile-theme="light"] body main > div > section:has(a[href="/the-loai/chieu-rap"]) a:active {
-            filter: brightness(.96);
-            transform: scale(.98);
-          }
-
-          /* Keep the floating dock from covering the last content row. */
-          html[data-mobile-theme="light"] body main:not(:has(.movie-detail-mobile)) {
-            padding-bottom: calc(84px + env(safe-area-inset-bottom));
-          }
-        }
-
-          /* Interest chips: compact, tactile glass pills inspired by the new home concept. */
-          html[data-mobile-theme] body .topic-grid-section {
-            padding-top: 17px !important;
-            padding-bottom: 12px !important;
-          }
-          html[data-mobile-theme] body .topic-grid-heading { min-height: 27px; }
-          html[data-mobile-theme] body .topic-grid-title {
-            display: flex; align-items: center; gap: 10px;
-            color: #f7f8ff !important; font-size: 18px !important;
-            font-weight: 850 !important; letter-spacing: -.035em !important;
-          }
-          html[data-mobile-theme] body .topic-grid-title::before {
-            content: ""; display: block; width: 4px; height: 21px; flex: 0 0 4px;
-            border-radius: 99px; background: linear-gradient(180deg, #a78bfa, #4c8dff);
-            box-shadow: 0 2px 12px rgba(139,92,246,.38);
-          }
-          html[data-mobile-theme] body .topic-grid-hint { color: #a9a3d8 !important; }
-          html[data-mobile-theme] body .topic-grid-chip {
-            min-height: 44px; padding: 0 15px !important; gap: 8px !important;
-            border: 1px solid rgba(255,255,255,.19) !important; border-radius: 999px !important;
-            background: linear-gradient(135deg, rgba(255,255,255,.105), rgba(255,255,255,.045)) !important;
-            color: #f4f2ff !important;
-            box-shadow: 0 5px 16px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.12) !important;
-            -webkit-backdrop-filter: blur(16px) saturate(150%);
-            backdrop-filter: blur(16px) saturate(150%);
-          }
-          html[data-mobile-theme] body .topic-grid-chip span { color: inherit !important; text-shadow: none !important; }
-          html[data-mobile-theme] body .topic-grid-chip:active { transform: scale(.97); filter: brightness(1.12); }
-
-          html[data-mobile-theme="light"] body .topic-grid-title { color: #202b50 !important; }
-          html[data-mobile-theme="light"] body .topic-grid-title::before {
-            background: linear-gradient(180deg, #895cff, #35aeea);
-            box-shadow: 0 2px 10px rgba(114,87,245,.25);
-          }
-          html[data-mobile-theme="light"] body .topic-grid-hint { color: #536ac3 !important; }
-          html[data-mobile-theme="light"] body .topic-grid-chip {
-            border: 1px solid rgba(111,102,205,.2) !important;
-            background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(230,239,255,.94)) !important;
-            color: #293b70 !important;
-            box-shadow: 0 4px 13px rgba(71,86,150,.13), inset 0 1px 0 rgba(255,255,255,.98) !important;
-          }
-          html[data-mobile-theme="light"] body .topic-grid-chip:active { filter: brightness(.97); }
-
-          /* Visible violet ambient glow on the interest chips, not just a flat glass fill. */
-          html[data-mobile-theme="dark"] body .topic-grid-chip {
-            border-color: rgba(177,145,255,.42) !important;
-            box-shadow:
-              0 0 0 1px rgba(139,92,246,.12),
-              0 0 15px rgba(139,92,246,.34),
-              0 0 30px rgba(99,102,241,.22),
-              0 7px 18px rgba(0,0,0,.28),
-              inset 0 1px 0 rgba(255,255,255,.18) !important;
-          }
-          html[data-mobile-theme="dark"] body .topic-grid-chip:active {
-            box-shadow: 0 0 18px rgba(167,139,250,.55), 0 0 34px rgba(99,102,241,.32) !important;
-          }
-          html[data-mobile-theme="light"] body .topic-grid-chip {
-            border-color: rgba(139,92,246,.34) !important;
-            box-shadow:
-              0 0 0 1px rgba(139,92,246,.08),
-              0 0 13px rgba(139,92,246,.24),
-              0 0 25px rgba(99,102,241,.13),
-              0 6px 16px rgba(71,86,150,.14),
-              inset 0 1px 0 rgba(255,255,255,.98) !important;
-          }
-
-          /* The "Xem toàn bộ" action becomes a compact glass capsule with a glowing arrow. */
-          html[data-mobile-theme="dark"] body .movie-carousel-view-more {
-            color: #e6dcff !important;
-            border: 1px solid rgba(167,139,250,.42) !important;
-            background: linear-gradient(135deg, rgba(139,92,246,.22), rgba(79,70,229,.12)) !important;
-            box-shadow: 0 0 14px rgba(139,92,246,.2), inset 0 1px 0 rgba(255,255,255,.12) !important;
-            text-shadow: 0 0 12px rgba(167,139,250,.28);
-            white-space: nowrap;
-          }
-          html[data-mobile-theme="dark"] body .movie-carousel-view-more-icon {
-            color: #fff !important;
-            background: linear-gradient(135deg, #9b7aff, #6557df) !important;
-            box-shadow: 0 0 12px rgba(139,92,246,.52), inset 0 1px 0 rgba(255,255,255,.35) !important;
-          }
-          html[data-mobile-theme="light"] body .movie-carousel-view-more {
-            color: #55449e !important;
-            border: 1px solid rgba(125,95,220,.27) !important;
-            background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(236,231,255,.94)) !important;
-            box-shadow: 0 0 12px rgba(139,92,246,.17), 0 4px 12px rgba(71,86,150,.1), inset 0 1px 0 #fff !important;
-            white-space: nowrap;
-          }
-          html[data-mobile-theme="light"] body .movie-carousel-view-more-icon {
-            color: #fff !important;
-            background: linear-gradient(135deg, #9877f5, #6557d8) !important;
-            box-shadow: 0 0 10px rgba(139,92,246,.38) !important;
-          }
-          /* Interest chips: no glow or drop shadow; only a clean violet gradient outline. */
-          html[data-mobile-theme] body .topic-grid-title::before {
-            box-shadow: none !important;
-          }
-          html[data-mobile-theme] body .topic-grid-chip {
-            border: 1.5px solid transparent !important;
-            border-radius: 999px !important;
-            background:
-              linear-gradient(135deg, rgba(24,22,39,.96), rgba(18,23,39,.96)) padding-box,
-              linear-gradient(115deg, #7657f5 0%, #bd79f6 48%, #557cf5 100%) border-box !important;
-            box-shadow: none !important;
-            -webkit-backdrop-filter: none !important;
-            backdrop-filter: none !important;
-          }
-          html[data-mobile-theme="light"] body .topic-grid-chip {
-            background:
-              linear-gradient(135deg, #ffffff 0%, #f4f6ff 100%) padding-box,
-              linear-gradient(115deg, #7657f5 0%, #bd79f6 48%, #557cf5 100%) border-box !important;
-            box-shadow: none !important;
-          }
-          html[data-mobile-theme] body .topic-grid-chip:active {
-            transform: scale(.97);
-            filter: none !important;
-            box-shadow: none !important;
-          }
-          html[data-mobile-theme] body .movie-carousel-view-more:active {
-            transform: scale(.97);
-          }
-
-
-          /* Monochrome Liquid Glass dock: neutral refraction, no accent colors. */
-          @media(max-width:1023px){
-            html[data-mobile-theme] body .rophim-liquid-nav{
-              --rln-glass-bg:linear-gradient(120deg,rgba(255,255,255,.15),rgba(255,255,255,.075) 52%,rgba(255,255,255,.12));
-              --rln-glass-border:rgba(255,255,255,.28);--rln-glass-outer:rgba(0,0,0,.24);
-              --rln-pill-bg:linear-gradient(145deg,rgba(255,255,255,.26),rgba(255,255,255,.12) 55%,rgba(255,255,255,.18));
-              --rln-icon:rgba(255,255,255,.68);--rln-active:rgba(255,255,255,1);
-              position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:4px;
-              width:min(100%,430px);min-height:62px;margin-inline:auto;padding:8px 10px;overflow:hidden;border-radius:9999px;
-              background:var(--rln-glass-bg)!important;border:1px solid var(--rln-glass-border)!important;
-              -webkit-backdrop-filter:blur(52px) saturate(155%) brightness(1.08);backdrop-filter:blur(52px) saturate(155%) brightness(1.08);
-              box-shadow:0 18px 48px -8px var(--rln-glass-outer),0 5px 22px rgba(0,0,0,.10),
-                inset 0 1.5px 0 rgba(255,255,255,.38),inset 0 -1px 0 rgba(255,255,255,.07)!important;
-              transition:background .6s ease,border-color .6s ease,box-shadow .6s ease;
-            }
-            html[data-mobile-theme] body .rophim-liquid-nav:before{
-              content:"";position:absolute;top:1px;left:1px;right:1px;height:58%;border-radius:9999px 9999px 60% 60%/9999px 9999px 80% 80%;
-              background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.12) 55%,transparent);pointer-events:none;z-index:1;
-            }
-            html[data-mobile-theme] body .rophim-liquid-nav:after{
-              content:"";position:absolute;inset:0;border-radius:inherit;
-              background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(255,255,255,.22),transparent 70%);
-              mix-blend-mode:screen;pointer-events:none;z-index:2;
-            }
-            html[data-mobile-theme] body .rophim-liquid-pill{
-              position:absolute;z-index:3;top:8px;bottom:8px;left:10px;width:calc((100% - 20px - 16px)/5);border-radius:9999px;
-              background:var(--rln-pill-bg);border:1px solid rgba(255,255,255,.48);
-              box-shadow:inset 0 1px 0 rgba(255,255,255,.52),inset 0 -1px 0 rgba(255,255,255,.10),0 3px 12px rgba(0,0,0,.08);
-              transform:translateX(calc(var(--rln-index,0)*(100% + 4px)));transition:transform .48s cubic-bezier(.34,1.2,.64,1),background .5s ease,box-shadow .5s ease;pointer-events:none;
-            }
-            html[data-mobile-theme] body .rophim-liquid-item{
-              position:relative;z-index:4;display:flex;min-width:0;min-height:44px;flex-direction:column;align-items:center;justify-content:center;
-              gap:4px;padding:5px 2px;border:0!important;border-radius:9999px;background:transparent!important;color:var(--rln-icon)!important;
-              font-family:inherit;font-size:10px;line-height:1.1;font-weight:500;letter-spacing:.01em;white-space:nowrap;text-decoration:none;outline:none;
-              -webkit-tap-highlight-color:transparent;user-select:none;transition:color .3s ease,transform .15s ease;
-            }
-            html[data-mobile-theme] body .rophim-liquid-item svg{width:19px;height:19px;flex:0 0 auto;filter:none;transition:transform .3s cubic-bezier(.34,1.2,.64,1),color .3s ease;}
-            html[data-mobile-theme] body .rophim-liquid-item.is-active{color:var(--rln-active)!important;}
-            html[data-mobile-theme] body .rophim-liquid-item:active{transform:scale(.92);}
-            html[data-mobile-theme] body .rophim-liquid-item:active svg{transform:scale(.88);}
-            html[data-mobile-theme="light"] body .rophim-liquid-nav{
-              --rln-glass-bg:linear-gradient(120deg,rgba(255,255,255,.70),rgba(255,255,255,.48) 52%,rgba(255,255,255,.62));
-              --rln-glass-border:rgba(255,255,255,.82);--rln-glass-outer:rgba(40,48,60,.12);
-              --rln-pill-bg:linear-gradient(145deg,rgba(255,255,255,.82),rgba(245,247,250,.52) 55%,rgba(255,255,255,.68));
-              --rln-icon:rgba(45,52,62,.68);--rln-active:rgba(24,29,36,1);
-              -webkit-backdrop-filter:blur(52px) saturate(145%) brightness(1.06);backdrop-filter:blur(52px) saturate(145%) brightness(1.06);
-              box-shadow:0 18px 42px rgba(35,42,55,.10),inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(255,255,255,.36)!important;
-            }
-            html[data-mobile-theme="light"] body .rophim-liquid-nav:before{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.32) 55%,transparent);}
-            html[data-mobile-theme="light"] body .rophim-liquid-nav:after{background:radial-gradient(circle 80px at var(--rln-mx,50%) var(--rln-my,50%),rgba(255,255,255,.58),transparent 70%);}
-            html[data-mobile-theme="light"] body .rophim-liquid-pill{
-              border-color:rgba(255,255,255,.96);box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(255,255,255,.55),0 3px 12px rgba(30,38,50,.08);
-            }
-            @media(prefers-reduced-motion:reduce){
-              html[data-mobile-theme] body .rophim-liquid-pill,html[data-mobile-theme] body .rophim-liquid-item,html[data-mobile-theme] body .rophim-liquid-item svg{transition:none!important;}
-            }
-          }
-
-          /* Account sheet: layered Liquid Glass surfaces in both themes. */
-          html[data-mobile-theme] body .mobile-account-sheet{
-            background:linear-gradient(145deg,rgba(27,22,48,.78),rgba(22,27,43,.72) 52%,rgba(43,24,62,.76))!important;
-            border:1px solid rgba(216,180,254,.34)!important;
-            -webkit-backdrop-filter:blur(42px) saturate(190%)!important;
-            backdrop-filter:blur(42px) saturate(190%)!important;
-            box-shadow:0 28px 90px rgba(0,0,0,.48),0 0 36px rgba(139,92,246,.13),inset 0 1px 0 rgba(255,255,255,.28)!important;
-          }
-          html[data-mobile-theme] body .mobile-account-sheet .account-glass-card{
-            background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(168,85,247,.10) 55%,rgba(255,255,255,.055))!important;
-            border-color:rgba(216,180,254,.28)!important;
-            box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 12px 30px rgba(0,0,0,.12);
-          }
-          html[data-mobile-theme] body .mobile-account-sheet .account-glass-group{
-            background:rgba(255,255,255,.065)!important;
-            border-color:rgba(216,180,254,.22)!important;
-            box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.12);
-            -webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);
-          }
-          html[data-mobile-theme] body .mobile-account-sheet .account-glass-icon{
-            color:#e9d5ff!important;background:linear-gradient(145deg,rgba(168,85,247,.36),rgba(99,102,241,.2))!important;
-            border:1px solid rgba(216,180,254,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 4px 14px rgba(139,92,246,.16);
-          }
-          html[data-mobile-theme] body .mobile-account-sheet .account-glass-title{color:#e9d5ff!important;}
-          html[data-mobile-theme="light"] body .mobile-account-sheet{
-            background:linear-gradient(145deg,rgba(255,255,255,.76),rgba(242,237,255,.68) 52%,rgba(232,243,255,.72))!important;
-            border-color:rgba(139,92,246,.3)!important;
-            box-shadow:0 28px 80px rgba(73,65,125,.2),0 0 34px rgba(139,92,246,.12),inset 0 1px 0 rgba(255,255,255,.92)!important;
-          }
-          html[data-mobile-theme="light"] body .mobile-account-sheet .account-glass-card{
-            background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(226,217,255,.5) 55%,rgba(255,255,255,.58))!important;
-            border-color:rgba(139,92,246,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 10px 28px rgba(91,75,150,.09);
-          }
-          html[data-mobile-theme="light"] body .mobile-account-sheet .account-glass-group{
-            background:rgba(255,255,255,.48)!important;border-color:rgba(139,92,246,.2)!important;
-            box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 22px rgba(91,75,150,.07);
-          }
-          html[data-mobile-theme="light"] body .mobile-account-sheet .account-glass-icon{
-            color:#7048cf!important;background:linear-gradient(145deg,rgba(196,181,253,.62),rgba(224,231,255,.68))!important;
-            border-color:rgba(139,92,246,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 4px 12px rgba(139,92,246,.12);
-          }
-          html[data-mobile-theme="light"] body .mobile-account-sheet .account-glass-title{color:#6741c6!important;}
-      `}</style>
-
-      {/* Full-screen search overlay */}
       {searchOpen && (
         <div className="mobile-search-overlay lg:hidden fixed inset-0 z-[70] bg-[#0a0b10] flex flex-col pb-[calc(env(safe-area-inset-bottom)+88px)]">
           <div className="flex items-center gap-2 px-3 pt-[max(12px,env(safe-area-inset-top))] pb-2 border-b border-white/10">
-            <button
-              type="button"
-              onClick={() => setSearchOpen(false)}
-              className="w-10 h-10 flex items-center justify-center text-white/70 active:text-white"
-              aria-label="Đóng"
-            >
+            <button type="button" onClick={() => setSearchOpen(false)} className="w-10 h-10 flex items-center justify-center text-white/70" aria-label="Đóng">
               <X size={22} />
             </button>
-            <form
-              className="flex-1 relative"
-              onSubmit={(e) => {
-                e.preventDefault();
-                submitSearch();
-              }}
-            >
-              <Search
-                size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
-              />
+            <form className="flex-1 relative" onSubmit={(e) => { e.preventDefault(); submitSearch(); }}>
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Tìm phim, diễn viên..."
-                className="w-full h-11 rounded-full bg-white/[0.08] border border-white/10 pl-10 pr-10 text-base text-white outline-none placeholder:text-white/35 focus:border-[#ffd875]/50"
+                className="w-full h-11 rounded-xl bg-white/[0.06] border border-white/10 pl-10 pr-10 text-[15px] text-white placeholder:text-white/35 outline-none focus:border-violet-400/50"
               />
               {query && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setQuery("");
-                    setResults([]);
-                    inputRef.current?.focus();
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40"
-                >
+                <button type="button" onClick={() => { setQuery(""); setResults([]); inputRef.current?.focus(); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40">
                   <X size={16} />
                 </button>
               )}
             </form>
           </div>
-
           <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-2">
             {isSearching && (
               <div className="flex items-center justify-center gap-2 py-10 text-white/40 text-sm">
-                <Loader2 size={16} className="animate-spin text-[#ffd875]" />
+                <Loader2 size={16} className="animate-spin text-violet-400" />
                 Đang tìm...
               </div>
             )}
-
             {!isSearching && query.trim().length >= 2 && results.length === 0 && (
-              <div className="py-12 text-center text-sm text-white/40">
-                Không tìm thấy kết quả
-              </div>
+              <div className="py-12 text-center text-sm text-white/40">Không tìm thấy kết quả</div>
             )}
-
             {!isSearching && results.length > 0 && (
               <div className="space-y-1">
                 {results.map((item) => (
-                  <Link
-                    key={item._id}
-                    href={`/phim/${item.slug}`}
-                    onClick={() => setSearchOpen(false)}
-                    className="flex items-center gap-3 p-2.5 rounded-xl active:bg-white/[0.06]"
-                  >
+                  <Link key={item._id} href={`/phim/${item.slug}`} onClick={() => setSearchOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl active:bg-white/[0.06]">
                     <div className="relative w-11 h-14 rounded-lg overflow-hidden bg-white/5 shrink-0 border border-white/10">
-                      <Image
-                        src={item.poster_url}
-                        alt={item.name}
-                        fill
-                        sizes="44px"
-                        className="object-cover"
-                      />
+                      <Image src={item.poster_url} alt={item.name} fill sizes="44px" className="object-cover" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[14px] font-semibold text-white line-clamp-1">
-                        {item.name}
-                      </p>
-                      <p className="text-[12px] text-white/45 line-clamp-1 mt-0.5">
-                        {item.origin_name}
-                      </p>
-                      <p className="text-[11px] text-[#ffd875]/80 mt-1">
-                        {item.year || "—"} · HD
-                      </p>
+                      <p className="text-[14px] font-semibold text-white line-clamp-1">{item.name}</p>
+                      <p className="text-[12px] text-white/45 line-clamp-1 mt-0.5">{item.origin_name}</p>
+                      <p className="text-[11px] text-violet-300/90 mt-1">{item.year || "—"} · HD</p>
                     </div>
                   </Link>
                 ))}
-
-                <button
-                  type="button"
-                  onClick={submitSearch}
-                  className="w-full mt-2 py-3 text-center text-[13px] font-bold text-[#ffd875]"
-                >
-                  Xem tất cả kết quả →
-                </button>
               </div>
             )}
-
-            {!query.trim() && (
-              <div className="px-2 pt-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/35 mb-3 flex items-center gap-1.5">
-                  <Film size={12} /> Gợi ý tìm kiếm
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "Phim Hàn Quốc",
-                    "Anime",
-                    "Phim chiếu rạp",
-                    "Netflix",
-                    "Cổ trang",
-                    "Kinh dị",
-                  ].map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setQuery(s)}
-                      className="px-3.5 py-2 rounded-full bg-white/[0.06] border border-white/10 text-[13px] text-white/70 active:bg-white/10"
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {!isSearching && query.trim().length < 2 && (
+              <div className="py-12 text-center text-sm text-white/35">Nhập ít nhất 2 ký tự để tìm kiếm</div>
             )}
           </div>
         </div>
       )}
 
-      {/* Account menu overlay */}
       {accountOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-[70] flex items-end justify-center bg-black/60 px-3 pt-[max(16px,env(safe-area-inset-top))] pb-[calc(env(safe-area-inset-bottom)+104px)] backdrop-blur-md"
-          onClick={() => setAccountOpen(false)}
-        >
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-label="Tài khoản"
-            className="mobile-account-sheet flex w-full max-w-md flex-col overflow-hidden rounded-[30px] border border-violet-200/30 bg-[#171923]/70 shadow-[0_24px_80px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,.22)] backdrop-blur-2xl"
-            style={{
-              maxHeight: "calc(100dvh - env(safe-area-inset-top) - 124px)",
-              WebkitBackdropFilter: "blur(30px) saturate(175%)",
-            }}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="shrink-0 px-5 pt-4">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <p className="account-glass-title text-[10px] font-bold uppercase tracking-[0.22em] text-violet-200">Không gian của bạn</p>
-                  <h2 className="mt-1 text-xl font-bold tracking-tight text-white">Tài khoản</h2>
+        <div className="mobile-account-sheet lg:hidden fixed inset-0 z-[70] bg-[#0a0b10]/95 backdrop-blur-md flex flex-col pb-[calc(env(safe-area-inset-bottom)+88px)]">
+          <div className="flex items-center justify-between px-4 pt-[max(12px,env(safe-area-inset-top))] pb-3 border-b border-white/10">
+            <h2 className="text-base font-bold text-white">Cá nhân</h2>
+            <button type="button" onClick={() => setAccountOpen(false)} className="w-9 h-9 flex items-center justify-center text-white/60" aria-label="Đóng">
+              <X size={20} />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+            {user ? (
+              <>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-sm font-semibold text-white">{user.name || user.email}</p>
+                  <p className="text-xs text-white/45 mt-0.5">{user.email}</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setAccountOpen(false)}
-                  aria-label="Đóng menu tài khoản"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.08] text-white/75 transition active:scale-95 active:bg-white/15"
-                >
-                  <X size={19} />
+                <button type="button" onClick={() => { setAccountOpen(false); openLibrary("history"); }} className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-white/85">
+                  <History size={18} className="text-violet-400" /> Lịch sử xem
                 </button>
-              </div>
-
-              <div className="account-glass-card relative mb-4 overflow-hidden rounded-[22px] border border-violet-200/25 p-4 backdrop-blur-xl">
-                <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#ffd875]/10 blur-2xl" />
-                <div className="relative flex items-center gap-3">
-                  <div className="account-glass-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-200/30 bg-violet-400/15 text-violet-100 shadow-inner">
-                    <UserCircle size={27} strokeWidth={1.7} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-medium text-white/50">{user ? "Chào mừng trở lại" : "Trải nghiệm xem phim của bạn"}</p>
-                    <p className="mt-0.5 truncate text-base font-bold text-white">{user ? user.username : "Chào mừng bạn!"}</p>
-                    <p className="mt-0.5 text-xs text-white/50">{user ? "Tài khoản XemPhim" : "Đăng nhập để đồng bộ lịch sử và tủ phim"}</p>
-                  </div>
-                  {user && <span className="shrink-0 whitespace-nowrap rounded-full border border-violet-300/40 bg-gradient-to-r from-fuchsia-500 via-violet-500 to-violet-700 px-3 py-1.5 text-[10px] font-extrabold tracking-wide text-white shadow-[0_3px_14px_rgba(139,92,246,.35)]">Thành viên</span>}
-                </div>
-                {!user && (
-                  <div className="relative mt-4 grid grid-cols-2 gap-2">
-                    <button type="button" onClick={() => { setAccountOpen(false); openAuth("login"); }} className="rounded-full bg-[#ffd875] px-3 py-2.5 text-sm font-bold text-[#171923] shadow-[0_5px_18px_rgba(255,216,117,.18)] active:scale-[.98]">Đăng nhập</button>
-                    <button type="button" onClick={() => { setAccountOpen(false); openAuth("register"); }} className="rounded-full border border-white/20 bg-white/[0.08] px-3 py-2.5 text-sm font-semibold text-white active:bg-white/15">Tạo tài khoản</button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4">
-              {user && (
-                <div className="mb-4">
-                  <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">Thư viện cá nhân</p>
-                  <div className="account-glass-group overflow-hidden rounded-2xl border border-violet-200/15 bg-white/[0.045]">
-                    <button type="button" onClick={() => { setAccountOpen(false); openLibrary("favorites"); }} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
-                      <span className="account-glass-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-400/15 text-violet-100"><Bookmark size={21} strokeWidth={2.2} /></span>
-                      <span className="min-w-0 flex-1"><span className="block font-semibold">Tủ phim của tôi</span><span className="mt-0.5 block text-xs text-white/40">Phim đã lưu và yêu thích</span></span>
-                      <ChevronRight size={17} className="text-white/35" />
-                    </button>
-                    <div className="mx-3.5 border-t border-white/[0.08]" />
-                    <button type="button" onClick={() => { setAccountOpen(false); openLibrary("history"); }} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
-                      <span className="account-glass-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-400/15 text-violet-100"><History size={20} /></span>
-                      <span className="min-w-0 flex-1"><span className="block font-semibold">Phim đang xem</span><span className="mt-0.5 block text-xs text-white/40">Tiếp tục từ nơi bạn đã dừng</span></span>
-                      <ChevronRight size={17} className="text-white/35" />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="mb-3">
-                <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">Tùy chỉnh ứng dụng</p>
-                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045]">
-                  <button type="button" onClick={toggleMobileTheme} className="flex w-full items-center gap-3 px-3.5 py-3.5 text-left text-sm text-white/90 transition active:bg-white/10">
-                    <span className="account-glass-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-400/10 text-violet-200">{mobileTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</span>
-                    <span className="min-w-0 flex-1"><span className="block font-semibold">Giao diện</span><span className="mt-0.5 block text-xs text-white/40">Chuyển sang chế độ {mobileTheme === "dark" ? "sáng" : "tối"}</span></span>
-                    <span className="rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-white/65">{mobileTheme === "dark" ? "Tối" : "Sáng"}</span>
-                  </button>
-                </div>
-              </div>
-
-              {user && (
-                <button type="button" onClick={async () => { setAccountOpen(false); await logout(); }} className="flex w-full items-center gap-3 rounded-2xl border border-red-400/15 bg-red-400/[0.055] px-3.5 py-3 text-left text-sm font-semibold text-red-300 transition active:bg-red-400/10">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-400/10"><LogOut size={18} /></span>
-                  Đăng xuất
-                  <ChevronRight size={17} className="ml-auto text-red-300/50" />
+                <button type="button" onClick={() => { setAccountOpen(false); openLibrary("favorites"); }} className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-white/85">
+                  <Bookmark size={18} className="text-violet-400" /> Đã lưu
                 </button>
-              )}
-              <p className="px-1 pt-3 text-center text-[10px] text-white/25">XEMPHIM</p>
-            </div>
-          </section>
+                <button type="button" onClick={toggleMobileTheme} className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-white/85">
+                  {mobileTheme === "dark" ? <Sun size={18} className="text-violet-400" /> : <Moon size={18} className="text-violet-400" />}
+                  {mobileTheme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
+                </button>
+                <button type="button" onClick={() => { logout(); setAccountOpen(false); }} className="w-full flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-left text-sm text-red-300">
+                  <LogOut size={18} /> Đăng xuất
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={() => { setAccountOpen(false); openAuth("login"); }} className="w-full rounded-xl bg-violet-600 py-3 text-center text-sm font-bold text-white">
+                  Đăng nhập
+                </button>
+                <button type="button" onClick={() => { setAccountOpen(false); openAuth("register"); }} className="w-full rounded-xl border border-white/15 py-3 text-center text-sm font-semibold text-white/80">
+                  Đăng ký
+                </button>
+                <button type="button" onClick={toggleMobileTheme} className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 py-3 text-sm text-white/70">
+                  {mobileTheme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                  {mobileTheme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Liquid Glass bottom dock */}
-      <div className="lg:hidden fixed bottom-[6px] left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
-        <div className="mx-auto max-w-md px-3 pb-2.5 pt-1">
-          <nav
-            className="rophim-liquid-nav pointer-events-auto"
-            style={{ "--rln-index": dockActiveIndex } as React.CSSProperties}
-            aria-label="Điều hướng chính"
-          >
-            <span className="rophim-liquid-pill" aria-hidden="true" />
+      <div className="gt-dock lg:hidden fixed bottom-0 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
+        <div className="mx-auto max-w-md px-4 pb-3 pt-1">
+          <nav className="gt-dock-nav pointer-events-auto" aria-label="Điều hướng chính">
             <Link
               href="/"
-              onClick={(event) => handleDockNavigation(event, isHome)}
-              className={`rophim-liquid-item ${isHome ? "is-active" : ""}`}
-              aria-current={isHome ? "page" : undefined}
+              onClick={(e) => handleDockNavigation(e, isHome)}
+              className={`gt-dock-item ${isHome && !searchOpen && !accountOpen ? "is-active" : ""}`}
+              aria-current={isHome && !searchOpen && !accountOpen ? "page" : undefined}
             >
-              <Home size={22} strokeWidth={isHome ? 2.25 : 1.8} />
+              <Home size={22} strokeWidth={isHome && !searchOpen && !accountOpen ? 2.4 : 1.8} />
               <span>Trang chủ</span>
             </Link>
             <Link
               href="/danh-sach/phim-bo"
-              onClick={(event) => handleDockNavigation(event, isSeries)}
-              className={`rophim-liquid-item ${isSeries ? "is-active" : ""}`}
-              aria-current={isSeries ? "page" : undefined}
+              onClick={(e) => handleDockNavigation(e, isList)}
+              className={`gt-dock-item ${isList && !searchOpen && !accountOpen ? "is-active" : ""}`}
+              aria-current={isList && !searchOpen && !accountOpen ? "page" : undefined}
             >
-              <Tv size={22} strokeWidth={isSeries ? 2.25 : 1.8} />
-              <span>Phim bộ</span>
+              <Clapperboard size={22} strokeWidth={isList && !searchOpen && !accountOpen ? 2.4 : 1.8} />
+              <span>Danh sách</span>
             </Link>
             <button
               type="button"
               onClick={handleSearch}
-              className={`rophim-liquid-item ${searchOpen ? "is-active" : ""}`}
+              className={`gt-dock-item ${searchOpen ? "is-active" : ""}`}
               aria-label="Tìm kiếm"
               aria-pressed={searchOpen}
             >
-              <Search size={23} strokeWidth={2} />
+              <Search size={22} strokeWidth={searchOpen ? 2.4 : 1.8} />
               <span>Tìm kiếm</span>
             </button>
-            <Link
-              href="/danh-sach/phim-le"
-              onClick={(event) => handleDockNavigation(event, isSingle)}
-              className={`rophim-liquid-item ${isSingle ? "is-active" : ""}`}
-              aria-current={isSingle ? "page" : undefined}
-            >
-              <Clapperboard size={22} strokeWidth={isSingle ? 2.25 : 1.8} />
-              <span>Phim lẻ</span>
-            </Link>
             <button
               type="button"
               onClick={handleAccount}
-              className={`rophim-liquid-item ${accountOpen ? "is-active" : ""}`}
-              aria-label="Tài khoản"
+              className={`gt-dock-item ${accountOpen ? "is-active" : ""}`}
+              aria-label="Cá nhân"
               aria-pressed={accountOpen}
             >
-              <UserCircle size={22} strokeWidth={user || accountOpen ? 2.2 : 1.8} />
-              <span>Tài khoản</span>
+              <UserCircle size={22} strokeWidth={accountOpen || user ? 2.3 : 1.8} />
+              <span>Cá nhân</span>
             </button>
           </nav>
         </div>
       </div>
+
+      <style jsx global>{`
+        .gt-dock-nav {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 4px;
+          padding: 8px 10px;
+          border-radius: 28px;
+          background: rgba(255, 255, 255, 0.92);
+          border: 1px solid rgba(139, 92, 246, 0.12);
+          box-shadow: 0 10px 40px rgba(88, 28, 135, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+          backdrop-filter: blur(20px) saturate(160%);
+          -webkit-backdrop-filter: blur(20px) saturate(160%);
+        }
+        html[data-mobile-theme="dark"] .gt-dock-nav {
+          background: rgba(24, 24, 32, 0.92);
+          border-color: rgba(255, 255, 255, 0.08);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+        }
+        .gt-dock-item {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          min-height: 52px;
+          padding: 6px 4px;
+          border-radius: 20px;
+          color: #9ca3af;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: -0.01em;
+          transition: all 0.2s ease;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          text-decoration: none;
+        }
+        .gt-dock-item.is-active {
+          color: #fff;
+          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+          box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+        }
+        html[data-mobile-theme="light"] .gt-dock-item:not(.is-active) {
+          color: #9ca3af;
+        }
+        html[data-mobile-theme="dark"] .gt-dock-item:not(.is-active) {
+          color: rgba(255, 255, 255, 0.45);
+        }
+        html[data-mobile-theme="light"] body {
+          background: linear-gradient(180deg, #f3f0ff 0%, #f8f7fc 40%, #f5f3fb 100%) !important;
+        }
+        html[data-mobile-theme="dark"] body {
+          background: #0c0c12 !important;
+        }
+        @media (min-width: 1024px) {
+          .gt-dock { display: none !important; }
+        }
+      `}</style>
     </>
   );
 }
