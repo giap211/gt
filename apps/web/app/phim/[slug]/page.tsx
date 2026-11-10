@@ -326,6 +326,11 @@ export default function MovieDetailPage({
         .movie-detail-page .movie-detail-content .snap-x>div{transition:transform .25s ease}
         .movie-detail-page .movie-detail-content .snap-x>div:active{transform:scale(.97)}
         html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:radial-gradient(ellipse 78% 14% at 50% 0%,rgba(167,139,250,.07),transparent 78%),linear-gradient(180deg,#f7f6fc 0%,#f7f6fc 100%);color:#28243a}
+        /* Keep the detail-page base surface theme-aware so the liquid-glass
+           scene capture never paints its dark default over the light theme. */
+        html[data-theme="light"] .movie-detail-page,html[data-mobile-theme="light"] .movie-detail-page{background-color:#f7f6fc!important;color:#28243a}
+        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-hero-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 34%,rgba(247,246,252,.08) 54%,rgba(247,246,252,.58) 78%,#f7f6fc 100%)!important}
+        html[data-theme="light"] .movie-detail-mobile-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.42) 68%,#f7f6fc 100%)!important}
         html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.56) 72%,#100f1e 100%)!important}
         html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:transparent!important;border:0!important;box-shadow:none!important}
         html[data-theme="light"] .movie-poster-glass,html[data-mobile-theme="light"] .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important}
