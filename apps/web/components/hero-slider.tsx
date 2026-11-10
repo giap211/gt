@@ -94,6 +94,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       html[data-mobile-theme="light"] .home-feature-hero .hero-save-button,html[data-theme="light"] .home-feature-hero .hero-save-button { color:#fff !important;border-color:rgba(196,181,253,.35) !important;background:rgba(167,139,250,.15) !important;box-shadow:0 4px 18px rgba(124,58,237,.24) !important; }
       html[data-mobile-theme="light"] .home-feature-hero .hero-save-button[aria-pressed="true"],html[data-theme="light"] .home-feature-hero .hero-save-button[aria-pressed="true"] { color:#fff !important;border-color:rgba(221,214,254,.7) !important;background:linear-gradient(135deg,rgba(217,70,239,.9),rgba(124,58,237,.95)) !important;box-shadow:0 0 22px rgba(168,85,247,.38) !important; }
       html[data-mobile-theme="light"] .home-feature-hero .hero-save-button svg,html[data-theme="light"] .home-feature-hero .hero-save-button svg { color:#fff !important;stroke:#fff !important; }
+      html[data-mobile-theme="light"] .home-feature-hero .hero-header-icon,html[data-theme="light"] .home-feature-hero .hero-header-icon { color:#fff !important;border-color:rgba(255,255,255,.2) !important;background:rgba(255,255,255,.1) !important;box-shadow:0 5px 20px rgba(0,0,0,.2) !important; }
+      html[data-mobile-theme="light"] .home-feature-hero .hero-header-icon svg,html[data-theme="light"] .home-feature-hero .hero-header-icon svg { color:#fff !important;stroke:#fff !important; }
       @keyframes heroSavedPop { 0%{transform:scale(.55) rotate(-18deg);opacity:.3} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }\n      .home-feature-hero .hero-slide-dot { width:5px;height:5px;min-width:5px;border-radius:999px;background:rgba(255,255,255,.48);box-shadow:none;transition:opacity .22s ease; }
       .home-feature-hero .hero-slide-dot[aria-current="true"] { width:5px;min-width:5px;height:5px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.13); }
       html[data-mobile-theme="light"] .home-feature-hero,html[data-theme="light"] .home-feature-hero { background:#f5f3fb; }
@@ -229,13 +231,13 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           </svg>
         </Link>
         <div className="pointer-events-auto flex items-center gap-2">
-        <button type="button" aria-label="Tìm kiếm" onClick={() => window.dispatchEvent(new Event("gt:open-search"))} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-[0_5px_20px_rgba(0,0,0,.2)] backdrop-blur-2xl"><Search size={20} /></button>
+        <button type="button" aria-label="Tìm kiếm" onClick={() => window.dispatchEvent(new Event("gt:open-search"))} className="hero-header-icon flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-[0_5px_20px_rgba(0,0,0,.2)] backdrop-blur-2xl"><Search size={20} /></button>
         <button
           type="button"
           aria-label="Thông báo"
           title="Thông báo"
           onClick={() => setNotificationsOpen(true)}
-          className="pointer-events-auto relative flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white shadow-[0_5px_20px_rgba(0,0,0,.25)] backdrop-blur-2xl transition-colors active:bg-white/20"
+          className="hero-header-icon pointer-events-auto relative flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-[0_5px_20px_rgba(0,0,0,.2)] backdrop-blur-2xl transition-colors active:bg-white/20"
         >
           <Bell size={19} strokeWidth={1.9} />
           {!user && (
