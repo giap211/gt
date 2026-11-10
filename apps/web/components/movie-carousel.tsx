@@ -51,7 +51,17 @@ export const MovieCarousel = ({
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="w-full relative py-3 md:py-5">
+    <section className={`w-full relative py-3 md:py-5 ${title === "Phim đang xem" ? "movie-carousel-continue-watching" : ""}`}>
+      <style jsx global>{`
+        html[data-mobile-theme="light"] .movie-carousel-continue-watching .movie-poster-frame + div,
+        html[data-theme="light"] .movie-carousel-continue-watching .movie-poster-frame + div {
+          color: #625873 !important;
+        }
+        html[data-mobile-theme="light"] .movie-carousel-continue-watching .movie-poster-frame + div span:last-child,
+        html[data-theme="light"] .movie-carousel-continue-watching .movie-poster-frame + div span:last-child {
+          color: #7652c8 !important;
+        }
+      `}</style>
       <div className="container mx-auto px-3 md:px-6">
         <div className="flex flex-col gap-3">
           <div className="flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden">
