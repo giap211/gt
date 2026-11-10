@@ -30,33 +30,41 @@ export function LiquidGlassDockSurface() {
 
     const vertex = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
     const fragment = `
-      precision highp float;
-      uniform sampler2D tex;
-      uniform vec2 res,tres,toff;
-      uniform float press;
-      float sdf(vec2 p,vec2 h,float r){vec2 q=abs(p)-h+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
-      vec3 S(vec2 fp,vec2 p,vec2 off,float z){
-        vec3 c=vec3(0.);
-        for(int i=0;i<5;i++){float a=float(i)*1.2566;vec2 o=vec2(cos(a),sin(a))*1.2;c+=texture2D(tex,(fp+toff+off+o-p*z)/tres).rgb;}
-        return c/5.;
-      }
-      void main(){
-        vec2 fp=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);vec2 p=fp-res*.5;
-        float R=res.y*.5;vec2 h=res*.5;float d=sdf(p,h,R);
-        float alpha=clamp(.5-d,0.,1.);
-        float bevel=R*.8;
-        vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
-        float t=1.-clamp(-d/bevel,0.,1.);
-        float k=t*t*(R*1.1)*(1.+press*.4);
-        vec2 off=n*k;float z=.06+press*.03;
-        vec3 c;c.r=S(fp,p,off*1.2,z).r;c.g=S(fp,p,off,z).g;c.b=S(fp,p,off*.8,z).b;
-        float l=dot(c,vec3(.299,.587,.114));c=mix(vec3(l),c,1.35);c=mix(c,vec3(1.),.08);
-        float rim=smoothstep(2.5,0.,-d);
-        vec2 L=normalize(vec2(-.6,-.8));
-        float spec=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
-        c+=rim*(.2+.5*spec)+(1.-smoothstep(0.,bevel,-d))*.06*spec;
-        gl_FragColor=vec4(c*alpha,alpha);
-      }`;
+  precision highp float;
+  uniform sampler2D tex;
+  uniform vec2 res,tres,toff;
+  uniform float press;
+  float sdf(vec2 p,vec2 h,float r){vec2 q=abs(p)-h+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
+  void main(){
+    vec2 fp=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);vec2 p=fp-res*.5;
+    float R=res.y*.5;vec2 h=res*.5;float d=sdf(p,h,R);
+    if(d>1.){gl_FragColor=vec4(0.);return;}
+    float a=clamp(.5-d,0.,1.);
+    float bev=R*.42;
+    float t=1.-clamp(-d/bev,0.,1.);
+    vec2 bp=fp+toff;
+    vec3 c;
+    if(t<=0.){
+      c=texture2D(tex,bp/tres).rgb;
+    }else{
+      vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
+      float k=t*t*(R*.75)*(1.+press*.4);
+      vec2 off=n*k;
+      float r=texture2D(tex,(bp+off*1.15)/tres).r;
+      float b=texture2D(tex,(bp+off*.85)/tres).b;
+      vec3 g3=(texture2D(tex,(bp+off+vec2(1.2,0.)*t)/tres).rgb
+              +texture2D(tex,(bp+off+vec2(-.6,1.04)*t)/tres).rgb
+              +texture2D(tex,(bp+off+vec2(-.6,-1.04)*t)/tres).rgb)/3.;
+      c=vec3(r,g3.g,b);
+      float l=dot(c,vec3(.299,.587,.114));
+      c=mix(vec3(l),c,1.+.35*t);c=mix(c,vec3(1.),.06*t);
+      float rim=smoothstep(2.5,0.,-d);
+      vec2 L=normalize(vec2(-.6,-.8));
+      float sp=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
+      c+=rim*(.2+.5*sp)+t*.06*sp;
+    }
+    gl_FragColor=vec4(c*a,a);
+  }`;
 
     const makeShader = (type: number, source: string) => {
       const shader = gl.createShader(type);
