@@ -83,7 +83,7 @@ export function LiquidGlassDockSurface() {
     const texture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]].forEach(([p,v]) => gl.texParameteri(gl.TEXTURE_2D,p,v));
+    ([[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]] as const).forEach(([p,v]) => gl.texParameteri(gl.TEXTURE_2D,p,v));
 
     const scene = document.createElement("canvas");
     const ctx = scene.getContext("2d");
