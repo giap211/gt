@@ -199,10 +199,10 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
       <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between px-6 pt-[max(52px,env(safe-area-inset-top))] sm:px-10 sm:pt-8 md:px-16 lg:hidden">
         <Link
           href="/"
-          aria-label="PHIM LẬU - Trang chủ"
+          aria-label="XemPhim - Trang chủ"
           className="pointer-events-auto inline-flex items-center"
         >
-          <span className="text-[22px] font-semibold tracking-[-.055em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,.55)]">PHIM LẬU</span>
+          <span className="text-[22px] font-semibold tracking-[-.055em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,.55)]">XEMPHIM</span>
         </Link>
         <div className="pointer-events-auto flex items-center gap-2">
         <button type="button" aria-label="Tìm kiếm" onClick={() => window.dispatchEvent(new Event("gt:open-search"))} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-[0_5px_20px_rgba(0,0,0,.2)] backdrop-blur-2xl"><Search size={20} /></button>
@@ -234,7 +234,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-[340px] bg-[radial-gradient(ellipse_at_top,rgba(255,216,117,.14),transparent_68%)]" />
           <header className="relative flex items-center justify-between border-b border-white/[0.08] px-5 pb-4 pt-[max(18px,env(safe-area-inset-top))] sm:px-8">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[.22em] text-[#a78bfa]">GIAPTRAN</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.22em] text-[#a78bfa]">XEMPHIM</p>
               <h2 id="notification-title" className="mt-1 text-[25px] font-black tracking-tight">Thông báo</h2>
             </div>
             <button
