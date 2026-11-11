@@ -302,16 +302,17 @@ export function BottomDock() {
           backdrop-filter: none;
           -webkit-tap-highlight-color: transparent;
         }
-        .gt-liquid-glass-canvas { position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; border-radius:inherit; pointer-events:none; opacity:1; }
+        .gt-liquid-glass-blur { position:absolute; inset:0; z-index:0; border-radius:inherit; pointer-events:none; background:rgba(255,255,255,.035); -webkit-backdrop-filter:blur(8px) saturate(125%); backdrop-filter:blur(8px) saturate(125%); }
+        .gt-liquid-glass-canvas { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; border-radius:inherit; pointer-events:none; opacity:1; }
         .gt-liquid-glass-rim { display:none !important; }
         .gt-liquid-glass-bubble {
-          position:absolute; top:7px; bottom:7px; left:0; width:0; z-index:1; pointer-events:none; border-radius:9999px;
+          position:absolute; top:7px; bottom:7px; left:0; width:0; z-index:2; pointer-events:none; border-radius:9999px;
           background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18);
           box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 3px 16px rgba(0,0,0,.08);
           transition:left .48s cubic-bezier(.34,1.2,.64,1), width .48s cubic-bezier(.34,1.2,.64,1);
         }
         .gt-dock-item {
-          position:relative; z-index:2; isolation:isolate; flex:1; display:flex; flex-direction:column;
+          position:relative; z-index:3; isolation:isolate; flex:1; display:flex; flex-direction:column;
           align-items:center; justify-content:center; gap:3px; min-width:0; height:58px; padding:5px 3px;
           border:0; border-radius:9999px; background:transparent; color:rgba(255,255,255,.72);
           font-size:10.5px; font-weight:500; letter-spacing:-.01em; text-decoration:none; cursor:pointer;
