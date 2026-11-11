@@ -98,7 +98,6 @@ export const VideoPlayer = ({
     let knownDurationSeconds = 0;
     let skipIntroControlVisible = false;
     let art: Artplayer | null = null;
-    let resumeObserver: MutationObserver | null = null;
     let seekWatchTimer: ReturnType<typeof setTimeout> | null = null;
     let stallWatchTimer: ReturnType<typeof setInterval> | null = null;
     let lastTime = 0;
@@ -684,7 +683,6 @@ export const VideoPlayer = ({
 
     return () => {
       clearTimers();
-      resumeObserver?.disconnect();
 
       try {
         const cleanup = (art as any)?.__seekCleanup;
