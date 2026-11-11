@@ -1,30 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-const MARGIN = 60;
-const REFRESH_MS = 120;
-const NEAR_RANGE = 600;
-const LEAD_MS = 24; // đoán trước vị trí theo vận tốc (ms). Cuộn còn lệch thì tăng, bị giật ngược thì giảm (16–40)
-type Box = { left: number; top: number; right: number; bottom: number; width: number; height: number };
+/**
+ * WebGL liquid-glass surface. The scene texture is redrawn every frame so
+ * refraction tracks page scrolling and movement without a delayed capture.
+ */
+export function LiquidGlassDockSurface() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
 
-type Layer = { el: Element; color: string };
-type Item = {
-  el: HTMLElement;
-  img: boolean;
-  bg: string;
-  radius: number;
-  font: string;
-  color: string;
-  text: string;
-  pl: number;
-  pt: number;
-  lh: number;
-  center: boolean;
-};
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const bubble = bubbleRef.current;
+    const dock = canvas?.parentElement;
+    if (!canvas || !bubble || !dock) return;
 
-const VERTEX = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
-const FRAGMENT = `
+    const gl = canvas.getContext("webgl", {
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+    });
+    if (!gl) {
+      dock.classList.add("gt-fb");
+      return () => dock.classList.remove("gt-fb");
+    }
+
+    dock.classList.remove("gt-fb");
+
+    const vertex = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+    const fragment = `
   precision highp float;
   uniform sampler2D tex;
   uniform vec2 res,tres,toff;
@@ -38,442 +43,296 @@ const FRAGMENT = `
     float bev=R*.42;
     float t=1.-clamp(-d/bev,0.,1.);
     vec2 bp=fp+toff;
-    vec2 n=vec2(0.);
     vec3 c;
     if(t<=0.){
       c=texture2D(tex,bp/tres).rgb;
     }else{
-      n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
-      float k=t*t*(R*.2)*(1.+press*.4);
-      vec2 off=-n*k;
-      c=vec3(texture2D(tex,(bp+off*1.1)/tres).r,
-             texture2D(tex,(bp+off)/tres).g,
-             texture2D(tex,(bp+off*.9)/tres).b);
+      vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
+      float k=t*t*(R*.75)*(1.+press*.4);
+      vec2 off=n*k;
+      float r=texture2D(tex,(bp+off*1.15)/tres).r;
+      float b=texture2D(tex,(bp+off*.85)/tres).b;
+      vec3 g3=(texture2D(tex,(bp+off+vec2(1.2,0.)*t)/tres).rgb
+              +texture2D(tex,(bp+off+vec2(-.6,1.04)*t)/tres).rgb
+              +texture2D(tex,(bp+off+vec2(-.6,-1.04)*t)/tres).rgb)/3.;
+      c=vec3(r,g3.g,b);
+      float l=dot(c,vec3(.299,.587,.114));
+      c=mix(vec3(l),c,1.+.35*t);c=mix(c,vec3(1.),.06*t);
+      float rim=smoothstep(2.5,0.,-d);
+      vec2 L=normalize(vec2(-.6,-.8));
+      float sp=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
+      c+=rim*(.2+.5*sp)+t*.06*sp;
     }
-    c=mix(c,vec3(1.),.05);
-    float rim=smoothstep(2.5,0.,-d);
-    vec2 L=normalize(vec2(-.6,-.8));
-    float sp=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
-    c+=rim*(.2+.5*sp)+t*.05*sp;
     gl_FragColor=vec4(c*a,a);
   }`;
 
-export function LiquidGlassDockSurface() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const bubbleRef = useRef<HTMLDivElement>(null);
-  const [epoch, setEpoch] = useState(0);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const bubble = bubbleRef.current;
-    const dock = canvas?.parentElement;
-    if (!canvas || !bubble || !dock) return;
-
-    const disposers: Array<() => void> = [];
-    const dispose = () => disposers.forEach((fn) => fn());
-
-    const placeBubble = () => {
-      const active = dock.querySelector<HTMLElement>(".gt-dock-item.is-active");
-      if (!active) return;
-      const n = dock.getBoundingClientRect();
-      const i = active.getBoundingClientRect();
-      bubble.style.left = i.left - n.left + 4 + "px";
-      bubble.style.width = Math.max(0, i.width - 8) + "px";
-    };
-    const classObs = new MutationObserver(placeBubble);
-    classObs.observe(dock, { subtree: true, attributes: true, attributeFilter: ["class"] });
-    const sizeObs = new ResizeObserver(placeBubble);
-    sizeObs.observe(dock);
-    placeBubble();
-    disposers.push(() => { classObs.disconnect(); sizeObs.disconnect(); });
-
-    const gl = canvas.getContext("webgl", {
-      alpha: true,
-      premultipliedAlpha: true,
-      antialias: false,
-      powerPreference: "high-performance",
-    });
-    dock.classList.remove("gt-fb");
-    disposers.push(() => dock.classList.remove("gt-fb"));
-    if (!gl) { dock.classList.add("gt-fb"); return dispose; }
-
-    dock.style.setProperty("backdrop-filter", "none", "important");
-    dock.style.setProperty("-webkit-backdrop-filter", "none", "important");
-    canvas.style.setProperty("opacity", "1", "important");
-    const restoreStyles = () => {
-      dock.style.removeProperty("backdrop-filter");
-      dock.style.removeProperty("-webkit-backdrop-filter");
-      canvas.style.removeProperty("opacity");
-    };
-    disposers.push(restoreStyles);
-
-    const makeShader = (type: number, src: string) => {
-      const s = gl.createShader(type);
-      if (!s) return null;
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.warn("Liquid dock shader:", gl.getShaderInfoLog(s));
-        gl.deleteShader(s);
+    const makeShader = (type: number, source: string) => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.warn("Liquid dock shader:", gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
         return null;
       }
-      return s;
+      return shader;
     };
-    const vs = makeShader(gl.VERTEX_SHADER, VERTEX);
-    const fs = makeShader(gl.FRAGMENT_SHADER, FRAGMENT);
+
+    const vs = makeShader(gl.VERTEX_SHADER, vertex);
+    const fs = makeShader(gl.FRAGMENT_SHADER, fragment);
+    if (!vs || !fs) {
+      dock.classList.add("gt-fb");
+      return () => {
+        dock.classList.remove("gt-fb");
+        if (vs) gl.deleteShader(vs);
+        if (fs) gl.deleteShader(fs);
+      };
+    }
+
     const program = gl.createProgram();
-    if (!vs || !fs || !program) { dock.classList.add("gt-fb"); return dispose; }
+    if (!program) {
+      dock.classList.add("gt-fb");
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return () => dock.classList.remove("gt-fb");
+    }
+
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { dock.classList.add("gt-fb"); return dispose; }
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.warn("Liquid dock program:", gl.getProgramInfoLog(program));
+      dock.classList.add("gt-fb");
+      gl.deleteProgram(program);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return () => dock.classList.remove("gt-fb");
+    }
     gl.useProgram(program);
 
     const buffer = gl.createBuffer();
+    if (!buffer) {
+      dock.classList.add("gt-fb");
+      gl.deleteProgram(program);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return () => dock.classList.remove("gt-fb");
+    }
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-    const attr = gl.getAttribLocation(program, "a");
-    gl.enableVertexAttribArray(attr);
-    gl.vertexAttribPointer(attr, 2, gl.FLOAT, false, 0, 0);
-
-    const uTex = gl.getUniformLocation(program, "tex");
-    const uRes = gl.getUniformLocation(program, "res");
-    const uTres = gl.getUniformLocation(program, "tres");
-    const uToff = gl.getUniformLocation(program, "toff");
-    const uPress = gl.getUniformLocation(program, "press");
+    const attribute = gl.getAttribLocation(program, "a");
+    gl.enableVertexAttribArray(attribute);
+    gl.vertexAttribPointer(attribute, 2, gl.FLOAT, false, 0, 0);
 
     const texture = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-    disposers.push(() => {
-      gl.deleteTexture(texture);
+    if (!texture) {
+      dock.classList.add("gt-fb");
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
+      return () => dock.classList.remove("gt-fb");
+    }
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    ([[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]] as const).forEach(([p, v]) => {
+      gl.texParameteri(gl.TEXTURE_2D, p, v);
     });
 
     const scene = document.createElement("canvas");
     const ctx = scene.getContext("2d");
-    if (!ctx) { dock.classList.add("gt-fb"); return dispose; }
-    ctx.imageSmoothingQuality = "high";
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const margin = 60;
+    const uniform = (name: string) => gl.getUniformLocation(program, name);
+    const uRes = uniform("res");
+    const uTextureSize = uniform("tres");
+    const uOffset = uniform("toff");
+    const uPress = uniform("press");
+    const uTex = uniform("tex");
 
-    let layers: Layer[] = [];
-    let items: Item[] = [];
-    let near: Item[] = [];
-    const corsCache = new Map<string, HTMLImageElement | null>();
+    let press = 0;
+    let pressed = 0;
+    let raf = 0;
+    const imgCache = new Map<string, HTMLImageElement | null>();
 
-    const sameOrigin = (src: string) => {
-      if (!src) return false;
-      if (src.startsWith("blob:") || src.startsWith("data:")) return true;
-      try { return new URL(src, location.href).origin === location.origin; } catch { return false; }
-    };
     const getCors = (src: string) => {
       if (!src) return null;
-      if (corsCache.has(src)) return corsCache.get(src) ?? null;
-      corsCache.set(src, null);
+      if (imgCache.has(src)) return imgCache.get(src) ?? null;
+      imgCache.set(src, null);
       const im = new window.Image();
       im.crossOrigin = "anonymous";
-      im.onload = () => corsCache.set(src, im);
-      im.onerror = () => corsCache.set(src, null);
+      im.onload = () => imgCache.set(src, im);
+      im.onerror = () => imgCache.set(src, null);
       im.src = src;
       return null;
     };
 
-    const order = (a: Element, b: Element) =>
-      a === b ? 0 : a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
-
-    const isClear = (c: string) => !c || c === "transparent" || c === "rgba(0, 0, 0, 0)";
-
-    const refreshLayers = () => {
-      const main = document.querySelector("main");
-      const b = dock.getBoundingClientRect();
-      const x0 = Math.max(0, b.left - MARGIN);
-      const x1 = Math.min(window.innerWidth - 1, b.right + MARGIN);
-      const y0 = Math.max(0, b.top - MARGIN);
-      const y1 = Math.min(window.innerHeight - 1, b.bottom + MARGIN);
-      const found = new Set<Element>();
-      for (let i = 0; i <= 4; i++) {
-        for (let j = 0; j <= 3; j++) {
-          const x = x0 + ((x1 - x0) * i) / 4;
-          const y = y0 + ((y1 - y0) * j) / 3;
-          document.elementsFromPoint(x, y).forEach((el) => {
-            if (dock.contains(el) || el.closest(".gt-dock")) return;
-            if (main && main.contains(el)) return;
-            found.add(el);
-          });
-        }
-      }
-      const next: Layer[] = [];
-      [...found].sort(order).forEach((el) => {
-        const color = getComputedStyle(el).backgroundColor;
-        if (isClear(color)) return;
-        next.push({ el, color });
-      });
-      layers = next;
-    };
-
-    const refreshItems = () => {
-      const root = document.querySelector("main") ?? document.body;
-      const next: Item[] = [];
-      root.querySelectorAll("*").forEach((node) => {
-        if (!(node instanceof HTMLElement) || node.closest(".gt-dock")) return;
-        const s = getComputedStyle(node);
-        if (s.display === "none" || s.visibility === "hidden") return;
-
-        if (node instanceof HTMLImageElement) {
-          const parent = node.parentElement ? getComputedStyle(node.parentElement) : null;
-          const radius = Math.max(
-            parseFloat(s.borderTopLeftRadius) || 0,
-            parent ? parseFloat(parent.borderTopLeftRadius) || 0 : 0,
-          );
-          next.push({ el: node, img: true, bg: "", radius, font: "", color: "", text: "", pl: 0, pt: 0, lh: 0, center: false });
-          return;
-        }
-
-        const bg = s.backgroundColor;
-        const hasBg = !isClear(bg);
-        let text = "";
-        node.childNodes.forEach((n) => { if (n.nodeType === 3) text += n.textContent || ""; });
-        text = text.replace(/\s+/g, " ").trim();
-        if (!hasBg && !text) return;
-        if (s.textTransform === "uppercase") text = text.toUpperCase();
-
-        const fontSize = parseFloat(s.fontSize) || 14;
-        next.push({
-          el: node,
-          img: false,
-          bg: hasBg ? bg : "",
-          radius: parseFloat(s.borderTopLeftRadius) || 0,
-          font: `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`,
-          color: s.color || "#fff",
-          text: text.slice(0, 80),
-          pl: (parseFloat(s.paddingLeft) || 0) + (parseFloat(s.borderLeftWidth) || 0),
-          pt: (parseFloat(s.paddingTop) || 0) + (parseFloat(s.borderTopWidth) || 0),
-          lh: parseFloat(s.lineHeight) || fontSize * 1.25,
-          center: s.textAlign === "center" || s.justifyContent === "center",
-        });
-      });
-      items = next;
-    };
-
-    const refreshNear = () => {
-      const b = dock.getBoundingClientRect();
-      const top = b.top - MARGIN - NEAR_RANGE;
-      const bottom = b.bottom + MARGIN + NEAR_RANGE;
-      near = items.filter((it) => {
-        const r = it.el.getBoundingClientRect();
-        return r.width > 0 && r.height > 0 && r.bottom > top && r.top < bottom;
-      });
-    };
-
-    const refreshAll = () => { refreshItems(); refreshLayers(); refreshNear(); };
-    refreshAll();
-
-    let timer = 0;
-    const scheduleNear = () => {
-      if (timer) return;
-      timer = window.setTimeout(() => { timer = 0; refreshLayers(); refreshNear(); }, REFRESH_MS);
-    };
-    let domTimer = 0;
-    const domObs = new MutationObserver(() => {
-      clearTimeout(domTimer);
-      domTimer = window.setTimeout(refreshAll, 150);
-    });
-    domObs.observe(document.body, { childList: true, subtree: true });
-    const themeObs = new MutationObserver(refreshAll);
-    themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-mobile-theme", "class"] });
-
-    window.addEventListener("scroll", scheduleNear, { passive: true, capture: true });
-    window.addEventListener("resize", refreshAll);
-    disposers.push(() => {
-      clearTimeout(timer);
-      clearTimeout(domTimer);
-      domObs.disconnect();
-      themeObs.disconnect();
-      window.removeEventListener("scroll", scheduleNear, true);
-      window.removeEventListener("resize", refreshAll);
-    });
-
-    const rrect = (r: Box, rad: number) => {
-      const k = Math.min(rad, r.width / 2, r.height / 2);
-      ctx.beginPath();
-      ctx.moveTo(r.left + k, r.top);
-      ctx.arcTo(r.right, r.top, r.right, r.bottom, k);
-      ctx.arcTo(r.right, r.bottom, r.left, r.bottom, k);
-      ctx.arcTo(r.left, r.bottom, r.left, r.top, k);
-      ctx.arcTo(r.left, r.top, r.right, r.top, k);
-      ctx.closePath();
-    };
-
-    const drawCover = (im: HTMLImageElement, r: Box) => {
-      const iw = im.naturalWidth, ih = im.naturalHeight;
-      if (!iw || !ih || r.width <= 0 || r.height <= 0) return;
-      const ir = iw / ih, br = r.width / r.height;
-      let sx = 0, sy = 0, sw = iw, sh = ih;
-      if (ir > br) { sw = ih * br; sx = (iw - sw) / 2; } else { sh = iw / br; sy = (ih - sh) / 2; }
-      ctx.drawImage(im, sx, sy, sw, sh, r.left, r.top, r.width, r.height);
-    };
-
-    const motion = new WeakMap<Element, { x: number; y: number; vx: number; vy: number; t: number }>();
-    let frameNow = 0;
-
-    const lead = (el: Element, r: DOMRect): Box => {
-      let m = motion.get(el);
-      if (!m || frameNow - m.t > 60) {
-        m = { x: r.left, y: r.top, vx: 0, vy: 0, t: frameNow };
-        motion.set(el, m);
+    const drawCover = (im: HTMLImageElement, rect: DOMRect) => {
+      if (!ctx || !im.naturalWidth || !im.naturalHeight || rect.width <= 0 || rect.height <= 0) return;
+      const imageRatio = im.naturalWidth / im.naturalHeight;
+      const boxRatio = rect.width / rect.height;
+      let sx = 0;
+      let sy = 0;
+      let sw = im.naturalWidth;
+      let sh = im.naturalHeight;
+      if (imageRatio > boxRatio) {
+        sw = sh * boxRatio;
+        sx = (im.naturalWidth - sw) / 2;
       } else {
-        const dt = Math.max(1, frameNow - m.t);
-        m.vx = m.vx * 0.5 + ((r.left - m.x) / dt) * 0.5;
-        m.vy = m.vy * 0.5 + ((r.top - m.y) / dt) * 0.5;
-        m.x = r.left;
-        m.y = r.top;
-        m.t = frameNow;
+        sh = sw / boxRatio;
+        sy = (im.naturalHeight - sh) / 2;
       }
-      const dx = Math.max(-60, Math.min(60, m.vx * LEAD_MS));
-      const dy = Math.max(-60, Math.min(60, m.vy * LEAD_MS));
-      return { left: r.left + dx, top: r.top + dy, right: r.right + dx, bottom: r.bottom + dy, width: r.width, height: r.height };
+      ctx.drawImage(im, sx, sy, sw, sh, rect.left, rect.top, rect.width, rect.height);
     };
 
-    const drawScene = (ox: number, oy: number, w: number, h: number) => {
-      const light = document.documentElement.dataset.mobileTheme === "light";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.fillStyle = light ? "#f5f3fb" : "#0a0b10";
-      ctx.fillRect(0, 0, w, h);
-      ctx.translate(-ox, -oy);
-
-      for (const l of layers) {
-        const b = lead(l.el, l.el.getBoundingClientRect());
-        if (b.bottom < oy || b.top > oy + h || b.right < ox || b.left > ox + w) continue;
-        ctx.fillStyle = l.color;
-        ctx.fillRect(b.left, b.top, b.width, b.height);
-      }
-
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-      for (const it of near) {
-        const b = lead(it.el, it.el.getBoundingClientRect());
-        if (b.width <= 0 || b.bottom < oy || b.top > oy + h || b.right < ox || b.left > ox + w) continue;
-
-        if (it.img) {
-          const img = it.el as HTMLImageElement;
-          const src = img.currentSrc || img.src;
-          const im = sameOrigin(src) ? (img.complete && img.naturalWidth ? img : null) : getCors(src);
-          if (!im) continue;
-          ctx.save();
-          rrect(b, it.radius);
-          ctx.clip();
-          try { drawCover(im, b); } catch { /* bỏ qua ảnh lỗi */ }
-          ctx.restore();
-          continue;
-        }
-
-        if (it.bg) {
-          ctx.fillStyle = it.bg;
-          if (it.radius > 0) { rrect(b, it.radius); ctx.fill(); }
-          else ctx.fillRect(b.left, b.top, b.width, b.height);
-        }
-        if (it.text) {
-          ctx.font = it.font;
-          ctx.fillStyle = it.color;
-          const maxW = Math.max(20, b.width - it.pl * 2);
-          const multiLine = b.height > it.lh * 1.6;
-          const y = multiLine ? b.top + it.pt + it.lh / 2 : b.top + b.height / 2;
-          if (it.center) {
-            ctx.textAlign = "center";
-            ctx.fillText(it.text, b.left + b.width / 2, y, maxW);
-            ctx.textAlign = "left";
-          } else {
-            ctx.fillText(it.text, b.left + it.pl, y, maxW);
-          }
-        }
-      }
-    };
-
-    let press = 0, pressed = 0, raf = 0, texReady = false;
     const onDown = () => { pressed = 1; };
     const onUp = () => { pressed = 0; };
     dock.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", onUp);
-    disposers.push(() => {
-      dock.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("pointercancel", onUp);
-    });
+
+    const drawScene = (ox: number, oy: number, width: number, height: number) => {
+      if (!ctx) return;
+      scene.width = Math.max(2, Math.round(width * dpr));
+      scene.height = Math.max(2, Math.round(height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      // Use the active app theme for a reliable base, then rebuild the
+      // actual colored surfaces behind the dock from the DOM.
+      const light = document.documentElement.dataset.mobileTheme === "light";
+      ctx.fillStyle = light ? "#f5f3fb" : "#0a0b10";
+      ctx.fillRect(0, 0, width, height);
+      ctx.translate(-ox, -oy);
+
+      const found = new Set<Element>();
+      for (let i = 0; i <= 4; i++) {
+        for (let j = 0; j <= 2; j++) {
+          const px = Math.min(
+            window.innerWidth - 1,
+            Math.max(0, ox + (width * i) / 4),
+          );
+          const py = Math.min(
+            window.innerHeight - 1,
+            Math.max(0, oy + (height * j) / 2),
+          );
+          document.elementsFromPoint(px, py).forEach((el) => {
+            if (!dock.contains(el) && !el.closest(".gt-dock")) found.add(el);
+          });
+        }
+      }
+
+      [...found]
+        .sort((a, b) => {
+          if (a === b) return 0;
+          return a.compareDocumentPosition(b) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+            ? -1
+            : 1;
+        })
+        .forEach((el) => {
+          const rect = el.getBoundingClientRect();
+          ctx.fillStyle = getComputedStyle(el).backgroundColor;
+          ctx.fillRect(rect.left, rect.top, rect.width, rect.height);
+        });
+
+      document.querySelectorAll<HTMLElement>("h1,h2,h3").forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom < oy || rect.top > oy + height || rect.right < ox || rect.left > ox + width) return;
+        const style = getComputedStyle(el);
+        ctx.font = style.fontWeight + " " + style.fontSize + " " + style.fontFamily;
+        ctx.fillStyle = style.color || "#fff";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText((el.textContent || "").trim().slice(0, 64), rect.left, rect.top + rect.height / 2, Math.max(20, rect.width));
+      });
+
+      document.querySelectorAll<HTMLImageElement>("main img, [data-movie-card] img, .movie-card img").forEach((img) => {
+        const rect = img.getBoundingClientRect();
+        if (rect.bottom < oy || rect.top > oy + height || rect.right < ox || rect.left > ox + width) return;
+        const im = getCors(img.currentSrc || img.src);
+        if (!im) return;
+        try {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(rect.left, rect.top, rect.width, rect.height, 8);
+          ctx.clip();
+          drawCover(im, rect);
+          ctx.restore();
+        } catch {
+          try { ctx.restore(); } catch { /* Ignore canvas drawing failures. */ }
+        }
+      });
+    };
+
+    const placeBubble = () => {
+      const active = dock.querySelector<HTMLElement>(".gt-dock-item.is-active");
+      if (!active) return;
+      const navRect = dock.getBoundingClientRect();
+      const itemRect = active.getBoundingClientRect();
+      bubble.style.left = itemRect.left - navRect.left + 4 + "px";
+      bubble.style.width = Math.max(0, itemRect.width - 8) + "px";
+    };
+
+    const observer = new MutationObserver(placeBubble);
+    observer.observe(dock, { subtree: true, attributes: true, attributeFilter: ["class"] });
+    const resizeObserver = new ResizeObserver(placeBubble);
+    resizeObserver.observe(dock);
+    placeBubble();
 
     const render = () => {
-      raf = requestAnimationFrame(render);
-      if (document.hidden) return;
-
-      const b = canvas.getBoundingClientRect();
-      const W = b.width, H = b.height;
-      if (W < 2 || H < 2) return;
-
-      const pw = Math.round(W * dpr), ph = Math.round(H * dpr);
-      if (canvas.width !== pw || canvas.height !== ph) {
-        canvas.width = pw;
-        canvas.height = ph;
-        gl.viewport(0, 0, pw, ph);
+      const bounds = dock.getBoundingClientRect();
+      const width = bounds.width;
+      const height = bounds.height;
+      const pixelWidth = Math.max(2, Math.round(width * dpr));
+      const pixelHeight = Math.max(2, Math.round(height * dpr));
+      if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+        canvas.width = pixelWidth;
+        canvas.height = pixelHeight;
+        gl.viewport(0, 0, pixelWidth, pixelHeight);
       }
 
-      const tw = Math.round((W + MARGIN * 2) * dpr);
-      const th = Math.round((H + MARGIN * 2) * dpr);
-      if (scene.width !== tw || scene.height !== th) {
-        scene.width = tw;
-        scene.height = th;
-        texReady = false;
-      }
-
-      frameNow = performance.now();
-      drawScene(b.left - MARGIN, b.top - MARGIN, W + MARGIN * 2, H + MARGIN * 2);
+      const textureWidth = width + margin * 2;
+      const textureHeight = height + margin * 2;
+      drawScene(bounds.left - margin, bounds.top - margin, textureWidth, textureHeight);
 
       gl.bindTexture(gl.TEXTURE_2D, texture);
       try {
-        if (!texReady) {
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scene);
-          texReady = true;
-        } else {
-          gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, scene);
-        }
-      } catch { /* lỗi upload không được làm chết vòng lặp */ }
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scene);
+      } catch {
+        // A failed image/texture upload must never stop the animation loop.
+      }
 
       press += (pressed - press) * 0.15;
       gl.uniform1i(uTex, 0);
-      gl.uniform2f(uRes, pw, ph);
-      gl.uniform2f(uTres, scene.width, scene.height);
-      gl.uniform2f(uToff, MARGIN * dpr, MARGIN * dpr);
+      gl.uniform2f(uRes, pixelWidth, pixelHeight);
+      gl.uniform2f(uTextureSize, scene.width, scene.height);
+      gl.uniform2f(uOffset, margin * dpr, margin * dpr);
       gl.uniform1f(uPress, press);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      raf = requestAnimationFrame(render);
     };
+
     raf = requestAnimationFrame(render);
-    disposers.push(() => cancelAnimationFrame(raf));
 
-    const onLost = (e: Event) => {
-      e.preventDefault();
+    return () => {
       cancelAnimationFrame(raf);
-      restoreStyles();
-      dock.classList.add("gt-fb");
+      observer.disconnect();
+      resizeObserver.disconnect();
+      dock.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      dock.classList.remove("gt-fb");
+      gl.deleteTexture(texture);
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
     };
-    const onRestored = () => setEpoch((n) => n + 1);
-    canvas.addEventListener("webglcontextlost", onLost);
-    canvas.addEventListener("webglcontextrestored", onRestored);
-    disposers.push(() => {
-      canvas.removeEventListener("webglcontextlost", onLost);
-      canvas.removeEventListener("webglcontextrestored", onRestored);
-    });
-
-    return dispose;
-  }, [epoch]);
+  }, []);
 
   return (
     <>
