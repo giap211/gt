@@ -25,6 +25,8 @@ interface VideoPlayerProps {
   backLabel?: string;
   onBack?: () => void;
   onRotate?: () => void;
+  showNextEpisode?: boolean;
+  onNextEpisode?: () => void;
 }
 
 export const VideoPlayer = ({
@@ -42,14 +44,18 @@ export const VideoPlayer = ({
   backLabel = "Trở về",
   onBack,
   onRotate,
+  showNextEpisode = false,
+  onNextEpisode,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
   const rotatedRef = useRef(rotated);
   rotatedRef.current = rotated;
   const onBackRef = useRef(onBack);
   const onRotateRef = useRef(onRotate);
+  const onNextEpisodeRef = useRef(onNextEpisode);
   onBackRef.current = onBack;
   onRotateRef.current = onRotate;
+  onNextEpisodeRef.current = onNextEpisode;
   const safeBackLabel = backLabel.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   const introSegmentRef = useRef({
     startSeconds: introStartSeconds,
@@ -167,6 +173,14 @@ export const VideoPlayer = ({
             tooltip: "Tiến 30 giây",
             click: () => { if (!art) return; art.seek = Math.min(art.duration || Infinity, art.currentTime + 30); art.play().catch(() => {}); art.notice.show = "Tiến 30 giây"; },
           },
+          ...(showNextEpisode ? [{
+            name: "next-episode",
+            position: "right" as const,
+            index: 99,
+            html: '<span style="display:inline-flex;align-items:center;gap:7px;padding:0 10px;font-size:12px;font-weight:750;white-space:nowrap;letter-spacing:.01em">TẬP TIẾP THEO <span style="font-size:15px;line-height:1">›</span></span>',
+            tooltip: "Chuyển sang tập tiếp theo",
+            click: () => onNextEpisodeRef.current?.(),
+          }] : []),
         ],
         settings: [
           {
@@ -403,8 +417,8 @@ export const VideoPlayer = ({
           if (art && inIntroRange && !skipIntroControlVisible) {
             art.controls.add({
               name: "skip-intro",
-              position: "right",
-              index: 20,
+              position: "left",
+              index: 12,
               html: '<span style="font-weight:700;white-space:nowrap">Bỏ qua intro »</span>',
               tooltip: "Bỏ qua đoạn giới thiệu",
               click: () => {
@@ -727,7 +741,7 @@ export const VideoPlayer = ({
           .forEach((el) => el.remove());
       }
     };
-  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, onUserInteraction]);
+  }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, onUserInteraction, showNextEpisode]);
 
   if (isEmbed) {
     return (
@@ -751,6 +765,22 @@ export const VideoPlayer = ({
     <div className="player-controls-frame relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
       <div ref={artRef} className="h-full w-full" />
       <style jsx global>{`
+        .player-controls-frame .artplayer-app .art-controls-right .art-control:not(.art-control-next-episode) {
+          display: none !important;
+        }
+        .player-controls-frame .artplayer-app .art-control-next-episode {
+          display: ${showNextEpisode ? 'flex' : 'none'} !important;
+          align-items: center !important;
+          justify-content: center !important;
+          min-height: 34px !important;
+          margin-left: 8px !important;
+          border: 1px solid rgba(255,255,255,.22) !important;
+          border-radius: 999px !important;
+          background: rgba(124,58,237,.32) !important;
+          color: #fff !important;
+          backdrop-filter: blur(14px) !important;
+          -webkit-backdrop-filter: blur(14px) !important;
+        }
         .player-controls-frame .artplayer-app .art-bottom {
           left: 50% !important;
           right: auto !important;

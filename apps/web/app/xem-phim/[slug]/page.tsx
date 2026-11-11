@@ -582,6 +582,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             backLabel={movie.name}
             onBack={handlePlayerBack}
             onRotate={handlePlayerRotate}
+            showNextEpisode={Boolean(nextEp)}
+            onNextEpisode={nextEp ? () => router.push(`/xem-phim/${slug}?tap=${nextEp.slug}&sv=${currentServer}`) : undefined}
           />
         )}
       </div>
