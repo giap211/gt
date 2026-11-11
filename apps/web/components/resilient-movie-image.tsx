@@ -11,8 +11,8 @@ type ResilientMovieImageProps = Omit<ImageProps, "src" | "alt" | "onError"> & {
 
 /**
  * Tries every distinct movie-art URL in order, then displays the local fallback.
- * Remote sources are loaded directly in the browser to avoid failures in the
- * Next.js image optimizer when a third-party movie CDN blocks server requests.
+ * Remote sources use the same-origin proxy for reliable CDN access, then Next.js
+ * image optimization to resize and encode the result for the requesting device.
  */
 export function ResilientMovieImage({
   sources,
@@ -52,7 +52,8 @@ export function ResilientMovieImage({
       {...imageProps}
       src={src}
       alt={alt}
-      unoptimized={!usingFallback}
+      unoptimized={usingFallback}
+      quality={imageProps.quality ?? 70}
       onError={() => {
         if (!usingFallback) setAttempt((current) => current + 1);
       }}
