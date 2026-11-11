@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { ResilientMovieImage } from "./resilient-movie-image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Star } from "lucide-react";
@@ -92,7 +92,6 @@ export const MovieCard = ({
   variant = "horizontal",
 }: MovieCardProps) => {
   const [isNavigating, setIsNavigating] = useState(false);
-  const [imageFailed, setImageFailed] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -102,15 +101,12 @@ export const MovieCard = ({
   const handleLinkClick = () => setIsNavigating(true);
 
   const isHorizontal = variant === "horizontal";
-  const imageSrc = isHorizontal ? thumbUrl || posterUrl : posterUrl || thumbUrl;
+  const imageSources = isHorizontal ? [thumbUrl, posterUrl] : [posterUrl, thumbUrl];
   const fallbackSrc = isHorizontal
     ? "/images/fallback-horizontal.svg"
     : "/images/fallback-vertical.svg";
   const langChip = buildLangChip(language, episodeCurrent);
 
-  useEffect(() => {
-    setImageFailed(false);
-  }, [imageSrc]);
   const qChip = qualityChip(quality);
   const numericRating = typeof rating === "number" ? rating : Number.parseFloat(String(rating ?? ""));
   const hasRating = Number.isFinite(numericRating) && numericRating > 0;
@@ -134,9 +130,9 @@ export const MovieCard = ({
           isHorizontal ? "aspect-[16/9]" : "aspect-[2/3]"
         }`}
       >
-        <Image
-          src={imageFailed || !imageSrc ? fallbackSrc : imageSrc}
-          onError={() => setImageFailed(true)}
+        <ResilientMovieImage
+          sources={imageSources}
+          fallbackSrc={fallbackSrc}
           alt={title}
           fill
           sizes={

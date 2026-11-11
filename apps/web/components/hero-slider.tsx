@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
+import { ResilientMovieImage } from "./resilient-movie-image";
 import Link from "next/link";
 import { Bell, Play, Plus, X, Bookmark } from "lucide-react";
 import { useMember } from "./member-provider";
@@ -64,7 +64,6 @@ function wrapHeroTitle(title: string, maxChars = 20) {
 export const HeroSlider = ({ movies }: HeroSliderProps) => {
   const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [failedHeroImages, setFailedHeroImages] = useState<Set<string>>(() => new Set());
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [savedSlugs, setSavedSlugs] = useState<Set<string>>(() => new Set());
   const [savingSlug, setSavingSlug] = useState<string | null>(null);
@@ -273,8 +272,11 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
             className="h-full w-full"
           >
             {movies.map((movie, index) => {
-              const heroImage =
-                movie.backdrop_url || movie.thumb_url || movie.poster_url;
+              const heroImageSources = [
+                movie.backdrop_url,
+                movie.thumb_url,
+                movie.poster_url,
+              ];
               const desc = cleanText(movie.content || movie.description);
               const metaParts = [
                 movie.rating ? `★ ${movie.rating}` : null,
@@ -287,14 +289,9 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                 <SwiperSlide key={movie._id} className="relative !h-auto">
                   <div className="relative min-h-[420px] sm:min-h-[480px] lg:min-h-[620px]">
                     <div className="absolute inset-0 z-0 bg-[#1a1030]">
-                      <Image
-                        src={failedHeroImages.has(movie.slug) ? "/images/fallback-horizontal.svg" : heroImage}
-                        onError={() => setFailedHeroImages((current) => {
-                          if (current.has(movie.slug)) return current;
-                          const next = new Set(current);
-                          next.add(movie.slug);
-                          return next;
-                        })}
+                      <ResilientMovieImage
+                        sources={heroImageSources}
+                        fallbackSrc="/images/fallback-horizontal.svg"
                         alt={movie.name}
                         fill
                         priority={index === 0}

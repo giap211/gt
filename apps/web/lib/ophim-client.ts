@@ -169,15 +169,20 @@ export const formatImageUrl = (
   cdnBase: string = DEFAULT_CDN_IMAGE,
 ): string => {
   if (!rawUrl || typeof rawUrl !== "string" || rawUrl.trim() === "") {
-    return "https://placehold.co/300x450?text=No+Image";
+    return "";
   }
 
   const trimmed = rawUrl.trim();
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+  if (trimmed.startsWith("//")) {
+    return `https:${trimmed}`;
+  }
+  if (/^https?:\/\//i.test(trimmed)) {
     return trimmed;
   }
 
-  const base = (cdnBase || DEFAULT_CDN_IMAGE).replace(/\/+$/, "");
+  const rawBase = (cdnBase || DEFAULT_CDN_IMAGE).trim();
+  const base = (rawBase.startsWith("//") ? `https:${rawBase}` : rawBase)
+    .replace(/\/+$/, "");
   const path = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
   return `${base}${path}`;
 };
@@ -237,7 +242,6 @@ const cleanAndFilterMovies = (
     const rawPoster = item.poster_url || item.thumb_url || "";
     const rawThumb = item.thumb_url || item.poster_url || "";
 
-    if (!rawPoster && !rawThumb) continue;
 
     seenId.add(id);
     seenId.add(slug);
