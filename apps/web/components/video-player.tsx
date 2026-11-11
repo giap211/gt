@@ -489,10 +489,12 @@ export const VideoPlayer = ({
         const video = art.video as HTMLVideoElement;
         const reportProgress = () => {
           const intro = introSegmentRef.current;
-          setDebugCurrentTime(Number(video.currentTime.toFixed(2)));
-          setDebugVideoState(
-            `${video.paused ? "Đang tạm dừng" : "Đang phát"} · readyState ${video.readyState} · ${video.networkState === 1 ? "có nguồn" : `networkState ${video.networkState}`}`,
-          );
+          if (showDebug) {
+            setDebugCurrentTime(Number(video.currentTime.toFixed(2)));
+            setDebugVideoState(
+              `${video.paused ? "Đang tạm dừng" : "Đang phát"} · readyState ${video.readyState} · ${video.networkState === 1 ? "có nguồn" : `networkState ${video.networkState}`}`,
+            );
+          }
           const hasIntro =
             typeof intro.startSeconds === "number" &&
             typeof intro.endSeconds === "number" &&
@@ -524,7 +526,6 @@ export const VideoPlayer = ({
         };
 
         const reportFinalProgress = () => {
-          syncPlaybackState();
           if (!Number.isFinite(video.currentTime)) return;
           const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
             ? video.duration
@@ -691,7 +692,6 @@ export const VideoPlayer = ({
           }
 
           // YouTube-style visual feedback centered in the tapped half.
-          if (seekFeedbackTimerRef.current) clearTimeout(seekFeedbackTimerRef.current);
           art!.notice.show = seconds < 0 ? "Lùi 30 giây" : "Tiến 30 giây";
           video.play().catch(() => {});
         };
