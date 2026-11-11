@@ -752,12 +752,15 @@ export const VideoPlayer = ({
       <div ref={artRef} className="h-full w-full" />
       <style jsx global>{`
         .player-controls-frame .artplayer-app .art-bottom {
-          left: 5%;
-          bottom: 12px;
-          width: 90%;
-          padding-left: 8px;
-          padding-right: 8px;
-          box-sizing: border-box;
+          left: 50% !important;
+          right: auto !important;
+          bottom: max(22px, env(safe-area-inset-bottom, 0px) + 14px) !important;
+          width: calc(100% - max(48px, env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px) + 32px)) !important;
+          padding-left: 6px !important;
+          padding-right: 6px !important;
+          box-sizing: border-box !important;
+          transform: translate(-50%, -10px) scale(0.94) !important;
+          transform-origin: bottom center !important;
         }
       `}</style>
       <div className={`pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 bg-gradient-to-b from-black/85 via-black/45 to-transparent px-3 pb-7 pt-3 text-white transition-all duration-200 sm:px-5 sm:pt-4 ${showPlayerHeader ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"}`} style={{ pointerEvents: showPlayerHeader ? "auto" : "none" }}>
