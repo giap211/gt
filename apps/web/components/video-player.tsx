@@ -22,6 +22,9 @@ interface VideoPlayerProps {
   onProgress?: (seconds: number, durationSeconds: number, force?: boolean) => void;
   onUserInteraction?: () => void;
   rotated?: boolean;
+  backLabel?: string;
+  onBack?: () => void;
+  onRotate?: () => void;
 }
 
 export const VideoPlayer = ({
@@ -36,10 +39,18 @@ export const VideoPlayer = ({
   onProgress,
   onUserInteraction,
   rotated = false,
+  backLabel = "Trở về",
+  onBack,
+  onRotate,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
   const rotatedRef = useRef(rotated);
   rotatedRef.current = rotated;
+  const onBackRef = useRef(onBack);
+  const onRotateRef = useRef(onRotate);
+  onBackRef.current = onBack;
+  onRotateRef.current = onRotate;
+  const safeBackLabel = backLabel.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   const introSegmentRef = useRef({
     startSeconds: introStartSeconds,
     endSeconds: introEndSeconds,
@@ -168,6 +179,18 @@ export const VideoPlayer = ({
         screenshot: true,
         setting: true,
         controls: [
+          {
+            name: "back-to-movie", position: "left", index: 0,
+            html: '<span style="display:inline-flex;align-items:center;gap:6px;max-width:min(42vw,280px);font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-size:22px;line-height:1">‹</span><span style="overflow:hidden;text-overflow:ellipsis">' + safeBackLabel + '</span></span>',
+            tooltip: "Quay về trang phim",
+            click: () => onBackRef.current?.(),
+          },
+          {
+            name: "rotate-player", position: "right", index: 30,
+            html: '<span style="font-size:19px;font-weight:700;white-space:nowrap">↻</span>',
+            tooltip: "Xoay ngang / dọc",
+            click: () => onRotateRef.current?.(),
+          },
           {
             name: "seek-back-30", position: "left", index: 10,
             html: '<span style="font-size:12px;font-weight:700;white-space:nowrap">−30s</span>',
