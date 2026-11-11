@@ -14,7 +14,7 @@ type Layer = { el: Element; color: string };
 type Head = { el: HTMLElement; font: string; color: string; text: string };
 
 const VERTEX = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
-const FRAGMENT = \`
+const FRAGMENT = `
   precision highp float;
   uniform sampler2D tex;
   uniform vec2 res,tres,toff;
@@ -49,7 +49,7 @@ const FRAGMENT = \`
       c+=rim*(.2+.5*sp)+t*.06*sp;
     }
     gl_FragColor=vec4(c*a,a);
-  }\`;
+  }`;
 
 const rpath = (x: CanvasRenderingContext2D, l: number, t: number, w: number, h: number, rad: number) => {
   const k = Math.max(0, Math.min(rad, w / 2, h / 2));
@@ -228,7 +228,7 @@ export function LiquidGlassDockSurface() {
       return getCors(src);
     };
     const thumbKey = (img: HTMLImageElement, w: number, h: number) =>
-      \`\${img.currentSrc || img.src}|\${Math.round(w * dpr)}|\${Math.round(h * dpr)}\`;
+      `\${img.currentSrc || img.src}|\${Math.round(w * dpr)}|\${Math.round(h * dpr)}`;
 
     const buildThumb = (im: HTMLImageElement, w: number, h: number) => {
       const pw = Math.max(1, Math.round(w * dpr));
@@ -277,7 +277,7 @@ export function LiquidGlassDockSurface() {
         const s = getComputedStyle(el);
         return {
           el,
-          font: \`\${s.fontWeight} \${s.fontSize} \${s.fontFamily}\`,
+          font: `\${s.fontWeight} \${s.fontSize} \${s.fontFamily}`,
           color: s.color || "#fff",
           text: (el.textContent || "").trim().slice(0, 64),
         };
