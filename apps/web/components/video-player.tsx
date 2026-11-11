@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Artplayer from "artplayer";
-import { Play } from "lucide-react";
+import { ArrowLeft, Play, RotateCw } from "lucide-react";
 import Hls from "hls.js";
 
 // Tắt double-click fullscreen / play mặc định
@@ -154,18 +154,6 @@ export const VideoPlayer = ({
         screenshot: true,
         setting: true,
         controls: [
-          {
-            name: "back-to-movie", position: "left", index: 0,
-            html: '<span style="display:inline-flex;align-items:center;gap:6px;max-width:min(42vw,280px);font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-size:22px;line-height:1">‹</span><span style="overflow:hidden;text-overflow:ellipsis">' + safeBackLabel + '</span></span>',
-            tooltip: "Quay về trang phim",
-            click: () => onBackRef.current?.(),
-          },
-          {
-            name: "rotate-player", position: "right", index: 30,
-            html: '<span style="font-size:19px;font-weight:700;white-space:nowrap">↻</span>',
-            tooltip: "Xoay ngang / dọc",
-            click: () => onRotateRef.current?.(),
-          },
           {
             name: "seek-back-30", position: "left", index: 10,
             html: '<span style="font-size:12px;font-weight:700;white-space:nowrap">−30s</span>',
@@ -754,6 +742,27 @@ export const VideoPlayer = ({
   return (
     <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
       <div ref={artRef} className="h-full w-full" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 bg-gradient-to-b from-black/85 via-black/45 to-transparent px-3 pb-7 pt-3 text-white sm:px-5 sm:pt-4">
+        <button
+          type="button"
+          onClick={() => onBackRef.current?.()}
+          aria-label="Quay về trang phim"
+          title="Quay về trang phim"
+          className="pointer-events-auto flex min-w-0 max-w-[calc(100%-56px)] items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 text-left text-sm font-semibold text-white shadow-lg backdrop-blur-md transition hover:bg-black/55 active:scale-95"
+        >
+          <ArrowLeft className="h-5 w-5 shrink-0" />
+          <span className="truncate">{safeBackLabel}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => onRotateRef.current?.()}
+          aria-label="Xoay ngang hoặc dọc"
+          title="Xoay ngang / dọc"
+          className="pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white shadow-lg backdrop-blur-md transition hover:bg-black/55 active:scale-95"
+        >
+          <RotateCw className="h-5 w-5" />
+        </button>
+      </div>
       {showDebug && (
       <div className="absolute left-2 top-2 z-40 max-w-[min(92%,420px)] rounded-lg border border-cyan-300/40 bg-black/90 p-2.5 text-[10px] leading-relaxed text-white shadow-xl sm:left-3 sm:top-3 sm:text-xs">
         <div className="mb-1 flex items-center justify-between gap-3">
