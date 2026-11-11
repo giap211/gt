@@ -740,8 +740,18 @@ export const VideoPlayer = ({
   }
 
   return (
-    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
+    <div className="player-controls-frame relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
       <div ref={artRef} className="h-full w-full" />
+      <style jsx global>{`
+        .player-controls-frame .artplayer-app .art-bottom {
+          left: 5%;
+          bottom: 12px;
+          width: 90%;
+          padding-left: 8px;
+          padding-right: 8px;
+          box-sizing: border-box;
+        }
+      `}</style>
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 bg-gradient-to-b from-black/85 via-black/45 to-transparent px-3 pb-7 pt-3 text-white sm:px-5 sm:pt-4">
         <button
           type="button"
