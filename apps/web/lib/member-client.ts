@@ -147,7 +147,6 @@ export const memberClient = {
       try {
         await this.syncLocalHistoryToAccount(res.user.username);
         await this.syncLocalFavoritesToAccount();
-      await this.syncLocalFavoritesToAccount();
       } catch (error) {
         console.warn("[Member] Chưa thể đồng bộ lịch sử xem cũ:", error);
       }
@@ -168,6 +167,7 @@ export const memberClient = {
       previousUser.username?.toLowerCase() === res.user.username.toLowerCase();
     if (canImportHistory) {
       await this.syncLocalHistoryToAccount(res.user.username);
+      await this.syncLocalFavoritesToAccount();
     }
     return res;
   },
