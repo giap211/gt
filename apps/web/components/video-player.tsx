@@ -81,6 +81,7 @@ export const VideoPlayer = ({
     !isDirectVideoFile;
 
   const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [showPlayerHeader, setShowPlayerHeader] = useState(true);
   const [showDebug, setShowDebug] = useState(() => {
     try {
       return typeof window !== "undefined" && window.localStorage.getItem("player-skip-intro-debug") === "on";
@@ -448,6 +449,13 @@ export const VideoPlayer = ({
         };
       }
 
+      if (art) {
+        // Đồng bộ hàng tên phim/nút xoay với trạng thái hiện/ẩn controls của Artplayer.
+        art.on("control", (visible: boolean) => {
+          setShowPlayerHeader(Boolean(visible));
+        });
+      }
+
       if (onReady && art) {
         onReady(art);
       }
@@ -752,7 +760,7 @@ export const VideoPlayer = ({
           box-sizing: border-box;
         }
       `}</style>
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 bg-gradient-to-b from-black/85 via-black/45 to-transparent px-3 pb-7 pt-3 text-white sm:px-5 sm:pt-4">
+      <div className={`pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 bg-gradient-to-b from-black/85 via-black/45 to-transparent px-3 pb-7 pt-3 text-white transition-all duration-200 sm:px-5 sm:pt-4 ${showPlayerHeader ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"}`} style={{ pointerEvents: showPlayerHeader ? "auto" : "none" }}>
         <button
           type="button"
           onClick={() => onBackRef.current?.()}
