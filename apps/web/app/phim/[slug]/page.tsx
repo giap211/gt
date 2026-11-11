@@ -461,74 +461,52 @@ export default function MovieDetailPage({
             </section>
           )}
 
-          <section id="movie-episodes" className="movie-glass-panel scroll-mt-5 p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[17px] font-semibold tracking-tight text-white">Danh sách tập</h2>
-              <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] text-white/70">{episodes[selectedServer]?.server_name || "Bản chiếu"}</span>
+          <section id="movie-episodes" className="movie-glass-panel scroll-mt-5 rounded-2xl border border-violet-300/10 bg-white/[0.025] p-3.5 sm:p-4">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-[17px] font-semibold tracking-tight text-white">Tập phim</h2>
+                <p className="mt-0.5 text-[11px] text-white/40">{mobileFilteredEpisodes.length.toLocaleString("vi-VN")} tập{mobileEpisodeSearch.trim() ? " phù hợp" : ""}</p>
+              </div>
+              <span className="max-w-[48%] truncate rounded-full border border-violet-300/20 bg-violet-400/10 px-3 py-1.5 text-[10px] font-semibold text-violet-200">{episodes[selectedServer]?.server_name || "Bản chiếu"}</span>
             </div>
-            <div className="mb-3 flex gap-2 overflow-x-auto no-scrollbar">
-              {episodes.map((ep, idx) => (
-                <button key={idx} type="button" onClick={() => { setSelectedServer(idx); setMobileEpisodePage(0); setMobileEpisodeSearch(""); }} className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] ${selectedServer === idx ? "border-white/60 bg-white text-slate-900" : "border-white/15 bg-white/[0.06] text-white/65"}`}>{ep.server_name || `Server ${idx + 1}`}</button>
-              ))}
-            </div>
-            <div className="mb-3 flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 text-white/45">
-              <Search size={15} className="shrink-0" />
-              <input
-                value={mobileEpisodeSearch}
-                onChange={(event) => { setMobileEpisodeSearch(event.target.value); setMobileEpisodePage(0); }}
-                placeholder="Tìm số tập..."
-                inputMode="search"
-                aria-label="Tìm tập phim"
-                className="min-w-0 flex-1 bg-transparent text-[13px] text-white outline-none placeholder:text-white/35"
-              />
-              <span className="shrink-0 text-[10px] tabular-nums">{mobileFilteredEpisodes.length} tập</span>
+            {episodes.length > 1 && (
+              <div className="mb-3">
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[.14em] text-white/35">Chọn server</p>
+                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                  {episodes.map((ep, idx) => (
+                    <button key={idx} type="button" onClick={() => { setSelectedServer(idx); setMobileEpisodePage(0); setMobileEpisodeSearch(""); }} aria-pressed={selectedServer === idx} className={`shrink-0 rounded-xl border px-3 py-2 text-[11px] font-semibold transition-all ${selectedServer === idx ? "border-violet-300/45 bg-gradient-to-r from-fuchsia-500/20 to-violet-500/20 text-violet-100" : "border-white/[0.08] bg-white/[0.035] text-white/55"}`}>{ep.server_name || `Server ${idx + 1}`}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="mb-3 flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] bg-black/15 px-3 text-white/45">
+              <Search size={14} className="shrink-0" />
+              <input value={mobileEpisodeSearch} onChange={(event) => { setMobileEpisodeSearch(event.target.value); setMobileEpisodePage(0); }} placeholder="Tìm tập phim..." inputMode="search" aria-label="Tìm tập phim" className="min-w-0 flex-1 bg-transparent text-[12px] text-white outline-none placeholder:text-white/30" />
+              <span className="shrink-0 text-[10px] tabular-nums text-white/35">{mobileFilteredEpisodes.length}</span>
             </div>
             {mobileEpisodePageCount > 1 && (
-              <div className="mb-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
                 {Array.from({ length: mobileEpisodePageCount }, (_, page) => {
-                  const start = page * mobileEpisodePageSize + 1;
-                  const end = Math.min((page + 1) * mobileEpisodePageSize, mobileFilteredEpisodes.length);
-                  return (
-                    <button
-                      key={page}
-                      type="button"
-                      onClick={() => setMobileEpisodePage(page)}
-                      aria-pressed={safeMobileEpisodePage === page}
-                      className={`shrink-0 rounded-full border px-3.5 py-2 text-[11px] font-semibold ${safeMobileEpisodePage === page ? "border-violet-300/50 bg-gradient-to-r from-fuchsia-500/20 to-violet-500/20 text-violet-200" : "border-white/10 bg-white/[0.04] text-white/55"}`}
-                    >
-                      {start}–{end}
-                    </button>
-                  );
+                  const from = page * mobileEpisodePageSize + 1;
+                  const to = Math.min((page + 1) * mobileEpisodePageSize, mobileFilteredEpisodes.length);
+                  return <button key={page} type="button" onClick={() => setMobileEpisodePage(page)} aria-pressed={safeMobileEpisodePage === page} className={`shrink-0 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold tabular-nums ${safeMobileEpisodePage === page ? "border-violet-300/40 bg-violet-400/15 text-violet-100" : "border-white/[0.07] bg-white/[0.025] text-white/45"}`}>{from}–{to}</button>;
                 })}
               </div>
             )}
-            <div className="space-y-2">
-              {mobileVisibleEpisodes.map((ep, idx) => (
-                <Link key={ep.slug || ep.name} href={"/xem-phim/" + movie.slug + "?sv=" + selectedServer + "&tap=" + encodeURIComponent(ep.slug || ep.name)} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-2.5 transition-colors active:bg-white/10">
-                  <div className="movie-poster-frame relative h-[76px] w-[118px] shrink-0 overflow-hidden rounded-xl bg-white/10">
-                    <ResilientMovieImage
-                      sources={[movie.thumb_url, movie.poster_url]}
-                      fallbackSrc="/images/fallback-horizontal.svg"
-                      alt=""
-                      fill
-                      sizes="118px"
-                      className="object-cover"
-                    />
-                    <span className="absolute inset-0 flex items-center justify-center bg-black/25"><Play size={22} fill="white" /></span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-white">{formatEpisodeName(ep.name) || "Tập " + (safeMobileEpisodePage * mobileEpisodePageSize + idx + 1)}</p>
-                    <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-white/45">{movie.name} · {movie.time || "Thời lượng đang cập nhật"}</p>
-                  </div>
-                </Link>
-              ))}
-              {!mobileFilteredEpisodes.length && <p className="rounded-xl bg-white/[0.06] p-4 text-sm text-white/50">Không tìm thấy tập phù hợp.</p>}
-            </div>
+            {mobileVisibleEpisodes.length ? (
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                {mobileVisibleEpisodes.map((ep, idx) => (
+                  <Link key={ep.slug || ep.name} href={"/xem-phim/" + movie.slug + "?sv=" + selectedServer + "&tap=" + encodeURIComponent(ep.slug || ep.name)} className="group flex min-h-10 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.035] px-1.5 py-2 text-center text-[11px] font-semibold text-white/70 transition-all hover:border-violet-300/40 hover:bg-violet-400/10 hover:text-violet-100 active:scale-[.97]">
+                    <span className="truncate">{formatEpisodeName(ep.name) || "Tập " + (safeMobileEpisodePage * mobileEpisodePageSize + idx + 1)}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : <p className="rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-8 text-center text-xs text-white/40">Không tìm thấy tập phù hợp.</p>}
             {mobileEpisodePageCount > 1 && (
-              <div className="mt-3 flex items-center justify-between border-t border-white/[0.08] pt-3">
-                <button type="button" disabled={safeMobileEpisodePage === 0} onClick={() => setMobileEpisodePage((page) => Math.max(0, page - 1))} className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs text-white/65 disabled:opacity-25"><ChevronLeft size={15} /> Trước</button>
-                <span className="text-[11px] tabular-nums text-white/40">{safeMobileEpisodePage + 1} / {mobileEpisodePageCount}</span>
-                <button type="button" disabled={safeMobileEpisodePage >= mobileEpisodePageCount - 1} onClick={() => setMobileEpisodePage((page) => Math.min(mobileEpisodePageCount - 1, page + 1))} className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs text-white/65 disabled:opacity-25">Tiếp <ChevronRight size={15} /></button>
+              <div className="mt-3 flex items-center justify-between border-t border-white/[0.07] pt-3">
+                <button type="button" disabled={safeMobileEpisodePage === 0} onClick={() => setMobileEpisodePage((page) => Math.max(0, page - 1))} className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] text-white/55 disabled:opacity-25"><ChevronLeft size={14} /> Trước</button>
+                <span className="text-[10px] tabular-nums text-white/35">Trang {safeMobileEpisodePage + 1}/{mobileEpisodePageCount}</span>
+                <button type="button" disabled={safeMobileEpisodePage >= mobileEpisodePageCount - 1} onClick={() => setMobileEpisodePage((page) => Math.min(mobileEpisodePageCount - 1, page + 1))} className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] text-white/55 disabled:opacity-25">Tiếp <ChevronRight size={14} /></button>
               </div>
             )}
           </section>
@@ -801,7 +779,7 @@ function TabContent({
               </div>
             )}
             {visibleEpisodes.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-6 xl:grid-cols-8">
                 {visibleEpisodes.map((ep) => (
                   <Link
                     key={ep.slug || ep.name}
