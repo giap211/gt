@@ -23,7 +23,7 @@ const FRAGMENT = `
     float R=res.y*.5;vec2 h=res*.5;float d=sdf(p,h,R);
     if(d>1.){gl_FragColor=vec4(0.);return;}
     float a=clamp(.5-d,0.,1.);
-    float bev=R*.42;
+    float bev=R*.38;
     float t=1.-clamp(-d/bev,0.,1.);
     vec2 bp=fp+toff;
     vec3 c;
@@ -31,7 +31,7 @@ const FRAGMENT = `
       c=texture2D(tex,bp/tres).rgb;
     }else{
       vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
-      float k=t*t*(R*.75)*(1.+press*.4);
+      float k=t*t*(R*.3)*(1.+press*.4);
       vec2 off=n*k;
       float r=texture2D(tex,(bp+off*1.15)/tres).r;
       float b=texture2D(tex,(bp+off*.85)/tres).b;
