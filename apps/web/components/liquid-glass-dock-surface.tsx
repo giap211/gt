@@ -33,7 +33,7 @@ export function LiquidGlassDockSurface() {
   precision highp float;
   uniform sampler2D tex;
   uniform vec2 res,tres,toff;
-  uniform float press,texScale;
+  uniform float press,texScale,dark;
   float sdf(vec2 p,vec2 h,float r){vec2 q=abs(p)-h+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
   void main(){
     vec2 fp=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);vec2 p=fp-res*.5;
@@ -45,7 +45,7 @@ export function LiquidGlassDockSurface() {
     vec2 bp=(fp+toff)*texScale;
     vec3 c;
     if(t<=0.){
-      c=texture2D(tex,bp/tres).rgb;
+      c=mix(texture2D(tex,bp/tres).rgb,vec3(.02,.025,.04),dark);
     }else{
       vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
       float k=t*t*(R*.75)*(1.+press*.4);
@@ -57,7 +57,9 @@ export function LiquidGlassDockSurface() {
               +texture2D(tex,(bp+off+vec2(-.6,-1.04)*t)/tres).rgb)/3.;
       c=vec3(r,g3.g,b);
       float l=dot(c,vec3(.299,.587,.114));
-      c=mix(vec3(l),c,1.+.35*t);c=mix(c,vec3(1.),.06*t);
+      c=mix(vec3(l),c,1.+.35*t*(1.-dark));
+      c=mix(c,vec3(1.),.06*t*(1.-dark));
+      c=mix(c,vec3(.02,.025,.04),dark*(1.-.35*t));
       float rim=smoothstep(2.5,0.,-d);
       vec2 L=normalize(vec2(-.6,-.8));
       float sp=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
@@ -152,6 +154,9 @@ export function LiquidGlassDockSurface() {
     const uOffset = uniform("toff");
     const uPress = uniform("press");
     const uTextureScale = uniform("texScale");
+    const uDark = uniform("dark");
+    const DARK_AMOUNT = 0.55; // độ tối ở giao diện tối: 0.4 nhẹ, 0.55 giống ảnh, 0.7 rất tối
+    let dark = 0;
     const uTex = uniform("tex");
 
     let press = 0;
@@ -313,6 +318,9 @@ export function LiquidGlassDockSurface() {
       }
 
       press += (pressed - press) * 0.15;
+      const isLight = document.documentElement.dataset.mobileTheme === "light";
+      dark += ((isLight ? 0 : DARK_AMOUNT) - dark) * 0.2;
+      gl.uniform1f(uDark, dark);
       gl.uniform1i(uTex, 0);
       gl.uniform2f(uRes, pixelWidth, pixelHeight);
       gl.uniform2f(uTextureSize, scene.width, scene.height);
