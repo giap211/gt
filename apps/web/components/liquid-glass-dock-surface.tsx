@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 const MARGIN = 60;
 const REFRESH_MS = 120;
 const NEAR_RANGE = 600;
-const LEAD = 0;
+const LEAD_MS = 24; // đoán trước vị trí theo vận tốc (ms). Cuộn còn lệch thì tăng, bị giật ngược thì giảm (16–40)
+type Box = { left: number; top: number; right: number; bottom: number; width: number; height: number };
 
 type Layer = { el: Element; color: string };
 type Item = {
@@ -34,7 +35,7 @@ const FRAGMENT = `
     float R=res.y*.5;vec2 h=res*.5;float d=sdf(p,h,R);
     if(d>1.){gl_FragColor=vec4(0.);return;}
     float a=clamp(.5-d,0.,1.);
-    float bev=R*.5;
+    float bev=R*.42;
     float t=1.-clamp(-d/bev,0.,1.);
     vec2 bp=fp+toff;
     vec2 n=vec2(0.);
@@ -43,8 +44,8 @@ const FRAGMENT = `
       c=texture2D(tex,bp/tres).rgb;
     }else{
       n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
-      float k=t*t*(R*.45)*(1.+press*.4);
-      vec2 off=n*k;
+      float k=t*t*(R*.2)*(1.+press*.4);
+      vec2 off=-n*k;
       c=vec3(texture2D(tex,(bp+off*1.1)/tres).r,
              texture2D(tex,(bp+off)/tres).g,
              texture2D(tex,(bp+off*.9)/tres).b);
@@ -95,6 +96,16 @@ export function LiquidGlassDockSurface() {
     dock.classList.remove("gt-fb");
     disposers.push(() => dock.classList.remove("gt-fb"));
     if (!gl) { dock.classList.add("gt-fb"); return dispose; }
+
+    dock.style.setProperty("backdrop-filter", "none", "important");
+    dock.style.setProperty("-webkit-backdrop-filter", "none", "important");
+    canvas.style.setProperty("opacity", "1", "important");
+    const restoreStyles = () => {
+      dock.style.removeProperty("backdrop-filter");
+      dock.style.removeProperty("-webkit-backdrop-filter");
+      canvas.style.removeProperty("opacity");
+    };
+    disposers.push(restoreStyles);
 
     const makeShader = (type: number, src: string) => {
       const s = gl.createShader(type);
@@ -290,7 +301,7 @@ export function LiquidGlassDockSurface() {
       window.removeEventListener("resize", refreshAll);
     });
 
-    const rrect = (r: DOMRect, rad: number) => {
+    const rrect = (r: Box, rad: number) => {
       const k = Math.min(rad, r.width / 2, r.height / 2);
       ctx.beginPath();
       ctx.moveTo(r.left + k, r.top);
@@ -301,7 +312,7 @@ export function LiquidGlassDockSurface() {
       ctx.closePath();
     };
 
-    const drawCover = (im: HTMLImageElement, r: DOMRect) => {
+    const drawCover = (im: HTMLImageElement, r: Box) => {
       const iw = im.naturalWidth, ih = im.naturalHeight;
       if (!iw || !ih || r.width <= 0 || r.height <= 0) return;
       const ir = iw / ih, br = r.width / r.height;
@@ -310,25 +321,46 @@ export function LiquidGlassDockSurface() {
       ctx.drawImage(im, sx, sy, sw, sh, r.left, r.top, r.width, r.height);
     };
 
-    const drawScene = (ox: number, oy: number, w: number, h: number, vy: number) => {
+    const motion = new WeakMap<Element, { x: number; y: number; vx: number; vy: number; t: number }>();
+    let frameNow = 0;
+
+    const lead = (el: Element, r: DOMRect): Box => {
+      let m = motion.get(el);
+      if (!m || frameNow - m.t > 60) {
+        m = { x: r.left, y: r.top, vx: 0, vy: 0, t: frameNow };
+        motion.set(el, m);
+      } else {
+        const dt = Math.max(1, frameNow - m.t);
+        m.vx = m.vx * 0.5 + ((r.left - m.x) / dt) * 0.5;
+        m.vy = m.vy * 0.5 + ((r.top - m.y) / dt) * 0.5;
+        m.x = r.left;
+        m.y = r.top;
+        m.t = frameNow;
+      }
+      const dx = Math.max(-60, Math.min(60, m.vx * LEAD_MS));
+      const dy = Math.max(-60, Math.min(60, m.vy * LEAD_MS));
+      return { left: r.left + dx, top: r.top + dy, right: r.right + dx, bottom: r.bottom + dy, width: r.width, height: r.height };
+    };
+
+    const drawScene = (ox: number, oy: number, w: number, h: number) => {
       const light = document.documentElement.dataset.mobileTheme === "light";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.fillStyle = light ? "#f5f3fb" : "#0a0b10";
       ctx.fillRect(0, 0, w, h);
-      ctx.translate(-ox, -oy - vy * LEAD);
+      ctx.translate(-ox, -oy);
 
       for (const l of layers) {
-        const r = l.el.getBoundingClientRect();
-        if (r.bottom < oy || r.top > oy + h || r.right < ox || r.left > ox + w) continue;
+        const b = lead(l.el, l.el.getBoundingClientRect());
+        if (b.bottom < oy || b.top > oy + h || b.right < ox || b.left > ox + w) continue;
         ctx.fillStyle = l.color;
-        ctx.fillRect(r.left, r.top, r.width, r.height);
+        ctx.fillRect(b.left, b.top, b.width, b.height);
       }
 
       ctx.textAlign = "left";
       ctx.textBaseline = "middle";
       for (const it of near) {
-        const r = it.el.getBoundingClientRect();
-        if (r.width <= 0 || r.bottom < oy || r.top > oy + h || r.right < ox || r.left > ox + w) continue;
+        const b = lead(it.el, it.el.getBoundingClientRect());
+        if (b.width <= 0 || b.bottom < oy || b.top > oy + h || b.right < ox || b.left > ox + w) continue;
 
         if (it.img) {
           const img = it.el as HTMLImageElement;
@@ -336,36 +368,36 @@ export function LiquidGlassDockSurface() {
           const im = sameOrigin(src) ? (img.complete && img.naturalWidth ? img : null) : getCors(src);
           if (!im) continue;
           ctx.save();
-          rrect(r, it.radius);
+          rrect(b, it.radius);
           ctx.clip();
-          try { drawCover(im, r); } catch { /* bỏ qua ảnh lỗi */ }
+          try { drawCover(im, b); } catch { /* bỏ qua ảnh lỗi */ }
           ctx.restore();
           continue;
         }
 
         if (it.bg) {
           ctx.fillStyle = it.bg;
-          if (it.radius > 0) { rrect(r, it.radius); ctx.fill(); }
-          else ctx.fillRect(r.left, r.top, r.width, r.height);
+          if (it.radius > 0) { rrect(b, it.radius); ctx.fill(); }
+          else ctx.fillRect(b.left, b.top, b.width, b.height);
         }
         if (it.text) {
           ctx.font = it.font;
           ctx.fillStyle = it.color;
-          const maxW = Math.max(20, r.width - it.pl * 2);
-          const multiLine = r.height > it.lh * 1.6;
-          const y = multiLine ? r.top + it.pt + it.lh / 2 : r.top + r.height / 2;
+          const maxW = Math.max(20, b.width - it.pl * 2);
+          const multiLine = b.height > it.lh * 1.6;
+          const y = multiLine ? b.top + it.pt + it.lh / 2 : b.top + b.height / 2;
           if (it.center) {
             ctx.textAlign = "center";
-            ctx.fillText(it.text, r.left + r.width / 2, y, maxW);
+            ctx.fillText(it.text, b.left + b.width / 2, y, maxW);
             ctx.textAlign = "left";
           } else {
-            ctx.fillText(it.text, r.left + it.pl, y, maxW);
+            ctx.fillText(it.text, b.left + it.pl, y, maxW);
           }
         }
       }
     };
 
-    let press = 0, pressed = 0, raf = 0, texReady = false, lastScrollY = window.scrollY;
+    let press = 0, pressed = 0, raf = 0, texReady = false;
     const onDown = () => { pressed = 1; };
     const onUp = () => { pressed = 0; };
     dock.addEventListener("pointerdown", onDown);
@@ -400,10 +432,8 @@ export function LiquidGlassDockSurface() {
         texReady = false;
       }
 
-      const sy = window.scrollY;
-      const vy = sy - lastScrollY;
-      lastScrollY = sy;
-      drawScene(b.left - MARGIN, b.top - MARGIN, W + MARGIN * 2, H + MARGIN * 2, vy);
+      frameNow = performance.now();
+      drawScene(b.left - MARGIN, b.top - MARGIN, W + MARGIN * 2, H + MARGIN * 2);
 
       gl.bindTexture(gl.TEXTURE_2D, texture);
       try {
@@ -431,6 +461,7 @@ export function LiquidGlassDockSurface() {
     const onLost = (e: Event) => {
       e.preventDefault();
       cancelAnimationFrame(raf);
+      restoreStyles();
       dock.classList.add("gt-fb");
     };
     const onRestored = () => setEpoch((n) => n + 1);
