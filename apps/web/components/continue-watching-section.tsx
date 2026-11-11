@@ -6,6 +6,40 @@ import { MovieCarousel } from "@/components/movie-carousel";
 import { useMember } from "@/components/member-provider";
 import { memberClient, WATCH_HISTORY_UPDATED_EVENT, type WatchHistoryItem } from "@/lib/member-client";
 
+function getEpisodeNumber(episodeName: string): number | null {
+  const match = episodeName.match(/\d+/);
+  return match ? Number(match[0]) : null;
+}
+
+function getLatestEpisodePerMovie(history: WatchHistoryItem[]): WatchHistoryItem[] {
+  const byMovie = new Map<string, WatchHistoryItem>();
+
+  for (const item of history) {
+    const existing = byMovie.get(item.movieSlug);
+    if (!existing) {
+      byMovie.set(item.movieSlug, item);
+      continue;
+    }
+
+    const itemEpisode = getEpisodeNumber(item.episodeName);
+    const existingEpisode = getEpisodeNumber(existing.episodeName);
+    const hasHigherEpisode =
+      itemEpisode !== null &&
+      (existingEpisode === null || itemEpisode > existingEpisode);
+    const sameEpisodeOrBothUnknown = itemEpisode === existingEpisode;
+    const isMoreRecentlyUpdated =
+      new Date(item.updatedAt).getTime() > new Date(existing.updatedAt).getTime();
+
+    if (hasHigherEpisode || (sameEpisodeOrBothUnknown && isMoreRecentlyUpdated)) {
+      byMovie.set(item.movieSlug, item);
+    }
+  }
+
+  return Array.from(byMovie.values()).sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  );
+}
+
 export function ContinueWatchingSection() {
   const { user, loading: memberLoading } = useMember();
   const pathname = usePathname();
@@ -16,7 +50,7 @@ export function ContinueWatchingSection() {
     if (!user) return;
     try {
       const result = await memberClient.history();
-      setItems(result.items || []);
+      setItems(getLatestEpisodePerMovie(result.items || []));
     } catch {
       // Keep the last successfully loaded history if the network is unavailable.
     }
@@ -36,13 +70,7 @@ export function ContinueWatchingSection() {
     const handleHistoryUpdated = (event: Event) => {
       const item = (event as CustomEvent<WatchHistoryItem>).detail;
       if (!item?.movieSlug || !item.episodeName) return;
-      setItems((current) => [
-        item,
-        ...current.filter((existing) =>
-          existing.movieSlug !== item.movieSlug ||
-          existing.episodeName !== item.episodeName
-        ),
-      ].slice(0, 30));
+      setItems((current) => getLatestEpisodePerMovie([item, ...current]).slice(0, 30));
     };
 
     const refreshWhenActive = () => {
