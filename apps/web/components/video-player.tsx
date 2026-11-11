@@ -109,6 +109,7 @@ export const VideoPlayer = ({
 
     let hlsInstance: Hls | null = null;
     let knownDurationSeconds = 0;
+    let skipIntroControlVisible = false;
     let art: Artplayer | null = null;
     let resumeObserver: MutationObserver | null = null;
     let seekWatchTimer: ReturnType<typeof setTimeout> | null = null;
@@ -517,6 +518,27 @@ export const VideoPlayer = ({
             });
           }
           setShowSkipIntro(inIntroRange);
+          if (art && inIntroRange && !skipIntroControlVisible) {
+            art.controls.add({
+              name: "skip-intro",
+              position: "right",
+              index: 20,
+              html: '<span style="font-weight:700;white-space:nowrap">Bỏ qua intro »</span>',
+              tooltip: "Bỏ qua đoạn giới thiệu",
+              click: () => {
+                const endSeconds = introSegmentRef.current.endSeconds;
+                if (typeof endSeconds !== "number" || !Number.isFinite(endSeconds)) return;
+                art!.seek = endSeconds;
+                art!.play().catch(() => {});
+                art!.controls.remove("skip-intro");
+                skipIntroControlVisible = false;
+              },
+            });
+            skipIntroControlVisible = true;
+          } else if (art && !inIntroRange && skipIntroControlVisible) {
+            art.controls.remove("skip-intro");
+            skipIntroControlVisible = false;
+          }
           if (!video.paused && Number.isFinite(video.currentTime)) {
             const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
               ? video.duration
@@ -856,46 +878,7 @@ export const VideoPlayer = ({
         <div>Nút cần hiện: <b className={showSkipIntro && !showResumeChoice ? "text-green-300" : "text-amber-300"}>{showSkipIntro && !showResumeChoice ? "CÓ" : "KHÔNG"}</b></div>
       </div>
       )}
-      {showSkipIntro && !showResumeChoice && (
-        <button
-          type="button"
-          onClick={() => {
-            const video = artRef.current?.querySelector("video");
-            if (!video) return;
-            const endSeconds = introSegmentRef.current.endSeconds;
-            if (typeof endSeconds !== "number" || !Number.isFinite(endSeconds)) return;
-            video.currentTime = endSeconds;
-            video.play().catch(() => {});
-            setShowSkipIntro(false);
-          }}
-          className="absolute right-4 bottom-16 sm:bottom-20 z-30 inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/75 px-4 py-2.5 text-sm font-bold text-white shadow-xl backdrop-blur-md transition hover:bg-black/90"
-        >
-          <span>Bỏ qua giới thiệu</span>
-          <span aria-hidden="true">»</span>
-        </button>
-      )}
-      {showResumeChoice && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/65 backdrop-blur-sm">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 px-4">
-            <button
-              type="button"
-              onClick={() => startPlayback(false)}
-              className="min-w-[150px] inline-flex items-center justify-center gap-2 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 px-6 py-3 text-sm font-bold text-white transition-all"
-            >
-              <Play size={18} fill="currentColor" />
-              Phát từ đầu
-            </button>
-            <button
-              type="button"
-              onClick={() => startPlayback(true)}
-              className="min-w-[170px] inline-flex items-center justify-center gap-2 rounded-full bg-[#ffd875] hover:brightness-110 px-6 py-3 text-sm font-black text-black transition-all shadow-[0_0_24px_rgba(255,216,117,0.25)]"
-            >
-              <Play size={18} fill="currentColor" />
-              Tiếp tục xem
-            </button>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
