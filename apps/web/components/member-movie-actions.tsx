@@ -6,7 +6,7 @@ import { memberClient, type MoviePayload } from "@/lib/member-client";
 import { useMember } from "./member-provider";
 
 export function MemberMovieActions({ movie, variant = "default" }: { movie: MoviePayload; variant?: "default" | "mobile" }) {
-  const { openLibrary } = useMember();
+  const { openLibrary, openAuth } = useMember();
   const [favorited, setFavorited] = useState(false);
   const [pending, setPending] = useState(false);
 
@@ -75,7 +75,7 @@ export function MemberMovieActions({ movie, variant = "default" }: { movie: Movi
       </button>
 
       <button
-        onClick={() => requireMember()}
+        onClick={() => openAuth("login")}
         className={actionClass}
       >
         <Bell size={mobile ? 20 : 18} />
