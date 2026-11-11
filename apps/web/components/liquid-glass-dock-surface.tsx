@@ -164,10 +164,15 @@ export function LiquidGlassDockSurface() {
       if (imgCache.has(src)) return imgCache.get(src) ?? null;
       imgCache.set(src, null);
       const im = new window.Image();
-      im.crossOrigin = "anonymous";
+      // Remote movie CDNs often omit Access-Control-Allow-Origin. Load the
+      // capture copy through our same-origin image proxy so Canvas can read it.
+      const absolute = new URL(src, window.location.href);
+      const captureSrc = absolute.origin === window.location.origin
+        ? absolute.href
+        : `/api/refraction-image?url=${encodeURIComponent(absolute.href)}`;
       im.onload = () => imgCache.set(src, im);
       im.onerror = () => imgCache.set(src, null);
-      im.src = src;
+      im.src = captureSrc;
       return null;
     };
 
