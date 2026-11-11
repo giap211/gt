@@ -33,7 +33,7 @@ export function LiquidGlassDockSurface() {
   precision highp float;
   uniform sampler2D tex;
   uniform vec2 res,tres,toff;
-  uniform float press;
+  uniform float press,texScale;
   float sdf(vec2 p,vec2 h,float r){vec2 q=abs(p)-h+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
   void main(){
     vec2 fp=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);vec2 p=fp-res*.5;
@@ -42,7 +42,7 @@ export function LiquidGlassDockSurface() {
     float a=clamp(.5-d,0.,1.);
     float bev=R*.42;
     float t=1.-clamp(-d/bev,0.,1.);
-    vec2 bp=fp+toff;
+    vec2 bp=(fp+toff)*texScale;
     vec3 c;
     if(t<=0.){
       c=texture2D(tex,bp/tres).rgb;
@@ -143,12 +143,15 @@ export function LiquidGlassDockSurface() {
     const scene = document.createElement("canvas");
     const ctx = scene.getContext("2d");
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Render only the refraction capture at 60% resolution; keep the dock canvas full-res.
+    const textureScale = 0.6;
     const margin = 60;
     const uniform = (name: string) => gl.getUniformLocation(program, name);
     const uRes = uniform("res");
     const uTextureSize = uniform("tres");
     const uOffset = uniform("toff");
     const uPress = uniform("press");
+    const uTextureScale = uniform("texScale");
     const uTex = uniform("tex");
 
     let press = 0;
@@ -194,9 +197,9 @@ export function LiquidGlassDockSurface() {
 
     const drawScene = (ox: number, oy: number, width: number, height: number) => {
       if (!ctx) return;
-      scene.width = Math.max(2, Math.round(width * dpr));
-      scene.height = Math.max(2, Math.round(height * dpr));
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      scene.width = Math.max(2, Math.round(width * dpr * textureScale));
+      scene.height = Math.max(2, Math.round(height * dpr * textureScale));
+      ctx.setTransform(dpr * textureScale, 0, 0, dpr * textureScale, 0, 0);
       ctx.clearRect(0, 0, width, height);
 
       // Use the active app theme for a reliable base, then rebuild the
@@ -310,6 +313,7 @@ export function LiquidGlassDockSurface() {
       gl.uniform2f(uTextureSize, scene.width, scene.height);
       gl.uniform2f(uOffset, margin * dpr, margin * dpr);
       gl.uniform1f(uPress, press);
+      gl.uniform1f(uTextureScale, textureScale);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
