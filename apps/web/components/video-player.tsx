@@ -80,7 +80,6 @@ export const VideoPlayer = ({
     /^https?:\/\//i.test(url) &&
     !isDirectVideoFile;
 
-  const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showDebug, setShowDebug] = useState(() => {
     try {
@@ -91,29 +90,6 @@ export const VideoPlayer = ({
   });
   const [debugCurrentTime, setDebugCurrentTime] = useState<number | null>(null);
   const [debugVideoState, setDebugVideoState] = useState("Đang chờ trình phát");
-
-  useEffect(() => {
-    setShowResumeChoice(startAtSeconds > 0 && !isEmbed);
-  }, [startAtSeconds, isEmbed]);
-
-  const startPlayback = (resume: boolean) => {
-    const video = artRef.current?.querySelector("video");
-    if (!video) return;
-    const play = () => {
-      if (resume && Number.isFinite(video.duration) && video.duration > 0) {
-        video.currentTime = Math.min(startAtSeconds, Math.max(0, video.duration - 2));
-      } else if (!resume) {
-        video.currentTime = 0;
-      }
-      video.play().catch(() => {});
-    };
-    if (video.readyState < 1) {
-      video.addEventListener("loadedmetadata", play, { once: true });
-    } else {
-      play();
-    }
-    setShowResumeChoice(false);
-  };
 
   useEffect(() => {
     if (!artRef.current || isEmbed) return;
@@ -172,7 +148,7 @@ export const VideoPlayer = ({
         volume: 0.7,
         isLive: false,
         muted: false,
-        autoplay: startAtSeconds <= 0,
+        autoplay: true,
         pip: true,
         autoSize: false,
         autoMini: false,
@@ -232,7 +208,7 @@ export const VideoPlayer = ({
         mutex: true,
         backdrop: true,
         playsInline: true,
-        autoPlayback: startAtSeconds <= 0,
+        autoPlayback: false,
         airplay: true,
         theme: "#ffd875",
         moreVideoAttr: {},
@@ -393,120 +369,16 @@ export const VideoPlayer = ({
         },
       });
 
-      if (art) {
-        const player = art.template.$player as HTMLElement;
-        const centerPlay = art.template.$state as HTMLElement;
-
-        const configureResumeChoice = () => {
-          const panel = player.querySelector(".art-layer-auto-playback") as HTMLElement | null;
-          if (!panel) return;
-
-          const lastSeen = panel.querySelector(".art-auto-playback-last") as HTMLElement | null;
-          const jumpButton = panel.querySelector(".art-auto-playback-jump") as HTMLElement | null;
-          const closeButton = panel.querySelector(".art-auto-playback-close") as HTMLElement | null;
-          if (!jumpButton) return;
-
-          if (lastSeen) lastSeen.style.display = "none";
-          if (closeButton) closeButton.style.display = "none";
-
-          let startButton = panel.querySelector(".art-auto-playback-start") as HTMLButtonElement | null;
-          if (!startButton) {
-            startButton = document.createElement("button");
-            startButton.type = "button";
-            startButton.className = "art-auto-playback-start";
-            startButton.textContent = "Phát từ đầu";
-            startButton.addEventListener("click", (event) => {
-              event.stopPropagation();
-              if (!art) return;
-              art.seek = 0;
-              art.play().catch(() => {});
-              (art.template.$poster as HTMLElement).style.display = "none";
-              panel.style.display = "none";
-            });
-            panel.insertBefore(startButton, jumpButton);
+      if (art && startAtSeconds > 0) {
+        const resumeVideo = art.video as HTMLVideoElement;
+        const resumePlayback = () => {
+          if (Number.isFinite(resumeVideo.duration) && resumeVideo.duration > 0) {
+            resumeVideo.currentTime = Math.min(startAtSeconds, Math.max(0, resumeVideo.duration - 2));
           }
-
-          Object.assign(panel.style, {
-            left: "50%",
-            right: "auto",
-            top: "50%",
-            bottom: "auto",
-            transform: "translate(-50%, -50%)",
-            display: getComputedStyle(panel).display === "none" ? "none" : "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "row",
-            flexWrap: "nowrap",
-            gap: "10px",
-            width: "max-content",
-            maxWidth: "calc(100% - 20px)",
-            padding: "0",
-            border: "0",
-            background: "transparent",
-            zIndex: "30",
-          });
-
-          for (const button of [startButton, jumpButton]) {
-            Object.assign(button.style, {
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              whiteSpace: "nowrap",
-              minHeight: "42px",
-              padding: "0 16px",
-              borderRadius: "9999px",
-              fontSize: "14px",
-              fontWeight: "700",
-              lineHeight: "1",
-              cursor: "pointer",
-              border: "1px solid rgba(255,255,255,.24)",
-            });
-          }
-          Object.assign(startButton.style, {
-            color: "#fff",
-            background: "rgba(255,255,255,.16)",
-          });
-          jumpButton.textContent = "Tiếp tục xem";
-          Object.assign(jumpButton.style, {
-            color: "#111",
-            background: "#ffd875",
-            borderColor: "#ffd875",
-          });
-
-          const syncCenterPlay = () => {
-            const activePanel = player.querySelector(".art-layer-auto-playback") as HTMLElement | null;
-            const visible = !!activePanel && getComputedStyle(activePanel).display !== "none";
-            if (visible) {
-              // Remove Artplayer's original circular play overlay while the
-              // start/resume choices are being shown.
-              centerPlay.style.setProperty("display", "none", "important");
-              centerPlay.style.setProperty("visibility", "hidden", "important");
-              centerPlay.style.setProperty("pointer-events", "none", "important");
-            } else {
-              centerPlay.style.removeProperty("display");
-              centerPlay.style.removeProperty("visibility");
-              centerPlay.style.removeProperty("pointer-events");
-            }
-          };
-          syncCenterPlay();
-          resumeObserver?.disconnect();
-          resumeObserver = new MutationObserver(() => {
-            const activePanel = player.querySelector(".art-layer-auto-playback");
-            if (activePanel && !activePanel.querySelector(".art-auto-playback-start")) {
-              configureResumeChoice();
-            }
-            syncCenterPlay();
-          });
-          resumeObserver.observe(player, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ["style", "class"],
-          });
+          resumeVideo.play().catch(() => {});
         };
-
-        art.on("ready", configureResumeChoice);
-        art.on("restart", configureResumeChoice);
+        if (resumeVideo.readyState >= 1) resumePlayback();
+        else resumeVideo.addEventListener("loadedmetadata", resumePlayback, { once: true });
       }
 
       if (art) {
@@ -883,7 +755,7 @@ export const VideoPlayer = ({
   }
 
   return (
-    <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10 ${showResumeChoice ? "[&_.art-state]:!hidden [&_.art-controls]:!hidden [&_.art-bottom]:!hidden" : ""}`}>
+    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
       <div ref={artRef} className="h-full w-full" />
       {showDebug && (
       <div className="absolute left-2 top-2 z-40 max-w-[min(92%,420px)] rounded-lg border border-cyan-300/40 bg-black/90 p-2.5 text-[10px] leading-relaxed text-white shadow-xl sm:left-3 sm:top-3 sm:text-xs">
@@ -897,8 +769,7 @@ export const VideoPlayer = ({
         <div>Thời gian video: {debugCurrentTime === null ? "chưa có timeupdate" : `${debugCurrentTime.toFixed(2)}s`}</div>
         <div>Trạng thái: {debugVideoState}</div>
         <div>Trong đoạn intro: <b>{showSkipIntro ? "CÓ" : "KHÔNG"}</b></div>
-        <div>Resume overlay: <b>{showResumeChoice ? "ĐANG HIỆN" : "TẮT"}</b></div>
-        <div>Nút cần hiện: <b className={showSkipIntro && !showResumeChoice ? "text-green-300" : "text-amber-300"}>{showSkipIntro && !showResumeChoice ? "CÓ" : "KHÔNG"}</b></div>
+        <div>Nút cần hiện: <b className={showSkipIntro ? "text-green-300" : "text-amber-300"}>{showSkipIntro ? "CÓ" : "KHÔNG"}</b></div>
       </div>
       )}
 
