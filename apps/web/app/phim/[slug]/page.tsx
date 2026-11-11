@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from "react";
 import { Play, ChevronDown, MessageCircle, Star, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { ResilientMovieImage } from "@/components/resilient-movie-image";
 import {
   getMovieDetail,
   getLatestMovies,
@@ -35,19 +35,10 @@ export default function MovieDetailPage({
   const [activeTab, setActiveTab] = useState("tập phim");
   const [showInfo, setShowInfo] = useState(false);
   const [backdropUrl, setBackdropUrl] = useState<string | null>(null);
-  const [heroImageFailed, setHeroImageFailed] = useState(false);
-  const [posterImageFailed, setPosterImageFailed] = useState(false);
-  const [episodeImageFailed, setEpisodeImageFailed] = useState(false);
   const [selectedServer, setSelectedServer] = useState(0);
   const [mobileEpisodePage, setMobileEpisodePage] = useState(0);
   const [mobileEpisodeSearch, setMobileEpisodeSearch] = useState("");
   const [actorImages, setActorImages] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    setHeroImageFailed(false);
-    setPosterImageFailed(false);
-    setEpisodeImageFailed(false);
-  }, [slug]);
 
   useEffect(() => {
     (async () => {
@@ -166,7 +157,6 @@ export default function MovieDetailPage({
       : null;
 
   const TABS = ["Tập phim", "Gallery", "OST", "Diễn viên", "Đề xuất"];
-  const heroSrc = backdropUrl || movie.thumb_url || movie.poster_url;
   const topWeek = [...latestMovies]
     .sort((a, b) => (b.view || 0) - (a.view || 0))
     .slice(0, 10);
@@ -353,9 +343,9 @@ export default function MovieDetailPage({
 
       {/* HERO — shorter + lighter overlay so image shows */}
       <div className="movie-detail-hero relative hidden w-full h-[420px] lg:block">
-        <Image
-          src={heroImageFailed ? "/images/fallback-horizontal.svg" : heroSrc || "/images/fallback-horizontal.svg"}
-          onError={() => setHeroImageFailed(true)}
+        <ResilientMovieImage
+          sources={[backdropUrl, movie.thumb_url, movie.poster_url]}
+          fallbackSrc="/images/fallback-horizontal.svg"
           alt={movie.name}
           fill
           priority
@@ -380,8 +370,9 @@ export default function MovieDetailPage({
       {/* ========== MOBILE — APPLE TV STYLE ========== */}
       <section className="movie-detail-mobile lg:hidden">
         <div className="relative h-[570px] w-full overflow-hidden">
-          <Image
-            src={heroSrc}
+          <ResilientMovieImage
+            sources={[backdropUrl, movie.thumb_url, movie.poster_url]}
+            fallbackSrc="/images/fallback-horizontal.svg"
             alt={movie.name}
             fill
             priority
@@ -515,9 +506,9 @@ export default function MovieDetailPage({
               {mobileVisibleEpisodes.map((ep, idx) => (
                 <Link key={ep.slug || ep.name} href={"/xem-phim/" + movie.slug + "?sv=" + selectedServer + "&tap=" + encodeURIComponent(ep.slug || ep.name)} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-2.5 transition-colors active:bg-white/10">
                   <div className="movie-poster-frame relative h-[76px] w-[118px] shrink-0 overflow-hidden rounded-xl bg-white/10">
-                    <Image
-                      src={episodeImageFailed ? "/images/fallback-horizontal.svg" : movie.thumb_url || movie.poster_url || "/images/fallback-horizontal.svg"}
-                      onError={() => setEpisodeImageFailed(true)}
+                    <ResilientMovieImage
+                      sources={[movie.thumb_url, movie.poster_url]}
+                      fallbackSrc="/images/fallback-horizontal.svg"
                       alt=""
                       fill
                       sizes="118px"
@@ -567,9 +558,9 @@ export default function MovieDetailPage({
               {/* poster floats higher into hero */}
               <div className="movie-poster-glass rounded-[26px] border p-2.5">
                 <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden">
-                  <Image
-                    src={posterImageFailed ? "/images/fallback-vertical.svg" : movie.poster_url || "/images/fallback-vertical.svg"}
-                    onError={() => setPosterImageFailed(true)}
+                  <ResilientMovieImage
+                    sources={[movie.poster_url, movie.thumb_url]}
+                    fallbackSrc="/images/fallback-vertical.svg"
                     alt={movie.name}
                     fill
                     priority
@@ -594,7 +585,14 @@ export default function MovieDetailPage({
                         {i + 1}
                       </span>
                       <div className="relative w-10 h-14 rounded overflow-hidden shrink-0">
-                        <Image src={m.poster_url} alt={m.name} fill sizes="40px" className="object-cover" />
+                        <ResilientMovieImage
+                          sources={[m.poster_url, m.thumb_url]}
+                          fallbackSrc="/images/fallback-vertical.svg"
+                          alt={m.name}
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                        />
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-medium text-white/80 line-clamp-1 group-hover:text-violet-300">
@@ -883,8 +881,9 @@ function TabContent({
           className="group relative flex min-h-[148px] w-full items-center overflow-hidden rounded-xl border border-white/[0.06] bg-[#626474] transition-colors hover:border-violet-300/40 sm:min-h-[164px]"
         >
           <div className="absolute inset-y-0 right-0 w-[40%] sm:w-[32%]">
-            <Image
-              src={movie.thumb_url || movie.poster_url}
+            <ResilientMovieImage
+              sources={[movie.thumb_url, movie.poster_url]}
+              fallbackSrc="/images/fallback-horizontal.svg"
               alt=""
               fill
               sizes="(max-width: 640px) 40vw, 32vw"
@@ -957,8 +956,9 @@ function TabContent({
         {related.map((m) => (
           <Link key={m._id} href={`/phim/${m.slug}`} className="group">
             <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
-              <Image
-                src={m.thumb_url || m.poster_url}
+              <ResilientMovieImage
+                sources={[m.thumb_url, m.poster_url]}
+                fallbackSrc="/images/fallback-horizontal.svg"
                 alt={m.name}
                 fill
                 sizes="25vw"
@@ -1001,8 +1001,9 @@ function RelatedSection({ related }: { related: ListMovie[] }) {
         {related.map((m) => (
           <Link key={m._id} href={`/phim/${m.slug}`} className="group">
             <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
-              <Image
-                src={m.thumb_url || m.poster_url}
+              <ResilientMovieImage
+                sources={[m.thumb_url, m.poster_url]}
+                fallbackSrc="/images/fallback-horizontal.svg"
                 alt={m.name}
                 fill
                 sizes="25vw"
