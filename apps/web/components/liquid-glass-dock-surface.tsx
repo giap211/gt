@@ -3,13 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 
 const MARGIN = 60;
-const LAYER_REFRESH_MS = 120;
-// 0 = vẽ đúng vị trí đọc được. Nếu thấy kính hơi trễ khi cuộn nhanh trên iOS,
-// thử 0.5 hoặc 1 để vẽ lệch trước một khoảng theo tốc độ cuộn.
+const REFRESH_MS = 120;
+const NEAR_RANGE = 600;
 const LEAD = 0;
 
 type Layer = { el: Element; color: string };
-type Head = { el: HTMLElement; font: string; color: string; text: string };
+type Item = {
+  el: HTMLElement;
+  img: boolean;
+  bg: string;
+  radius: number;
+  font: string;
+  color: string;
+  text: string;
+  pl: number;
+  pt: number;
+  lh: number;
+  center: boolean;
+};
 
 const VERTEX = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
 const FRAGMENT = `
@@ -23,17 +34,17 @@ const FRAGMENT = `
     float R=res.y*.5;vec2 h=res*.5;float d=sdf(p,h,R);
     if(d>1.){gl_FragColor=vec4(0.);return;}
     float edge=clamp(.5-d,0.,1.);
-    float bev=R*.36;
+    float bev=R*.34;
     float t=1.-clamp(-d/bev,0.,1.);
     if(t<=0.){gl_FragColor=vec4(0.);return;}
     vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
     vec2 bp=fp+toff;
-    float k=t*t*(R*.2)*(1.+press*.4);
-    vec2 off=n*k;
-    vec3 c=vec3(texture2D(tex,(bp+off*1.1)/tres).r,
+    float k=t*t*(R*.16)*(1.+press*.4);
+    vec2 off=-n*k;
+    vec3 c=vec3(texture2D(tex,(bp+off*1.12)/tres).r,
                 texture2D(tex,(bp+off)/tres).g,
-                texture2D(tex,(bp+off*.9)/tres).b);
-    float a=edge*smoothstep(0.,.18,t);
+                texture2D(tex,(bp+off*.88)/tres).b);
+    float a=edge*smoothstep(0.,.55,t);
     float rim=smoothstep(2.5,0.,-d);
     vec2 L=normalize(vec2(-.6,-.8));
     float sp=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
@@ -44,7 +55,7 @@ const FRAGMENT = `
 export function LiquidGlassDockSurface() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
-  const [epoch, setEpoch] = useState(0); // tăng lên để khởi tạo lại sau khi mất context WebGL
+  const [epoch, setEpoch] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -55,7 +66,6 @@ export function LiquidGlassDockSurface() {
     const disposers: Array<() => void> = [];
     const dispose = () => disposers.forEach((fn) => fn());
 
-    /* ---------- bong bóng tab ---------- */
     const placeBubble = () => {
       const active = dock.querySelector<HTMLElement>(".gt-dock-item.is-active");
       if (!active) return;
@@ -71,7 +81,6 @@ export function LiquidGlassDockSurface() {
     placeBubble();
     disposers.push(() => { classObs.disconnect(); sizeObs.disconnect(); });
 
-    /* ---------- WebGL ---------- */
     const gl = canvas.getContext("webgl", {
       alpha: true,
       premultipliedAlpha: true,
@@ -133,7 +142,6 @@ export function LiquidGlassDockSurface() {
       gl.deleteShader(fs);
     });
 
-    /* ---------- scene 2D ---------- */
     const scene = document.createElement("canvas");
     const ctx = scene.getContext("2d");
     if (!ctx) { dock.classList.add("gt-fb"); return dispose; }
@@ -141,8 +149,8 @@ export function LiquidGlassDockSurface() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     let layers: Layer[] = [];
-    let heads: Head[] = [];
-    let pics: HTMLImageElement[] = [];
+    let items: Item[] = [];
+    let near: Item[] = [];
     const corsCache = new Map<string, HTMLImageElement | null>();
 
     const sameOrigin = (src: string) => {
@@ -165,53 +173,97 @@ export function LiquidGlassDockSurface() {
     const order = (a: Element, b: Element) =>
       a === b ? 0 : a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
 
-    // Quét các lớp nền thật phía sau dock (tốn kém nên chỉ làm định kỳ).
+    const isClear = (c: string) => !c || c === "transparent" || c === "rgba(0, 0, 0, 0)";
+
     const refreshLayers = () => {
+      const main = document.querySelector("main");
       const b = dock.getBoundingClientRect();
       const x0 = Math.max(0, b.left - MARGIN);
       const x1 = Math.min(window.innerWidth - 1, b.right + MARGIN);
-      const y0 = Math.max(0, b.top - MARGIN - 240);
+      const y0 = Math.max(0, b.top - MARGIN);
       const y1 = Math.min(window.innerHeight - 1, b.bottom + MARGIN);
       const found = new Set<Element>();
-      for (let i = 0; i <= 6; i++) {
-        for (let j = 0; j <= 6; j++) {
-          const x = x0 + ((x1 - x0) * i) / 6;
-          const y = y0 + ((y1 - y0) * j) / 6;
+      for (let i = 0; i <= 4; i++) {
+        for (let j = 0; j <= 3; j++) {
+          const x = x0 + ((x1 - x0) * i) / 4;
+          const y = y0 + ((y1 - y0) * j) / 3;
           document.elementsFromPoint(x, y).forEach((el) => {
-            if (!dock.contains(el) && !el.closest(".gt-dock")) found.add(el);
+            if (dock.contains(el) || el.closest(".gt-dock")) return;
+            if (main && main.contains(el)) return;
+            found.add(el);
           });
         }
       }
       const next: Layer[] = [];
       [...found].sort(order).forEach((el) => {
         const color = getComputedStyle(el).backgroundColor;
-        if (!color || color === "transparent" || color === "rgba(0, 0, 0, 0)") return;
+        if (isClear(color)) return;
         next.push({ el, color });
       });
       layers = next;
     };
 
-    // Cache tiêu đề + ảnh (chỉ làm lại khi DOM hoặc theme đổi).
-    const refreshLists = () => {
-      heads = [...document.querySelectorAll<HTMLElement>("h1,h2,h3")].map((el) => {
-        const s = getComputedStyle(el);
-        return {
-          el,
+    const refreshItems = () => {
+      const root = document.querySelector("main") ?? document.body;
+      const next: Item[] = [];
+      root.querySelectorAll("*").forEach((node) => {
+        if (!(node instanceof HTMLElement) || node.closest(".gt-dock")) return;
+        const s = getComputedStyle(node);
+        if (s.display === "none" || s.visibility === "hidden") return;
+
+        if (node instanceof HTMLImageElement) {
+          const parent = node.parentElement ? getComputedStyle(node.parentElement) : null;
+          const radius = Math.max(
+            parseFloat(s.borderTopLeftRadius) || 0,
+            parent ? parseFloat(parent.borderTopLeftRadius) || 0 : 0,
+          );
+          next.push({ el: node, img: true, bg: "", radius, font: "", color: "", text: "", pl: 0, pt: 0, lh: 0, center: false });
+          return;
+        }
+
+        const bg = s.backgroundColor;
+        const hasBg = !isClear(bg);
+        let text = "";
+        node.childNodes.forEach((n) => { if (n.nodeType === 3) text += n.textContent || ""; });
+        text = text.replace(/\s+/g, " ").trim();
+        if (!hasBg && !text) return;
+        if (s.textTransform === "uppercase") text = text.toUpperCase();
+
+        const fontSize = parseFloat(s.fontSize) || 14;
+        next.push({
+          el: node,
+          img: false,
+          bg: hasBg ? bg : "",
+          radius: parseFloat(s.borderTopLeftRadius) || 0,
           font: `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`,
           color: s.color || "#fff",
-          text: (el.textContent || "").trim().slice(0, 64),
-        };
+          text: text.slice(0, 80),
+          pl: (parseFloat(s.paddingLeft) || 0) + (parseFloat(s.borderLeftWidth) || 0),
+          pt: (parseFloat(s.paddingTop) || 0) + (parseFloat(s.borderTopWidth) || 0),
+          lh: parseFloat(s.lineHeight) || fontSize * 1.25,
+          center: s.textAlign === "center" || s.justifyContent === "center",
+        });
       });
-      pics = [...document.querySelectorAll<HTMLImageElement>("main img, [data-movie-card] img, .movie-card img")];
+      items = next;
     };
 
-    const refreshAll = () => { refreshLists(); refreshLayers(); };
+    const refreshNear = () => {
+      const b = dock.getBoundingClientRect();
+      const top = b.top - MARGIN - NEAR_RANGE;
+      const bottom = b.bottom + MARGIN + NEAR_RANGE;
+      near = items.filter((it) => {
+        const r = it.el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && r.bottom > top && r.top < bottom;
+      });
+    };
+
+    const refreshAll = () => { refreshItems(); refreshLayers(); refreshNear(); };
     refreshAll();
 
-    let layerTimer = 0;
-    const scheduleLayers = () => {
-      if (layerTimer) return;
-      layerTimer = window.setTimeout(() => { layerTimer = 0; refreshLayers(); }, LAYER_REFRESH_MS);
+    let timer = 0;
+    const scheduleNear = () => {
+      if (timer) return;
+      timer = window.setTimeout(() => { timer = 0; refreshLayers(); refreshNear(); }, REFRESH_MS);
     };
     let domTimer = 0;
     const domObs = new MutationObserver(() => {
@@ -222,24 +274,25 @@ export function LiquidGlassDockSurface() {
     const themeObs = new MutationObserver(refreshAll);
     themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-mobile-theme", "class"] });
 
-    window.addEventListener("scroll", scheduleLayers, { passive: true, capture: true });
+    window.addEventListener("scroll", scheduleNear, { passive: true, capture: true });
     window.addEventListener("resize", refreshAll);
     disposers.push(() => {
-      clearTimeout(layerTimer);
+      clearTimeout(timer);
       clearTimeout(domTimer);
       domObs.disconnect();
       themeObs.disconnect();
-      window.removeEventListener("scroll", scheduleLayers, true);
+      window.removeEventListener("scroll", scheduleNear, true);
       window.removeEventListener("resize", refreshAll);
     });
 
     const rrect = (r: DOMRect, rad: number) => {
+      const k = Math.min(rad, r.width / 2, r.height / 2);
       ctx.beginPath();
-      ctx.moveTo(r.left + rad, r.top);
-      ctx.arcTo(r.right, r.top, r.right, r.bottom, rad);
-      ctx.arcTo(r.right, r.bottom, r.left, r.bottom, rad);
-      ctx.arcTo(r.left, r.bottom, r.left, r.top, rad);
-      ctx.arcTo(r.left, r.top, r.right, r.top, rad);
+      ctx.moveTo(r.left + k, r.top);
+      ctx.arcTo(r.right, r.top, r.right, r.bottom, k);
+      ctx.arcTo(r.right, r.bottom, r.left, r.bottom, k);
+      ctx.arcTo(r.left, r.bottom, r.left, r.top, k);
+      ctx.arcTo(r.left, r.top, r.right, r.top, k);
       ctx.closePath();
     };
 
@@ -268,29 +321,45 @@ export function LiquidGlassDockSurface() {
 
       ctx.textAlign = "left";
       ctx.textBaseline = "middle";
-      for (const t of heads) {
-        const r = t.el.getBoundingClientRect();
-        if (r.bottom < oy || r.top > oy + h || r.right < ox || r.left > ox + w) continue;
-        ctx.font = t.font;
-        ctx.fillStyle = t.color;
-        ctx.fillText(t.text, r.left, r.top + r.height / 2, Math.max(20, r.width));
-      }
-
-      for (const img of pics) {
-        const r = img.getBoundingClientRect();
+      for (const it of near) {
+        const r = it.el.getBoundingClientRect();
         if (r.width <= 0 || r.bottom < oy || r.top > oy + h || r.right < ox || r.left > ox + w) continue;
-        const src = img.currentSrc || img.src;
-        const im = sameOrigin(src) ? (img.complete && img.naturalWidth ? img : null) : getCors(src);
-        if (!im) continue;
-        ctx.save();
-        rrect(r, 8);
-        ctx.clip();
-        try { drawCover(im, r); } catch { /* bỏ qua ảnh lỗi */ }
-        ctx.restore();
+
+        if (it.img) {
+          const img = it.el as HTMLImageElement;
+          const src = img.currentSrc || img.src;
+          const im = sameOrigin(src) ? (img.complete && img.naturalWidth ? img : null) : getCors(src);
+          if (!im) continue;
+          ctx.save();
+          rrect(r, it.radius);
+          ctx.clip();
+          try { drawCover(im, r); } catch { /* bỏ qua ảnh lỗi */ }
+          ctx.restore();
+          continue;
+        }
+
+        if (it.bg) {
+          ctx.fillStyle = it.bg;
+          if (it.radius > 0) { rrect(r, it.radius); ctx.fill(); }
+          else ctx.fillRect(r.left, r.top, r.width, r.height);
+        }
+        if (it.text) {
+          ctx.font = it.font;
+          ctx.fillStyle = it.color;
+          const maxW = Math.max(20, r.width - it.pl * 2);
+          const multiLine = r.height > it.lh * 1.6;
+          const y = multiLine ? r.top + it.pt + it.lh / 2 : r.top + r.height / 2;
+          if (it.center) {
+            ctx.textAlign = "center";
+            ctx.fillText(it.text, r.left + r.width / 2, y, maxW);
+            ctx.textAlign = "left";
+          } else {
+            ctx.fillText(it.text, r.left + it.pl, y, maxW);
+          }
+        }
       }
     };
 
-    /* ---------- vòng render ---------- */
     let press = 0, pressed = 0, raf = 0, texReady = false, lastScrollY = window.scrollY;
     const onDown = () => { pressed = 1; };
     const onUp = () => { pressed = 0; };
@@ -354,7 +423,6 @@ export function LiquidGlassDockSurface() {
     raf = requestAnimationFrame(render);
     disposers.push(() => cancelAnimationFrame(raf));
 
-    /* ---------- iOS có thể làm mất context WebGL ---------- */
     const onLost = (e: Event) => {
       e.preventDefault();
       cancelAnimationFrame(raf);
