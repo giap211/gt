@@ -302,7 +302,7 @@ export function BottomDock() {
           backdrop-filter: none;
           -webkit-tap-highlight-color: transparent;
         }
-        .gt-liquid-glass-blur { position:absolute; inset:0; z-index:0; border-radius:inherit; pointer-events:none; background:rgba(255,255,255,.035); -webkit-backdrop-filter:blur(8px) saturate(125%); backdrop-filter:blur(8px) saturate(125%); }
+        .gt-liquid-glass-blur { position:absolute; inset:0; z-index:0; border-radius:inherit; pointer-events:none; background:rgba(255,255,255,.045); -webkit-backdrop-filter:blur(16px) saturate(145%); backdrop-filter:blur(16px) saturate(145%); }
         .gt-liquid-glass-canvas { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; border-radius:inherit; pointer-events:none; opacity:1; }
         .gt-liquid-glass-rim { display:none !important; }
         .gt-liquid-glass-bubble {
