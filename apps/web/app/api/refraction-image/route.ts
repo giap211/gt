@@ -56,7 +56,7 @@ export async function GET(request: Request) {
     return new Response(upstream.body, {
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        "Cache-Control": "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=604800",
         "X-Content-Type-Options": "nosniff",
         "Access-Control-Allow-Origin": "*",
       },
