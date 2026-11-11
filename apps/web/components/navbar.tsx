@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { ResilientMovieImage } from "./resilient-movie-image";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Clock3,
@@ -375,7 +375,7 @@ export const Navbar = () => {
                           className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/[0.08] transition-all group"
                         >
                           <div className="relative w-10 h-13 rounded-lg overflow-hidden bg-black/50 shrink-0 border border-white/10">
-                            <Image src={item.poster_url} alt={item.name} fill sizes="40px" className="object-cover" />
+                            <ResilientMovieImage sources={[item.poster_url, item.thumb_url]} fallbackSrc="/images/poster-fallback.svg" alt={item.name} fill sizes="40px" className="object-cover" />
                           </div>
                           <div className="min-w-0 flex-1">
                             <h4 className="text-xs font-semibold text-white line-clamp-2 group-hover:text-[#ffd875]">{item.name}</h4>
