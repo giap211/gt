@@ -408,8 +408,7 @@ export const VideoPlayer = ({
               endSeconds: intro.endSeconds,
               hasIntro,
               inIntroRange,
-              showResumeChoice,
-              buttonShouldRender: inIntroRange && !showResumeChoice,
+              buttonShouldRender: inIntroRange,
             });
           }
           setShowSkipIntro(inIntroRange);
