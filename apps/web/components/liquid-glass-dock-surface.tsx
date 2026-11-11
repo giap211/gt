@@ -144,7 +144,7 @@ export function LiquidGlassDockSurface() {
     const ctx = scene.getContext("2d");
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     // Render only the refraction capture at 60% resolution; keep the dock canvas full-res.
-    const textureScale = 0.6;
+    const textureScale = 0.4;
     const margin = 60;
     const uniform = (name: string) => gl.getUniformLocation(program, name);
     const uRes = uniform("res");
@@ -340,6 +340,7 @@ export function LiquidGlassDockSurface() {
 
   return (
     <>
+      <div className="gt-liquid-glass-blur" aria-hidden="true" />
       <canvas ref={canvasRef} aria-hidden="true" className="gt-liquid-glass-canvas" />
       <div ref={bubbleRef} className="gt-liquid-glass-bubble" aria-hidden="true" />
     </>
