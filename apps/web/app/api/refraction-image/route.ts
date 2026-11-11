@@ -35,7 +35,11 @@ export async function GET(request: Request) {
 
   try {
     const upstream = await fetch(imageUrl, {
-      headers: { Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" },
+      headers: {
+        Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (compatible; PhimLauImageProxy/1.0)",
+        Referer: `${imageUrl.origin}/`,
+      },
       next: { revalidate: 86400 },
       redirect: "error",
     });

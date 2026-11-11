@@ -39,7 +39,13 @@ export function ResilientMovieImage({
   }, [sourceKey]);
 
   const usingFallback = attempt >= candidates.length;
-  const src = usingFallback ? fallbackSrc : (candidates[attempt] ?? fallbackSrc);
+  const remoteSrc = candidates[attempt] ?? fallbackSrc;
+  // Serve remote poster artwork through our same-origin image proxy. This
+  // avoids browser hotlink/CORS failures on movie CDNs while retaining the
+  // ordered retry behavior when a source itself is unavailable.
+  const src = usingFallback
+    ? fallbackSrc
+    : `/api/refraction-image?url=${encodeURIComponent(remoteSrc)}`;
 
   return (
     <Image
