@@ -101,3 +101,32 @@ export function MemberMovieActions({ movie, variant = "default" }: { movie: Movi
     </div>
   );
 }
+
+export function SaveToLibraryButton({ movie }: { movie: MoviePayload }) {
+  const { openLibrary } = useMember();
+  const [pending, setPending] = useState(false);
+
+  const saveToLibrary = async () => {
+    setPending(true);
+    try {
+      await memberClient.saveFavorite(movie);
+      openLibrary("favorites");
+    } catch (error) {
+      console.error("[Member] Could not save movie to library", error);
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={saveToLibrary}
+      disabled={pending}
+      className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 text-[13px] font-semibold text-white backdrop-blur-xl transition active:scale-[.98] disabled:opacity-60 sm:px-4 sm:text-[14px]"
+    >
+      <Plus size={18} />
+      {pending ? "Đang lưu..." : "Lưu vào tủ phim"}
+    </button>
+  );
+}

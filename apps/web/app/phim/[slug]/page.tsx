@@ -12,7 +12,7 @@ import {
   type ListMovie,
 } from "@/lib/ophim-client";
 import { CommentsPanel } from "@/components/comments-panel";
-import { MemberMovieActions } from "@/components/member-movie-actions";
+import { MemberMovieActions, SaveToLibraryButton } from "@/components/member-movie-actions";
 
 const formatEpisodeName = (name?: string) => {
   if (!name) return "";
@@ -406,13 +406,13 @@ export default function MovieDetailPage({
                 ))}
               </div>
             )}
-            <div className="mt-5 grid grid-cols-[1.25fr_1fr] gap-2.5">
+            <div className="mt-5 grid grid-cols-[1fr_1.25fr] gap-2.5">
               <Link href={watchHref} className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full bg-white px-5 text-[15px] font-bold text-[#10131a] shadow-[0_8px_28px_rgba(255,255,255,.18)] active:scale-[.98]">
                 <Play size={19} fill="currentColor" /> Phát ngay
               </Link>
-              <button type="button" onClick={() => setShowInfo(!showInfo)} className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 text-[14px] font-semibold text-white backdrop-blur-xl active:scale-[.98]">
-                <ChevronDown size={17} className={showInfo ? "rotate-180 transition-transform" : "transition-transform"} /> Thông tin
-              </button>
+              <SaveToLibraryButton
+                movie={{ movieSlug: movie.slug, movieTitle: movie.name, posterUrl: movie.poster_url }}
+              />
             </div>
           </div>
         </div>
