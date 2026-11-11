@@ -110,8 +110,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
     if (!response.ok) {
       const payload = await response.json().catch(() => null);
-      throw new Error(
-        payload?.message || "Không thể kết nối tài khoản thành viên",
+      throw Object.assign(
+        new Error(payload?.message || "Không thể kết nối tài khoản thành viên"),
+        { status: response.status },
       );
     }
 
@@ -145,6 +146,8 @@ export const memberClient = {
     if (canImportHistory) {
       try {
         await this.syncLocalHistoryToAccount(res.user.username);
+        await this.syncLocalFavoritesToAccount();
+      await this.syncLocalFavoritesToAccount();
       } catch (error) {
         console.warn("[Member] Chưa thể đồng bộ lịch sử xem cũ:", error);
       }
@@ -167,6 +170,21 @@ export const memberClient = {
       await this.syncLocalHistoryToAccount(res.user.username);
     }
     return res;
+  },
+
+  async syncLocalFavoritesToAccount(): Promise<void> {
+    const localFavorites = getLocalItem<FavoriteItem[]>(STORAGE_KEYS.FAVORITES, []);
+    if (!localFavorites.length) return;
+    await request<{ ok: true }>("/api/member/favorites", {
+      method: "POST",
+      body: JSON.stringify({
+        items: localFavorites.slice(0, 100).map((item) => ({
+          movieSlug: item.movieSlug,
+          movieTitle: item.movieTitle,
+          posterUrl: item.posterUrl,
+        })),
+      }),
+    });
   },
 
   async syncLocalHistoryToAccount(accountUsername: string): Promise<void> {
@@ -207,19 +225,17 @@ export const memberClient = {
 
   async toggleFavorite(input: MoviePayload): Promise<{ favorited: boolean }> {
     try {
-      const res = await request<{ favorited: boolean }>("/member/favorites/toggle", {
+      const res = await request<{ favorited: boolean }>("/api/member/favorites/toggle", {
         method: "POST",
         body: JSON.stringify(input),
       });
       return res;
-    } catch {
+    } catch (error) {
+      if ((error as { status?: number })?.status !== 401) throw error;
       const list = getLocalItem<FavoriteItem[]>(STORAGE_KEYS.FAVORITES, []);
       const index = list.findIndex((f) => f.movieSlug === input.movieSlug);
-      let favorited = false;
-      if (index >= 0) {
-        list.splice(index, 1);
-        favorited = false;
-      } else {
+      const favorited = index < 0;
+      if (favorited) {
         list.unshift({
           id: `fav_${Date.now().toString(36)}`,
           movieSlug: input.movieSlug,
@@ -227,7 +243,8 @@ export const memberClient = {
           posterUrl: input.posterUrl,
           createdAt: new Date().toISOString(),
         });
-        favorited = true;
+      } else {
+        list.splice(index, 1);
       }
       setLocalItem(STORAGE_KEYS.FAVORITES, list);
       return { favorited };
@@ -236,19 +253,32 @@ export const memberClient = {
 
   async saveFavorite(input: MoviePayload): Promise<{ favorited: boolean }> {
     try {
-      return await request<{ favorited: boolean }>("/member/favorites", {
+      return await request<{ favorited: boolean }>("/api/member/favorites", {
         method: "POST",
         body: JSON.stringify(input),
       });
-    } catch {
-      return this.toggleFavorite(input);
+    } catch (error) {
+      if ((error as { status?: number })?.status !== 401) throw error;
+      const list = getLocalItem<FavoriteItem[]>(STORAGE_KEYS.FAVORITES, []);
+      if (!list.some((item) => item.movieSlug === input.movieSlug)) {
+        list.unshift({
+          id: `fav_${Date.now().toString(36)}`,
+          movieSlug: input.movieSlug,
+          movieTitle: input.movieTitle,
+          posterUrl: input.posterUrl,
+          createdAt: new Date().toISOString(),
+        });
+        setLocalItem(STORAGE_KEYS.FAVORITES, list);
+      }
+      return { favorited: true };
     }
   },
 
   async favorites(): Promise<{ items: FavoriteItem[] }> {
     try {
-      return await request<{ items: FavoriteItem[] }>("/member/favorites");
-    } catch {
+      return await request<{ items: FavoriteItem[] }>("/api/member/favorites", { cache: "no-store" });
+    } catch (error) {
+      if ((error as { status?: number })?.status !== 401) throw error;
       const items = getLocalItem<FavoriteItem[]>(STORAGE_KEYS.FAVORITES, []);
       return { items };
     }

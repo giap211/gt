@@ -1,25 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Bell, Plus, Send } from "lucide-react";
 import { memberClient, type MoviePayload } from "@/lib/member-client";
 import { useMember } from "./member-provider";
 
 export function MemberMovieActions({ movie, variant = "default" }: { movie: MoviePayload; variant?: "default" | "mobile" }) {
-  const { user, openAuth, openLibrary } = useMember();
+  const { openLibrary } = useMember();
   const [favorited, setFavorited] = useState(false);
   const [pending, setPending] = useState(false);
 
-  const requireMember = () => {
-    if (!user) {
-      openAuth("login");
-      return false;
-    }
-    return true;
-  };
+  useEffect(() => {
+    let active = true;
+    memberClient.favorites()
+      .then(({ items }) => {
+        if (active) setFavorited(items.some((item) => item.movieSlug === movie.movieSlug));
+      })
+      .catch((error) => console.error("[Member] Could not load favorite state", error));
+    return () => { active = false; };
+  }, [movie.movieSlug]);
 
   const toggleFavorite = async () => {
-    if (!requireMember()) return;
     setPending(true);
     try {
       const result = await memberClient.toggleFavorite(movie);
@@ -30,7 +31,6 @@ export function MemberMovieActions({ movie, variant = "default" }: { movie: Movi
   };
 
   const saveToLibrary = async () => {
-    if (!requireMember()) return;
     setPending(true);
     try {
       await memberClient.saveFavorite(movie);
