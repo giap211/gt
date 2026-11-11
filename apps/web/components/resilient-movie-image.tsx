@@ -39,7 +39,7 @@ export function ResilientMovieImage({
   }, [sourceKey]);
 
   const usingFallback = attempt >= candidates.length;
-  const src = usingFallback ? fallbackSrc : candidates[attempt];
+  const src = usingFallback ? fallbackSrc : (candidates[attempt] ?? fallbackSrc);
 
   return (
     <Image
