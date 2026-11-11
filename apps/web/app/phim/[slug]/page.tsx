@@ -35,10 +35,19 @@ export default function MovieDetailPage({
   const [activeTab, setActiveTab] = useState("tập phim");
   const [showInfo, setShowInfo] = useState(false);
   const [backdropUrl, setBackdropUrl] = useState<string | null>(null);
+  const [heroImageFailed, setHeroImageFailed] = useState(false);
+  const [posterImageFailed, setPosterImageFailed] = useState(false);
+  const [episodeImageFailed, setEpisodeImageFailed] = useState(false);
   const [selectedServer, setSelectedServer] = useState(0);
   const [mobileEpisodePage, setMobileEpisodePage] = useState(0);
   const [mobileEpisodeSearch, setMobileEpisodeSearch] = useState("");
   const [actorImages, setActorImages] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setHeroImageFailed(false);
+    setPosterImageFailed(false);
+    setEpisodeImageFailed(false);
+  }, [slug]);
 
   useEffect(() => {
     (async () => {
@@ -345,7 +354,8 @@ export default function MovieDetailPage({
       {/* HERO — shorter + lighter overlay so image shows */}
       <div className="movie-detail-hero relative hidden w-full h-[420px] lg:block">
         <Image
-          src={heroSrc}
+          src={heroImageFailed ? "/images/fallback-horizontal.svg" : heroSrc || "/images/fallback-horizontal.svg"}
+          onError={() => setHeroImageFailed(true)}
           alt={movie.name}
           fill
           priority
@@ -505,7 +515,14 @@ export default function MovieDetailPage({
               {mobileVisibleEpisodes.map((ep, idx) => (
                 <Link key={ep.slug || ep.name} href={"/xem-phim/" + movie.slug + "?sv=" + selectedServer + "&tap=" + encodeURIComponent(ep.slug || ep.name)} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-2.5 transition-colors active:bg-white/10">
                   <div className="movie-poster-frame relative h-[76px] w-[118px] shrink-0 overflow-hidden rounded-xl bg-white/10">
-                    <Image src={movie.thumb_url || movie.poster_url} alt="" fill sizes="118px" className="object-cover" />
+                    <Image
+                      src={episodeImageFailed ? "/images/fallback-horizontal.svg" : movie.thumb_url || movie.poster_url || "/images/fallback-horizontal.svg"}
+                      onError={() => setEpisodeImageFailed(true)}
+                      alt=""
+                      fill
+                      sizes="118px"
+                      className="object-cover"
+                    />
                     <span className="absolute inset-0 flex items-center justify-center bg-black/25"><Play size={22} fill="white" /></span>
                   </div>
                   <div className="min-w-0 flex-1">
@@ -551,7 +568,8 @@ export default function MovieDetailPage({
               <div className="movie-poster-glass rounded-[26px] border p-2.5">
                 <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden">
                   <Image
-                    src={movie.poster_url}
+                    src={posterImageFailed ? "/images/fallback-vertical.svg" : movie.poster_url || "/images/fallback-vertical.svg"}
+                    onError={() => setPosterImageFailed(true)}
                     alt={movie.name}
                     fill
                     priority

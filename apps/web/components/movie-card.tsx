@@ -38,9 +38,6 @@ const formatPlaybackTime = (value: number) => {
     : `${minutes}:${String(remaining).padStart(2, "0")}`;
 };
 
-const PLACEHOLDER =
-  "https://placehold.co/640x360/1a1c28/ffffff?text=No+Image";
-
 function buildLangChip(
   language?: string,
   episodeCurrent?: string,
@@ -95,6 +92,7 @@ export const MovieCard = ({
   variant = "horizontal",
 }: MovieCardProps) => {
   const [isNavigating, setIsNavigating] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -104,10 +102,15 @@ export const MovieCard = ({
   const handleLinkClick = () => setIsNavigating(true);
 
   const isHorizontal = variant === "horizontal";
-  const imageSrc: string =
-    (isHorizontal ? thumbUrl || posterUrl : posterUrl || thumbUrl) ||
-    PLACEHOLDER;
+  const imageSrc = isHorizontal ? thumbUrl || posterUrl : posterUrl || thumbUrl;
+  const fallbackSrc = isHorizontal
+    ? "/images/fallback-horizontal.svg"
+    : "/images/fallback-vertical.svg";
   const langChip = buildLangChip(language, episodeCurrent);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [imageSrc]);
   const qChip = qualityChip(quality);
   const numericRating = typeof rating === "number" ? rating : Number.parseFloat(String(rating ?? ""));
   const hasRating = Number.isFinite(numericRating) && numericRating > 0;
@@ -132,7 +135,8 @@ export const MovieCard = ({
         }`}
       >
         <Image
-          src={imageSrc}
+          src={imageFailed || !imageSrc ? fallbackSrc : imageSrc}
+          onError={() => setImageFailed(true)}
           alt={title}
           fill
           sizes={
