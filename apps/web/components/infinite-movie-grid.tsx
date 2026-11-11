@@ -84,6 +84,7 @@ export const InfiniteMovieGrid = ({
     title: m.name,
     originalTitle: m.origin_name,
     posterUrl: m.poster_url,
+    thumbUrl: m.thumb_url,
     slug: m.slug,
     year: m.year,
     quality: m.quality || "HD",
