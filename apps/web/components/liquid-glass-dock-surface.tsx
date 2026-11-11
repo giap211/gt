@@ -6,6 +6,7 @@ const MARGIN = 60;
 const REFRESH_MS = 120;
 const NEAR_RANGE = 600;
 const LEAD = 0;
+const SCALE = 0.25; // độ phân giải bản sao: thấp = mờ mềm, che lệch chi tiết
 
 type Layer = { el: Element; color: string };
 type Item = {
@@ -307,7 +308,7 @@ export function LiquidGlassDockSurface() {
 
     const drawScene = (ox: number, oy: number, w: number, h: number, vy: number) => {
       const light = document.documentElement.dataset.mobileTheme === "light";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.setTransform(dpr * SCALE, 0, 0, dpr * SCALE, 0, 0);
       ctx.fillStyle = light ? "#f5f3fb" : "#0a0b10";
       ctx.fillRect(0, 0, w, h);
       ctx.translate(-ox, -oy - vy * LEAD);
@@ -343,20 +344,6 @@ export function LiquidGlassDockSurface() {
           if (it.radius > 0) { rrect(r, it.radius); ctx.fill(); }
           else ctx.fillRect(r.left, r.top, r.width, r.height);
         }
-        if (it.text) {
-          ctx.font = it.font;
-          ctx.fillStyle = it.color;
-          const maxW = Math.max(20, r.width - it.pl * 2);
-          const multiLine = r.height > it.lh * 1.6;
-          const y = multiLine ? r.top + it.pt + it.lh / 2 : r.top + r.height / 2;
-          if (it.center) {
-            ctx.textAlign = "center";
-            ctx.fillText(it.text, r.left + r.width / 2, y, maxW);
-            ctx.textAlign = "left";
-          } else {
-            ctx.fillText(it.text, r.left + it.pl, y, maxW);
-          }
-        }
       }
     };
 
@@ -387,8 +374,8 @@ export function LiquidGlassDockSurface() {
         gl.viewport(0, 0, pw, ph);
       }
 
-      const tw = Math.round((W + MARGIN * 2) * dpr);
-      const th = Math.round((H + MARGIN * 2) * dpr);
+      const tw = Math.round((W + MARGIN * 2) * dpr * SCALE);
+      const th = Math.round((H + MARGIN * 2) * dpr * SCALE);
       if (scene.width !== tw || scene.height !== th) {
         scene.width = tw;
         scene.height = th;
@@ -413,7 +400,7 @@ export function LiquidGlassDockSurface() {
       press += (pressed - press) * 0.15;
       gl.uniform1i(uTex, 0);
       gl.uniform2f(uRes, pw, ph);
-      gl.uniform2f(uTres, scene.width, scene.height);
+      gl.uniform2f(uTres, (W + MARGIN * 2) * dpr, (H + MARGIN * 2) * dpr);
       gl.uniform2f(uToff, MARGIN * dpr, MARGIN * dpr);
       gl.uniform1f(uPress, press);
       gl.clearColor(0, 0, 0, 0);
