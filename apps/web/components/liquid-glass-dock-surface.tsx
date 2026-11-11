@@ -6,7 +6,6 @@ const MARGIN = 60;
 const REFRESH_MS = 120;
 const NEAR_RANGE = 600;
 const LEAD = 0;
-const SCALE = 0.25; // độ phân giải bản sao: thấp = mờ mềm, che lệch chi tiết
 
 type Layer = { el: Element; color: string };
 type Item = {
@@ -34,22 +33,27 @@ const FRAGMENT = `
     vec2 fp=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);vec2 p=fp-res*.5;
     float R=res.y*.5;vec2 h=res*.5;float d=sdf(p,h,R);
     if(d>1.){gl_FragColor=vec4(0.);return;}
-    float edge=clamp(.5-d,0.,1.);
-    float bev=R*.34;
+    float a=clamp(.5-d,0.,1.);
+    float bev=R*.5;
     float t=1.-clamp(-d/bev,0.,1.);
-    if(t<=0.){gl_FragColor=vec4(0.);return;}
-    vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
     vec2 bp=fp+toff;
-    float k=t*t*(R*.16)*(1.+press*.4);
-    vec2 off=-n*k;
-    vec3 c=vec3(texture2D(tex,(bp+off*1.12)/tres).r,
-                texture2D(tex,(bp+off)/tres).g,
-                texture2D(tex,(bp+off*.88)/tres).b);
-    float a=edge*smoothstep(0.,.55,t);
+    vec2 n=vec2(0.);
+    vec3 c;
+    if(t<=0.){
+      c=texture2D(tex,bp/tres).rgb;
+    }else{
+      n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
+      float k=t*t*(R*.45)*(1.+press*.4);
+      vec2 off=n*k;
+      c=vec3(texture2D(tex,(bp+off*1.1)/tres).r,
+             texture2D(tex,(bp+off)/tres).g,
+             texture2D(tex,(bp+off*.9)/tres).b);
+    }
+    c=mix(c,vec3(1.),.05);
     float rim=smoothstep(2.5,0.,-d);
     vec2 L=normalize(vec2(-.6,-.8));
     float sp=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
-    c+=rim*(.2+.5*sp);
+    c+=rim*(.2+.5*sp)+t*.05*sp;
     gl_FragColor=vec4(c*a,a);
   }`;
 
@@ -308,7 +312,7 @@ export function LiquidGlassDockSurface() {
 
     const drawScene = (ox: number, oy: number, w: number, h: number, vy: number) => {
       const light = document.documentElement.dataset.mobileTheme === "light";
-      ctx.setTransform(dpr * SCALE, 0, 0, dpr * SCALE, 0, 0);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.fillStyle = light ? "#f5f3fb" : "#0a0b10";
       ctx.fillRect(0, 0, w, h);
       ctx.translate(-ox, -oy - vy * LEAD);
@@ -344,6 +348,20 @@ export function LiquidGlassDockSurface() {
           if (it.radius > 0) { rrect(r, it.radius); ctx.fill(); }
           else ctx.fillRect(r.left, r.top, r.width, r.height);
         }
+        if (it.text) {
+          ctx.font = it.font;
+          ctx.fillStyle = it.color;
+          const maxW = Math.max(20, r.width - it.pl * 2);
+          const multiLine = r.height > it.lh * 1.6;
+          const y = multiLine ? r.top + it.pt + it.lh / 2 : r.top + r.height / 2;
+          if (it.center) {
+            ctx.textAlign = "center";
+            ctx.fillText(it.text, r.left + r.width / 2, y, maxW);
+            ctx.textAlign = "left";
+          } else {
+            ctx.fillText(it.text, r.left + it.pl, y, maxW);
+          }
+        }
       }
     };
 
@@ -374,8 +392,8 @@ export function LiquidGlassDockSurface() {
         gl.viewport(0, 0, pw, ph);
       }
 
-      const tw = Math.round((W + MARGIN * 2) * dpr * SCALE);
-      const th = Math.round((H + MARGIN * 2) * dpr * SCALE);
+      const tw = Math.round((W + MARGIN * 2) * dpr);
+      const th = Math.round((H + MARGIN * 2) * dpr);
       if (scene.width !== tw || scene.height !== th) {
         scene.width = tw;
         scene.height = th;
@@ -400,7 +418,7 @@ export function LiquidGlassDockSurface() {
       press += (pressed - press) * 0.15;
       gl.uniform1i(uTex, 0);
       gl.uniform2f(uRes, pw, ph);
-      gl.uniform2f(uTres, (W + MARGIN * 2) * dpr, (H + MARGIN * 2) * dpr);
+      gl.uniform2f(uTres, scene.width, scene.height);
       gl.uniform2f(uToff, MARGIN * dpr, MARGIN * dpr);
       gl.uniform1f(uPress, press);
       gl.clearColor(0, 0, 0, 0);
