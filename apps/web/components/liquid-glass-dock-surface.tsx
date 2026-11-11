@@ -22,30 +22,22 @@ const FRAGMENT = `
     vec2 fp=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);vec2 p=fp-res*.5;
     float R=res.y*.5;vec2 h=res*.5;float d=sdf(p,h,R);
     if(d>1.){gl_FragColor=vec4(0.);return;}
-    float a=clamp(.5-d,0.,1.);
-    float bev=R*.38;
+    float edge=clamp(.5-d,0.,1.);
+    float bev=R*.36;
     float t=1.-clamp(-d/bev,0.,1.);
+    if(t<=0.){gl_FragColor=vec4(0.);return;}
+    vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
     vec2 bp=fp+toff;
-    vec3 c;
-    if(t<=0.){
-      c=texture2D(tex,bp/tres).rgb;
-    }else{
-      vec2 n=normalize(vec2(sdf(p+vec2(1.,0.),h,R)-sdf(p-vec2(1.,0.),h,R),sdf(p+vec2(0.,1.),h,R)-sdf(p-vec2(0.,1.),h,R))+1e-5);
-      float k=t*t*(R*.3)*(1.+press*.4);
-      vec2 off=n*k;
-      float r=texture2D(tex,(bp+off*1.15)/tres).r;
-      float b=texture2D(tex,(bp+off*.85)/tres).b;
-      vec3 g3=(texture2D(tex,(bp+off+vec2(1.2,0.)*t)/tres).rgb
-              +texture2D(tex,(bp+off+vec2(-.6,1.04)*t)/tres).rgb
-              +texture2D(tex,(bp+off+vec2(-.6,-1.04)*t)/tres).rgb)/3.;
-      c=vec3(r,g3.g,b);
-      float l=dot(c,vec3(.299,.587,.114));
-      c=mix(vec3(l),c,1.+.35*t);c=mix(c,vec3(1.),.06*t);
-      float rim=smoothstep(2.5,0.,-d);
-      vec2 L=normalize(vec2(-.6,-.8));
-      float sp=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
-      c+=rim*(.2+.5*sp)+t*.06*sp;
-    }
+    float k=t*t*(R*.2)*(1.+press*.4);
+    vec2 off=n*k;
+    vec3 c=vec3(texture2D(tex,(bp+off*1.1)/tres).r,
+                texture2D(tex,(bp+off)/tres).g,
+                texture2D(tex,(bp+off*.9)/tres).b);
+    float a=edge*smoothstep(0.,.18,t);
+    float rim=smoothstep(2.5,0.,-d);
+    vec2 L=normalize(vec2(-.6,-.8));
+    float sp=pow(max(dot(n,L),0.),2.)+.6*pow(max(dot(n,-L),0.),2.);
+    c+=rim*(.2+.5*sp);
     gl_FragColor=vec4(c*a,a);
   }`;
 
@@ -315,7 +307,7 @@ export function LiquidGlassDockSurface() {
       raf = requestAnimationFrame(render);
       if (document.hidden) return;
 
-      const b = dock.getBoundingClientRect();
+      const b = canvas.getBoundingClientRect();
       const W = b.width, H = b.height;
       if (W < 2 || H < 2) return;
 
