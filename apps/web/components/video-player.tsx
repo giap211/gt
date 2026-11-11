@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Artplayer from "artplayer";
-import { Play, Rewind, FastForward } from "lucide-react";
+import { Play, Pause, Rewind, FastForward } from "lucide-react";
 import Hls from "hls.js";
 
 // Tắt double-click fullscreen / play mặc định
@@ -71,6 +71,9 @@ export const VideoPlayer = ({
 
   const [showResumeChoice, setShowResumeChoice] = useState(startAtSeconds > 0 && !isEmbed);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [playbackClock, setPlaybackClock] = useState({ currentTime: 0, duration: 0 });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const lastOverlayTapRef = useRef<{ at: number; side: "left" | "right" } | null>(null);
   const [seekFeedback, setSeekFeedback] = useState<{ side: "left" | "right"; vertical: boolean; seconds: number; key: number } | null>(null);
   const seekFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showDebug, setShowDebug] = useState(() => {
@@ -86,6 +89,39 @@ export const VideoPlayer = ({
   useEffect(() => {
     setShowResumeChoice(startAtSeconds > 0 && !isEmbed);
   }, [startAtSeconds, isEmbed]);
+
+  const seekTo = (seconds: number) => {
+    const video = artRef.current?.querySelector("video");
+    if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return;
+    video.currentTime = Math.max(0, Math.min(video.duration, seconds));
+    setPlaybackClock({ currentTime: video.currentTime, duration: video.duration });
+    try { (artRef.current as any)?.querySelector(".artplayer-app")?.art?.hls?.startLoad?.(video.currentTime); } catch { /* ignore */ }
+  };
+
+  const seekBy = (seconds: number) => {
+    const video = artRef.current?.querySelector("video");
+    if (!video) return;
+    seekTo(video.currentTime + seconds);
+    video.play().catch(() => {});
+  };
+
+  const togglePlayback = () => {
+    const video = artRef.current?.querySelector("video");
+    if (!video) return;
+    if (video.paused) video.play().catch(() => {});
+    else video.pause();
+  };
+
+  const formatClock = (seconds: number) => {
+    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+    const total = Math.floor(seconds);
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const secs = total % 60;
+    return hours > 0
+      ? `${hours}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`
+      : `${minutes}:${String(secs).padStart(2, "0")}`;
+  };
 
   const startPlayback = (resume: boolean) => {
     const video = artRef.current?.querySelector("video");
@@ -475,7 +511,20 @@ export const VideoPlayer = ({
 
       if (art) {
         const video = art.video as HTMLVideoElement;
+        const syncPlaybackState = () => {
+          setPlaybackClock({
+            currentTime: Number.isFinite(video.currentTime) ? video.currentTime : 0,
+            duration: Number.isFinite(video.duration) && video.duration > 0 ? video.duration : knownDurationSeconds,
+          });
+          setIsPlaying(!video.paused && !video.ended);
+        };
+        video.controls = false;
+        video.removeAttribute("controls");
+        video.setAttribute("tabindex", "-1");
+        video.setAttribute("disablepictureinpicture", "");
+        video.setAttribute("controlslist", "nodownload noplaybackrate noremoteplayback");
         const reportProgress = () => {
+          syncPlaybackState();
           const intro = introSegmentRef.current;
           setDebugCurrentTime(Number(video.currentTime.toFixed(2)));
           setDebugVideoState(
@@ -512,6 +561,7 @@ export const VideoPlayer = ({
         };
 
         const reportFinalProgress = () => {
+          syncPlaybackState();
           if (!Number.isFinite(video.currentTime)) return;
           const mediaDuration = Number.isFinite(video.duration) && video.duration > 0
             ? video.duration
@@ -519,12 +569,18 @@ export const VideoPlayer = ({
           onProgress?.(video.currentTime, mediaDuration, true);
         };
         video.addEventListener("timeupdate", reportProgress);
+        video.addEventListener("loadedmetadata", syncPlaybackState);
+        video.addEventListener("durationchange", syncPlaybackState);
+        video.addEventListener("play", syncPlaybackState);
         video.addEventListener("pause", reportFinalProgress);
         video.addEventListener("ended", reportFinalProgress);
 
         const previousCleanup = (art as any).__seekCleanup as (() => void) | undefined;
         (art as any).__seekCleanup = () => {
           video.removeEventListener("timeupdate", reportProgress);
+          video.removeEventListener("loadedmetadata", syncPlaybackState);
+          video.removeEventListener("durationchange", syncPlaybackState);
+          video.removeEventListener("play", syncPlaybackState);
           video.removeEventListener("pause", reportFinalProgress);
           video.removeEventListener("ended", reportFinalProgress);
           previousCleanup?.();
@@ -538,6 +594,12 @@ export const VideoPlayer = ({
       // Double tap: trái -30 giây, phải +30 giây
       if (art) {
         const container = art.template.$player as HTMLElement;
+        // Player gốc chỉ còn nhiệm vụ giải mã/phát video; mọi hit-test được chuyển cho overlay.
+        container.style.pointerEvents = "none";
+        container.querySelectorAll<HTMLElement>(".art-controls,.art-bottom,.art-settings,.art-contextmenus,.art-notice,.art-layer-auto-playback").forEach((el) => {
+          el.style.setProperty("display", "none", "important");
+          el.style.setProperty("pointer-events", "none", "important");
+        });
 
         // Gọi lại thanh tiêu đề ngay khi người dùng chạm player.
         const onPlayerPointerDown = () => onUserInteraction?.();
@@ -838,7 +900,54 @@ export const VideoPlayer = ({
 
   return (
     <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10 ${showResumeChoice ? "[&_.art-state]:!hidden [&_.art-controls]:!hidden [&_.art-bottom]:!hidden" : ""}`}>
-      <div ref={artRef} className="w-full h-full" />
+      <div ref={artRef} className="pointer-events-none h-full w-full" />
+      {!isEmbed && !showResumeChoice && (
+        <>
+          <div
+            className="absolute inset-0 z-10 cursor-pointer"
+            onPointerUp={(event) => {
+              onUserInteraction?.();
+              const rect = event.currentTarget.getBoundingClientRect();
+              const side = event.clientX < rect.left + rect.width / 2 ? "left" : "right";
+              const now = Date.now();
+              const previous = lastOverlayTapRef.current;
+              if (previous && previous.side === side && now - previous.at < 320) {
+                seekBy(side === "left" ? -30 : 30);
+                setSeekFeedback({ side, vertical: rotatedRef.current || window.matchMedia("(orientation: landscape)").matches, seconds: 30, key: now });
+                if (seekFeedbackTimerRef.current) clearTimeout(seekFeedbackTimerRef.current);
+                seekFeedbackTimerRef.current = setTimeout(() => setSeekFeedback(null), 850);
+                lastOverlayTapRef.current = null;
+              } else {
+                lastOverlayTapRef.current = { at: now, side };
+              }
+            }}
+            aria-label="Vùng video; chạm hai lần để tua 30 giây"
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/90 via-black/45 to-transparent px-4 pb-4 pt-12">
+            <div className="pointer-events-auto flex items-center gap-3">
+              <button type="button" onClick={togglePlayback} aria-label={isPlaying ? "Tạm dừng" : "Phát"} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/20 bg-white/15 text-white backdrop-blur-xl active:scale-95">
+                {isPlaying ? <Pause size={19} fill="currentColor" /> : <Play size={19} fill="currentColor" />}
+              </button>
+              <button type="button" onClick={() => seekBy(-30)} aria-label="Lùi 30 giây" className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white/90 hover:bg-white/10"><Rewind size={18}/></button>
+              <button type="button" onClick={() => seekBy(30)} aria-label="Tiến 30 giây" className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white/90 hover:bg-white/10"><FastForward size={18}/></button>
+              <span className="min-w-[42px] text-[11px] font-semibold tabular-nums text-white/90">{formatClock(playbackClock.currentTime)}</span>
+              <input
+                aria-label="Thanh tiến trình video"
+                type="range"
+                min={0}
+                max={Math.max(1, playbackClock.duration)}
+                step={0.1}
+                value={Math.min(playbackClock.currentTime, Math.max(1, playbackClock.duration))}
+                onPointerDown={(event) => { event.stopPropagation(); onUserInteraction?.(); }}
+                onPointerUp={(event) => event.stopPropagation()}
+                onChange={(event) => seekTo(Number(event.currentTarget.value))}
+                className="h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-white/30 accent-violet-400"
+              />
+              <span className="min-w-[42px] text-right text-[11px] font-semibold tabular-nums text-white/70">{formatClock(playbackClock.duration)}</span>
+            </div>
+          </div>
+        </>
+      )}
       {seekFeedback && (
         <div
           key={seekFeedback.key}
