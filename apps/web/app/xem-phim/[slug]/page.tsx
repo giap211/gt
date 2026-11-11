@@ -578,7 +578,6 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             introEndSeconds={introSegment?.endSeconds}
             introDebugStatus={introDebugStatus}
             onProgress={handlePlaybackProgress}
-            onUserInteraction={handlePlayerInteraction}
             rotated={isPlayerRotated}
             backLabel={movie.name}
             onBack={handlePlayerBack}
