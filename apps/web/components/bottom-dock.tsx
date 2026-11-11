@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { ResilientMovieImage } from "./resilient-movie-image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
@@ -179,7 +179,7 @@ export function BottomDock() {
                 {results.map((item) => (
                   <Link key={item._id} href={`/phim/${item.slug}`} onClick={() => setSearchOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl active:bg-white/[0.06]">
                     <div className="relative w-11 h-14 rounded-lg overflow-hidden bg-white/5 shrink-0 border border-white/10">
-                      <Image src={item.poster_url} alt={item.name} fill sizes="44px" className="object-cover" />
+                      <ResilientMovieImage sources={[item.poster_url, item.thumb_url]} fallbackSrc="/images/fallback-vertical.svg" alt={item.name} fill sizes="44px" className="object-cover" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[14px] font-semibold text-white line-clamp-1">{item.name}</p>
