@@ -12,7 +12,7 @@ type Layer = { el: Element; color: string };
 type Head = { el: HTMLElement; font: string; color: string; text: string };
 
 const VERTEX = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
-const FRAGMENT = \`
+const FRAGMENT = `
   precision highp float;
   uniform sampler2D tex;
   uniform vec2 res,tres,toff;
@@ -47,7 +47,7 @@ const FRAGMENT = \`
       c+=rim*(.2+.5*sp)+t*.06*sp;
     }
     gl_FragColor=vec4(c*a,a);
-  }\`;
+  }`;
 
 export function LiquidGlassDockSurface() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -205,7 +205,7 @@ export function LiquidGlassDockSurface() {
         const s = getComputedStyle(el);
         return {
           el,
-          font: \`\${s.fontWeight} \${s.fontSize} \${s.fontFamily}\`,
+          font: `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`,
           color: s.color || "#fff",
           text: (el.textContent || "").trim().slice(0, 64),
         };
