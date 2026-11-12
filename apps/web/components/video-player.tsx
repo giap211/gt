@@ -225,7 +225,7 @@ export const VideoPlayer=({url,poster,title,startAtSeconds=0,introStartSeconds,i
     void loadSubtitles();
     return () => {
       cancelled = true;
-      subtitleSelectRef.current = () => {};
+      subtitleSelectRef.current = async () => {};
       attachedTracks.forEach((track) => { if (track.parentNode) track.parentNode.removeChild(track); });
       subtitleObjectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
     };
