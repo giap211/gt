@@ -514,7 +514,14 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-episode-grid { display:grid; width:100%; min-height:min-content; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); align-content:start; gap:8px; padding:4px 2px 16px 0; }
         .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
-        .watch-player-menu .active-choice { color:#101216; background:rgba(245,247,250,.96); border-color:rgba(255,255,255,.9); }
+        .watch-player-menu .active-choice { color:#fff; background:rgba(225,231,238,.16); border-color:rgba(255,255,255,.72); box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 8px 26px rgba(0,0,0,.2); }
+        .watch-player-menu > header { margin:0 0 18px; padding:16px 18px; border:1px solid rgba(255,255,255,.2); border-radius:22px; background:rgba(225,231,238,.075); box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 30px rgba(0,0,0,.16); backdrop-filter:blur(24px) saturate(140%); -webkit-backdrop-filter:blur(24px) saturate(140%); }
+        .watch-player-menu .watch-player-episode-grid > button { border-color:rgba(255,255,255,.16); background:rgba(225,231,238,.075); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter:blur(18px) saturate(125%); -webkit-backdrop-filter:blur(18px) saturate(125%); }
+        .watch-player-menu .watch-player-episode-grid > button.active-choice { border-color:rgba(255,255,255,.78); background:rgba(225,231,238,.17); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 8px 26px rgba(0,0,0,.24); }
+        .watch-player-menu .watch-player-episode-grid > button > span { color:rgba(255,255,255,.9); }
+        .watch-player-menu .watch-player-episode-grid > button.active-choice > span { color:#fff; }
+        .watch-player-menu .watch-player-episode-grid > button .episode-current-badge { color:#101216; background:rgba(245,247,250,.96); }
+        .watch-player-menu .watch-player-episode-grid > button:not(.active-choice):hover { border-color:rgba(255,255,255,.42); background:rgba(225,231,238,.12); }
         .watch-player-round { width:54px;height:54px;border-radius:999px;display:grid;place-items:center; flex:0 0 54px; cursor:pointer; }
         .watch-player-page > .watch-player-round { position:absolute; z-index:70; pointer-events:auto; }
         .watch-player-page .watch-player-top { z-index:50; }
@@ -629,7 +636,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   if (!matched) return;
                   setOverlayOpen(false);
                   router.push("/xem-phim/" + slug + "?tap=" + matched.slug + "&sv=" + index);
-                }} className={"shrink-0 rounded-full border px-4 py-2.5 text-xs font-bold " + (currentServer === index ? "active-choice" : "border-white/15 bg-white/[.06] text-white/65")}>
+                }} className={"shrink-0 rounded-full border px-4 py-2.5 text-xs font-bold backdrop-blur-xl " + (currentServer === index ? "active-choice" : "border-white/20 bg-white/[.07] text-white/70")}>
                   {server.server_name || "SV " + (index + 1)}
                 </button>
               ))}
@@ -655,7 +662,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                       {still ? <Image src={still} alt={formatEpisodeName(ep.name)} fill sizes="(max-width: 700px) 33vw, 180px" className="object-cover" /> : null}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                       <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-1 text-[10px] font-bold text-white">TẬP {number}</span>
-                      {active && <span className="absolute right-2 top-2 rounded-full bg-white px-2 py-1 text-[9px] font-black text-[#101216]">ĐANG XEM</span>}
+                      {active && <span className="episode-current-badge absolute right-2 top-2 rounded-full border border-white/70 bg-white/90 px-2 py-1 text-[9px] font-black text-[#101216] shadow-lg">ĐANG XEM</span>}
                     </div>
                     <span className="block truncate px-3 py-2.5 text-xs font-semibold">{formatEpisodeName(ep.name)}</span>
                   </button>
