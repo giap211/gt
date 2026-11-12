@@ -769,7 +769,8 @@ export const VideoPlayer = ({
         const toVttTimestamp = (value: string) => {
           const match = value.trim().match(/^(\d{1,2}):(\d{2}):(\d{2})[,.](\d{1,3})$/);
           if (!match) return value.trim();
-          return `${match[1].padStart(2, "0")}:${match[2]}:${match[3]}.${match[4].padEnd(3, "0")}`;
+          const [, hours = "00", minutes = "00", seconds = "00", milliseconds = "000"] = match;
+          return `${hours.padStart(2, "0")}:${minutes}:${seconds}.${milliseconds.padEnd(3, "0")}`;
         };
 
         let vtt = "";
