@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Artplayer from "artplayer";
-import { ArrowLeft, Play, RotateCw } from "lucide-react";
+import { ArrowLeft, Play, Pause, RotateCw, SkipBack, SkipForward, Subtitles, Maximize2, Settings2 } from "lucide-react";
 import Hls from "hls.js";
 
 // Tắt double-click fullscreen / play mặc định
@@ -132,6 +132,9 @@ export const VideoPlayer = ({
 
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showPlayerHeader, setShowPlayerHeader] = useState(true);
+  const [playerTime, setPlayerTime] = useState(0);
+  const [playerDuration, setPlayerDuration] = useState(0);
+  const [playerIsPlaying, setPlayerIsPlaying] = useState(false);
   const [subtitlePanelOpen, setSubtitlePanelOpen] = useState(false);
   const [subtitleCandidates, setSubtitleCandidates] = useState<any[]>([]);
   const [subtitleLoading, setSubtitleLoading] = useState(false);
@@ -483,6 +486,9 @@ export const VideoPlayer = ({
         const onVideoPlayForVoiceover = () => syncVoiceover();
         const reportProgress = () => {
           syncVoiceover();
+          setPlayerTime(Number.isFinite(video.currentTime) ? video.currentTime : 0);
+          const uiDuration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : knownDurationSeconds;
+          if (uiDuration > 0) setPlayerDuration(uiDuration);
           const intro = introSegmentRef.current;
           if (showDebug) {
             setDebugCurrentTime(Number(video.currentTime.toFixed(2)));
@@ -547,6 +553,16 @@ export const VideoPlayer = ({
             : knownDurationSeconds;
           onProgress?.(video.currentTime, mediaDuration, true);
         };
+        const syncPlayerUi = () => {
+          setPlayerTime(Number.isFinite(video.currentTime) ? video.currentTime : 0);
+          const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : knownDurationSeconds;
+          if (duration > 0) setPlayerDuration(duration);
+          setPlayerIsPlaying(!video.paused && !video.ended);
+        };
+        video.addEventListener("loadedmetadata", syncPlayerUi);
+        video.addEventListener("durationchange", syncPlayerUi);
+        video.addEventListener("play", syncPlayerUi);
+        video.addEventListener("pause", syncPlayerUi);
         video.addEventListener("timeupdate", reportProgress);
         video.addEventListener("pause", reportFinalProgress);
         video.addEventListener("ended", reportFinalProgress);
@@ -558,6 +574,10 @@ export const VideoPlayer = ({
         const previousCleanup = (art as any).__seekCleanup as (() => void) | undefined;
         (art as any).__seekCleanup = () => {
           cancelVoiceover();
+          video.removeEventListener("loadedmetadata", syncPlayerUi);
+          video.removeEventListener("durationchange", syncPlayerUi);
+          video.removeEventListener("play", syncPlayerUi);
+          video.removeEventListener("pause", syncPlayerUi);
           video.removeEventListener("timeupdate", reportProgress);
           video.removeEventListener("pause", reportFinalProgress);
           video.removeEventListener("ended", reportFinalProgress);
@@ -1018,9 +1038,61 @@ export const VideoPlayer = ({
     );
   }
 
+  const formatPlayerTime = (seconds: number) => {
+    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+    const total = Math.floor(seconds);
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const secs = total % 60;
+    return hours > 0 ? hours + ":" + String(minutes).padStart(2, "0") + ":" + String(secs).padStart(2, "0") : minutes + ":" + String(secs).padStart(2, "0");
+  };
+  const seekPlayerTo = (value: number) => {
+    const art = artPlayerRef.current;
+    if (!art || !Number.isFinite(value)) return;
+    art.seek = Math.max(0, Math.min(playerDuration || art.duration || value, value));
+    setPlayerTime(art.currentTime);
+  };
+  const togglePlayerPlayback = () => {
+    const art = artPlayerRef.current;
+    if (!art) return;
+    if (art.video.paused) art.play().catch(() => {});
+    else art.pause();
+  };
+  const seekPlayerBy = (delta: number) => {
+    const art = artPlayerRef.current;
+    if (!art) return;
+    const duration = Number.isFinite(art.duration) && art.duration > 0 ? art.duration : Infinity;
+    art.seek = Math.max(0, Math.min(duration, art.currentTime + delta));
+    art.play().catch(() => {});
+    setPlayerTime(art.currentTime);
+  };
+
   return (
     <div className="player-controls-frame relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
       <div ref={artRef} className="h-full w-full" />
+      <div className={"player-custom-dock absolute inset-x-0 bottom-0 z-[45] px-4 pb-4 pt-16 text-white transition-all duration-200 sm:px-6 " + (showPlayerHeader ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0 pointer-events-none")} onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 rounded-[22px] border border-white/20 bg-[#171321]/90 p-3 shadow-2xl backdrop-blur-2xl sm:p-4">
+          <div className="flex items-center gap-3">
+            <span className="min-w-[42px] text-right text-[11px] font-semibold tabular-nums text-white/85">{formatPlayerTime(playerTime)}</span>
+            <input aria-label="Tua video" type="range" min={0} max={Math.max(1, playerDuration)} step={0.1} value={Math.min(playerTime, Math.max(1, playerDuration))} onChange={(event) => seekPlayerTo(Number(event.target.value))} className="player-custom-seek min-w-0 flex-1" />
+            <span className="min-w-[42px] text-[11px] font-semibold tabular-nums text-white/55">{formatPlayerTime(playerDuration)}</span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button type="button" onClick={togglePlayerPlayback} aria-label={playerIsPlaying ? "Tạm dừng" : "Phát"} className="player-dock-main">{playerIsPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}</button>
+              <button type="button" onClick={() => seekPlayerBy(-30)} aria-label="Lùi 30 giây" className="player-dock-button"><SkipBack size={18} /><span>30</span></button>
+              <button type="button" onClick={() => seekPlayerBy(30)} aria-label="Tiến 30 giây" className="player-dock-button"><SkipForward size={18} /><span>30</span></button>
+              {showSkipIntro && <button type="button" onClick={() => { const end = introSegmentRef.current.endSeconds; if (typeof end === "number" && Number.isFinite(end)) seekPlayerTo(end); }} className="player-dock-skip">Bỏ qua intro ›</button>}
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button type="button" onClick={() => setSubtitlePanelOpen(true)} className="player-dock-button" aria-label="Chọn phụ đề"><Subtitles size={19} /><span className="hidden sm:inline">Phụ đề</span></button>
+              {showNextEpisode && <button type="button" onClick={() => onNextEpisodeRef.current?.()} className="player-dock-button" aria-label="Tập tiếp theo"><SkipForward size={18} /><span className="hidden sm:inline">Tập tiếp</span></button>}
+              <button type="button" onClick={() => { const art = artPlayerRef.current; if (art) art.fullscreen = !art.fullscreen; }} className="player-dock-button" aria-label="Toàn màn hình"><Maximize2 size={18} /></button>
+              <button type="button" onClick={() => { const art = artPlayerRef.current as any; if (art?.setting) art.setting.show = !art.setting.show; }} className="player-dock-button" aria-label="Cài đặt phát"><Settings2 size={18} /></button>
+            </div>
+          </div>
+        </div>
+      </div>
       {subtitlePanelOpen && (
         <div className="absolute inset-0 z-[80] flex items-end justify-center bg-black/65 p-3 backdrop-blur-sm sm:items-center sm:p-5" onClick={() => setSubtitlePanelOpen(false)}>
           <section role="dialog" aria-modal="true" aria-label="Chọn phụ đề" className="max-h-[82%] w-full max-w-lg overflow-hidden rounded-3xl border border-white/15 bg-[#111018]/95 text-white shadow-2xl shadow-purple-950/40" onClick={(event) => event.stopPropagation()}>
@@ -1097,6 +1169,22 @@ export const VideoPlayer = ({
         </div>
       )}
       <style jsx global>{`
+        .player-controls-frame .artplayer-app .art-controls,
+        .player-controls-frame .artplayer-app .art-bottom { display:none!important; }
+        .player-custom-seek { appearance:none;-webkit-appearance:none;width:100%;height:5px;border-radius:999px;outline:none;background:linear-gradient(90deg,#8b5cf6,#c084fc);cursor:pointer;touch-action:pan-x; }
+        .player-custom-seek::-webkit-slider-thumb { appearance:none;-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid #a78bfa;box-shadow:0 0 0 4px rgba(139,92,246,.2); }
+        .player-custom-seek::-moz-range-thumb { width:9px;height:9px;border-radius:50%;background:#fff;border:3px solid #a78bfa; }
+        .player-dock-main { display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:0 0 44px;border-radius:15px;background:linear-gradient(135deg,#8b5cf6,#c084fc);color:white;box-shadow:0 6px 22px rgba(139,92,246,.35); }
+        .player-dock-button { display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:42px;height:42px;padding:0 10px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.09);color:white; }
+        .player-dock-button > span {font-size:10px;font-weight:800;line-height:1}
+        .player-dock-skip {display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border:1px solid rgba(196,181,253,.35);border-radius:13px;background:rgba(139,92,246,.2);color:#ede9fe;font-size:12px;font-weight:750;white-space:nowrap}
+        @media(max-width:600px) {
+          .player-custom-dock {padding-left:10px!important;padding-right:10px!important;padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
+          .player-custom-dock > div {gap:10px!important;padding:10px!important;border-radius:18px!important}
+          .player-dock-main {width:40px;height:40px;flex-basis:40px}
+          .player-dock-button {min-width:36px;height:38px;padding:0 7px;border-radius:12px}
+          .player-dock-skip {min-height:38px;padding:0 8px;font-size:10px}
+        }
         .player-controls-frame .artplayer-app { --art-theme: #a78bfa; }
         .player-controls-frame .artplayer-app .art-controls-right .art-control:not(.art-control-next-episode):not(.art-control-subtitle-toggle) { display:none!important; }
         .player-controls-frame .artplayer-app .art-control-subtitle-toggle,
