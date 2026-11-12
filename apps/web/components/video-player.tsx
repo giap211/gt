@@ -804,7 +804,7 @@ export const VideoPlayer = ({
         player.setting.add({
           name: settingName,
           html: "Phụ đề",
-          tooltip: "Tắt phụ đề",
+          tooltip: loaded[0].label,
           width: 260,
           selector,
           onSelect: (item: { html: string; trackIndex: number }) => {
