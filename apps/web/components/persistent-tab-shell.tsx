@@ -62,8 +62,9 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
         transition={tabTransition}
         className="w-full"
         style={{
-          position: isTabRoute ? "relative" : "absolute",
-          inset: isTabRoute ? "auto" : 0,
+          // Keep tab screens mounted for state retention, but remove the whole
+          // tab stack from layout/scroll overflow while another route is open.
+          display: isTabRoute ? "block" : "none",
           pointerEvents: isTabRoute ? "auto" : "none",
           zIndex: isTabRoute ? 1 : 0,
           willChange: "opacity, transform",
@@ -76,8 +77,7 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
           transition={tabTransition}
           className="w-full"
           style={{
-            position: isHome ? "relative" : "absolute",
-            inset: isHome ? "auto" : 0,
+            display: isHome ? "block" : "none",
             pointerEvents: isHome ? "auto" : "none",
             willChange: "opacity, transform",
           }}
@@ -91,8 +91,7 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
           transition={tabTransition}
           className="w-full"
           style={{
-            position: isSeries ? "relative" : "absolute",
-            inset: isSeries ? "auto" : 0,
+            display: isSeries ? "block" : "none",
             pointerEvents: isSeries ? "auto" : "none",
             willChange: "opacity, transform",
           }}
@@ -106,8 +105,7 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
           transition={tabTransition}
           className="w-full"
           style={{
-            position: isSingle ? "relative" : "absolute",
-            inset: isSingle ? "auto" : 0,
+            display: isSingle ? "block" : "none",
             pointerEvents: isSingle ? "auto" : "none",
             willChange: "opacity, transform",
           }}
