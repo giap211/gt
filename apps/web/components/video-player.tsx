@@ -277,7 +277,7 @@ export const VideoPlayer = ({
         playsInline: true,
         autoPlayback: false,
         airplay: true,
-        theme: "#ffd875",
+        theme: "#8b5cf6",
         moreVideoAttr: {},
 
         customType: {
@@ -1163,6 +1163,16 @@ export const VideoPlayer = ({
           .player-controls-frame .artplayer-app .art-control-subtitle-toggle,.player-controls-frame .artplayer-app .art-control-next-episode { min-height:42px!important;padding-inline:10px!important;margin-left:4px!important; }
           .player-controls-frame .artplayer-app .art-bottom { left:max(18px,env(safe-area-inset-left,0px) + 14px)!important;right:max(18px,env(safe-area-inset-right,0px) + 14px)!important; }
           .player-controls-frame .artplayer-app .art-state .art-icon { width:64px!important;height:64px!important; }
+        }
+        /* Keep Artplayer's actual controls horizontal; do not rely on child defaults. */
+        .player-controls-frame .artplayer-app .art-controls { flex-direction:row!important; }
+        .player-controls-frame .artplayer-app .art-controls-left,
+        .player-controls-frame .artplayer-app .art-controls-right {
+          position:static!important;inset:auto!important;float:none!important;
+          flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;
+        }
+        .player-controls-frame .artplayer-app .art-controls .art-control {
+          position:relative!important;inset:auto!important;float:none!important;
         }
         @media(max-width:380px) {
           .player-controls-frame .artplayer-app .art-controls { left:8px!important;right:8px!important;padding-inline:6px!important; }
