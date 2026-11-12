@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://rophim.com.mx/sitemap.xml

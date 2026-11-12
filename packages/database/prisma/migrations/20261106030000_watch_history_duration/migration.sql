@@ -1,2 +1,0 @@
-ALTER TABLE "WatchHistory"
-ADD COLUMN "totalDurationSeconds" INTEGER NOT NULL DEFAULT 0;

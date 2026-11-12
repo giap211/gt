@@ -54,7 +54,7 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="relative w-full min-h-[60vh] overflow-x-clip">
+    <div className="relative w-full overflow-x-clip">
       <motion.div
         aria-hidden={!isTabRoute}
         initial={false}
