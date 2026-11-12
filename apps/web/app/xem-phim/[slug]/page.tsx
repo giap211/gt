@@ -508,13 +508,13 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-top > div { min-width:0; max-width:calc(100% - 112px); }
         .watch-player-top > div > div { min-width:0; flex:1 1 auto; overflow:hidden; }
         .watch-player-top > div > div > div { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .watch-player-glass { background:rgba(15,18,27,.58); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
-        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; min-height:0; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); border-radius:0; background:linear-gradient(145deg,rgba(22,26,37,.97),rgba(7,9,15,.97)); border:0; color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:none; }
+        .watch-player-glass { background:rgba(224,230,238,.10); border:1px solid rgba(255,255,255,.28); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
+        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; min-height:0; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); border-radius:0; background:linear-gradient(145deg,rgba(28,32,39,.96),rgba(5,6,8,.985)); border:0; color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:none; }
         .watch-player-episode-scroll { position:relative; z-index:1; display:block; flex:1 1 0%; min-height:0; height:0; width:100%; overflow-x:hidden; overflow-y:scroll; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; touch-action:pan-y; pointer-events:auto; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.22) transparent; }
         .watch-player-episode-grid { display:grid; width:100%; min-height:min-content; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); align-content:start; gap:8px; padding:4px 2px 16px 0; }
         .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
-        .watch-player-menu .active-choice { color:#fff; background:linear-gradient(135deg,#7c3aed,#a855f7); border-color:#c4b5fd; }
+        .watch-player-menu .active-choice { color:#101216; background:rgba(245,247,250,.96); border-color:rgba(255,255,255,.9); }
         .watch-player-round { width:54px;height:54px;border-radius:999px;display:grid;place-items:center; flex:0 0 54px; cursor:pointer; }
         .watch-player-page > .watch-player-round { position:absolute; z-index:70; pointer-events:auto; }
         .watch-player-page .watch-player-top { z-index:50; }
@@ -614,7 +614,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         <section className="watch-player-menu" role="dialog" aria-modal="true" aria-label="Chọn tập và máy chủ">
           <header className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 pb-4">
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[.2em] text-purple-300">Danh sách phát</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/55">Danh sách phát</p>
               <h2 className="mt-1 truncate text-xl font-bold">{movie.name}</h2>
               <p className="mt-1 text-xs text-white/50">{currentServerEpisodes.length} tập · {episodes[currentServer]?.server_name || "SV " + (currentServer + 1)}</p>
             </div>
@@ -650,12 +650,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   <button key={ep.slug || ep.name + "-" + index} type="button" onClick={() => {
                     setOverlayOpen(false);
                     router.push("/xem-phim/" + slug + "?tap=" + ep.slug + "&sv=" + currentServer);
-                  }} className={"group min-w-0 overflow-hidden rounded-2xl border text-left " + (active ? "active-choice" : "border-white/10 bg-white/[.055] text-white hover:border-purple-300/60")}>
+                  }} className={"group min-w-0 overflow-hidden rounded-2xl border text-left " + (active ? "active-choice" : "border-white/10 bg-white/[.055] text-white hover:border-white/45")}>
                     <div className="relative aspect-video w-full overflow-hidden bg-white/5">
                       {still ? <Image src={still} alt={formatEpisodeName(ep.name)} fill sizes="(max-width: 700px) 33vw, 180px" className="object-cover" /> : null}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                       <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-1 text-[10px] font-bold text-white">TẬP {number}</span>
-                      {active && <span className="absolute right-2 top-2 rounded-full bg-purple-500 px-2 py-1 text-[9px] font-black text-white">ĐANG XEM</span>}
+                      {active && <span className="absolute right-2 top-2 rounded-full bg-white px-2 py-1 text-[9px] font-black text-white">ĐANG XEM</span>}
                     </div>
                     <span className="block truncate px-3 py-2.5 text-xs font-semibold">{formatEpisodeName(ep.name)}</span>
                   </button>
