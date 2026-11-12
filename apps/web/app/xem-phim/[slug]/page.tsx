@@ -563,6 +563,78 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           .watch-player-rotate-hint { display:none !important; }
         }
         @media (min-width:1024px) { .watch-player-menu { padding:28px clamp(28px,5vw,80px); } .watch-player-episode-grid { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; } }
+
+        /* Landscape player: keep the control groups in one deliberate horizontal dock.
+           The page itself is rotated in portrait mode, so these dimensions are already landscape. */
+        .watch-player-page.watch-player-rotated .watch-player-shell,
+        .watch-player-page.watch-player-rotated .watch-player-shell > div,
+        .watch-player-page.watch-player-rotated .watch-player-shell .artplayer-app {
+          width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+        }
+        .watch-player-page.watch-player-rotated .artplayer-app .art-controls {
+          position:absolute!important;top:auto!important;
+          left:clamp(26px,4vw,68px)!important;right:clamp(26px,4vw,68px)!important;
+          bottom:clamp(76px,12vh,108px)!important;width:auto!important;
+          min-height:64px!important;height:auto!important;
+          display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+          align-items:center!important;justify-content:space-between!important;
+          gap:clamp(12px,2vw,24px)!important;padding:9px 14px!important;
+          box-sizing:border-box!important;transform:none!important;
+          border:1px solid rgba(255,255,255,.2)!important;border-radius:22px!important;
+          background:linear-gradient(110deg,rgba(14,12,24,.88),rgba(35,24,54,.82))!important;
+          box-shadow:0 18px 48px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.16)!important;
+          -webkit-backdrop-filter:blur(26px) saturate(170%)!important;
+          backdrop-filter:blur(26px) saturate(170%)!important;
+        }
+        .watch-player-page.watch-player-rotated .artplayer-app .art-controls-left,
+        .watch-player-page.watch-player-rotated .artplayer-app .art-controls-right {
+          position:static!important;inset:auto!important;float:none!important;
+          display:flex!important;flex:0 0 auto!important;flex-direction:row!important;
+          flex-wrap:nowrap!important;align-items:center!important;justify-content:center!important;
+          gap:10px!important;min-width:0!important;width:auto!important;height:auto!important;
+          transform:none!important;
+        }
+        .watch-player-page.watch-player-rotated .artplayer-app .art-controls .art-control {
+          position:relative!important;inset:auto!important;float:none!important;
+          display:inline-flex!important;flex:0 0 auto!important;
+          align-items:center!important;justify-content:center!important;
+          min-width:50px!important;min-height:48px!important;margin:0!important;
+          border-radius:15px!important;box-sizing:border-box!important;
+        }
+        .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-back-30,
+        .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-forward-30 {
+          min-width:64px!important;background:rgba(139,92,246,.24)!important;
+          border-color:rgba(196,181,253,.42)!important;
+        }
+        .watch-player-page.watch-player-rotated .artplayer-app .art-bottom {
+          position:absolute!important;top:auto!important;
+          left:clamp(30px,4.5vw,76px)!important;right:clamp(30px,4.5vw,76px)!important;
+          bottom:max(18px,env(safe-area-inset-bottom,0px) + 14px)!important;
+          width:auto!important;padding:0 4px!important;transform:none!important;
+        }
+        .watch-player-page.watch-player-rotated .artplayer-app .art-progress {
+          height:12px!important;padding-block:7px!important;touch-action:pan-x!important;
+        }
+        .watch-player-page.watch-player-rotated .watch-player-top {
+          top:max(18px,env(safe-area-inset-top,0px) + 10px)!important;
+          left:clamp(26px,4vw,68px)!important;right:clamp(26px,4vw,68px)!important;
+        }
+        @media (orientation:portrait) and (max-width:1023px) {
+          .watch-player-page.watch-player-rotated .artplayer-app .art-controls {
+            left:24px!important;right:24px!important;bottom:74px!important;
+            min-height:60px!important;padding:7px 10px!important;gap:8px!important;
+          }
+          .watch-player-page.watch-player-rotated .artplayer-app .art-controls-left,
+          .watch-player-page.watch-player-rotated .artplayer-app .art-controls-right { gap:7px!important; }
+          .watch-player-page.watch-player-rotated .artplayer-app .art-controls .art-control {
+            min-width:44px!important;min-height:44px!important;padding:0 8px!important;
+          }
+          .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-back-30,
+          .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-forward-30 { min-width:52px!important; }
+          .watch-player-page.watch-player-rotated .artplayer-app .art-bottom {
+            left:28px!important;right:28px!important;bottom:16px!important;
+          }
+        }
       `}</style>
 
       <div
