@@ -311,7 +311,7 @@ export const memberClient = {
         id: "usr_guest",
         username: "khach",
         email: "",
-        name: "Thành viên Phim Lậu",
+        name: "Thành viên Xem phim",
       });
       const newComment: CommentItem = {
         id: `cmt_${Date.now().toString(36)}`,
@@ -321,7 +321,7 @@ export const memberClient = {
         createdAt: new Date().toISOString(),
         user: {
           id: currentUser?.id || "usr_guest",
-          name: currentUser?.name || "Thành viên Phim Lậu",
+          name: currentUser?.name || "Thành viên Xem phim",
         },
       };
       const all = getLocalItem<CommentItem[]>(STORAGE_KEYS.COMMENTS, []);

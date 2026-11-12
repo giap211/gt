@@ -15,7 +15,7 @@ export const AdsBanner = () => {
             </div>
             <div>
               <h4 className="text-base md:text-xl font-black uppercase tracking-tight text-white">
-                Phim Lậu cập nhật phim mới mỗi ngày
+                Xem phim cập nhật phim mới mỗi ngày
               </h4>
               <p className="mt-1 text-[11px] md:text-xs font-bold uppercase tracking-widest text-white/45">
                 Chọn nhanh phim hot, vietsub rõ, giao diện sạch và mượt.

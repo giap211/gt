@@ -165,7 +165,7 @@ export default function MovieDetailPage({
   const faqItems = [
     {
       q: `Phim ${movie.name} có bản chất lượng nào?`,
-      a: `${movie.name} hiện có bản Vietsub chất lượng ${movie.quality || "HD"}, xem online miễn phí tại Phim Lậu.`,
+      a: `${movie.name} hiện có bản Vietsub chất lượng ${movie.quality || "HD"}, xem online miễn phí tại Xem phim.`,
     },
     {
       q: `Phim ${movie.name} có bao nhiêu tập?`,
@@ -179,7 +179,7 @@ export default function MovieDetailPage({
     },
     {
       q: `Xem phim ${movie.name} ở đâu?`,
-      a: `Bạn có thể xem online miễn phí, chất lượng cao tại Phim Lậu.`,
+      a: `Bạn có thể xem online miễn phí, chất lượng cao tại Xem phim.`,
     },
   ];
 
