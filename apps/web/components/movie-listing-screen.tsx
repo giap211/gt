@@ -215,7 +215,7 @@ export function MovieListingScreen({ type }: { type: string }) {
         }
       `}</style>
 
-      <div className="mx-auto max-w-[1400px] px-3 pb-24 pt-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1400px] px-3 pb-24 pt-4 sm:px-6 sm:pt-6 lg:px-8">
         {isMainMovieType ? (
           <section
             className="listing-hero relative mb-6 overflow-hidden rounded-[26px] px-4 py-5 sm:mb-8 sm:px-7 sm:py-7"
