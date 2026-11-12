@@ -1126,16 +1126,109 @@ export const VideoPlayer = ({
           backdrop-filter: blur(14px) !important;
           -webkit-backdrop-filter: blur(14px) !important;
         }
+        /* Player controls: larger touch targets, balanced spacing and safe-area clearance. */
+        .player-controls-frame .artplayer-app .art-controls {
+          left: max(16px, env(safe-area-inset-left, 0px) + 12px) !important;
+          right: max(16px, env(safe-area-inset-right, 0px) + 12px) !important;
+          bottom: max(66px, env(safe-area-inset-bottom, 0px) + 58px) !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: clamp(8px, 1.8vw, 16px) !important;
+          padding: 9px 12px !important;
+          border: 1px solid rgba(255,255,255,.13) !important;
+          border-radius: 22px !important;
+          background: linear-gradient(135deg, rgba(20,18,30,.78), rgba(12,12,18,.58)) !important;
+          box-shadow: 0 10px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.12) !important;
+          -webkit-backdrop-filter: blur(22px) saturate(155%) !important;
+          backdrop-filter: blur(22px) saturate(155%) !important;
+          box-sizing: border-box !important;
+        }
+        .player-controls-frame .artplayer-app .art-controls-left,
+        .player-controls-frame .artplayer-app .art-controls-right {
+          display: flex !important;
+          align-items: center !important;
+          gap: clamp(7px, 1.4vw, 12px) !important;
+        }
+        .player-controls-frame .artplayer-app .art-controls .art-control {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          flex: 0 0 auto !important;
+          min-width: 42px !important;
+          min-height: 42px !important;
+          margin: 0 !important;
+          padding: 0 10px !important;
+          border: 1px solid rgba(255,255,255,.14) !important;
+          border-radius: 14px !important;
+          background: rgba(255,255,255,.075) !important;
+          color: rgba(255,255,255,.96) !important;
+          font-size: 13px !important;
+          line-height: 1 !important;
+          transition: background .18s ease, border-color .18s ease, transform .18s ease !important;
+        }
+        .player-controls-frame .artplayer-app .art-controls .art-control:active {
+          transform: scale(.94) !important;
+          background: rgba(139,92,246,.34) !important;
+          border-color: rgba(192,132,252,.58) !important;
+        }
+        .player-controls-frame .artplayer-app .art-control-seek-back-30,
+        .player-controls-frame .artplayer-app .art-control-seek-forward-30 {
+          min-width: 54px !important;
+          border-radius: 13px !important;
+          background: rgba(139,92,246,.16) !important;
+          border-color: rgba(192,132,252,.25) !important;
+          font-weight: 750 !important;
+        }
         .player-controls-frame .artplayer-app .art-bottom {
           left: 50% !important;
           right: auto !important;
-          bottom: max(22px, env(safe-area-inset-bottom, 0px) + 14px) !important;
-          width: calc(100% - max(48px, env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px) + 32px)) !important;
-          padding-left: 6px !important;
-          padding-right: 6px !important;
+          bottom: max(14px, env(safe-area-inset-bottom, 0px) + 12px) !important;
+          width: calc(100% - max(40px, env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px) + 36px)) !important;
+          padding: 0 4px !important;
           box-sizing: border-box !important;
-          transform: translate(-50%, -10px) scale(0.94) !important;
+          transform: translate(-50%, 0) !important;
           transform-origin: bottom center !important;
+        }
+        .player-controls-frame .artplayer-app .art-progress {
+          height: 8px !important;
+          padding-block: 5px !important;
+          cursor: pointer !important;
+        }
+        .player-controls-frame .artplayer-app .art-progress .art-progress-loaded,
+        .player-controls-frame .artplayer-app .art-progress .art-progress-played {
+          border-radius: 999px !important;
+        }
+        .player-controls-frame .artplayer-app .art-progress .art-progress-played {
+          background: linear-gradient(90deg, #8b5cf6, #d946ef) !important;
+        }
+        .player-controls-frame .artplayer-app .art-control-subtitle-toggle,
+        .player-controls-frame .artplayer-app .art-control-next-episode {
+          min-height: 42px !important;
+          padding-inline: 13px !important;
+          border-radius: 14px !important;
+        }
+        @media (max-width: 520px) {
+          .player-controls-frame .artplayer-app .art-controls {
+            left: max(10px, env(safe-area-inset-left, 0px) + 8px) !important;
+            right: max(10px, env(safe-area-inset-right, 0px) + 8px) !important;
+            bottom: max(62px, env(safe-area-inset-bottom, 0px) + 54px) !important;
+            gap: 6px !important;
+            padding: 7px 8px !important;
+            border-radius: 18px !important;
+          }
+          .player-controls-frame .artplayer-app .art-controls .art-control {
+            min-width: 38px !important;
+            min-height: 40px !important;
+            padding-inline: 7px !important;
+            border-radius: 12px !important;
+          }
+          .player-controls-frame .artplayer-app .art-control-seek-back-30,
+          .player-controls-frame .artplayer-app .art-control-seek-forward-30 {
+            min-width: 47px !important;
+          }
+          .player-controls-frame .artplayer-app .art-bottom {
+            width: calc(100% - max(28px, env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px) + 24px)) !important;
+          }
         }
       `}</style>
       <div className={`pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 bg-gradient-to-b from-black/85 via-black/45 to-transparent px-3 pb-7 pt-3 text-white transition-all duration-200 sm:px-5 sm:pt-4 ${showPlayerHeader ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"}`} style={{ pointerEvents: showPlayerHeader ? "auto" : "none" }}>
