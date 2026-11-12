@@ -66,7 +66,7 @@ export const InfiniteMovieGrid = ({
           setCurrentPage(nextPage);
           loadMore(nextPage);
         }
-      });
+      }, { rootMargin: "700px 0px" });
 
       if (node) observer.current.observe(node);
     },

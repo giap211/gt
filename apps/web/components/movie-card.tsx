@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 import { ResilientMovieImage } from "./resilient-movie-image";
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { Star } from "lucide-react";
 
 interface MovieCardProps {
@@ -91,15 +89,6 @@ export const MovieCard = ({
   hideInfo = false,
   variant = "horizontal",
 }: MovieCardProps) => {
-  const [isNavigating, setIsNavigating] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    setIsNavigating(false);
-  }, [pathname]);
-
-  const handleLinkClick = () => setIsNavigating(true);
-
   const isHorizontal = variant === "horizontal";
   const imageSources = isHorizontal ? [thumbUrl, posterUrl] : [posterUrl, thumbUrl];
   const fallbackSrc = isHorizontal
@@ -125,7 +114,6 @@ export const MovieCard = ({
     <div className="group relative w-full">
       <Link
         href={href || `/phim/${slug}`}
-        onClick={handleLinkClick}
         className={`movie-poster-frame ${isHorizontal ? "movie-poster-frame-horizontal" : "movie-poster-frame-vertical"} block relative overflow-hidden rounded-lg ${
           isHorizontal ? "aspect-[16/9]" : "aspect-[2/3]"
         }`}
@@ -155,21 +143,6 @@ export const MovieCard = ({
             {qChip}
           </span>
         </div>
-
-        <div
-          className={`absolute inset-0 bg-black/40 transition-opacity duration-300 z-10 ${
-            isNavigating ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          }`}
-        />
-
-        {showProgressBar && (
-          <div className="absolute bottom-0 left-0 right-0 z-30 h-[5px] bg-white/35">
-            <div
-              className="relative h-full bg-[#ffd875] shadow-[0_0_8px_rgba(255,216,117,0.65)]"
-              style={{ width: `${Math.min(100, Math.max(0, (displayProgressSeconds / (totalDurationSeconds || 1)) * 100))}%` }}
-            >
-              <span className="absolute -right-[4px] -top-[2px] h-[9px] w-[9px] rounded-full border-2 border-[#ffd875] bg-white shadow-md" />
-            </div>
           </div>
         )}
       </Link>
@@ -185,7 +158,6 @@ export const MovieCard = ({
         <div className="movie-card-info mt-2 px-0.5">
           <Link
             href={href || `/phim/${slug}`}
-            onClick={handleLinkClick}
             className="block"
             title={title}
           >

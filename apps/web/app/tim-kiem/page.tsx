@@ -44,19 +44,14 @@ function SearchContent() {
 
       <FilterBar />
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-32 space-y-6">
-          <div className="w-12 h-12 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-[#ffd875]/40 animate-pulse text-xs font-black uppercase tracking-[0.3em]">
-            Hệ não đang truy vấn dữ liệu...
-          </p>
-        </div>
-      ) : results.length > 0 ? (
+      {results.length > 0 ? (
         <InfiniteMovieGrid
           initialItems={results}
           initialTotalPages={10}
           fetchMore={(page) => searchMovies(query || "", page, 24)}
         />
+      ) : loading ? (
+        <div className="py-10 text-center text-xs font-medium text-white/40" role="status">Đang tìm phim…</div>
       ) : (
         <div className="text-center py-32 bg-white/5 rounded-[20px] border border-white/10 backdrop-blur-md">
           <p className="text-white/40 font-black uppercase tracking-[0.2em]">
@@ -71,7 +66,7 @@ function SearchContent() {
 export default function SearchPage() {
   return (
     <main className="min-h-screen bg-[#0b0d14] text-white">
-      <Suspense fallback={<div>Loading search...</div>}>
+      <Suspense fallback={<div className="min-h-screen" aria-hidden="true" />}>
         <SearchContent />
       </Suspense>
     </main>

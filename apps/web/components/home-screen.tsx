@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HeroSlider } from "@/components/hero-slider";
 import { MovieCarousel } from "@/components/movie-carousel";
 import { TrendingCarousel } from "@/components/trending-carousel";
@@ -61,7 +61,8 @@ export function HomeScreen() {
     hero: [],
   });
 
-  const [loading, setLoading] = useState(true);
+  const [shouldLoadSecondary, setShouldLoadSecondary] = useState(false);
+  const secondaryTriggerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -106,14 +107,11 @@ export function HomeScreen() {
     };
 
     const fetchData = async () => {
-      // Render the first useful content as soon as the three core feeds arrive.
-      // Secondary shelves and the curated hero continue loading in parallel.
       const corePromise = Promise.all([
         getLatestMovies(1),
         getMoviesByType("phim-bo", 1, true),
         getMoviesByType("phim-le", 1, true),
       ]);
-
       const heroPromise = fetch("/api/hero-trending")
         .then(async (response) => {
           if (!response.ok) return [] as HeroMovie[];
@@ -124,27 +122,9 @@ export function HomeScreen() {
           console.error("Failed to fetch trending hero movies", error);
           return [] as HeroMovie[];
         });
-
-      const secondaryPromise = Promise.all([
-        getMoviesByLanguage("thuyet-minh", 1),
-        getMoviesByCountry("han-quoc", 1, true),
-        getMoviesByCountry("trung-quoc", 1, true),
-        getMoviesByCountry("au-my", 1, true),
-        getMoviesByType("hoat-hinh", 1, true),
-        getMoviesByCategory("chieu-rap", 1, true),
-        getMoviesByCountry("nhat-ban", 1, true),
-        getMoviesByCountry("thai-lan", 1, true),
-        getMoviesByCountry("hong-kong", 1, true),
-        getMoviesByCategory("co-trang", 1, true),
-        getMoviesByCategory("kinh-di", 1, true),
-        getMoviesByCategory("tinh-cam", 1, true),
-        getMoviesByCountry("viet-nam", 1, true),
-      ]);
-
       try {
         const [latestRes, seriesRes, singleRes] = await corePromise;
         if (cancelled) return;
-
         const fallbackHero = (latestRes?.items || []).slice(0, 6);
         setData((current) => ({
           ...current,
@@ -154,31 +134,60 @@ export function HomeScreen() {
           cinema: singleRes?.items || [],
           hero: fallbackHero,
         }));
-        setLoading(false);
+        const trendingHero = await heroPromise;
+        if (cancelled) return;
+        const curatedHero = (trendingHero.length ? trendingHero : fallbackHero).slice(0, 6);
+        setData((current) => ({ ...current, hero: curatedHero }));
+        void fetchHeroBackdrops(curatedHero);
+      } catch (error) {
+        console.error("Failed to fetch core movies", error);
+      }
+    };
+    fetchData();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-        const [trendingHero, secondary] = await Promise.all([
-          heroPromise,
-          secondaryPromise,
+  useEffect(() => {
+    const target = secondaryTriggerRef.current;
+    if (!target || shouldLoadSecondary) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShouldLoadSecondary(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "900px 0px" },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [shouldLoadSecondary]);
+
+  useEffect(() => {
+    if (!shouldLoadSecondary) return;
+    let cancelled = false;
+    const fetchSecondary = async () => {
+      try {
+        const secondary = await Promise.all([
+          getMoviesByLanguage("thuyet-minh", 1),
+          getMoviesByCountry("han-quoc", 1, true),
+          getMoviesByCountry("trung-quoc", 1, true),
+          getMoviesByCountry("au-my", 1, true),
+          getMoviesByType("hoat-hinh", 1, true),
+          getMoviesByCategory("chieu-rap", 1, true),
+          getMoviesByCountry("nhat-ban", 1, true),
+          getMoviesByCountry("thai-lan", 1, true),
+          getMoviesByCountry("hong-kong", 1, true),
+          getMoviesByCategory("co-trang", 1, true),
+          getMoviesByCategory("kinh-di", 1, true),
+          getMoviesByCategory("tinh-cam", 1, true),
+          getMoviesByCountry("viet-nam", 1, true),
         ]);
         if (cancelled) return;
-
-        const [
-          dubbedRes,
-          koreanRes,
-          chineseRes,
-          usukRes,
-          cartoonRes,
-          cinemaRes,
-          japaneseRes,
-          thaiRes,
-          hongkongRes,
-          costumeRes,
-          horrorRes,
-          romanceRes,
-          vietRes,
-        ] = secondary;
-
-        const curatedHero = (trendingHero.length ? trendingHero : fallbackHero).slice(0, 6);
+        const [dubbedRes, koreanRes, chineseRes, usukRes, cartoonRes, cinemaRes,
+          japaneseRes, thaiRes, hongkongRes, costumeRes, horrorRes, romanceRes, vietRes] = secondary;
         setData((current) => ({
           ...current,
           dubbed: dubbedRes?.items || [],
@@ -194,22 +203,14 @@ export function HomeScreen() {
           horror: horrorRes?.items || [],
           romance: romanceRes?.items || [],
           viet: vietRes?.items || [],
-          hero: curatedHero,
         }));
-
-        void fetchHeroBackdrops(curatedHero);
       } catch (error) {
-        console.error("Failed to fetch movies", error);
-      } finally {
-        if (!cancelled) setLoading(false);
+        console.error("Failed to fetch secondary movie shelves", error);
       }
     };
-
-    fetchData();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    void fetchSecondary();
+    return () => { cancelled = true; };
+  }, [shouldLoadSecondary]);
 
   const uniqueMovies = (movies: ListMovie[]) => {
     return Array.from(
@@ -285,15 +286,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
       <div className="flex flex-col gap-0 pb-16 relative z-30">
         <ContinueWatchingSection />
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-48 space-y-4">
-            <div className="w-12 h-12 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin" />
-            <p className="text-white/40 animate-pulse text-sm font-medium tracking-wider uppercase">
-              Đang đồng bộ dữ liệu...
-            </p>
-          </div>
-        ) : (
-          <>
+        <>
             <TopicGrid />
 
             <MovieCarousel
@@ -303,7 +296,8 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
               items={transformMovies(data.latest)}
             />
 
-            <div className="space-y-1 md:space-y-2">
+            <div ref={secondaryTriggerRef} className="h-px w-full" aria-hidden="true" />
+            {shouldLoadSecondary && <div className="space-y-1 md:space-y-2">
               <MovieCarousel
                 title="Điện ảnh Hàn Quốc"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)"
@@ -456,9 +450,8 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <AdsBanner />
               <GhibliSection />
-            </div>
+            </div>}
           </>
-        )}
       </div>
     </main>
   );
