@@ -912,7 +912,7 @@ export const VideoPlayer = ({
           vtt = normalized;
         } else {
           const cues = normalized
-            .replace(/(\d{1,2}:\d{2}:\d{2}),(\d{1,3})/g, (_match, time, millis) => `${time}.${String(millis).padEnd(3, "0")}`);
+            .replace(/(\d{1,2}:\d{2}:\d{2}),(\d{1,3})/g, (_match: string, time: string, millis: string) => `${time}.${String(millis).padEnd(3, "0")}`);
           vtt = "WEBVTT\n\n" + cues;
         }
         if (!/^WEBVTT(?:\s|$)/i.test(vtt) || !/-->/.test(vtt)) {
