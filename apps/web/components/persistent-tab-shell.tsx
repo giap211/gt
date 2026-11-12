@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { HomeScreen } from "@/components/home-screen";
@@ -48,87 +47,37 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
     previousPath.current = pathname;
   }, [pathname]);
 
-  const tabTransition = {
-    opacity: { duration: 0.2, ease: "easeOut" as const },
-    y: { duration: 0.24, ease: [0.22, 1, 0.36, 1] as const },
-  };
-
   return (
     <div className="relative w-full overflow-x-clip">
-      <motion.div
-        aria-hidden={!isTabRoute}
-        initial={false}
-        animate={{ opacity: isTabRoute ? 1 : 0, y: isTabRoute ? 0 : 6 }}
-        transition={tabTransition}
-        className="w-full"
-        style={{
-          // Keep tab screens mounted for state retention, but remove the whole
-          // tab stack from layout/scroll overflow while another route is open.
-          display: isTabRoute ? "block" : "none",
-          pointerEvents: isTabRoute ? "auto" : "none",
-          zIndex: isTabRoute ? 1 : 0,
-          willChange: "opacity, transform",
-        }}
-      >
-        <motion.div
+      <div aria-hidden={!isTabRoute} className="w-full" style={{ display: isTabRoute ? "block" : "none" }}>
+        <div
           aria-hidden={!isHome}
-          initial={false}
-          animate={{ opacity: isHome ? 1 : 0, y: isHome ? 0 : 6 }}
-          transition={tabTransition}
           className="w-full"
-          style={{
-            display: isHome ? "block" : "none",
-            pointerEvents: isHome ? "auto" : "none",
-            willChange: "opacity, transform",
-          }}
+          style={{ display: isHome ? "block" : "none", pointerEvents: isHome ? "auto" : "none" }}
         >
           <HomeScreen />
-        </motion.div>
-        <motion.div
+        </div>
+        <div
           aria-hidden={!isSeries}
-          initial={false}
-          animate={{ opacity: isSeries ? 1 : 0, y: isSeries ? 0 : 6 }}
-          transition={tabTransition}
           className="w-full"
-          style={{
-            display: isSeries ? "block" : "none",
-            pointerEvents: isSeries ? "auto" : "none",
-            willChange: "opacity, transform",
-          }}
+          style={{ display: isSeries ? "block" : "none", pointerEvents: isSeries ? "auto" : "none" }}
         >
           <MovieListingScreen type="phim-bo" />
-        </motion.div>
-        <motion.div
+        </div>
+        <div
           aria-hidden={!isSingle}
-          initial={false}
-          animate={{ opacity: isSingle ? 1 : 0, y: isSingle ? 0 : 6 }}
-          transition={tabTransition}
           className="w-full"
-          style={{
-            display: isSingle ? "block" : "none",
-            pointerEvents: isSingle ? "auto" : "none",
-            willChange: "opacity, transform",
-          }}
+          style={{ display: isSingle ? "block" : "none", pointerEvents: isSingle ? "auto" : "none" }}
         >
           <MovieListingScreen type="phim-le" />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
-      <AnimatePresence initial={false} mode="sync">
-        {!isTabRoute && !isWatchRoute ? (
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="relative z-10 w-full min-w-0 bg-inherit"
-            style={{ willChange: "opacity, transform" }}
-          >
-            {children}
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {!isTabRoute && !isWatchRoute ? (
+        <div key={pathname} className="relative z-10 w-full min-w-0 bg-inherit">
+          {children}
+        </div>
+      ) : null}
 
       {isWatchRoute ? (
         <div className="relative z-10 w-full min-w-0 bg-inherit">{children}</div>
