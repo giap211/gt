@@ -70,18 +70,11 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isPlayerRotated, setIsPlayerRotated] = useState(false);
-  // Embed ở server dự phòng chạy trong iframe: thao tác bên trong iframe không nổi bọt
-  // ra trang cha, vì vậy không tự ẩn các nút điều hướng của player.
-  const isBackupEmbed = Boolean(
-    currentEpisode?.url &&
-    /^https?:\/\//i.test(currentEpisode.url) &&
-    !/\.(?:m3u8|mp4|webm|ogg|mp3)(?:$|[?#])/i.test(currentEpisode.url),
-  );
   useEffect(() => {
-    if (overlayOpen || isBackupEmbed || !showPlayerChrome) return;
+    if (overlayOpen || !showPlayerChrome) return;
     const timeout = window.setTimeout(() => setShowPlayerChrome(false), 3200);
     return () => window.clearTimeout(timeout);
-  }, [overlayOpen, showPlayerChrome, isBackupEmbed]);
+  }, [overlayOpen, showPlayerChrome]);
 
   const handlePlayerBack = useCallback(() => {
     router.push(`/phim/${slug}`);
@@ -135,12 +128,18 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           setMovie(movieRes.movie);
 
           // Giữ nhãn Thuyết minh từ nguồn; các server thông thường vẫn đánh số SV.
-          const merged = (movieRes.episodes || []).map((server, i) => ({
-            ...server,
-            server_name: /thuyết minh|thuyet minh|lồng tiếng|long tieng|dự phòng/i.test(server.server_name)
-              ? server.server_name
-              : `SV ${i + 1}`,
-          }));
+          const merged = (movieRes.episodes || [])
+            .map((server, i) => ({
+              ...server,
+              server_data: (server.server_data || []).filter((episode) => Boolean(episode.link_m3u8)),
+              server_name: /thuyết minh|thuyet minh|lồng tiếng|long tieng|dự phòng/i.test(server.server_name)
+                ? server.server_name
+                : `SV ${i + 1}`,
+            }))
+            .filter((server) =>
+              server.server_data.length > 0 &&
+              !/dự phòng|backup|iframe|embed/i.test(server.server_name),
+            );
           setEpisodes(merged);
 
           // Khôi phục đúng server chứa tập đã lưu, không mặc định server đầu tiên.
@@ -187,7 +186,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
               setCurrentEpisode({
                 name: ep.name,
                 slug: ep.slug,
-                url: ep.link_m3u8 || ep.link_embed,
+                url: ep.link_m3u8 || "",
               });
             }
           }
@@ -451,7 +450,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     setCurrentEpisode({
       name: matched.name,
       slug: matched.slug,
-      url: matched.link_m3u8 || matched.link_embed,
+      url: matched.link_m3u8 || "",
     });
   };
 
@@ -503,27 +502,33 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-page { width:100vw; height:100dvh; }
         .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
         .watch-player-shell > div { width:100%; height:100%; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
-        .watch-player-shell .artplayer-app { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
-        .watch-player-shell iframe { width:100% !important; height:100% !important; }
+        .watch-player-shell .native-player { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
         .watch-player-top { position:absolute; z-index:50; top:max(14px,env(safe-area-inset-top)); left:max(16px,env(safe-area-inset-left)); right:max(16px,env(safe-area-inset-right)); display:flex; align-items:center; justify-content:space-between; pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
         .watch-player-top > * { pointer-events:auto; }
         .watch-player-top > div { min-width:0; max-width:calc(100% - 112px); }
         .watch-player-top > div > div { min-width:0; flex:1 1 auto; overflow:hidden; }
         .watch-player-top > div > div > div { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .watch-player-glass { background:rgba(15,18,27,.58); border:1px solid rgba(255,255,255,.2); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
-        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; min-height:0; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); border-radius:0; background:linear-gradient(145deg,rgba(22,26,37,.97),rgba(7,9,15,.97)); border:0; color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:none; }
+        .watch-player-glass { background:rgba(224,230,238,.10); border:1px solid rgba(255,255,255,.28); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
+        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; min-height:0; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); border-radius:0; background:linear-gradient(145deg,rgba(28,32,39,.96),rgba(5,6,8,.985)); border:0; color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:none; }
         .watch-player-episode-scroll { position:relative; z-index:1; display:block; flex:1 1 0%; min-height:0; height:0; width:100%; overflow-x:hidden; overflow-y:scroll; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; touch-action:pan-y; pointer-events:auto; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.22) transparent; }
         .watch-player-episode-grid { display:grid; width:100%; min-height:min-content; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); align-content:start; gap:8px; padding:4px 2px 16px 0; }
         .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
-        .watch-player-menu .active-choice { color:#fff; background:linear-gradient(135deg,#7c3aed,#a855f7); border-color:#c4b5fd; }
+        .watch-player-menu .active-choice { color:#fff; background:rgba(225,231,238,.16); border-color:rgba(255,255,255,.72); box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 8px 26px rgba(0,0,0,.2); }
+        .watch-player-menu > header { margin:0 0 18px; padding:16px 18px; border:1px solid rgba(255,255,255,.2); border-radius:22px; background:rgba(225,231,238,.075); box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 30px rgba(0,0,0,.16); backdrop-filter:blur(24px) saturate(140%); -webkit-backdrop-filter:blur(24px) saturate(140%); }
+        .watch-player-menu .watch-player-episode-grid > button { border-color:rgba(255,255,255,.16); background:rgba(225,231,238,.075); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter:blur(18px) saturate(125%); -webkit-backdrop-filter:blur(18px) saturate(125%); }
+        .watch-player-menu .watch-player-episode-grid > button.active-choice { border-color:rgba(255,255,255,.78); background:rgba(225,231,238,.17); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 8px 26px rgba(0,0,0,.24); }
+        .watch-player-menu .watch-player-episode-grid > button > span { color:rgba(255,255,255,.9); }
+        .watch-player-menu .watch-player-episode-grid > button.active-choice > span { color:#fff; }
+        .watch-player-menu .watch-player-episode-grid > button .episode-current-badge { color:#101216; background:rgba(245,247,250,.96); }
+        .watch-player-menu .watch-player-episode-grid > button:not(.active-choice):hover { border-color:rgba(255,255,255,.42); background:rgba(225,231,238,.12); }
         .watch-player-round { width:54px;height:54px;border-radius:999px;display:grid;place-items:center; flex:0 0 54px; cursor:pointer; }
         .watch-player-page > .watch-player-round { position:absolute; z-index:70; pointer-events:auto; }
         .watch-player-page .watch-player-top { z-index:50; }
         .watch-player-hidden { opacity:0; pointer-events:none; transform:translateY(-8px); }
         .watch-player-rotate-hint { display:none; }
         @media (orientation:landscape) and (max-width:1023px) {
-          .watch-player-shell .artplayer-app { height:100% !important; }
+          .watch-player-shell .native-player { height:100% !important; }
         }
         @media (orientation:portrait) and (max-width:1023px) {
           /* Xoay thủ công bằng nút; không đọc cảm biến và không phụ thuộc khóa xoay iPhone. */
@@ -544,7 +549,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             overflow:hidden !important;
           }
           .watch-player-shell > div,
-          .watch-player-shell .artplayer-app {
+          .watch-player-shell .native-player {
             width:100% !important;
             height:100% !important;
             aspect-ratio:auto !important;
@@ -564,77 +569,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         }
         @media (min-width:1024px) { .watch-player-menu { padding:28px clamp(28px,5vw,80px); } .watch-player-episode-grid { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; } }
 
-        /* Landscape player: keep the control groups in one deliberate horizontal dock.
-           The page itself is rotated in portrait mode, so these dimensions are already landscape. */
         .watch-player-page.watch-player-rotated .watch-player-shell,
         .watch-player-page.watch-player-rotated .watch-player-shell > div,
-        .watch-player-page.watch-player-rotated .watch-player-shell .artplayer-app {
+        .watch-player-page.watch-player-rotated .watch-player-shell .native-player {
           width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
         }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-controls {
-          position:absolute!important;top:auto!important;
-          left:clamp(26px,4vw,68px)!important;right:clamp(26px,4vw,68px)!important;
-          bottom:clamp(76px,12vh,108px)!important;width:auto!important;
-          min-height:64px!important;height:auto!important;
-          display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
-          align-items:center!important;justify-content:space-between!important;
-          gap:clamp(12px,2vw,24px)!important;padding:9px 14px!important;
-          box-sizing:border-box!important;transform:none!important;
-          border:1px solid rgba(255,255,255,.2)!important;border-radius:22px!important;
-          background:linear-gradient(110deg,rgba(14,12,24,.88),rgba(35,24,54,.82))!important;
-          box-shadow:0 18px 48px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.16)!important;
-          -webkit-backdrop-filter:blur(26px) saturate(170%)!important;
-          backdrop-filter:blur(26px) saturate(170%)!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-controls-left,
-        .watch-player-page.watch-player-rotated .artplayer-app .art-controls-right {
-          position:static!important;inset:auto!important;float:none!important;
-          display:flex!important;flex:0 0 auto!important;flex-direction:row!important;
-          flex-wrap:nowrap!important;align-items:center!important;justify-content:center!important;
-          gap:10px!important;min-width:0!important;width:auto!important;height:auto!important;
-          transform:none!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-controls .art-control {
-          position:relative!important;inset:auto!important;float:none!important;
-          display:inline-flex!important;flex:0 0 auto!important;
-          align-items:center!important;justify-content:center!important;
-          min-width:50px!important;min-height:48px!important;margin:0!important;
-          border-radius:15px!important;box-sizing:border-box!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-back-30,
-        .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-forward-30 {
-          min-width:64px!important;background:rgba(139,92,246,.24)!important;
-          border-color:rgba(196,181,253,.42)!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-bottom {
-          position:absolute!important;top:auto!important;
-          left:clamp(30px,4.5vw,76px)!important;right:clamp(30px,4.5vw,76px)!important;
-          bottom:max(18px,env(safe-area-inset-bottom,0px) + 14px)!important;
-          width:auto!important;padding:0 4px!important;transform:none!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-progress {
-          height:12px!important;padding-block:7px!important;touch-action:pan-x!important;
-        }
-        .watch-player-page.watch-player-rotated .watch-player-top {
-          top:max(18px,env(safe-area-inset-top,0px) + 10px)!important;
-          left:clamp(26px,4vw,68px)!important;right:clamp(26px,4vw,68px)!important;
-        }
-        @media (orientation:portrait) and (max-width:1023px) {
-          .watch-player-page.watch-player-rotated .artplayer-app .art-controls {
-            left:24px!important;right:24px!important;bottom:74px!important;
-            min-height:60px!important;padding:7px 10px!important;gap:8px!important;
-          }
-          .watch-player-page.watch-player-rotated .artplayer-app .art-controls-left,
-          .watch-player-page.watch-player-rotated .artplayer-app .art-controls-right { gap:7px!important; }
-          .watch-player-page.watch-player-rotated .artplayer-app .art-controls .art-control {
-            min-width:44px!important;min-height:44px!important;padding:0 8px!important;
-          }
-          .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-back-30,
-          .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-forward-30 { min-width:52px!important; }
-          .watch-player-page.watch-player-rotated .artplayer-app .art-bottom {
-            left:28px!important;right:28px!important;bottom:16px!important;
-          }
-        }
+        .watch-player-page.watch-player-rotated .native-player-video { object-fit:contain!important; }
       `}</style>
 
       <div
@@ -681,7 +621,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         <section className="watch-player-menu" role="dialog" aria-modal="true" aria-label="Chọn tập và máy chủ">
           <header className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 pb-4">
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[.2em] text-purple-300">Danh sách phát</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/55">Danh sách phát</p>
               <h2 className="mt-1 truncate text-xl font-bold">{movie.name}</h2>
               <p className="mt-1 text-xs text-white/50">{currentServerEpisodes.length} tập · {episodes[currentServer]?.server_name || "SV " + (currentServer + 1)}</p>
             </div>
@@ -696,7 +636,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   if (!matched) return;
                   setOverlayOpen(false);
                   router.push("/xem-phim/" + slug + "?tap=" + matched.slug + "&sv=" + index);
-                }} className={"shrink-0 rounded-full border px-4 py-2.5 text-xs font-bold " + (currentServer === index ? "active-choice" : "border-white/15 bg-white/[.06] text-white/65")}>
+                }} className={"shrink-0 rounded-full border px-4 py-2.5 text-xs font-bold backdrop-blur-xl " + (currentServer === index ? "active-choice" : "border-white/20 bg-white/[.07] text-white/70")}>
                   {server.server_name || "SV " + (index + 1)}
                 </button>
               ))}
@@ -717,12 +657,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                   <button key={ep.slug || ep.name + "-" + index} type="button" onClick={() => {
                     setOverlayOpen(false);
                     router.push("/xem-phim/" + slug + "?tap=" + ep.slug + "&sv=" + currentServer);
-                  }} className={"group min-w-0 overflow-hidden rounded-2xl border text-left " + (active ? "active-choice" : "border-white/10 bg-white/[.055] text-white hover:border-purple-300/60")}>
+                  }} className={"group min-w-0 overflow-hidden rounded-2xl border text-left " + (active ? "active-choice" : "border-white/10 bg-white/[.055] text-white hover:border-white/45")}>
                     <div className="relative aspect-video w-full overflow-hidden bg-white/5">
                       {still ? <Image src={still} alt={formatEpisodeName(ep.name)} fill sizes="(max-width: 700px) 33vw, 180px" className="object-cover" /> : null}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                       <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-1 text-[10px] font-bold text-white">TẬP {number}</span>
-                      {active && <span className="absolute right-2 top-2 rounded-full bg-purple-500 px-2 py-1 text-[9px] font-black text-white">ĐANG XEM</span>}
+                      {active && <span className="episode-current-badge absolute right-2 top-2 rounded-full border border-white/70 bg-white/90 px-2 py-1 text-[9px] font-black text-[#101216] shadow-lg">ĐANG XEM</span>}
                     </div>
                     <span className="block truncate px-3 py-2.5 text-xs font-semibold">{formatEpisodeName(ep.name)}</span>
                   </button>
