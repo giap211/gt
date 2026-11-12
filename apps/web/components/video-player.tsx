@@ -101,83 +101,6 @@ export const VideoPlayer = ({
   const [debugVideoState, setDebugVideoState] = useState("Đang chờ trình phát");
 
 
-  // Tự tìm phụ đề tiếng Việt từ OpenSubtitles và gắn vào thẻ video HTML5.
-  // API key chỉ nằm ở server; không đưa credential xuống trình duyệt.
-  useEffect(() => {
-    if (!subtitleSearch?.title?.trim() || isEmbed) return;
-
-    let cancelled = false;
-    let subtitleObjectUrl: string | null = null;
-    let attachedTrack: HTMLTrackElement | null = null;
-
-    const toVtt = (srt: string) => {
-      const normalized = srt
-        .replace(/^\\uFEFF/, "")
-        .replace(/\\r/g, "")
-        .replace(/(\\d{2}:\\d{2}:\\d{2}),(\\d{3})/g, "$1.$2")
-        .trim();
-      return "WEBVTT\\n\\n" + normalized.replace(/^\\d+\\s*$/gm, "").trim();
-    };
-
-    const loadSubtitle = async () => {
-      try {
-        const params = new URLSearchParams({
-          title: subtitleSearch.title.trim(),
-          language: "vi",
-        });
-        if (subtitleSearch.year) params.set("year", String(subtitleSearch.year));
-        if (subtitleSearch.tmdbId) params.set("tmdbId", String(subtitleSearch.tmdbId));
-
-        const searchResponse = await fetch("/api/subtitles?" + params.toString());
-        const searchData = await searchResponse.json().catch(() => null);
-        if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
-        const candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
-        if (!candidates.length) return;
-
-        // Ưu tiên nguồn tin cậy, nhiều lượt tải và bản không phải máy dịch.
-        const selected = candidates[0];
-        const downloadResponse = await fetch("/api/subtitles", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fileId: selected.fileId }),
-        });
-        const downloadData = await downloadResponse.json().catch(() => null);
-        if (!downloadResponse.ok || typeof downloadData?.content !== "string") {
-          throw new Error(downloadData?.error || "Không tải được phụ đề");
-        }
-        if (cancelled) return;
-
-        const video = artRef.current?.querySelector("video");
-        if (!video) return;
-
-        const blob = new Blob([toVtt(downloadData.content)], { type: "text/vtt;charset=utf-8" });
-        subtitleObjectUrl = URL.createObjectURL(blob);
-        attachedTrack = document.createElement("track");
-        attachedTrack.kind = "subtitles";
-        attachedTrack.label = "Tiếng Việt · OpenSubtitles";
-        attachedTrack.srclang = "vi";
-        attachedTrack.src = subtitleObjectUrl;
-        attachedTrack.default = true;
-        video.appendChild(attachedTrack);
-
-        const enableTrack = () => {
-          if (video.textTracks.length) video.textTracks[video.textTracks.length - 1].mode = "showing";
-        };
-        attachedTrack.addEventListener("load", enableTrack, { once: true });
-        window.setTimeout(enableTrack, 500);
-      } catch (error) {
-        console.warn("[Subtitles] Không thể tự tải phụ đề:", error);
-      }
-    };
-
-    void loadSubtitle();
-    return () => {
-      cancelled = true;
-      if (attachedTrack?.parentNode) attachedTrack.parentNode.removeChild(attachedTrack);
-      if (subtitleObjectUrl) URL.revokeObjectURL(subtitleObjectUrl);
-    };
-  }, [url, isEmbed, subtitleSearch?.title, subtitleSearch?.year, subtitleSearch?.tmdbId]);
-
   useEffect(() => {
     if (!artRef.current || isEmbed) return;
 
@@ -783,6 +706,81 @@ export const VideoPlayer = ({
       }
     };
   }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, showNextEpisode]);
+
+  // Tự tìm phụ đề tiếng Việt từ OpenSubtitles và gắn vào thẻ video HTML5.
+  // API key chỉ nằm ở server; không đưa credential xuống trình duyệt.
+  useEffect(() => {
+    if (!subtitleSearch?.title?.trim() || isEmbed) return;
+
+    let cancelled = false;
+    let subtitleObjectUrl: string | null = null;
+    let attachedTrack: HTMLTrackElement | null = null;
+
+    const toVtt = (srt: string) => {
+      const normalized = srt
+        .replace(/^\uFEFF/, "")
+        .replace(/\r/g, "")
+        .replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2")
+        .trim();
+      return "WEBVTT\n\n" + normalized.replace(/^\d+\s*$/gm, "").trim();
+    };
+
+    const loadSubtitle = async () => {
+      try {
+        const params = new URLSearchParams({
+          title: subtitleSearch.title.trim(),
+          language: "vi",
+        });
+        if (subtitleSearch.year) params.set("year", String(subtitleSearch.year));
+        if (subtitleSearch.tmdbId) params.set("tmdbId", String(subtitleSearch.tmdbId));
+
+        const searchResponse = await fetch("/api/subtitles?" + params.toString());
+        const searchData = await searchResponse.json().catch(() => null);
+        if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
+        const candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
+        if (!candidates.length) return;
+
+        // Ưu tiên nguồn tin cậy, nhiều lượt tải và bản không phải máy dịch.
+        const selected = candidates[0];
+        const downloadResponse = await fetch("/api/subtitles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileId: selected.fileId }),
+        });
+        const downloadData = await downloadResponse.json().catch(() => null);
+        if (!downloadResponse.ok || typeof downloadData?.content !== "string") {
+          throw new Error(downloadData?.error || "Không tải được phụ đề");
+        }
+        if (cancelled) return;
+
+        const video = artRef.current?.querySelector("video");
+        if (!video) return;
+
+        const blob = new Blob([toVtt(downloadData.content)], { type: "text/vtt;charset=utf-8" });
+        subtitleObjectUrl = URL.createObjectURL(blob);
+        attachedTrack = document.createElement("track");
+        attachedTrack.kind = "subtitles";
+        attachedTrack.label = "Tiếng Việt · OpenSubtitles";
+        attachedTrack.srclang = "vi";
+        attachedTrack.src = subtitleObjectUrl;
+        attachedTrack.default = true;
+        video.appendChild(attachedTrack);
+
+        attachedTrack.addEventListener("load", () => {
+          if (attachedTrack?.track) attachedTrack.track.mode = "showing";
+        }, { once: true });
+      } catch (error) {
+        console.warn("[Subtitles] Không thể tự tải phụ đề:", error);
+      }
+    };
+
+    void loadSubtitle();
+    return () => {
+      cancelled = true;
+      if (attachedTrack?.parentNode) attachedTrack.parentNode.removeChild(attachedTrack);
+      if (subtitleObjectUrl) URL.revokeObjectURL(subtitleObjectUrl);
+    };
+  }, [url, isEmbed, subtitleSearch?.title, subtitleSearch?.year, subtitleSearch?.tmdbId]);
 
   if (isEmbed) {
     return (
