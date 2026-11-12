@@ -374,6 +374,7 @@ export const VideoPlayer = ({
           },
         },
       });
+      artPlayerRef.current = art;
 
       if (art && startAtSeconds > 0) {
         const resumeVideo = art.video as HTMLVideoElement;
@@ -716,7 +717,6 @@ export const VideoPlayer = ({
     let cancelled = false;
     let subtitleObjectUrls: string[] = [];
     let attachedTracks: HTMLTrackElement[] = [];
-    let subtitleVideo: HTMLVideoElement | null = null;
     const settingName = "external-subtitles";
 
     const toVtt = (srt: string) => {
@@ -752,7 +752,6 @@ export const VideoPlayer = ({
 
         const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
         if (!video) return;
-        subtitleVideo = video;
 
         // Tải tối đa 6 bản để tránh tiêu hao quota API quá nhiều.
         const loaded: Array<{ label: string; track: HTMLTrackElement }> = [];
@@ -832,7 +831,6 @@ export const VideoPlayer = ({
         if (track.parentNode) track.parentNode.removeChild(track);
       });
       subtitleObjectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
-      subtitleVideo = null;
     };
   }, [url, isEmbed, subtitleSearch?.title, subtitleSearch?.year, subtitleSearch?.tmdbId]);
 
