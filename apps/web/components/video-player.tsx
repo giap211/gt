@@ -1267,6 +1267,14 @@ export const VideoPlayer = ({
           .player-controls-frame .artplayer-app .art-controls .art-control { min-width:36px!important;padding-inline:5px!important; }
           .player-controls-frame .artplayer-app .art-control-seek-back-30,.player-controls-frame .artplayer-app .art-control-seek-forward-30 { min-width:42px!important; }
         }
+        /* Final override: only the React player dock should remain visible. */
+        .player-controls-frame .artplayer-app .art-controls,
+        .player-controls-frame .artplayer-app .art-bottom {
+          display:none!important;
+          visibility:hidden!important;
+          opacity:0!important;
+          pointer-events:none!important;
+        }
 `}</style>
       <div className={`pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 bg-gradient-to-b from-black/85 via-black/45 to-transparent px-3 pb-7 pt-3 text-white transition-all duration-200 sm:px-5 sm:pt-4 ${showPlayerHeader ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"}`} style={{ pointerEvents: showPlayerHeader ? "auto" : "none" }}>
         <button
