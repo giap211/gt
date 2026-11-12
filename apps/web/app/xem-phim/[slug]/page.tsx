@@ -584,7 +584,23 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             onRotate={handlePlayerRotate}
             showNextEpisode={Boolean(nextEp)}
             onNextEpisode={nextEp ? () => router.push(`/xem-phim/${slug}?tap=${nextEp.slug}&sv=${currentServer}`) : undefined}
-            subtitleSearch={{ title: movie.name, year: movie.year, tmdbId: movie.tmdb?.id }}
+            subtitleSearch={{
+              // Ưu tiên loại nội dung TMDB do PhimAPI trả về; fallback sang type của PhimAPI.
+              title: movie.origin_name || movie.original_name || movie.name,
+              year: movie.year,
+              tmdbId: movie.tmdb?.id,
+              type: movie.tmdb?.type === "tv" || (!movie.tmdb?.type && (movie.type === "series" || movie.type === "tvshows" || movie.type === "hoathinh")) ? "tv" : "movie",
+              season: (() => {
+                const match = currentEpisode.name.match(/s(\d{1,2})\s*e\d{1,3}/i);
+                return match ? Number(match[1]) : 1;
+              })(),
+              episode: (() => {
+                const named = currentEpisode.name.match(/s\d{1,2}\s*e(\d{1,3})/i);
+                const numbered = currentEpisode.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) || currentEpisode.name.match(/^0*(\d+)$/);
+                const value = Number(named?.[1] || numbered?.[1] || 0);
+                return value > 0 ? value : undefined;
+              })(),
+            }}
           />
         )}
       </div>
