@@ -655,7 +655,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
                       {still ? <Image src={still} alt={formatEpisodeName(ep.name)} fill sizes="(max-width: 700px) 33vw, 180px" className="object-cover" /> : null}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                       <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-1 text-[10px] font-bold text-white">TẬP {number}</span>
-                      {active && <span className="absolute right-2 top-2 rounded-full bg-white px-2 py-1 text-[9px] font-black text-white">ĐANG XEM</span>}
+                      {active && <span className="absolute right-2 top-2 rounded-full bg-white px-2 py-1 text-[9px] font-black text-[#101216]">ĐANG XEM</span>}
                     </div>
                     <span className="block truncate px-3 py-2.5 text-xs font-semibold">{formatEpisodeName(ep.name)}</span>
                   </button>
