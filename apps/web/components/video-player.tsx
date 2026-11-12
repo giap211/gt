@@ -35,7 +35,7 @@ export const VideoPlayer=({url,poster,title,startAtSeconds=0,introStartSeconds,i
   stall=window.setInterval(()=>{if(v.paused||v.ended){stuck=0;last=v.currentTime;return}if(Math.abs(v.currentTime-last)<.05)stuck++;else stuck=0;last=v.currentTime;if(stuck>=4){stuck=0;recover()}},1200);
   return()=>{dead=true;window.clearInterval(stall);window.clearTimeout(seekTimer);cancelVoice();v.removeEventListener("loadedmetadata",loaded);v.removeEventListener("durationchange",update);v.removeEventListener("timeupdate",update);v.removeEventListener("play",update);v.removeEventListener("pause",paused);v.removeEventListener("ended",final);v.removeEventListener("seeking",seeking);v.removeEventListener("seeked",seeked);hlsRef.current?.destroy();hlsRef.current=null;v.pause();v.removeAttribute("src");v.load()};
  },[url,startAtSeconds,isHls,debug]);
- useEffect(()=>{if(!playing||subtitlePanelOpen||settingsOpen)return;const t=window.setTimeout(()=>setControls(false),3800);return()=>window.clearTimeout(t)},[playing,controls,subtitlePanelOpen,settingsOpen]);
+ useEffect(()=>{if(!playing||subtitlePanelOpen||settingsOpen)return;const t=window.setTimeout(()=>setControls(false),8000);return()=>window.clearTimeout(t)},[playing,controls,subtitlePanelOpen,settingsOpen]);
  useEffect(()=>()=>{if(tapTimer.current)window.clearTimeout(tapTimer.current);if(feedbackTimer.current)window.clearTimeout(feedbackTimer.current)},[]);
  const surfaceDown=(e:PointerEvent<HTMLDivElement>)=>{if((e.target as HTMLElement).closest(".player-ui"))return;pointer.current={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false}};
  const surfaceMove=(e:PointerEvent<HTMLDivElement>)=>{const p=pointer.current;if(p&&p.id===e.pointerId&&Math.hypot(e.clientX-p.x,e.clientY-p.y)>14)p.moved=true};
