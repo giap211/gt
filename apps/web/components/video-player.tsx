@@ -735,10 +735,18 @@ export const VideoPlayer = ({
         if (subtitleSearch.year) params.set("year", String(subtitleSearch.year));
         if (subtitleSearch.tmdbId) params.set("tmdbId", String(subtitleSearch.tmdbId));
 
-        const searchResponse = await fetch("/api/subtitles?" + params.toString());
-        const searchData = await searchResponse.json().catch(() => null);
+        let searchResponse = await fetch("/api/subtitles?" + params.toString());
+        let searchData = await searchResponse.json().catch(() => null);
         if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
-        const candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
+        let candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
+        // Nếu TMDB chưa có phụ đề, thử tìm lần hai bằng tên phim.
+        if (!candidates.length && subtitleSearch.tmdbId) {
+          params.delete("tmdbId");
+          searchResponse = await fetch("/api/subtitles?" + params.toString());
+          searchData = await searchResponse.json().catch(() => null);
+          if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
+          candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
+        }
         if (!candidates.length) return;
 
         // Ưu tiên nguồn tin cậy, nhiều lượt tải và bản không phải máy dịch.
