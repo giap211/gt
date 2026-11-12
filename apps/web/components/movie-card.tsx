@@ -143,8 +143,6 @@ export const MovieCard = ({
             {qChip}
           </span>
         </div>
-          </div>
-        )}
       </Link>
 
       {showProgressBar && hasRealProgress && (
