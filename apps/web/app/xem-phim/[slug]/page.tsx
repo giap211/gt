@@ -70,18 +70,11 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const [showPlayerChrome, setShowPlayerChrome] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isPlayerRotated, setIsPlayerRotated] = useState(false);
-  // Embed ở server dự phòng chạy trong iframe: thao tác bên trong iframe không nổi bọt
-  // ra trang cha, vì vậy không tự ẩn các nút điều hướng của player.
-  const isBackupEmbed = Boolean(
-    currentEpisode?.url &&
-    /^https?:\/\//i.test(currentEpisode.url) &&
-    !/\.(?:m3u8|mp4|webm|ogg|mp3)(?:$|[?#])/i.test(currentEpisode.url),
-  );
   useEffect(() => {
-    if (overlayOpen || isBackupEmbed || !showPlayerChrome) return;
+    if (overlayOpen || !showPlayerChrome) return;
     const timeout = window.setTimeout(() => setShowPlayerChrome(false), 3200);
     return () => window.clearTimeout(timeout);
-  }, [overlayOpen, showPlayerChrome, isBackupEmbed]);
+  }, [overlayOpen, showPlayerChrome]);
 
   const handlePlayerBack = useCallback(() => {
     router.push(`/phim/${slug}`);
@@ -135,12 +128,18 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           setMovie(movieRes.movie);
 
           // Giữ nhãn Thuyết minh từ nguồn; các server thông thường vẫn đánh số SV.
-          const merged = (movieRes.episodes || []).map((server, i) => ({
-            ...server,
-            server_name: /thuyết minh|thuyet minh|lồng tiếng|long tieng|dự phòng/i.test(server.server_name)
-              ? server.server_name
-              : `SV ${i + 1}`,
-          }));
+          const merged = (movieRes.episodes || [])
+            .map((server, i) => ({
+              ...server,
+              server_data: (server.server_data || []).filter((episode) => Boolean(episode.link_m3u8)),
+              server_name: /thuyết minh|thuyet minh|lồng tiếng|long tieng|dự phòng/i.test(server.server_name)
+                ? server.server_name
+                : `SV ${i + 1}`,
+            }))
+            .filter((server) =>
+              server.server_data.length > 0 &&
+              !/dự phòng|backup|iframe|embed/i.test(server.server_name),
+            );
           setEpisodes(merged);
 
           // Khôi phục đúng server chứa tập đã lưu, không mặc định server đầu tiên.
@@ -187,7 +186,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
               setCurrentEpisode({
                 name: ep.name,
                 slug: ep.slug,
-                url: ep.link_m3u8 || ep.link_embed,
+                url: ep.link_m3u8 || "",
               });
             }
           }
@@ -451,7 +450,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     setCurrentEpisode({
       name: matched.name,
       slug: matched.slug,
-      url: matched.link_m3u8 || matched.link_embed,
+      url: matched.link_m3u8 || "",
     });
   };
 
@@ -503,8 +502,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-page { width:100vw; height:100dvh; }
         .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
         .watch-player-shell > div { width:100%; height:100%; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
-        .watch-player-shell .artplayer-app { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
-        .watch-player-shell iframe { width:100% !important; height:100% !important; }
+        .watch-player-shell .native-player { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
         .watch-player-top { position:absolute; z-index:50; top:max(14px,env(safe-area-inset-top)); left:max(16px,env(safe-area-inset-left)); right:max(16px,env(safe-area-inset-right)); display:flex; align-items:center; justify-content:space-between; pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
         .watch-player-top > * { pointer-events:auto; }
         .watch-player-top > div { min-width:0; max-width:calc(100% - 112px); }
@@ -523,7 +521,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-hidden { opacity:0; pointer-events:none; transform:translateY(-8px); }
         .watch-player-rotate-hint { display:none; }
         @media (orientation:landscape) and (max-width:1023px) {
-          .watch-player-shell .artplayer-app { height:100% !important; }
+          .watch-player-shell .native-player { height:100% !important; }
         }
         @media (orientation:portrait) and (max-width:1023px) {
           /* Xoay thủ công bằng nút; không đọc cảm biến và không phụ thuộc khóa xoay iPhone. */
@@ -544,7 +542,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             overflow:hidden !important;
           }
           .watch-player-shell > div,
-          .watch-player-shell .artplayer-app {
+          .watch-player-shell .native-player {
             width:100% !important;
             height:100% !important;
             aspect-ratio:auto !important;
@@ -564,77 +562,12 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         }
         @media (min-width:1024px) { .watch-player-menu { padding:28px clamp(28px,5vw,80px); } .watch-player-episode-grid { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; } }
 
-        /* Landscape player: keep the control groups in one deliberate horizontal dock.
-           The page itself is rotated in portrait mode, so these dimensions are already landscape. */
         .watch-player-page.watch-player-rotated .watch-player-shell,
         .watch-player-page.watch-player-rotated .watch-player-shell > div,
-        .watch-player-page.watch-player-rotated .watch-player-shell .artplayer-app {
+        .watch-player-page.watch-player-rotated .watch-player-shell .native-player {
           width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
         }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-controls {
-          position:absolute!important;top:auto!important;
-          left:clamp(26px,4vw,68px)!important;right:clamp(26px,4vw,68px)!important;
-          bottom:clamp(76px,12vh,108px)!important;width:auto!important;
-          min-height:64px!important;height:auto!important;
-          display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
-          align-items:center!important;justify-content:space-between!important;
-          gap:clamp(12px,2vw,24px)!important;padding:9px 14px!important;
-          box-sizing:border-box!important;transform:none!important;
-          border:1px solid rgba(255,255,255,.2)!important;border-radius:22px!important;
-          background:linear-gradient(110deg,rgba(14,12,24,.88),rgba(35,24,54,.82))!important;
-          box-shadow:0 18px 48px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.16)!important;
-          -webkit-backdrop-filter:blur(26px) saturate(170%)!important;
-          backdrop-filter:blur(26px) saturate(170%)!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-controls-left,
-        .watch-player-page.watch-player-rotated .artplayer-app .art-controls-right {
-          position:static!important;inset:auto!important;float:none!important;
-          display:flex!important;flex:0 0 auto!important;flex-direction:row!important;
-          flex-wrap:nowrap!important;align-items:center!important;justify-content:center!important;
-          gap:10px!important;min-width:0!important;width:auto!important;height:auto!important;
-          transform:none!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-controls .art-control {
-          position:relative!important;inset:auto!important;float:none!important;
-          display:inline-flex!important;flex:0 0 auto!important;
-          align-items:center!important;justify-content:center!important;
-          min-width:50px!important;min-height:48px!important;margin:0!important;
-          border-radius:15px!important;box-sizing:border-box!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-back-30,
-        .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-forward-30 {
-          min-width:64px!important;background:rgba(139,92,246,.24)!important;
-          border-color:rgba(196,181,253,.42)!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-bottom {
-          position:absolute!important;top:auto!important;
-          left:clamp(30px,4.5vw,76px)!important;right:clamp(30px,4.5vw,76px)!important;
-          bottom:max(18px,env(safe-area-inset-bottom,0px) + 14px)!important;
-          width:auto!important;padding:0 4px!important;transform:none!important;
-        }
-        .watch-player-page.watch-player-rotated .artplayer-app .art-progress {
-          height:12px!important;padding-block:7px!important;touch-action:pan-x!important;
-        }
-        .watch-player-page.watch-player-rotated .watch-player-top {
-          top:max(18px,env(safe-area-inset-top,0px) + 10px)!important;
-          left:clamp(26px,4vw,68px)!important;right:clamp(26px,4vw,68px)!important;
-        }
-        @media (orientation:portrait) and (max-width:1023px) {
-          .watch-player-page.watch-player-rotated .artplayer-app .art-controls {
-            left:24px!important;right:24px!important;bottom:74px!important;
-            min-height:60px!important;padding:7px 10px!important;gap:8px!important;
-          }
-          .watch-player-page.watch-player-rotated .artplayer-app .art-controls-left,
-          .watch-player-page.watch-player-rotated .artplayer-app .art-controls-right { gap:7px!important; }
-          .watch-player-page.watch-player-rotated .artplayer-app .art-controls .art-control {
-            min-width:44px!important;min-height:44px!important;padding:0 8px!important;
-          }
-          .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-back-30,
-          .watch-player-page.watch-player-rotated .artplayer-app .art-control-seek-forward-30 { min-width:52px!important; }
-          .watch-player-page.watch-player-rotated .artplayer-app .art-bottom {
-            left:28px!important;right:28px!important;bottom:16px!important;
-          }
-        }
+        .watch-player-page.watch-player-rotated .native-player-video { object-fit:contain!important; }
       `}</style>
 
       <div
