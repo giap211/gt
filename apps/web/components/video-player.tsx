@@ -715,6 +715,7 @@ export const VideoPlayer = ({
     let cancelled = false;
     let subtitleObjectUrl: string | null = null;
     let attachedTrack: HTMLTrackElement | null = null;
+    let subtitleVideo: (HTMLVideoElement & { __subtitleVoiceCleanup?: () => void }) | null = null;
 
     const toVtt = (srt: string) => {
       const normalized = srt
@@ -753,8 +754,9 @@ export const VideoPlayer = ({
         }
         if (cancelled) return;
 
-        const video = artRef.current?.querySelector("video");
+        const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
         if (!video) return;
+        subtitleVideo = video as HTMLVideoElement & { __subtitleVoiceCleanup?: () => void };
 
         const blob = new Blob([toVtt(downloadData.content)], { type: "text/vtt;charset=utf-8" });
         subtitleObjectUrl = URL.createObjectURL(blob);
@@ -846,8 +848,7 @@ export const VideoPlayer = ({
     void loadSubtitle();
     return () => {
       cancelled = true;
-      const video = artRef.current?.querySelector("video") as (HTMLVideoElement & { __subtitleVoiceCleanup?: () => void }) | null;
-      video?.__subtitleVoiceCleanup?.();
+      subtitleVideo?.__subtitleVoiceCleanup?.();
       if (attachedTrack?.parentNode) attachedTrack.parentNode.removeChild(attachedTrack);
       if (subtitleObjectUrl) URL.revokeObjectURL(subtitleObjectUrl);
     };
