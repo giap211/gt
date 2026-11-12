@@ -285,7 +285,7 @@ export function BottomDock() {
               href="/"
               onClick={(e) => handleDockNavigation(e, isHome, "home")}
               className={`gt-dock-item ${dockHomeActive && !searchOpen && !accountOpen ? "is-active" : ""}`}
-              aria-current={dockHomeActive && !searchOpen && !accountOpen ? "page" : undefined}>
+              aria-current={dockHomeActive && !searchOpen && !accountOpen ? "page" : undefined}
             >
               <Home size={22} strokeWidth={isHome && !searchOpen && !accountOpen ? 2.4 : 1.8} />
               <span>Trang chủ</span>
@@ -294,7 +294,7 @@ export function BottomDock() {
               href="/danh-sach/phim-bo"
               onClick={(e) => handleDockNavigation(e, isList, "list")}
               className={`gt-dock-item ${dockListActive && !searchOpen && !accountOpen ? "is-active" : ""}`}
-              aria-current={dockListActive && !searchOpen && !accountOpen ? "page" : undefined}>
+              aria-current={dockListActive && !searchOpen && !accountOpen ? "page" : undefined}
             >
               <Clapperboard size={22} strokeWidth={isList && !searchOpen && !accountOpen ? 2.4 : 1.8} />
               <span>Danh sách</span>
