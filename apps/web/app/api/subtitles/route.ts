@@ -3,134 +3,162 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const API_BASE = "https://api.opensubtitles.com/api/v1";
-const USER_AGENT = "PhimLau/1.0";
+const API_BASE = "https://api.subdl.com/api/v2";
+const MAX_SUBTITLE_BYTES = 3_000_000;
 
-function apiHeaders(json = false): HeadersInit {
-  const apiKey = process.env.OPEN_SUBTITLES_API_KEY;
-  const token = process.env.OPEN_SUBTITLES_TOKEN;
+function subdlHeaders(): HeadersInit {
+  const apiKey = process.env.SUBDL_API_KEY;
   return {
     Accept: "application/json",
-    "Api-Key": apiKey || "",
-    "User-Agent": USER_AGENT,
-    ...(json ? { "Content-Type": "application/json" } : {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    Authorization: `Bearer ${apiKey}`,
   };
 }
 
+function subtitleError(message: string, status = 502) {
+  return NextResponse.json({ error: message }, { status });
+}
+
 export async function GET(request: NextRequest) {
-  const apiKey = process.env.OPEN_SUBTITLES_API_KEY;
+  const apiKey = process.env.SUBDL_API_KEY;
   if (!apiKey) {
-    return NextResponse.json(
-      { error: "Thiếu OPEN_SUBTITLES_API_KEY trong biến môi trường máy chủ." },
-      { status: 503 },
-    );
+    return subtitleError("Thiếu SUBDL_API_KEY trong biến môi trường máy chủ.", 503);
   }
 
   const params = request.nextUrl.searchParams;
   const title = (params.get("title") || "").trim().slice(0, 160);
-  const year = params.get("year");
-  const tmdbId = params.get("tmdbId");
-  if (!title) return NextResponse.json({ error: "Thiếu tên phim." }, { status: 400 });
+  const year = params.get("year") || "";
+  const tmdbId = params.get("tmdbId") || "";
+  const mediaType = params.get("type") === "tv" ? "tv" : "movie";
+  const season = params.get("season") || "";
+  const episode = params.get("episode") || "";
 
-  const query = new URLSearchParams();
-  query.set("languages", "vi");
-  query.set("type", "movie");
-  if (tmdbId && /^\d+$/.test(tmdbId)) query.set("tmdb_id", tmdbId);
-  else query.set("query", title.toLowerCase());
-  if (year && /^\d{4}$/.test(year)) query.set("year", year);
-  query.set("machine_translated", "exclude");
+  if (!title && !/^\d+$/.test(tmdbId)) {
+    return subtitleError("Cần tên phim hoặc TMDB ID để tìm phụ đề.", 400);
+  }
+
+  const query = new URLSearchParams({
+    languages: "vi",
+    unpack: "1",
+    subs_per_page: "20",
+  });
+  if (/^\d+$/.test(tmdbId)) {
+    query.set("tmdb_id", tmdbId);
+    query.set("type", mediaType);
+  } else {
+    query.set("film_name", title);
+    query.set("type", mediaType);
+  }
+  if (/^\d{4}$/.test(year)) query.set("year", year);
+  if (mediaType === "tv") {
+    if (/^\d+$/.test(season)) query.set("season", season);
+    if (/^\d+$/.test(episode)) query.set("episode", episode);
+  }
 
   try {
-    const response = await fetch(`${API_BASE}/subtitles?${query.toString()}`, {
-      headers: apiHeaders(),
+    const response = await fetch(`${API_BASE}/subtitles/search?${query.toString()}`, {
+      headers: subdlHeaders(),
       cache: "no-store",
-      redirect: "follow",
     });
     const payload = await response.json().catch(() => null);
     if (!response.ok) {
-      return NextResponse.json(
-        { error: payload?.message || `OpenSubtitles trả về HTTP ${response.status}` },
-        { status: response.status === 403 ? 502 : response.status },
-      );
+      const message = payload?.error?.message || payload?.message || `SubDL trả về HTTP ${response.status}`;
+      return subtitleError(message, response.status === 401 || response.status === 403 ? 502 : response.status);
     }
 
-    const subtitles = (Array.isArray(payload?.data) ? payload.data : [])
-      .flatMap((item: any) => {
-        const attributes = item?.attributes || {};
-        const feature = attributes.feature_details || {};
-        const files = Array.isArray(attributes.files) ? attributes.files : [];
-        return files.map((file: any) => ({
-          fileId: Number(file.file_id),
-          fileName: String(file.file_name || ""),
-          language: String(attributes.language || ""),
-          release: String(attributes.release || ""),
-          downloads: Number(attributes.download_count || 0),
-          trusted: Boolean(attributes.from_trusted),
-          aiTranslated: Boolean(attributes.ai_translated),
-          movieTitle: String(feature.title || feature.movie_name || ""),
-          year: Number(feature.year || 0),
-        }));
-      })
+    const rawSubtitles = Array.isArray(payload?.subtitles) ? payload.subtitles : [];
+    const subtitles = rawSubtitles.flatMap((item: any) => {
+      const language = String(item?.lang || item?.language || "").toLowerCase();
+      const parentNId = String(item?.n_id || item?.nId || item?.id || "");
+      const unpacked = Array.isArray(item?.unpack_files) ? item.unpack_files : [];
+      const files = unpacked.length ? unpacked : [item];
+
+      return files.map((file: any) => {
+        const fileName = String(file?.name || item?.name || item?.release_name || "subtitle.srt");
+        const format = String(file?.format || fileName.split(".").pop() || "").toLowerCase();
+        return {
+          nId: String(file?.n_id || file?.nId || parentNId),
+          label: String(file?.release_name || item?.release_name || fileName),
+          fileName,
+          language: String(file?.lang || file?.language || language),
+          format,
+        };
+      });
+    })
       .filter((item: any) =>
-        Number.isSafeInteger(item.fileId) &&
-        item.fileId > 0 &&
-        item.language === "vi" &&
-        /\.(srt|vtt|ass)$/i.test(item.fileName),
-      )
-      .sort((a: any, b: any) =>
-        Number(b.trusted) - Number(a.trusted) ||
-        b.downloads - a.downloads,
+        /^[a-zA-Z0-9_-]{4,80}$/.test(item.nId) &&
+        /^(vi|vietnamese|vietnam)$/i.test(item.language) &&
+        /^(srt|vtt|ass|ssa)$/.test(item.format),
       )
       .slice(0, 12);
 
-    return NextResponse.json({ subtitles });
+    return NextResponse.json({ subtitles, provider: "SubDL" });
   } catch {
-    return NextResponse.json({ error: "Không kết nối được OpenSubtitles." }, { status: 502 });
+    return subtitleError("Không kết nối được SubDL.", 502);
   }
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.OPEN_SUBTITLES_API_KEY;
+  const apiKey = process.env.SUBDL_API_KEY;
   if (!apiKey) {
-    return NextResponse.json(
-      { error: "Thiếu OPEN_SUBTITLES_API_KEY trong biến môi trường máy chủ." },
-      { status: 503 },
-    );
+    return subtitleError("Thiếu SUBDL_API_KEY trong biến môi trường máy chủ.", 503);
   }
 
   const body = await request.json().catch(() => null);
-  const fileId = Number(body?.fileId);
-  if (!Number.isSafeInteger(fileId) || fileId <= 0) {
-    return NextResponse.json({ error: "Mã file phụ đề không hợp lệ." }, { status: 400 });
+  const nId = String(body?.nId || "");
+  if (!/^[a-zA-Z0-9_-]{4,80}$/.test(nId)) {
+    return subtitleError("Mã phụ đề SubDL không hợp lệ.", 400);
   }
 
   try {
-    const response = await fetch(`${API_BASE}/download`, {
-      method: "POST",
-      headers: apiHeaders(true),
-      body: JSON.stringify({ file_id: fileId, sub_format: "srt" }),
+    const response = await fetch(`${API_BASE}/subtitles/${encodeURIComponent(nId)}/download?format=file`, {
+      headers: subdlHeaders(),
       cache: "no-store",
+      redirect: "follow",
     });
-    const payload = await response.json().catch(() => null);
-    if (!response.ok || typeof payload?.link !== "string") {
-      return NextResponse.json(
-        { error: payload?.message || `Không lấy được link phụ đề (HTTP ${response.status}).` },
-        { status: response.status === 403 ? 502 : response.status },
-      );
+
+    const contentType = response.headers.get("content-type") || "";
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      return subtitleError(payload?.error?.message || `Không tải được phụ đề từ SubDL (HTTP ${response.status}).`, response.status);
     }
 
-    const fileResponse = await fetch(payload.link, { cache: "no-store", redirect: "follow" });
-    if (!fileResponse.ok) {
-      return NextResponse.json({ error: "Link phụ đề đã hết hạn hoặc không tải được." }, { status: 502 });
-    }
-    const content = await fileResponse.text();
-    if (!content.trim() || content.length > 3_000_000) {
-      return NextResponse.json({ error: "File phụ đề rỗng hoặc vượt quá dung lượng cho phép." }, { status: 422 });
+    let content = "";
+    let fileName = "subtitle.srt";
+    if (contentType.includes("application/json")) {
+      const payload = await response.json().catch(() => null);
+      if (typeof payload?.content === "string") {
+        content = payload.content;
+      } else {
+        const rawUrl = payload?.url || payload?.download_url || payload?.downloadUrl;
+        if (typeof rawUrl !== "string") {
+          return subtitleError("SubDL không trả về nội dung hoặc link tải phụ đề.");
+        }
+        const downloadUrl = rawUrl.startsWith("/")
+          ? new URL(rawUrl, "https://dl.subdl.com").toString()
+          : rawUrl;
+        const parsedUrl = new URL(downloadUrl);
+        if (!["dl.subdl.com", "api.subdl.com", "subdl.com"].includes(parsedUrl.hostname)) {
+          return subtitleError("SubDL trả về host tải file không hợp lệ.");
+        }
+        const fileResponse = await fetch(parsedUrl, {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          cache: "no-store",
+          redirect: "follow",
+        });
+        if (!fileResponse.ok) return subtitleError("Không tải được file phụ đề.");
+        content = await fileResponse.text();
+        fileName = String(payload?.name || payload?.file_name || fileName);
+      }
+    } else {
+      content = await response.text();
+      fileName = response.headers.get("content-disposition")?.match(/filename="?([^";]+)"?/i)?.[1] || fileName;
     }
 
-    return NextResponse.json({ content, fileName: payload.file_name || "subtitle.srt" });
+    if (!content.trim() || content.length > MAX_SUBTITLE_BYTES) {
+      return subtitleError("File phụ đề rỗng hoặc vượt quá dung lượng cho phép.", 422);
+    }
+    return NextResponse.json({ content, fileName });
   } catch {
-    return NextResponse.json({ error: "Lỗi khi tải file phụ đề." }, { status: 502 });
+    return subtitleError("Lỗi khi tải file phụ đề từ SubDL.");
   }
 }
