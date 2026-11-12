@@ -112,27 +112,108 @@ export default function MovieDetailPage({
 
   if (loading) {
     return (
-      <main className="movie-detail-page min-h-screen bg-[#100f1e] text-white animate-pulse">
-        <div className="relative min-h-[480px] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-violet-950/35 via-[#100f1e]/70 to-[#100f1e]" />
-          <div className="relative mx-auto max-w-7xl px-3 pt-24 pb-10">
-            <div className="grid grid-cols-1 gap-5 items-start">
-              <div className="mx-auto w-36 aspect-[2/3] rounded-2xl bg-white/[0.09] border border-white/[0.08]" />
-              <div className="pt-2 space-y-4 max-w-2xl">
-                <div className="h-8 w-3/4 rounded-lg bg-white/[0.12]" />
-                <div className="h-4 w-1/2 rounded bg-white/[0.08]" />
-                <div className="flex gap-2"><div className="h-6 w-14 rounded bg-white/[0.1]" /><div className="h-6 w-16 rounded bg-white/[0.1]" /><div className="h-6 w-12 rounded bg-white/[0.1]" /></div>
-                <div className="h-3 w-full max-w-xl rounded bg-white/[0.08]" /><div className="h-3 w-5/6 max-w-lg rounded bg-white/[0.08]" /><div className="h-3 w-2/3 max-w-md rounded bg-white/[0.08]" />
-                <div className="flex gap-3 pt-3"><div className="h-11 w-32 rounded-full bg-violet-400/20" /><div className="h-11 w-28 rounded-full bg-white/[0.08]" /></div>
+      <main className="movie-detail-page min-h-screen bg-[#100f1e] text-white">
+        {/* Skeleton khớp trực tiếp với hero mobile thật: backdrop tràn khung, nội dung neo đáy. */}
+        <section className="movie-detail-mobile">
+          <div className="relative h-[570px] w-full overflow-hidden bg-[#19172b]">
+            <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-violet-950/30 via-[#171528]/35 to-[#100f1e]" />
+            <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),14px)]">
+              <div className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.08]" />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-7 pt-24">
+              <div className="mb-3 h-3 w-28 rounded bg-white/20 animate-pulse" />
+              <div className="space-y-2 animate-pulse">
+                <div className="h-10 w-[88%] rounded-lg bg-white/[0.16]" />
+                <div className="h-10 w-[62%] rounded-lg bg-white/[0.12]" />
+              </div>
+              <div className="mt-3 flex items-center gap-2 animate-pulse">
+                <div className="h-3 w-10 rounded bg-white/15" />
+                <div className="h-3 w-14 rounded bg-white/10" />
+                <div className="h-5 w-12 rounded-md bg-white/15" />
+                <div className="h-5 w-10 rounded bg-white/15" />
+              </div>
+              <div className="mt-3 flex gap-2 animate-pulse">
+                <div className="h-7 w-16 rounded-full bg-white/10" />
+                <div className="h-7 w-20 rounded-full bg-white/10" />
+                <div className="h-7 w-14 rounded-full bg-white/10" />
+              </div>
+              <div className="mt-5 grid grid-cols-[1fr_1.25fr] gap-2.5">
+                <div className="h-[54px] rounded-full bg-white/90 animate-pulse" />
+                <div className="h-[54px] rounded-full border border-white/15 bg-white/[0.10] animate-pulse" />
               </div>
             </div>
           </div>
-        </div>
-        <section className="mx-auto max-w-7xl px-4 -mt-2 pb-20 space-y-6">
-          <div className="h-6 w-36 rounded bg-white/[0.1]" />
-          <div className="grid grid-cols-3 gap-3">{Array.from({ length: 8 }, (_, i) => <div key={i} className="aspect-video rounded-xl bg-white/[0.08]" />)}</div>
-          <div className="h-6 w-44 rounded bg-white/[0.1] mt-8" />
-          <div className="grid grid-cols-2 gap-4">{Array.from({ length: 6 }, (_, i) => <div key={i} className="space-y-2"><div className="aspect-[2/3] rounded-xl bg-white/[0.08]" /><div className="h-3 w-4/5 rounded bg-white/[0.08]" /></div>)}</div>
+
+          <div className="movie-detail-content relative -mt-1 space-y-7 px-4 pb-10 pt-5">
+            {/* Mô tả phim */}
+            <div className="space-y-2 animate-pulse">
+              <div className="h-3 w-full rounded bg-white/[0.11]" />
+              <div className="h-3 w-[94%] rounded bg-white/[0.09]" />
+              <div className="h-3 w-[72%] rounded bg-white/[0.08]" />
+              <div className="h-3 w-20 rounded bg-violet-300/15" />
+            </div>
+
+            {/* Thanh thao tác phim */}
+            <div className="flex items-center justify-around rounded-2xl border border-white/[0.06] bg-white/[0.025] px-3 py-5 animate-pulse">
+              <div className="h-9 w-9 rounded-full bg-white/[0.10]" />
+              <div className="h-9 w-9 rounded-full bg-white/[0.10]" />
+              <div className="h-9 w-9 rounded-full bg-white/[0.10]" />
+              <div className="h-9 w-9 rounded-full bg-white/[0.10]" />
+            </div>
+
+            {/* Diễn viên nổi bật — đúng dạng carousel ngang */}
+            <section>
+              <div className="mb-3 flex items-center justify-between">
+                <div className="h-5 w-36 rounded bg-white/[0.12] animate-pulse" />
+                <div className="h-3 w-16 rounded bg-white/[0.08] animate-pulse" />
+              </div>
+              <div className="-mx-4 flex gap-3 overflow-hidden px-4">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <div key={i} className="w-[104px] shrink-0 animate-pulse">
+                    <div className="aspect-[4/5] rounded-2xl border border-white/[0.06] bg-white/[0.08]" />
+                    <div className="mt-2 h-3 w-4/5 rounded bg-white/[0.09]" />
+                    <div className="mt-1 h-3 w-3/5 rounded bg-white/[0.06]" />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Tập phim — khớp panel, server, tìm kiếm và lưới tập thật */}
+            <section className="scroll-mt-5 rounded-2xl border border-violet-300/10 bg-white/[0.025] p-3.5">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <div className="h-5 w-20 rounded bg-white/[0.12] animate-pulse" />
+                  <div className="mt-2 h-3 w-24 rounded bg-white/[0.07] animate-pulse" />
+                </div>
+                <div className="h-7 w-24 rounded-full bg-violet-300/10 animate-pulse" />
+              </div>
+              <div className="mb-3 flex gap-2 overflow-hidden">
+                <div className="h-9 w-24 shrink-0 rounded-xl bg-violet-300/15 animate-pulse" />
+                <div className="h-9 w-24 shrink-0 rounded-xl bg-white/[0.06] animate-pulse" />
+                <div className="h-9 w-24 shrink-0 rounded-xl bg-white/[0.06] animate-pulse" />
+              </div>
+              <div className="mb-3 h-10 rounded-xl border border-white/[0.06] bg-black/15 animate-pulse" />
+              <div className="grid grid-cols-4 gap-2">
+                {Array.from({ length: 16 }, (_, i) => (
+                  <div key={i} className="h-10 rounded-xl border border-white/[0.05] bg-white/[0.055] animate-pulse" />
+                ))}
+              </div>
+            </section>
+
+            {/* Tabs và vùng bình luận */}
+            <section className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4">
+              <div className="mb-5 flex gap-5 overflow-hidden">
+                {["w-14", "w-12", "w-10", "w-16", "w-14"].map((width, i) => (
+                  <div key={i} className={`h-4 shrink-0 rounded bg-white/[0.09] animate-pulse ${width}`} />
+                ))}
+              </div>
+              <div className="space-y-3 animate-pulse">
+                <div className="h-5 w-32 rounded bg-white/[0.10]" />
+                <div className="h-20 rounded-xl bg-white/[0.05]" />
+                <div className="h-10 rounded-xl bg-white/[0.05]" />
+              </div>
+            </section>
+          </div>
         </section>
       </main>
     );
