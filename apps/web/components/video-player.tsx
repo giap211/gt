@@ -1269,25 +1269,16 @@ export const VideoPlayer = ({
           .player-controls-frame .artplayer-app .art-controls .art-control { min-width:36px!important;padding-inline:5px!important; }
           .player-controls-frame .artplayer-app .art-control-seek-back-30,.player-controls-frame .artplayer-app .art-control-seek-forward-30 { min-width:42px!important; }
         }
-        /* Final override: hide Artplayer's legacy control layer regardless of its internal root class. */
-        .player-controls-frame .artplayer-app .art-controls,
-        .player-controls-frame .artplayer-app .art-bottom,
-        .player-controls-frame .artplayer-app .art-progress,
-        .watch-player-shell .artplayer-app .art-controls,
-        .watch-player-shell .artplayer-app .art-bottom,
-        .watch-player-shell .artplayer-app .art-progress {
+        /* Final override: hide Artplayer UI without relying on its root class. */
+        .player-controls-frame .art-controls,
+        .player-controls-frame .art-bottom,
+        .player-controls-frame .art-progress,
+        .player-controls-frame [class*="art-controls"],
+        .player-controls-frame [class*="art-control-"],
+        .player-controls-frame [class*="art-bottom"] {
           display:none!important;
           visibility:hidden!important;
           opacity:0!important;
-          pointer-events:none!important;
-        }
-        .player-controls-frame .artplayer-app .art-control,
-        .player-controls-frame .artplayer-app .art-control-volume,
-        .player-controls-frame .artplayer-app .art-control-fullscreen,
-        .player-controls-frame .artplayer-app .art-control-setting,
-        .watch-player-shell .artplayer-app .art-control {
-          display:none!important;
-          visibility:hidden!important;
           pointer-events:none!important;
         }
 `}</style>
