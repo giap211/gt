@@ -22,6 +22,58 @@ type HeroMovie = ListMovie & {
   hero_source?: "tmdb" | "netflix" | "latest";
 };
 
+function HomeSkeletonHero() {
+  return (
+    <div className="px-4 pt-3 pb-2" aria-hidden="true">
+      <div className="relative h-[min(66svh,610px)] min-h-[420px] overflow-hidden rounded-[28px] bg-[#171321]">
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-violet-950/70 via-[#211a32] to-[#111018]" />
+        <div className="absolute inset-x-0 bottom-0 space-y-4 bg-gradient-to-t from-[#08090d] via-[#08090d]/70 to-transparent px-5 pb-12 pt-28">
+          <div className="h-3 w-24 animate-pulse rounded-full bg-white/10" />
+          <div className="h-10 w-3/4 max-w-[280px] animate-pulse rounded-xl bg-white/15" />
+          <div className="h-3 w-2/3 animate-pulse rounded-full bg-white/10" />
+          <div className="flex gap-3 pt-2">
+            <div className="h-11 w-32 animate-pulse rounded-full bg-white/20" />
+            <div className="h-11 w-28 animate-pulse rounded-full bg-white/10" />
+          </div>
+        </div>
+        <div className="absolute right-5 top-5 h-10 w-10 animate-pulse rounded-full border border-white/10 bg-white/10" />
+      </div>
+    </div>
+  );
+}
+
+function HomeSkeletonShelf({ compact = false }: { compact?: boolean }) {
+  return (
+    <section className="w-full py-3" aria-hidden="true">
+      <div className="px-5">
+        <div className="mb-3 h-5 w-40 animate-pulse rounded-md bg-white/10" />
+        <div className="flex gap-3 overflow-hidden">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="w-[38vw] max-w-[170px] shrink-0">
+              <div className={`aspect-[2/3] w-full animate-pulse rounded-xl bg-gradient-to-br from-white/10 to-white/[0.035] ${compact ? "aspect-[3/4]" : ""}`} />
+              <div className="mt-2 h-3 w-4/5 animate-pulse rounded bg-white/10" />
+              <div className="mt-2 h-2.5 w-1/2 animate-pulse rounded bg-white/[0.06]" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HomeSecondarySkeleton() {
+  return (
+    <div className="space-y-1 md:space-y-2" aria-label="Đang tải danh sách phim">
+      <HomeSkeletonShelf />
+      <HomeSkeletonShelf />
+      <HomeSkeletonShelf />
+      <HomeSkeletonShelf compact />
+      <HomeSkeletonShelf />
+      <HomeSkeletonShelf />
+    </div>
+  );
+}
+
 export function HomeScreen() {
   const [data, setData] = useState<{
     latest: ListMovie[];
@@ -61,6 +113,8 @@ export function HomeScreen() {
     hero: [],
   });
 
+  const [coreLoaded, setCoreLoaded] = useState(false);
+  const [secondaryLoaded, setSecondaryLoaded] = useState(false);
   const [shouldLoadSecondary, setShouldLoadSecondary] = useState(false);
   const secondaryTriggerRef = useRef<HTMLDivElement | null>(null);
 
@@ -134,6 +188,7 @@ export function HomeScreen() {
           cinema: singleRes?.items || [],
           hero: fallbackHero,
         }));
+        setCoreLoaded(true);
         const trendingHero = await heroPromise;
         if (cancelled) return;
         const curatedHero = (trendingHero.length ? trendingHero : fallbackHero).slice(0, 6);
@@ -141,6 +196,7 @@ export function HomeScreen() {
         void fetchHeroBackdrops(curatedHero);
       } catch (error) {
         console.error("Failed to fetch core movies", error);
+        setCoreLoaded(true);
       }
     };
     fetchData();
@@ -204,8 +260,10 @@ export function HomeScreen() {
           romance: romanceRes?.items || [],
           viet: vietRes?.items || [],
         }));
+        setSecondaryLoaded(true);
       } catch (error) {
         console.error("Failed to fetch secondary movie shelves", error);
+        setSecondaryLoaded(true);
       }
     };
     void fetchSecondary();
@@ -282,22 +340,24 @@ html[data-mobile-theme=light] .apple-tv-home .topic-grid-chip,html[data-theme=li
 html[data-mobile-theme=light] .apple-tv-home .topic-grid-title,html[data-theme=light] .apple-tv-home .topic-grid-title{color:#211d2d!important}
 html[data-mobile-theme=light] .apple-tv-home .topic-grid-hint,html[data-theme=light] .apple-tv-home .topic-grid-hint{color:#6c5bb0!important}
 html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data-theme=light] .apple-tv-home .movie-carousel-view-more{color:#76649f!important}html[data-mobile-theme=light] .apple-tv-home .movie-carousel-poster .movie-poster-frame,html[data-theme=light] .apple-tv-home .movie-carousel-poster .movie-poster-frame{border-color:rgba(125,91,190,.2)!important;box-shadow:0 5px 16px rgba(79,63,122,.09)!important}`}</style>
-      <HeroSlider movies={data.hero.slice(0, 6)} />
+      {data.hero.length > 0 ? <HeroSlider movies={data.hero.slice(0, 6)} /> : <HomeSkeletonHero />}
 
       <div className="flex flex-col gap-0 pb-16 relative z-30">
         <ContinueWatchingSection />
         <>
             <TopicGrid />
 
-            <MovieCarousel
-              title="Phim nổi bật"
-              titleGradient="linear-gradient(235deg, #ffffff 20%, #a78bfa 125%)"
-              layout="poster"
-              items={transformMovies(data.latest)}
-            />
+            {coreLoaded ? (
+              <MovieCarousel
+                title="Phim nổi bật"
+                titleGradient="linear-gradient(235deg, #ffffff 20%, #a78bfa 125%)"
+                layout="poster"
+                items={transformMovies(data.latest)}
+              />
+            ) : <HomeSkeletonShelf />}
 
             <div ref={secondaryTriggerRef} className="h-px w-full" aria-hidden="true" />
-            {shouldLoadSecondary && <div className="space-y-1 md:space-y-2">
+            {shouldLoadSecondary && (!secondaryLoaded ? <HomeSecondarySkeleton /> : <div className="space-y-1 md:space-y-2">
               <MovieCarousel
                 title="Điện ảnh Hàn Quốc"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)"
@@ -450,7 +510,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <AdsBanner />
               <GhibliSection />
-            </div>}
+            </div>)}
           </>
       </div>
     </main>
