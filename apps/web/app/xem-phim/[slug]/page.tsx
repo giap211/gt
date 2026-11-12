@@ -509,19 +509,37 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-top > div > div { min-width:0; flex:1 1 auto; overflow:hidden; }
         .watch-player-top > div > div > div { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .watch-player-glass { background:rgba(224,230,238,.10); border:1px solid rgba(255,255,255,.28); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
-        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; min-height:0; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); border-radius:0; background:linear-gradient(145deg,rgba(28,32,39,.96),rgba(5,6,8,.985)); border:0; color:#fff; backdrop-filter:blur(32px) saturate(170%); -webkit-backdrop-filter:blur(32px) saturate(170%); box-shadow:none; }
-        .watch-player-episode-scroll { position:relative; z-index:1; display:block; flex:1 1 0%; min-height:0; height:0; width:100%; overflow-x:hidden; overflow-y:scroll; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; touch-action:pan-y; pointer-events:auto; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.22) transparent; }
-        .watch-player-episode-grid { display:grid; width:100%; min-height:min-content; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); align-content:start; gap:8px; padding:4px 2px 16px 0; }
-        .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
+        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; min-height:0; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left)); border-radius:0; background:radial-gradient(ellipse at 78% 12%,rgba(105,128,158,.24),transparent 42%),linear-gradient(135deg,rgba(27,37,51,.97),rgba(9,14,22,.985) 62%,rgba(18,25,36,.98)); border:0; color:#f3f6fa; backdrop-filter:blur(34px) saturate(145%); -webkit-backdrop-filter:blur(34px) saturate(145%); box-shadow:none; }
+        .watch-player-picker-layout { display:grid; grid-template-columns:minmax(220px,.34fr) minmax(0,1fr); flex:1 1 0%; min-height:0; gap:0; border:1px solid rgba(218,228,240,.19); border-radius:26px; background:linear-gradient(145deg,rgba(207,218,232,.075),rgba(93,111,135,.055)); box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 50px rgba(0,0,0,.2); overflow:hidden; }
+        .watch-player-server-column { min-width:0; padding:22px 20px; border-right:1px solid rgba(221,230,241,.17); background:linear-gradient(180deg,rgba(190,204,222,.055),rgba(16,23,34,.12)); }
+        .watch-player-episode-column { display:flex; min-width:0; min-height:0; flex-direction:column; padding:22px 24px; }
+        .watch-player-episode-scroll { position:relative; z-index:1; display:block; flex:1 1 0%; min-height:0; height:0; width:100%; overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; touch-action:pan-y; pointer-events:auto; scrollbar-width:thin; scrollbar-color:rgba(220,230,242,.28) transparent; }
+        .watch-player-episode-grid { display:grid; width:100%; min-height:min-content; grid-template-columns:repeat(4,minmax(0,1fr)); align-content:start; gap:12px; padding:4px 8px 16px 0; }
+        .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease,color .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
-        .watch-player-menu .active-choice { color:#fff; background:rgba(225,231,238,.16); border-color:rgba(255,255,255,.72); box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 8px 26px rgba(0,0,0,.2); }
-        .watch-player-menu > header { margin:0 0 18px; padding:16px 18px; border:1px solid rgba(255,255,255,.2); border-radius:22px; background:rgba(225,231,238,.075); box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 30px rgba(0,0,0,.16); backdrop-filter:blur(24px) saturate(140%); -webkit-backdrop-filter:blur(24px) saturate(140%); }
-        .watch-player-menu .watch-player-episode-grid > button { border-color:rgba(255,255,255,.16); background:rgba(225,231,238,.075); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter:blur(18px) saturate(125%); -webkit-backdrop-filter:blur(18px) saturate(125%); }
-        .watch-player-menu .watch-player-episode-grid > button.active-choice { border-color:rgba(255,255,255,.78); background:rgba(225,231,238,.17); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 8px 26px rgba(0,0,0,.24); }
-        .watch-player-menu .watch-player-episode-grid > button > span { color:rgba(255,255,255,.9); }
-        .watch-player-menu .watch-player-episode-grid > button.active-choice > span { color:#fff; }
-        .watch-player-menu .watch-player-episode-grid > button .episode-current-badge { color:#101216; background:rgba(245,247,250,.96); }
-        .watch-player-menu .watch-player-episode-grid > button:not(.active-choice):hover { border-color:rgba(255,255,255,.42); background:rgba(225,231,238,.12); }
+        .watch-player-menu .active-choice { color:#182230; background:linear-gradient(145deg,#f5f7fa 0%,#c4cedb 100%); border-color:rgba(255,255,255,.92); box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 5px 18px rgba(207,220,237,.2); }
+        .watch-player-menu > header { margin:0 0 18px; padding:16px 20px; border:1px solid rgba(218,228,240,.2); border-radius:22px; background:linear-gradient(120deg,rgba(194,207,224,.12),rgba(92,109,132,.09)); box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 12px 30px rgba(0,0,0,.16); backdrop-filter:blur(26px) saturate(135%); -webkit-backdrop-filter:blur(26px) saturate(135%); }
+        .watch-player-server-list { display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+        .watch-player-server-list > button { display:flex; width:100%; min-height:54px; align-items:center; gap:12px; border:1px solid rgba(219,229,241,.17); border-radius:16px; padding:10px 14px; text-align:left; color:rgba(239,244,250,.82); background:linear-gradient(145deg,rgba(205,216,230,.11),rgba(116,132,153,.07)); box-shadow:inset 0 1px 0 rgba(255,255,255,.09); backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%); }
+        .watch-player-server-list > button.active-choice { color:#182230; background:linear-gradient(145deg,#f5f7fa 0%,#c4cedb 100%); border-color:rgba(255,255,255,.92); }
+        .watch-player-server-index { display:grid; width:28px; height:28px; flex:0 0 28px; place-items:center; border-radius:9px; color:inherit; background:rgba(116,132,153,.2); font-size:10px; font-weight:800; }
+        .watch-player-episode-grid > button { display:flex; min-width:0; min-height:54px; align-items:center; justify-content:center; gap:8px; border:1px solid rgba(219,229,241,.17); border-radius:15px; padding:10px 12px; color:rgba(241,245,250,.9); background:linear-gradient(145deg,rgba(205,216,230,.12),rgba(116,132,153,.075)); box-shadow:inset 0 1px 0 rgba(255,255,255,.09); backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%); }
+        .watch-player-episode-grid > button.active-choice { color:#182230; border-color:rgba(255,255,255,.96); background:linear-gradient(145deg,#f7f9fc 0%,#c5cfdd 100%); box-shadow:inset 0 1px 0 #fff,0 5px 18px rgba(207,220,237,.18); }
+        .watch-player-episode-grid > button:not(.active-choice):hover,.watch-player-server-list > button:not(.active-choice):hover { border-color:rgba(232,240,249,.42); background:linear-gradient(145deg,rgba(218,228,240,.17),rgba(129,146,168,.12)); }
+        .watch-player-menu .picker-section-label { color:rgba(226,235,246,.72); font-size:12px; font-weight:750; letter-spacing:.04em; text-transform:uppercase; }
+        .watch-player-menu .picker-muted { color:rgba(220,230,242,.5); }
+        @media(max-width:700px) {
+          .watch-player-menu { padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); }
+          .watch-player-picker-layout { grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); border-radius:20px; }
+          .watch-player-server-column { padding:14px 14px 12px; border-right:0; border-bottom:1px solid rgba(221,230,241,.17); }
+          .watch-player-server-list { flex-direction:row; overflow-x:auto; margin-top:12px; padding-bottom:3px; scrollbar-width:none; }
+          .watch-player-server-list > button { width:auto; min-width:max-content; min-height:44px; padding:8px 12px; }
+          .watch-player-episode-column { padding:14px; }
+          .watch-player-episode-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+          .watch-player-episode-grid > button { min-height:46px; padding:8px 6px; font-size:12px; }
+        }
+        @media(min-width:701px) and (max-width:1023px) { .watch-player-episode-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; } }
+        @media(min-width:1024px) { .watch-player-menu { padding:28px clamp(28px,5vw,80px); } .watch-player-episode-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; } }
         .watch-player-round { width:54px;height:54px;border-radius:999px;display:grid;place-items:center; flex:0 0 54px; cursor:pointer; }
         .watch-player-page > .watch-player-round { position:absolute; z-index:70; pointer-events:auto; }
         .watch-player-page .watch-player-top { z-index:50; }
@@ -627,48 +645,51 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             </div>
             <button type="button" onClick={() => setOverlayOpen(false)} aria-label="Đóng danh sách tập" className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 bg-white/10 text-2xl text-white">×</button>
           </header>
-          {episodes.length > 1 && (
-            <div className="flex shrink-0 gap-2 overflow-x-auto py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {episodes.map((server, index) => (
-                <button key={server.server_name + "-" + index} type="button" onClick={() => {
-                  const list = server.server_data || [];
-                  const matched = list.find((ep) => ep.slug === currentEpisode?.slug || ep.name === currentEpisode?.name) || list[0];
-                  if (!matched) return;
-                  setOverlayOpen(false);
-                  router.push("/xem-phim/" + slug + "?tap=" + matched.slug + "&sv=" + index);
-                }} className={"shrink-0 rounded-full border px-4 py-2.5 text-xs font-bold backdrop-blur-xl " + (currentServer === index ? "active-choice" : "border-white/20 bg-white/[.07] text-white/70")}>
-                  {server.server_name || "SV " + (index + 1)}
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="mb-2 flex shrink-0 items-center justify-between">
-            <h3 className="text-sm font-bold">Chọn tập</h3>
-            <span className="text-xs text-white/45">Đang xem: {formatEpisodeName(currentEpisode?.name)}</span>
-          </div>
-          <div className="watch-player-episode-scroll">
-            <div className="watch-player-episode-grid">
-              {currentServerEpisodes.map((ep, index) => {
-                const match = ep.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) || ep.name.match(/^0*(\d+)$/);
-                const number = Number(match?.[1] || index + 1);
-                const still = episodeStills[number] || movie.thumb_url || movie.poster_url;
-                const active = ep.slug === currentEpisode?.slug;
-                return (
-                  <button key={ep.slug || ep.name + "-" + index} type="button" onClick={() => {
+          <div className="watch-player-picker-layout">
+            <aside className="watch-player-server-column">
+              <p className="picker-section-label">Máy chủ phát</p>
+              <div className="watch-player-server-list">
+                {episodes.map((server, index) => (
+                  <button key={server.server_name + "-" + index} type="button" onClick={() => {
+                    const list = server.server_data || [];
+                    const matched = list.find((ep) => ep.slug === currentEpisode?.slug || ep.name === currentEpisode?.name) || list[0];
+                    if (!matched) return;
                     setOverlayOpen(false);
-                    router.push("/xem-phim/" + slug + "?tap=" + ep.slug + "&sv=" + currentServer);
-                  }} className={"group min-w-0 overflow-hidden rounded-2xl border text-left " + (active ? "active-choice" : "border-white/10 bg-white/[.055] text-white hover:border-white/45")}>
-                    <div className="relative aspect-video w-full overflow-hidden bg-white/5">
-                      {still ? <Image src={still} alt={formatEpisodeName(ep.name)} fill sizes="(max-width: 700px) 33vw, 180px" className="object-cover" /> : null}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                      <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-1 text-[10px] font-bold text-white">TẬP {number}</span>
-                      {active && <span className="episode-current-badge absolute right-2 top-2 rounded-full border border-white/70 bg-white/90 px-2 py-1 text-[9px] font-black text-[#101216] shadow-lg">ĐANG XEM</span>}
-                    </div>
-                    <span className="block truncate px-3 py-2.5 text-xs font-semibold">{formatEpisodeName(ep.name)}</span>
+                    router.push("/xem-phim/" + slug + "?tap=" + matched.slug + "&sv=" + index);
+                  }} className={currentServer === index ? "active-choice" : ""}>
+                    <span className="watch-player-server-index">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="min-w-0 truncate text-sm font-semibold">{server.server_name || "SV " + (index + 1)}</span>
+                    {currentServer === index && <span className="ml-auto text-sm font-black">✓</span>}
                   </button>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            </aside>
+            <section className="watch-player-episode-column">
+              <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
+                <div>
+                  <h3 className="picker-section-label">Danh sách tập</h3>
+                  <p className="mt-1 text-xs picker-muted">{currentServerEpisodes.length} tập · Đang xem {formatEpisodeName(currentEpisode?.name)}</p>
+                </div>
+              </div>
+              <div className="watch-player-episode-scroll">
+                <div className="watch-player-episode-grid">
+                  {currentServerEpisodes.map((ep, index) => {
+                    const match = ep.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) || ep.name.match(/^0*(\d+)$/);
+                    const number = Number(match?.[1] || index + 1);
+                    const active = ep.slug === currentEpisode?.slug;
+                    return (
+                      <button key={ep.slug || ep.name + "-" + index} type="button" title={formatEpisodeName(ep.name)} aria-current={active ? "true" : undefined} onClick={() => {
+                        setOverlayOpen(false);
+                        router.push("/xem-phim/" + slug + "?tap=" + ep.slug + "&sv=" + currentServer);
+                      }} className={active ? "active-choice" : ""}>
+                        <span className="truncate text-sm font-semibold">Tập {String(number).padStart(2, "0")}</span>
+                        {active && <span className="text-xs font-black" aria-label="Đang xem">✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
           </div>
         </section>
       )}
