@@ -255,7 +255,7 @@ export const VideoPlayer=({url,poster,title,startAtSeconds=0,introStartSeconds,i
      </div>
      <div className="flex shrink-0 items-center gap-3">
       <button type="button" onClick={()=>setSubtitlePanelOpen(true)} aria-label="Phụ đề" className="player-bottom-action"><Subtitles size={21}/></button>
-      {showNextEpisode&&<button type="button" onClick={()=>onNextEpisode?.()} aria-label="Tập tiếp theo" className="player-bottom-action"><SkipForward size={21}/></button>}
+      {showNextEpisode&&<button type="button" onClick={()=>onNextEpisode?.()} aria-label="Tập tiếp theo" className="player-next-episode"><SkipForward size={18}/><span>Tập tiếp theo</span></button>}
       <button type="button" onClick={()=>void fullscreen()} aria-label="Toàn màn hình" className="player-bottom-action"><Maximize2 size={20}/></button>
       <button type="button" onClick={()=>setSettingsOpen(x=>!x)} aria-label="Cài đặt phát" className="player-bottom-action"><Settings2 size={20}/></button>
      </div>
@@ -286,6 +286,9 @@ export const VideoPlayer=({url,poster,title,startAtSeconds=0,introStartSeconds,i
    .player-center-skip{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:58px;height:58px;border-radius:50%;border:1px solid rgba(255,255,255,.34);background:rgba(220,226,234,.12);color:#fff;backdrop-filter:blur(24px) saturate(120%);-webkit-backdrop-filter:blur(24px) saturate(120%);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
    .player-center-skip span{font-size:10px;font-weight:800;line-height:1}
    .player-bottom-action{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;color:#fff;background:rgba(225,231,238,.11);border:1px solid rgba(255,255,255,.24);backdrop-filter:blur(24px) saturate(120%);-webkit-backdrop-filter:blur(24px) saturate(120%);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+   .player-next-episode{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;color:#fff;background:rgba(225,231,238,.13);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(24px) saturate(135%);-webkit-backdrop-filter:blur(24px) saturate(135%);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 5px 18px rgba(0,0,0,.18);font-size:11px;font-weight:700;white-space:nowrap}
+   .player-next-episode svg{flex:none;opacity:.95}
+   .player-next-episode:active{background:rgba(255,255,255,.22)}
    .native-player .player-ui button{transition:background .18s ease,border-color .18s ease,transform .18s ease}
    .native-player .player-ui button:active{transform:scale(.96)}
    .native-player .player-ui button:focus-visible,.native-player input:focus-visible{outline:2px solid rgba(255,255,255,.85);outline-offset:3px}
