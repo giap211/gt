@@ -710,23 +710,60 @@ export const VideoPlayer = ({
     };
   }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, showNextEpisode]);
 
-  // Tự tìm và tải các bản phụ đề tiếng Việt, cho phép chọn ngay trong Cài đặt player.
+  // Tự tìm phụ đề tiếng Việt qua SubDL và thêm bộ chọn vào Cài đặt player.
   useEffect(() => {
     if (!subtitleSearch?.title?.trim() || isEmbed) return;
 
     let cancelled = false;
-    let subtitleObjectUrls: string[] = [];
-    let attachedTracks: HTMLTrackElement[] = [];
+    const subtitleObjectUrls: string[] = [];
+    const attachedTracks: HTMLTrackElement[] = [];
     const settingName = "external-subtitles";
+    const loaded: Array<{ label: string; track: HTMLTrackElement }> = [];
+    const player = artPlayerRef.current as any;
 
-    const toVtt = (srt: string) => {
-      const normalized = srt
-        .replace(/^\uFEFF/, "")
-        .replace(/\r/g, "")
+    const toVtt = (content: string, format: string) => {
+      const normalized = content.replace(/^\uFEFF/, "").replace(/\r/g, "").trim();
+      if (format === "vtt" || /^WEBVTT(?:\s|$)/i.test(normalized)) return normalized;
+      return "WEBVTT\n\n" + normalized
         .replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2")
+        .replace(/^\d+\s*$/gm, "")
         .trim();
-      return "WEBVTT\n\n" + normalized.replace(/^\d+\s*$/gm, "").trim();
     };
+
+    const installSelector = (emptyLabel?: string) => {
+      const activePlayer = artPlayerRef.current as any;
+      if (!activePlayer?.setting) return;
+      try { activePlayer.setting.remove(settingName); } catch { /* setting chưa tồn tại */ }
+      const selector = loaded.length
+        ? [
+            { html: "Tắt phụ đề", trackIndex: -1 },
+            ...loaded.map((item, index) => ({
+              html: item.label.replace(/[<>]/g, ""),
+              trackIndex: index,
+              default: index === 0,
+            })),
+          ]
+        : [{ html: emptyLabel || "Chưa tìm thấy phụ đề", trackIndex: -2 }];
+      activePlayer.setting.add({
+        name: settingName,
+        html: "Phụ đề",
+        tooltip: loaded[0]?.label || emptyLabel || "Đang tìm phụ đề tiếng Việt",
+        width: 280,
+        selector,
+        onSelect: (item: { html: string; trackIndex: number }) => {
+          loaded.forEach((entry, index) => {
+            entry.track.track.mode = index === item.trackIndex ? "showing" : "disabled";
+          });
+          if (item.trackIndex === -2) return item.html;
+          return item.trackIndex < 0
+            ? "Tắt phụ đề"
+            : loaded[item.trackIndex]?.label || item.html;
+        },
+      });
+    };
+
+    // Nút Phụ đề luôn xuất hiện, kể cả lúc đang tìm hoặc không có kết quả.
+    installSelector("Đang tìm phụ đề...");
 
     const loadSubtitles = async () => {
       try {
@@ -741,6 +778,7 @@ export const VideoPlayer = ({
         let searchData = await searchResponse.json().catch(() => null);
         if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
         let candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
+
         if (!candidates.length && subtitleSearch.tmdbId) {
           params.delete("tmdbId");
           searchResponse = await fetch("/api/subtitles?" + params.toString());
@@ -748,32 +786,41 @@ export const VideoPlayer = ({
           if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
           candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
         }
-        if (!candidates.length || cancelled) return;
+
+        if (cancelled) return;
+        if (!candidates.length) {
+          installSelector("Không tìm thấy phụ đề tiếng Việt");
+          return;
+        }
 
         const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
-        if (!video) return;
+        if (!video) {
+          installSelector("Player chưa sẵn sàng");
+          return;
+        }
 
-        // Tải tối đa 6 bản để tránh tiêu hao quota API quá nhiều.
-        const loaded: Array<{ label: string; track: HTMLTrackElement }> = [];
+        // Giới hạn tối đa 6 bản để tiết kiệm quota tải xuống.
         for (const candidate of candidates.slice(0, 6)) {
           if (cancelled) return;
           try {
             const downloadResponse = await fetch("/api/subtitles", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ fileId: candidate.fileId }),
+              body: JSON.stringify({ nId: candidate.nId }),
             });
             const downloadData = await downloadResponse.json().catch(() => null);
             if (!downloadResponse.ok || typeof downloadData?.content !== "string") continue;
 
+            const format = String(candidate.format || "srt").toLowerCase();
+            const subtitleContent = toVtt(downloadData.content, format);
             const objectUrl = URL.createObjectURL(
-              new Blob([toVtt(downloadData.content)], { type: "text/vtt;charset=utf-8" }),
+              new Blob([subtitleContent], { type: "text/vtt;charset=utf-8" }),
             );
             subtitleObjectUrls.push(objectUrl);
 
             const track = document.createElement("track");
             track.kind = "subtitles";
-            track.label = String(candidate.release || candidate.fileName || "Phụ đề tiếng Việt");
+            track.label = String(candidate.label || candidate.fileName || "Phụ đề tiếng Việt");
             track.srclang = "vi";
             track.src = objectUrl;
             track.default = loaded.length === 0;
@@ -782,53 +829,27 @@ export const VideoPlayer = ({
             attachedTracks.push(track);
             loaded.push({ label: track.label, track });
           } catch (error) {
-            console.warn("[Subtitles] Không tải được một bản phụ đề:", error);
+            console.warn("[Subtitles] Không tải được một bản SubDL:", error);
           }
         }
 
-        const firstSubtitle = loaded[0];
-        if (!firstSubtitle || cancelled) return;
-
-        const player = artPlayerRef.current as any;
-        if (!player?.setting) return;
-
-        try { player.setting.remove(settingName); } catch { /* setting chưa tồn tại */ }
-        const selector = [
-          { html: "Tắt phụ đề", trackIndex: -1 },
-          ...loaded.map((item, index) => ({
-            html: item.label.replace(/[<>]/g, ""),
-            trackIndex: index,
-            default: index === 0,
-          })),
-        ];
-
-        player.setting.add({
-          name: settingName,
-          html: "Phụ đề",
-          tooltip: firstSubtitle.label,
-          width: 260,
-          selector,
-          onSelect: (item: { html: string; trackIndex: number }) => {
-            loaded.forEach((entry, index) => {
-              entry.track.track.mode = index === item.trackIndex ? "showing" : "disabled";
-            });
-            const selectedLabel = item.trackIndex < 0 ? "Tắt phụ đề" : loaded[item.trackIndex]?.label || item.html;
-            return selectedLabel;
-          },
-        });
-
-        // Mặc định bật bản đầu tiên đã tải thành công.
-        firstSubtitle.track.track.mode = "showing";
+        if (cancelled) return;
+        installSelector(loaded.length ? undefined : "Không tải được file phụ đề");
+        if (loaded[0]) loaded[0].track.track.mode = "showing";
       } catch (error) {
-        console.warn("[Subtitles] Không thể tự tải phụ đề:", error);
+        console.warn("[Subtitles] SubDL search failed:", error);
+        if (!cancelled) {
+          const message = error instanceof Error ? error.message : "Không thể tìm phụ đề";
+          installSelector(message.slice(0, 90));
+        }
       }
     };
 
     void loadSubtitles();
     return () => {
       cancelled = true;
-      const player = artPlayerRef.current as any;
-      try { player?.setting?.remove(settingName); } catch { /* player đã bị hủy */ }
+      const activePlayer = artPlayerRef.current as any;
+      try { activePlayer?.setting?.remove(settingName); } catch { /* player đã bị hủy */ }
       attachedTracks.forEach((track) => {
         if (track.parentNode) track.parentNode.removeChild(track);
       });
