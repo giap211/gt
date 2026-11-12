@@ -769,6 +769,68 @@ export const VideoPlayer = ({
         attachedTrack.addEventListener("load", () => {
           if (attachedTrack?.track) attachedTrack.track.mode = "showing";
         }, { once: true });
+
+        // Thử nghiệm thuyết minh trực tiếp từ cue phụ đề bằng giọng tiếng Việt có sẵn trên thiết bị.
+        // Âm thanh gốc được hạ nhỏ trong lúc dùng track thuyết minh.
+        const cues = downloadData.content
+          .replace(/^\uFEFF/, "")
+          .replace(/\r/g, "")
+          .split(/\n\s*\n/)
+          .map((chunk: string) => {
+            const lines = chunk.split("\n").map((line: string) => line.trim()).filter(Boolean);
+            const timeLineIndex = lines.findIndex((line: string) => line.includes("-->"));
+            if (timeLineIndex < 0) return null;
+            const times = lines[timeLineIndex].split("-->");
+            const toSeconds = (value: string) => {
+              const match = value.trim().match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
+              return match ? Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]) + Number(match[4]) / 1000 : NaN;
+            };
+            const text = lines.slice(timeLineIndex + 1).join(" ").replace(/<[^>]+>/g, "").trim();
+            const start = toSeconds(times[0] || "");
+            const end = toSeconds(times[1] || "");
+            return text && Number.isFinite(start) && end > start ? { start, end, text } : null;
+          })
+          .filter((cue: { start: number; end: number; text: string } | null): cue is { start: number; end: number; text: string } => Boolean(cue));
+
+        const speech = window.speechSynthesis;
+        const originalVolume = video.volume;
+        let lastSpokenCue = -1;
+        if (speech && cues.length) {
+          video.volume = Math.min(originalVolume, 0.28);
+          const onTimeUpdate = () => {
+            if (video.paused) return;
+            const currentTime = video.currentTime;
+            const cueIndex = cues.findIndex((cue: { start: number; end: number }) => currentTime >= cue.start && currentTime < cue.end);
+            if (cueIndex < 0 || cueIndex === lastSpokenCue) return;
+            lastSpokenCue = cueIndex;
+            speech.cancel();
+            const utterance = new SpeechSynthesisUtterance(cues[cueIndex].text);
+            utterance.lang = "vi-VN";
+            utterance.rate = 1.08;
+            const voices = speech.getVoices();
+            const vietnameseVoices = voices.filter((voice) => voice.lang.toLowerCase().startsWith("vi"));
+            const preferredVoice = vietnameseVoices.find((voice) => /female|woman|nữ|google vietnamese/i.test(voice.name));
+            utterance.voice = preferredVoice || vietnameseVoices[0] || null;
+            speech.speak(utterance);
+          };
+          const onSeek = () => {
+            speech.cancel();
+            lastSpokenCue = -1;
+          };
+          const onPause = () => speech.cancel();
+          video.addEventListener("timeupdate", onTimeUpdate);
+          video.addEventListener("seeking", onSeek);
+          video.addEventListener("pause", onPause);
+          video.addEventListener("play", onTimeUpdate);
+          (video as HTMLVideoElement & { __subtitleVoiceCleanup?: () => void }).__subtitleVoiceCleanup = () => {
+            video.removeEventListener("timeupdate", onTimeUpdate);
+            video.removeEventListener("seeking", onSeek);
+            video.removeEventListener("pause", onPause);
+            video.removeEventListener("play", onTimeUpdate);
+            speech.cancel();
+            video.volume = originalVolume;
+          };
+        }
       } catch (error) {
         console.warn("[Subtitles] Không thể tự tải phụ đề:", error);
       }
@@ -777,6 +839,8 @@ export const VideoPlayer = ({
     void loadSubtitle();
     return () => {
       cancelled = true;
+      const video = artRef.current?.querySelector("video") as (HTMLVideoElement & { __subtitleVoiceCleanup?: () => void }) | null;
+      video?.__subtitleVoiceCleanup?.();
       if (attachedTrack?.parentNode) attachedTrack.parentNode.removeChild(attachedTrack);
       if (subtitleObjectUrl) URL.revokeObjectURL(subtitleObjectUrl);
     };
