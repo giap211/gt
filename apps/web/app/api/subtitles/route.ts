@@ -65,36 +65,53 @@ export async function GET(request: NextRequest) {
       return subtitleError(message, response.status === 401 || response.status === 403 ? 502 : response.status);
     }
 
+    if (payload?.status === false) {
+      return subtitleError(String(payload?.error || "SubDL không tìm thấy dữ liệu phù hợp."), 502);
+    }
+
     const rawSubtitles = Array.isArray(payload?.subtitles) ? payload.subtitles : [];
     const subtitles = rawSubtitles.flatMap((item: any) => {
-      const language = String(item?.lang || item?.language || "").toLowerCase();
+      const parentLanguage = String(item?.lang || item?.language || item?.language_name || "").trim();
       const parentNId = String(item?.n_id || item?.nId || item?.id || "");
       const unpacked = Array.isArray(item?.unpack_files) ? item.unpack_files : [];
       const files = unpacked.length ? unpacked : [item];
 
       return files.map((file: any) => {
+        const rawUrl = typeof file?.url === "string" ? file.url : (typeof item?.url === "string" ? item.url : "");
+        const urlMatch = rawUrl.match(/\\/subtitle\\/([^/?#]+)(?:\\/([^/?#]+))?/i);
+        const nId = parentNId || String(urlMatch?.[1] || "");
+        const fileNId = String(file?.file_n_id || file?.fileNId || urlMatch?.[2] || "");
         const fileName = String(file?.name || item?.name || item?.release_name || "subtitle.srt");
-        const format = String(file?.format || fileName.split(".").pop() || "").toLowerCase();
-        const fileNId = String(file?.file_n_id || file?.fileNId || "");
-        const downloadUrl = typeof file?.url === "string" ? file.url : "";
+        const extension = fileName.match(/\\.([a-z0-9]{2,5})(?:$|[?#])/i)?.[1] || "";
+        const format = String(file?.format || extension || "").toLowerCase();
+        const language = String(file?.language || file?.lang || file?.language_name || parentLanguage).trim();
+        const downloadUrl = rawUrl
+          ? (rawUrl.startsWith("/") ? new URL(rawUrl, "https://dl.subdl.com").toString() : rawUrl)
+          : "";
         return {
-          nId: parentNId,
+          nId,
           fileNId,
           downloadUrl,
           label: String(file?.release_name || item?.release_name || fileName),
           fileName,
-          language: String(file?.lang || file?.language || language),
+          language,
           format,
         };
       });
     })
-      .filter((item: any) =>
-        /^[a-zA-Z0-9_-]{4,80}$/.test(item.nId) &&
-        (!item.fileNId || /^[a-zA-Z0-9_-]{1,100}$/.test(item.fileNId)) &&
-        /^(vi|vietnamese|vietnam)$/i.test(item.language) &&
-        /^(srt|vtt|ass|ssa)$/.test(item.format),
-      )
-      .slice(0, 12);
+      .filter((item: any) => {
+        const validId = /^[a-zA-Z0-9_-]{1,100}$/.test(item.nId);
+        const validFileId = !item.fileNId || /^[a-zA-Z0-9_-]{1,100}$/.test(item.fileNId);
+        // The search request already asks SubDL for Vietnamese. Some v2 records omit
+        // per-file language metadata, so only reject an explicit non-Vietnamese value.
+        const normalizedLanguage = item.language.toLowerCase().replace(/[\\s_-]/g, "");
+        const isVietnamese = !normalizedLanguage ||
+          /^(vi|vie|vietnamese|vietnam)$/.test(normalizedLanguage);
+        const validFormat = /^(srt|vtt|ass|ssa)$/.test(item.format);
+        const validUrl = !item.downloadUrl || /^https:\\/\\/(?:dl|api)\\.subdl\\.com\\//i.test(item.downloadUrl);
+        return validId && validFileId && isVietnamese && validFormat && validUrl;
+      })
+      .slice(0, 20);
 
     return NextResponse.json({ subtitles, provider: "SubDL" });
   } catch {
