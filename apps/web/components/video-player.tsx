@@ -1269,6 +1269,23 @@ export const VideoPlayer = ({
           .player-controls-frame .artplayer-app .art-controls .art-control { min-width:36px!important;padding-inline:5px!important; }
           .player-controls-frame .artplayer-app .art-control-seek-back-30,.player-controls-frame .artplayer-app .art-control-seek-forward-30 { min-width:42px!important; }
         }
+        /* Restore the actual media surface: keep the decoded video visible beneath custom controls. */
+        .player-controls-frame .artplayer-app {
+          position:relative!important;width:100%!important;height:100%!important;
+          min-width:0!important;min-height:0!important;background:#000!important;
+        }
+        .player-controls-frame .artplayer-app .art-video-player {
+          position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+          overflow:hidden!important;background:#000!important;
+        }
+        .player-controls-frame .artplayer-app video,
+        .player-controls-frame .artplayer-app video.art-video {
+          display:block!important;position:absolute!important;inset:0!important;
+          width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+          max-width:none!important;max-height:none!important;object-fit:contain!important;
+          visibility:visible!important;opacity:1!important;transform:none!important;
+          filter:none!important;z-index:1!important;background:transparent!important;
+        }
         /* Final override: hide Artplayer UI without relying on its root class. */
         .player-controls-frame .art-controls,
         .player-controls-frame .art-bottom,
