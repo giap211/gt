@@ -65,7 +65,7 @@ export default function RootLayout({
         <HideDevBadge />
         <MemberProvider>
           <Navbar />
-          <div className="pb-24 lg:pb-0"><PersistentTabShell>{children}</PersistentTabShell></div>
+          <div className="pb-0"><PersistentTabShell>{children}</PersistentTabShell></div>
           <BottomDock />
         </MemberProvider>
       </body>
