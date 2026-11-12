@@ -27,7 +27,7 @@ interface VideoPlayerProps {
   onRotate?: () => void;
   showNextEpisode?: boolean;
   onNextEpisode?: () => void;
-  subtitleSearch?: { title: string; year?: number; tmdbId?: number | string };
+  subtitleSearch?: { title: string; year?: number; tmdbId?: number | string; type?: "movie" | "tv"; season?: number; episode?: number };
 }
 
 export const VideoPlayer = ({
@@ -773,6 +773,9 @@ export const VideoPlayer = ({
         });
         if (subtitleSearch.year) params.set("year", String(subtitleSearch.year));
         if (subtitleSearch.tmdbId) params.set("tmdbId", String(subtitleSearch.tmdbId));
+        if (subtitleSearch.type) params.set("type", subtitleSearch.type);
+        if (subtitleSearch.type === "tv" && Number.isInteger(subtitleSearch.season) && Number(subtitleSearch.season) > 0) params.set("season", String(subtitleSearch.season));
+        if (subtitleSearch.type === "tv" && Number.isInteger(subtitleSearch.episode) && Number(subtitleSearch.episode) > 0) params.set("episode", String(subtitleSearch.episode));
 
         let searchResponse = await fetch("/api/subtitles?" + params.toString());
         let searchData = await searchResponse.json().catch(() => null);
@@ -806,7 +809,7 @@ export const VideoPlayer = ({
             const downloadResponse = await fetch("/api/subtitles", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ nId: candidate.nId }),
+              body: JSON.stringify({ nId: candidate.nId, fileNId: candidate.fileNId, downloadUrl: candidate.downloadUrl }),
             });
             const downloadData = await downloadResponse.json().catch(() => null);
             if (!downloadResponse.ok || typeof downloadData?.content !== "string") continue;
@@ -855,7 +858,7 @@ export const VideoPlayer = ({
       });
       subtitleObjectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
     };
-  }, [url, isEmbed, subtitleSearch?.title, subtitleSearch?.year, subtitleSearch?.tmdbId]);
+  }, [url, isEmbed, subtitleSearch?.title, subtitleSearch?.year, subtitleSearch?.tmdbId, subtitleSearch?.type, subtitleSearch?.season, subtitleSearch?.episode]);
 
   if (isEmbed) {
     return (
