@@ -862,7 +862,10 @@ export const VideoPlayer = ({
 
         if (cancelled) return;
         installSelector(loaded.length ? undefined : "Không tải được file phụ đề");
-        if (loaded[0]) loaded[0].track.track.mode = "showing";
+        if (loaded[0]) {
+          loaded[0].track.track.mode = "showing";
+          subtitleEnabledRef.current = true;
+        }
       } catch (error) {
         console.warn("[Subtitles] SubDL search failed:", error);
         if (!cancelled) {
