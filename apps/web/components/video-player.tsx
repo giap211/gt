@@ -50,6 +50,7 @@ export const VideoPlayer = ({
   subtitleSearch,
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
+  const artPlayerRef = useRef<Artplayer | null>(null);
   const rotatedRef = useRef(rotated);
   rotatedRef.current = rotated;
   const onBackRef = useRef(onBack);
@@ -694,6 +695,7 @@ export const VideoPlayer = ({
           // ignore
         }
 
+        if (artPlayerRef.current === art) artPlayerRef.current = null;
         art = null;
       }
 
@@ -707,15 +709,15 @@ export const VideoPlayer = ({
     };
   }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, showNextEpisode]);
 
-  // Tự tìm phụ đề tiếng Việt từ OpenSubtitles và gắn vào thẻ video HTML5.
-  // API key chỉ nằm ở server; không đưa credential xuống trình duyệt.
+  // Tự tìm và tải các bản phụ đề tiếng Việt, cho phép chọn ngay trong Cài đặt player.
   useEffect(() => {
     if (!subtitleSearch?.title?.trim() || isEmbed) return;
 
     let cancelled = false;
-    let subtitleObjectUrl: string | null = null;
-    let attachedTrack: HTMLTrackElement | null = null;
-    let subtitleVideo: (HTMLVideoElement & { __subtitleVoiceCleanup?: () => void }) | null = null;
+    let subtitleObjectUrls: string[] = [];
+    let attachedTracks: HTMLTrackElement[] = [];
+    let subtitleVideo: HTMLVideoElement | null = null;
+    const settingName = "external-subtitles";
 
     const toVtt = (srt: string) => {
       const normalized = srt
@@ -726,7 +728,7 @@ export const VideoPlayer = ({
       return "WEBVTT\n\n" + normalized.replace(/^\d+\s*$/gm, "").trim();
     };
 
-    const loadSubtitle = async () => {
+    const loadSubtitles = async () => {
       try {
         const params = new URLSearchParams({
           title: subtitleSearch.title.trim(),
@@ -739,7 +741,6 @@ export const VideoPlayer = ({
         let searchData = await searchResponse.json().catch(() => null);
         if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
         let candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
-        // Nếu TMDB chưa có phụ đề, thử tìm lần hai bằng tên phim.
         if (!candidates.length && subtitleSearch.tmdbId) {
           params.delete("tmdbId");
           searchResponse = await fetch("/api/subtitles?" + params.toString());
@@ -747,118 +748,91 @@ export const VideoPlayer = ({
           if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
           candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
         }
-        if (!candidates.length) return;
-
-        // Ưu tiên nguồn tin cậy, nhiều lượt tải và bản không phải máy dịch.
-        const selected = candidates[0];
-        const downloadResponse = await fetch("/api/subtitles", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fileId: selected.fileId }),
-        });
-        const downloadData = await downloadResponse.json().catch(() => null);
-        if (!downloadResponse.ok || typeof downloadData?.content !== "string") {
-          throw new Error(downloadData?.error || "Không tải được phụ đề");
-        }
-        if (cancelled) return;
+        if (!candidates.length || cancelled) return;
 
         const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
         if (!video) return;
-        subtitleVideo = video as HTMLVideoElement & { __subtitleVoiceCleanup?: () => void };
+        subtitleVideo = video;
 
-        const blob = new Blob([toVtt(downloadData.content)], { type: "text/vtt;charset=utf-8" });
-        subtitleObjectUrl = URL.createObjectURL(blob);
-        attachedTrack = document.createElement("track");
-        attachedTrack.kind = "subtitles";
-        attachedTrack.label = "Tiếng Việt · OpenSubtitles";
-        attachedTrack.srclang = "vi";
-        attachedTrack.src = subtitleObjectUrl;
-        attachedTrack.default = true;
-        video.appendChild(attachedTrack);
+        // Tải tối đa 6 bản để tránh tiêu hao quota API quá nhiều.
+        const loaded: Array<{ label: string; track: HTMLTrackElement }> = [];
+        for (const candidate of candidates.slice(0, 6)) {
+          if (cancelled) return;
+          try {
+            const downloadResponse = await fetch("/api/subtitles", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ fileId: candidate.fileId }),
+            });
+            const downloadData = await downloadResponse.json().catch(() => null);
+            if (!downloadResponse.ok || typeof downloadData?.content !== "string") continue;
 
-        attachedTrack.addEventListener("load", () => {
-          if (attachedTrack?.track) attachedTrack.track.mode = "showing";
-        }, { once: true });
+            const objectUrl = URL.createObjectURL(
+              new Blob([toVtt(downloadData.content)], { type: "text/vtt;charset=utf-8" }),
+            );
+            subtitleObjectUrls.push(objectUrl);
 
-        // Thử nghiệm thuyết minh trực tiếp từ cue phụ đề bằng giọng tiếng Việt có sẵn trên thiết bị.
-        // Âm thanh gốc được hạ nhỏ trong lúc dùng track thuyết minh.
-        const cues = downloadData.content
-          .replace(/^\uFEFF/, "")
-          .replace(/\r/g, "")
-          .split(/\n\s*\n/)
-          .map((chunk: string) => {
-            const lines = chunk.split("\n").map((line: string) => line.trim()).filter(Boolean);
-            const timeLineIndex = lines.findIndex((line: string) => line.includes("-->"));
-            if (timeLineIndex < 0) return null;
-            const times = lines[timeLineIndex].split("-->");
-            const toSeconds = (value: string) => {
-              const match = value.trim().match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
-              return match ? Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]) + Number(match[4]) / 1000 : NaN;
-            };
-            const text = lines.slice(timeLineIndex + 1).join(" ").replace(/<[^>]+>/g, "").trim();
-            const start = toSeconds(times[0] || "");
-            const end = toSeconds(times[1] || "");
-            return text && Number.isFinite(start) && end > start ? { start, end, text } : null;
-          })
-          .filter((cue: { start: number; end: number; text: string } | null): cue is { start: number; end: number; text: string } => Boolean(cue));
-
-        const speech = window.speechSynthesis;
-        const originalVolume = video.volume;
-        let lastSpokenCue = -1;
-        let speechUnlocked = false;
-        if (speech && cues.length) {
-          video.volume = Math.min(originalVolume, 0.28);
-          const unlockSpeech = () => {
-            speechUnlocked = true;
-            speech.resume();
-          };
-          const onTimeUpdate = () => {
-            if (video.paused || !speechUnlocked) return;
-            const currentTime = video.currentTime;
-            const cueIndex = cues.findIndex((cue: { start: number; end: number }) => currentTime >= cue.start && currentTime < cue.end);
-            if (cueIndex < 0 || cueIndex === lastSpokenCue) return;
-            lastSpokenCue = cueIndex;
-            speech.cancel();
-            const utterance = new SpeechSynthesisUtterance(cues[cueIndex].text);
-            utterance.lang = "vi-VN";
-            utterance.rate = 1.08;
-            const voices = speech.getVoices();
-            const vietnameseVoices = voices.filter((voice) => voice.lang.toLowerCase().startsWith("vi"));
-            const preferredVoice = vietnameseVoices.find((voice) => /female|woman|nữ|google vietnamese/i.test(voice.name));
-            utterance.voice = preferredVoice || vietnameseVoices[0] || null;
-            speech.speak(utterance);
-          };
-          const onSeek = () => {
-            speech.cancel();
-            lastSpokenCue = -1;
-          };
-          const onPause = () => speech.cancel();
-          artRef.current?.addEventListener("pointerdown", unlockSpeech, { once: true });
-          video.addEventListener("timeupdate", onTimeUpdate);
-          video.addEventListener("seeking", onSeek);
-          video.addEventListener("pause", onPause);
-          video.addEventListener("play", onTimeUpdate);
-          (video as HTMLVideoElement & { __subtitleVoiceCleanup?: () => void }).__subtitleVoiceCleanup = () => {
-            artRef.current?.removeEventListener("pointerdown", unlockSpeech);
-            video.removeEventListener("timeupdate", onTimeUpdate);
-            video.removeEventListener("seeking", onSeek);
-            video.removeEventListener("pause", onPause);
-            video.removeEventListener("play", onTimeUpdate);
-            speech.cancel();
-            video.volume = originalVolume;
-          };
+            const track = document.createElement("track");
+            track.kind = "subtitles";
+            track.label = String(candidate.release || candidate.fileName || "Phụ đề tiếng Việt");
+            track.srclang = "vi";
+            track.src = objectUrl;
+            track.default = loaded.length === 0;
+            track.track.mode = "disabled";
+            video.appendChild(track);
+            attachedTracks.push(track);
+            loaded.push({ label: track.label, track });
+          } catch (error) {
+            console.warn("[Subtitles] Không tải được một bản phụ đề:", error);
+          }
         }
+
+        if (!loaded.length || cancelled) return;
+
+        const player = artPlayerRef.current as any;
+        if (!player?.setting) return;
+
+        try { player.setting.remove(settingName); } catch { /* setting chưa tồn tại */ }
+        const selector = [
+          { html: "Tắt phụ đề", trackIndex: -1, default: true },
+          ...loaded.map((item, index) => ({
+            html: item.label.replace(/[<>]/g, ""),
+            trackIndex: index,
+          })),
+        ];
+
+        player.setting.add({
+          name: settingName,
+          html: "Phụ đề",
+          tooltip: "Tắt phụ đề",
+          width: 260,
+          selector,
+          onSelect: (item: { html: string; trackIndex: number }) => {
+            loaded.forEach((entry, index) => {
+              entry.track.track.mode = index === item.trackIndex ? "showing" : "disabled";
+            });
+            const selectedLabel = item.trackIndex < 0 ? "Tắt phụ đề" : loaded[item.trackIndex]?.label || item.html;
+            return selectedLabel;
+          },
+        });
+
+        // Mặc định bật bản đầu tiên đã tải thành công.
+        loaded[0].track.track.mode = "showing";
       } catch (error) {
         console.warn("[Subtitles] Không thể tự tải phụ đề:", error);
       }
     };
 
-    void loadSubtitle();
+    void loadSubtitles();
     return () => {
       cancelled = true;
-      subtitleVideo?.__subtitleVoiceCleanup?.();
-      if (attachedTrack?.parentNode) attachedTrack.parentNode.removeChild(attachedTrack);
-      if (subtitleObjectUrl) URL.revokeObjectURL(subtitleObjectUrl);
+      const player = artPlayerRef.current as any;
+      try { player?.setting?.remove(settingName); } catch { /* player đã bị hủy */ }
+      attachedTracks.forEach((track) => {
+        if (track.parentNode) track.parentNode.removeChild(track);
+      });
+      subtitleObjectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
+      subtitleVideo = null;
     };
   }, [url, isEmbed, subtitleSearch?.title, subtitleSearch?.year, subtitleSearch?.tmdbId]);
 
