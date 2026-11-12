@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Variants } from "framer-motion";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { HomeScreen } from "@/components/home-screen";
@@ -14,34 +13,15 @@ function isTabPath(pathname: string) {
   return tabPaths.includes(pathname);
 }
 
-const routeVariants: Variants = {
-  enter: (direction: number) => ({
-    x: direction === -1 ? "-100%" : "100%",
-    opacity: 0.98,
-  }),
-  center: { x: "0%", opacity: 1 },
-  exit: (direction: number) => ({
-    x: direction === -1 ? "100%" : "-22%",
-    opacity: 0.96,
-  }),
-};
-
 export function PersistentTabShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const scrollPositions = useRef(new Map<string, number>());
   const previousPath = useRef(pathname);
-  const navigationDirection = useRef<1 | -1>(1);
   const isHome = pathname === "/";
   const isSeries = pathname === "/danh-sach/phim-bo";
   const isSingle = pathname === "/danh-sach/phim-le";
   const isTabRoute = isTabPath(pathname);
   const isWatchRoute = pathname === "/xem-phim" || pathname.startsWith("/xem-phim/");
-
-  useEffect(() => {
-    const markBackNavigation = () => { navigationDirection.current = -1; };
-    window.addEventListener("popstate", markBackNavigation);
-    return () => window.removeEventListener("popstate", markBackNavigation);
-  }, []);
 
   useEffect(() => {
     const rememberTabScroll = (event: MouseEvent) => {
@@ -68,39 +48,84 @@ export function PersistentTabShell({ children }: { children: ReactNode }) {
     previousPath.current = pathname;
   }, [pathname]);
 
-  useEffect(() => {
-    // A completed navigation starts the next forward transition by default.
-    // popstate sets this to -1 before the pathname changes for browser Back.
-    const reset = window.setTimeout(() => { navigationDirection.current = 1; }, 450);
-    return () => window.clearTimeout(reset);
-  }, [pathname]);
+  const tabTransition = {
+    opacity: { duration: 0.2, ease: "easeOut" as const },
+    y: { duration: 0.24, ease: [0.22, 1, 0.36, 1] as const },
+  };
 
   return (
     <div className="relative w-full min-h-[60vh] overflow-x-clip">
-      <div
+      <motion.div
         aria-hidden={!isTabRoute}
-        className={isTabRoute ? "block" : "hidden"}
+        initial={false}
+        animate={{ opacity: isTabRoute ? 1 : 0, y: isTabRoute ? 0 : 6 }}
+        transition={tabTransition}
+        className="w-full"
+        style={{
+          position: isTabRoute ? "relative" : "absolute",
+          inset: isTabRoute ? "auto" : 0,
+          pointerEvents: isTabRoute ? "auto" : "none",
+          zIndex: isTabRoute ? 1 : 0,
+          willChange: "opacity, transform",
+        }}
       >
-        <div hidden={!isHome}><HomeScreen /></div>
-        <div hidden={!isSeries}><MovieListingScreen type="phim-bo" /></div>
-        <div hidden={!isSingle}><MovieListingScreen type="phim-le" /></div>
-      </div>
+        <motion.div
+          aria-hidden={!isHome}
+          initial={false}
+          animate={{ opacity: isHome ? 1 : 0, y: isHome ? 0 : 6 }}
+          transition={tabTransition}
+          className="w-full"
+          style={{
+            position: isHome ? "relative" : "absolute",
+            inset: isHome ? "auto" : 0,
+            pointerEvents: isHome ? "auto" : "none",
+            willChange: "opacity, transform",
+          }}
+        >
+          <HomeScreen />
+        </motion.div>
+        <motion.div
+          aria-hidden={!isSeries}
+          initial={false}
+          animate={{ opacity: isSeries ? 1 : 0, y: isSeries ? 0 : 6 }}
+          transition={tabTransition}
+          className="w-full"
+          style={{
+            position: isSeries ? "relative" : "absolute",
+            inset: isSeries ? "auto" : 0,
+            pointerEvents: isSeries ? "auto" : "none",
+            willChange: "opacity, transform",
+          }}
+        >
+          <MovieListingScreen type="phim-bo" />
+        </motion.div>
+        <motion.div
+          aria-hidden={!isSingle}
+          initial={false}
+          animate={{ opacity: isSingle ? 1 : 0, y: isSingle ? 0 : 6 }}
+          transition={tabTransition}
+          className="w-full"
+          style={{
+            position: isSingle ? "relative" : "absolute",
+            inset: isSingle ? "auto" : 0,
+            pointerEvents: isSingle ? "auto" : "none",
+            willChange: "opacity, transform",
+          }}
+        >
+          <MovieListingScreen type="phim-le" />
+        </motion.div>
+      </motion.div>
 
-      <AnimatePresence initial={false} mode="sync" custom={navigationDirection.current}>
+      <AnimatePresence initial={false} mode="sync">
         {!isTabRoute && !isWatchRoute ? (
           <motion.div
             key={pathname}
-            custom={navigationDirection.current}
-            variants={routeVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "tween", duration: 0.46, ease: [0.22, 1, 0.36, 1] },
-              opacity: { duration: 0.3 },
-            }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
             className="relative z-10 w-full min-w-0 bg-inherit"
-            style={{ willChange: "transform" }}
+            style={{ willChange: "opacity, transform" }}
           >
             {children}
           </motion.div>
