@@ -78,11 +78,11 @@ export async function GET(request: NextRequest) {
 
       return files.map((file: any) => {
         const rawUrl = typeof file?.url === "string" ? file.url : (typeof item?.url === "string" ? item.url : "");
-        const urlMatch = rawUrl.match(/\\/subtitle\\/([^/?#]+)(?:\\/([^/?#]+))?/i);
+        const urlMatch = rawUrl.match(/\/subtitle\/([^/?#]+)(?:\/([^/?#]+))?/i);
         const nId = parentNId || String(urlMatch?.[1] || "");
         const fileNId = String(file?.file_n_id || file?.fileNId || urlMatch?.[2] || "");
         const fileName = String(file?.name || item?.name || item?.release_name || "subtitle.srt");
-        const extension = fileName.match(/\\.([a-z0-9]{2,5})(?:$|[?#])/i)?.[1] || "";
+        const extension = fileName.match(/\.([a-z0-9]{2,5})(?:$|[?#])/i)?.[1] || "";
         const format = String(file?.format || extension || "").toLowerCase();
         const language = String(file?.language || file?.lang || file?.language_name || parentLanguage).trim();
         const downloadUrl = rawUrl
@@ -104,11 +104,11 @@ export async function GET(request: NextRequest) {
         const validFileId = !item.fileNId || /^[a-zA-Z0-9_-]{1,100}$/.test(item.fileNId);
         // The search request already asks SubDL for Vietnamese. Some v2 records omit
         // per-file language metadata, so only reject an explicit non-Vietnamese value.
-        const normalizedLanguage = item.language.toLowerCase().replace(/[\\s_-]/g, "");
+        const normalizedLanguage = item.language.toLowerCase().replace(/[\s_-]/g, "");
         const isVietnamese = !normalizedLanguage ||
           /^(vi|vie|vietnamese|vietnam)$/.test(normalizedLanguage);
         const validFormat = /^(srt|vtt|ass|ssa)$/.test(item.format);
-        const validUrl = !item.downloadUrl || /^https:\\/\\/(?:dl|api)\\.subdl\\.com\\//i.test(item.downloadUrl);
+        const validUrl = !item.downloadUrl || /^https:\/\/(?:dl|api)\.subdl\.com\//i.test(item.downloadUrl);
         return validId && validFileId && isVietnamese && validFormat && validUrl;
       })
       .slice(0, 20);
