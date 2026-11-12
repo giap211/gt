@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Artplayer from "artplayer";
-import { ArrowLeft, Play, Pause, RotateCw, SkipBack, SkipForward, Subtitles, Maximize2, Settings2 } from "lucide-react";
+import { ArrowLeft, Play, Pause, RotateCw, SkipBack, SkipForward, Subtitles, Maximize2, Settings2, List } from "lucide-react";
 import Hls from "hls.js";
 
 // Tắt double-click fullscreen / play mặc định
@@ -64,6 +64,7 @@ interface VideoPlayerProps {
   backLabel?: string;
   onBack?: () => void;
   onRotate?: () => void;
+  onOpenEpisodePicker?: () => void;
   showNextEpisode?: boolean;
   onNextEpisode?: () => void;
   subtitleSearch?: { title: string; year?: number; tmdbId?: number | string; type?: "movie" | "tv"; season?: number; episode?: number };
@@ -84,6 +85,7 @@ export const VideoPlayer = ({
   backLabel = "Trở về",
   onBack,
   onRotate,
+  onOpenEpisodePicker,
   showNextEpisode = false,
   onNextEpisode,
   subtitleSearch,
@@ -1299,6 +1301,15 @@ export const VideoPlayer = ({
         >
           <ArrowLeft className="h-5 w-5 shrink-0" />
           <span className="truncate">{safeBackLabel}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => onOpenEpisodePicker?.()}
+          aria-label="Chọn tập và máy chủ"
+          title="Chọn tập và máy chủ"
+          className="pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white shadow-lg backdrop-blur-md transition hover:bg-black/55 active:scale-95"
+        >
+          <List className="h-5 w-5" />
         </button>
         <button
           type="button"
