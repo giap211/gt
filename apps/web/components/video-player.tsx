@@ -761,13 +761,71 @@ export const VideoPlayer = ({
           throw new Error(data?.error || "Không tải được phụ đề này.");
         }
         const format = String(candidate.format || "srt").toLowerCase();
-        const normalized = data.content.replace(/^\\uFEFF/, "").replace(/\\r/g, "").trim();
-        const vtt = format === "vtt" || /^WEBVTT(?:\\s|$)/i.test(normalized)
-          ? normalized
-          : "WEBVTT\\n\\n" + normalized
-              .replace(/(\\d{2}:\\d{2}:\\d{2}),(\\d{3})/g, "$1.$2")
-              .replace(/^\\d+\\s*$/gm, "")
+        const normalized = data.content
+          .replace(/^\uFEFF/, "")
+          .replace(/\r\n?/g, "\n")
+          .trim();
+
+        const toVttTimestamp = (value: string) => {
+          const match = value.trim().match(/^(\d{1,2}):(\d{2}):(\d{2})[,.](\d{1,3})$/);
+          if (!match) return value.trim();
+          return `${match[1].padStart(2, "0")}:${match[2]}:${match[3]}.${match[4].padEnd(3, "0")}`;
+        };
+
+        let vtt = "";
+        if (format === "ass" || format === "ssa" || /^\[Script Info\]/im.test(normalized)) {
+          const lines = normalized.split("\n");
+          let inEvents = false;
+          let fields = ["Layer", "Start", "End", "Style", "Name", "MarginL", "MarginR", "MarginV", "Effect", "Text"];
+          const cues: string[] = [];
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (/^\[Events\]$/i.test(trimmed)) {
+              inEvents = true;
+              continue;
+            }
+            if (/^\[.+\]$/.test(trimmed)) {
+              inEvents = false;
+              continue;
+            }
+            if (!inEvents) continue;
+            if (/^Format\s*:/i.test(trimmed)) {
+              fields = trimmed.slice(trimmed.indexOf(":") + 1).split(",").map((field) => field.trim());
+              continue;
+            }
+            if (!/^Dialogue\s*:/i.test(trimmed)) continue;
+            const raw = trimmed.slice(trimmed.indexOf(":") + 1);
+            const textIndex = fields.findIndex((field) => field.toLowerCase() === "text");
+            const startIndex = fields.findIndex((field) => field.toLowerCase() === "start");
+            const endIndex = fields.findIndex((field) => field.toLowerCase() === "end");
+            if (textIndex < 0 || startIndex < 0 || endIndex < 0) continue;
+            const parts = raw.split(",");
+            const values = parts.slice(0, textIndex);
+            values.push(parts.slice(textIndex).join(","));
+            const start = toVttTimestamp(values[startIndex] || "");
+            const end = toVttTimestamp(values[endIndex] || "");
+            const caption = (values[textIndex] || "")
+              .replace(/\{[^}]*\}/g, "")
+              .replace(/\\[Nn]/g, "\n")
+              .replace(/\\h/g, " ")
+              .replace(/\\\\/g, "\\")
               .trim();
+            if (/^\d{2}:\d{2}:\d{2}\.\d{3}$/.test(start) &&
+                /^\d{2}:\d{2}:\d{2}\.\d{3}$/.test(end) && caption) {
+              cues.push(`${start} --> ${end}\n${caption}`);
+            }
+          }
+          vtt = "WEBVTT\n\n" + cues.join("\n\n");
+        } else if (/^WEBVTT(?:\s|$)/i.test(normalized)) {
+          vtt = normalized;
+        } else {
+          const cues = normalized
+            .replace(/(\d{1,2}:\d{2}:\d{2}),(\d{1,3})/g, (_match, time, millis) => `${time}.${String(millis).padEnd(3, "0")}`);
+          vtt = "WEBVTT\n\n" + cues;
+        }
+        if (!/^WEBVTT(?:\s|$)/i.test(vtt) || !/-->/.test(vtt)) {
+          throw new Error("File phụ đề không có câu thoại hợp lệ hoặc định dạng không được hỗ trợ.");
+        }
         const objectUrl = URL.createObjectURL(new Blob([vtt], { type: "text/vtt;charset=utf-8" }));
         subtitleObjectUrls.push(objectUrl);
         const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
@@ -777,12 +835,25 @@ export const VideoPlayer = ({
         track.label = String(candidate.label || candidate.fileName || "Phụ đề tiếng Việt");
         track.srclang = "vi";
         track.src = objectUrl;
+        track.default = true;
         video.appendChild(track);
-        track.track.mode = "disabled";
         attachedTracks.push(track);
         const entry = { key, label: track.label, track };
         loaded.push(entry);
-        loaded.forEach((item) => { item.track.track.mode = item === entry ? "showing" : "disabled"; });
+        const activateTrack = () => {
+          if (cancelled || !video.isConnected) return;
+          loaded.forEach((item) => {
+            item.track.track.mode = item === entry ? "showing" : "disabled";
+          });
+          // Safari/iOS đôi khi chỉ cập nhật cue sau khi track đã tải xong.
+          if (entry.track.track.mode !== "showing") entry.track.track.mode = "showing";
+        };
+        track.addEventListener("load", activateTrack, { once: true });
+        track.addEventListener("error", () => {
+          if (!cancelled) setSubtitleError("Trình duyệt không đọc được file phụ đề này.");
+        }, { once: true });
+        activateTrack();
+        window.setTimeout(activateTrack, 150);
         setSelectedSubtitle(entry.label);
       } catch (error) {
         const message = error instanceof Error ? error.message : "Không tải được phụ đề.";
