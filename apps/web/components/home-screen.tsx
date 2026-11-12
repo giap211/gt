@@ -106,15 +106,67 @@ export function HomeScreen() {
     };
 
     const fetchData = async () => {
+      // Render the first useful content as soon as the three core feeds arrive.
+      // Secondary shelves and the curated hero continue loading in parallel.
+      const corePromise = Promise.all([
+        getLatestMovies(1),
+        getMoviesByType("phim-bo", 1, true),
+        getMoviesByType("phim-le", 1, true),
+      ]);
+
+      const heroPromise = fetch("/api/hero-trending")
+        .then(async (response) => {
+          if (!response.ok) return [] as HeroMovie[];
+          const payload = (await response.json()) as { items?: HeroMovie[] };
+          return Array.isArray(payload.items) ? payload.items : [];
+        })
+        .catch((error) => {
+          console.error("Failed to fetch trending hero movies", error);
+          return [] as HeroMovie[];
+        });
+
+      const secondaryPromise = Promise.all([
+        getMoviesByLanguage("thuyet-minh", 1),
+        getMoviesByCountry("han-quoc", 1, true),
+        getMoviesByCountry("trung-quoc", 1, true),
+        getMoviesByCountry("au-my", 1, true),
+        getMoviesByType("hoat-hinh", 1, true),
+        getMoviesByCategory("chieu-rap", 1, true),
+        getMoviesByCountry("nhat-ban", 1, true),
+        getMoviesByCountry("thai-lan", 1, true),
+        getMoviesByCountry("hong-kong", 1, true),
+        getMoviesByCategory("co-trang", 1, true),
+        getMoviesByCategory("kinh-di", 1, true),
+        getMoviesByCategory("tinh-cam", 1, true),
+        getMoviesByCountry("viet-nam", 1, true),
+      ]);
+
       try {
+        const [latestRes, seriesRes, singleRes] = await corePromise;
+        if (cancelled) return;
+
+        const fallbackHero = (latestRes?.items || []).slice(0, 6);
+        setData((current) => ({
+          ...current,
+          latest: latestRes?.items || [],
+          series: seriesRes?.items || [],
+          single: singleRes?.items || [],
+          cinema: singleRes?.items || [],
+          hero: fallbackHero,
+        }));
+        setLoading(false);
+
+        const [trendingHero, secondary] = await Promise.all([
+          heroPromise,
+          secondaryPromise,
+        ]);
+        if (cancelled) return;
+
         const [
-          latestRes,
           dubbedRes,
           koreanRes,
           chineseRes,
           usukRes,
-          seriesRes,
-          singleRes,
           cartoonRes,
           cinemaRes,
           japaneseRes,
@@ -124,58 +176,17 @@ export function HomeScreen() {
           horrorRes,
           romanceRes,
           vietRes,
-        ] = await Promise.all([
-          getLatestMovies(1),
-          getMoviesByLanguage("thuyet-minh", 1),
-          getMoviesByCountry("han-quoc", 1, true),
-          getMoviesByCountry("trung-quoc", 1, true),
-          getMoviesByCountry("au-my", 1, true),
-          getMoviesByType("phim-bo", 1, true),
-          getMoviesByType("phim-le", 1, true),
-          getMoviesByType("hoat-hinh", 1, true),
-          // Dùng category chieu-rap (map sang phim-le) thay vì phim-sap-chieu
-          // để chỉ hiện phim chiếu rạp đã có nguồn xem.
-          getMoviesByCategory("chieu-rap", 1, true),
-          getMoviesByCountry("nhat-ban", 1, true),
-          getMoviesByCountry("thai-lan", 1, true),
-          getMoviesByCountry("hong-kong", 1, true),
-          getMoviesByCategory("co-trang", 1, true),
-          getMoviesByCategory("kinh-di", 1, true),
-          getMoviesByCategory("tinh-cam", 1, true),
-          getMoviesByCountry("viet-nam", 1, true),
-        ]);
+        ] = secondary;
 
-        let trendingHero: HeroMovie[] = [];
-        try {
-          const heroResponse = await fetch("/api/hero-trending");
-          if (heroResponse.ok) {
-            const heroPayload = (await heroResponse.json()) as {
-              items?: HeroMovie[];
-            };
-            trendingHero = Array.isArray(heroPayload.items)
-              ? heroPayload.items
-              : [];
-          }
-        } catch (error) {
-          console.error("Failed to fetch trending hero movies", error);
-        }
-
-        const curatedHero = (
-          trendingHero.length ? trendingHero : latestRes?.items || []
-        ).slice(0, 6);
-
-        if (cancelled) return;
-
-        setData({
-          latest: latestRes?.items || [],
+        const curatedHero = (trendingHero.length ? trendingHero : fallbackHero).slice(0, 6);
+        setData((current) => ({
+          ...current,
           dubbed: dubbedRes?.items || [],
           korean: koreanRes?.items || [],
           chinese: chineseRes?.items || [],
           usuk: usukRes?.items || [],
-          series: seriesRes?.items || [],
-          single: singleRes?.items || [],
           cartoon: cartoonRes?.items || [],
-          cinema: cinemaRes?.items || singleRes?.items || [],
+          cinema: cinemaRes?.items?.length ? cinemaRes.items : current.single,
           japanese: japaneseRes?.items || [],
           thai: thaiRes?.items || [],
           hongkong: hongkongRes?.items || [],
@@ -184,7 +195,7 @@ export function HomeScreen() {
           romance: romanceRes?.items || [],
           viet: vietRes?.items || [],
           hero: curatedHero,
-        });
+        }));
 
         void fetchHeroBackdrops(curatedHero);
       } catch (error) {

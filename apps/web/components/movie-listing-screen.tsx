@@ -43,14 +43,16 @@ export function MovieListingScreen({ type }: { type: string }) {
     const fetchInitial = async () => {
       setIsLoading(true);
       try {
-        const responses = await Promise.all([1, 2, 3, 4, 5].map((page) => fetchMoviesFromAPI(page)));
+        // Fetch only the first page initially. InfiniteMovieGrid loads later
+        // pages when the viewer reaches the end of the current results.
+        const firstPage = await fetchMoviesFromAPI(1);
         if (cancelled) return;
-        const validResults = responses.filter((result) => result && result.status);
-        if (validResults.length > 0) {
-          const allItems = validResults.flatMap((result) => result.items || []);
-          const unique = Array.from(new Map(allItems.map((movie) => [movie._id, movie])).values());
-          setMovies(unique.slice(0, 200));
-          setTotalPages(validResults[0]?.pagination?.totalPages || 1);
+        if (firstPage?.status) {
+          const unique = Array.from(
+            new Map((firstPage.items || []).map((movie) => [movie._id, movie])).values(),
+          );
+          setMovies(unique);
+          setTotalPages(firstPage.pagination?.totalPages || 1);
         } else {
           setMovies([]);
           setTotalPages(1);
@@ -274,7 +276,7 @@ export function MovieListingScreen({ type }: { type: string }) {
           <div className="relative">
             {isLoading && hasLoaded && <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold text-violet-400" role="status"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-violet-400" /> Đang chuyển danh mục...</div>}
             <div className={`transition-opacity duration-200 ${isLoading && hasLoaded ? "opacity-75" : "opacity-100"}`}>
-              <InfiniteMovieGrid initialItems={movies} initialTotalPages={totalPages} initialPage={5} fetchMore={fetchMoviesFromAPI} type={type} />
+              <InfiniteMovieGrid initialItems={movies} initialTotalPages={totalPages} initialPage={1} fetchMore={fetchMoviesFromAPI} type={type} />
             </div>
           </div>
         ) : (
