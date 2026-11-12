@@ -1267,12 +1267,21 @@ export const VideoPlayer = ({
           .player-controls-frame .artplayer-app .art-controls .art-control { min-width:36px!important;padding-inline:5px!important; }
           .player-controls-frame .artplayer-app .art-control-seek-back-30,.player-controls-frame .artplayer-app .art-control-seek-forward-30 { min-width:42px!important; }
         }
-        /* Final override: only the React player dock should remain visible. */
-        .player-controls-frame .artplayer-app .art-controls,
-        .player-controls-frame .artplayer-app .art-bottom {
+        /* Final override: hide Artplayer's legacy control layer regardless of its internal root class. */
+        .player-controls-frame .art-controls,
+        .player-controls-frame .art-bottom,
+        .player-controls-frame .art-progress {
           display:none!important;
           visibility:hidden!important;
           opacity:0!important;
+          pointer-events:none!important;
+        }
+        .player-controls-frame .art-control,
+        .player-controls-frame .art-control-volume,
+        .player-controls-frame .art-control-fullscreen,
+        .player-controls-frame .art-control-setting {
+          display:none!important;
+          visibility:hidden!important;
           pointer-events:none!important;
         }
 `}</style>
