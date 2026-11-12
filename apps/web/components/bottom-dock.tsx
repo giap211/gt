@@ -102,15 +102,37 @@ export function BottomDock() {
   };
 
   useEffect(() => {
-    if (searchOpen) {
-      const t = setTimeout(() => inputRef.current?.focus(), 80);
-      document.body.style.overflow = "hidden";
-      return () => {
-        clearTimeout(t);
-        document.body.style.overflow = "";
-      };
-    }
-    document.body.style.overflow = "";
+    if (!searchOpen) return;
+
+    // iOS Safari can still move the document when an input receives focus,
+    // even with body overflow hidden. Freeze the page at its current scroll
+    // position while the search sheet is open, then restore it on close.
+    const body = document.body;
+    const scrollY = window.scrollY;
+    const previousStyles = {
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+      overflow: body.style.overflow,
+    };
+
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+
+    const focusTimer = window.setTimeout(() => {
+      inputRef.current?.focus({ preventScroll: true });
+    }, 80);
+
+    return () => {
+      window.clearTimeout(focusTimer);
+      body.style.position = previousStyles.position;
+      body.style.top = previousStyles.top;
+      body.style.width = previousStyles.width;
+      body.style.overflow = previousStyles.overflow;
+      window.scrollTo({ top: scrollY, left: 0, behavior: "instant" });
+    };
   }, [searchOpen]);
 
   useEffect(() => {
@@ -191,7 +213,7 @@ export function BottomDock() {
                 className="w-full h-11 rounded-xl bg-white/[0.06] border border-white/10 pl-10 pr-10 text-base text-white placeholder:text-white/35 outline-none focus:border-violet-400/50"
               />
               {query && (
-                <button type="button" onClick={() => { setQuery(""); setResults([]); inputRef.current?.focus(); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40">
+                <button type="button" onClick={() => { setQuery(""); setResults([]); inputRef.current?.focus({ preventScroll: true }); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40">
                   <X size={16} />
                 </button>
               )}
