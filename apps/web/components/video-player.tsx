@@ -51,6 +51,8 @@ export const VideoPlayer = ({
 }: VideoPlayerProps) => {
   const artRef = useRef<HTMLDivElement>(null);
   const artPlayerRef = useRef<Artplayer | null>(null);
+  const subtitleToggleRef = useRef<() => void>(() => {});
+  const subtitleEnabledRef = useRef(false);
   const rotatedRef = useRef(rotated);
   rotatedRef.current = rotated;
   const onBackRef = useRef(onBack);
@@ -176,6 +178,14 @@ export const VideoPlayer = ({
             html: '<span style="font-size:12px;font-weight:700;white-space:nowrap">+30s</span>',
             tooltip: "Tiến 30 giây",
             click: () => { if (!art) return; art.seek = Math.min(art.duration || Infinity, art.currentTime + 30); art.play().catch(() => {}); art.notice.show = "Tiến 30 giây"; },
+          },
+          {
+            name: "subtitle-toggle",
+            position: "right",
+            index: 98,
+            html: '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:24px;padding:0 6px;border:1px solid currentColor;border-radius:6px;font-size:11px;font-weight:850;letter-spacing:.04em">SUB</span>',
+            tooltip: "Bật / tắt phụ đề",
+            click: () => subtitleToggleRef.current(),
           },
           ...(showNextEpisode ? [{
             name: "next-episode",
@@ -754,12 +764,26 @@ export const VideoPlayer = ({
           loaded.forEach((entry, index) => {
             entry.track.track.mode = index === item.trackIndex ? "showing" : "disabled";
           });
+          subtitleEnabledRef.current = item.trackIndex >= 0;
           if (item.trackIndex === -2) return item.html;
           return item.trackIndex < 0
             ? "Tắt phụ đề"
             : loaded[item.trackIndex]?.label || item.html;
         },
       });
+      subtitleToggleRef.current = () => {
+        const activePlayer = artPlayerRef.current as any;
+        if (!loaded.length) {
+          if (activePlayer?.setting) activePlayer.setting.show = true;
+          return;
+        }
+        const enable = !subtitleEnabledRef.current;
+        loaded.forEach((entry) => {
+          entry.track.track.mode = enable && entry === loaded[0] ? "showing" : "disabled";
+        });
+        subtitleEnabledRef.current = enable;
+        if (activePlayer?.notice) activePlayer.notice.show = enable ? "Đã bật phụ đề" : "Đã tắt phụ đề";
+      };
     };
 
     // Nút Phụ đề luôn xuất hiện, kể cả lúc đang tìm hoặc không có kết quả.
@@ -851,6 +875,8 @@ export const VideoPlayer = ({
     void loadSubtitles();
     return () => {
       cancelled = true;
+      subtitleToggleRef.current = () => {};
+      subtitleEnabledRef.current = false;
       const activePlayer = artPlayerRef.current as any;
       try { activePlayer?.setting?.remove(settingName); } catch { /* player đã bị hủy */ }
       attachedTracks.forEach((track) => {
