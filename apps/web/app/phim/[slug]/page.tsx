@@ -113,13 +113,13 @@ export default function MovieDetailPage({
   if (loading) {
     return (
       <main className="movie-detail-page min-h-screen bg-[#100f1e] text-white animate-pulse">
-        <div className="relative min-h-[520px] md:min-h-[600px] overflow-hidden">
+        <div className="relative min-h-[480px] overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-violet-950/35 via-[#100f1e]/70 to-[#100f1e]" />
-          <div className="relative mx-auto max-w-7xl px-4 pt-28 md:pt-36 pb-12">
-            <div className="grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)] gap-7 md:gap-10 items-start">
-              <div className="mx-auto md:mx-0 w-40 md:w-[220px] aspect-[2/3] rounded-2xl bg-white/[0.09] border border-white/[0.08]" />
+          <div className="relative mx-auto max-w-7xl px-3 pt-24 pb-10">
+            <div className="grid grid-cols-1 gap-5 items-start">
+              <div className="mx-auto w-36 aspect-[2/3] rounded-2xl bg-white/[0.09] border border-white/[0.08]" />
               <div className="pt-2 space-y-4 max-w-2xl">
-                <div className="h-8 md:h-10 w-3/4 rounded-lg bg-white/[0.12]" />
+                <div className="h-8 w-3/4 rounded-lg bg-white/[0.12]" />
                 <div className="h-4 w-1/2 rounded bg-white/[0.08]" />
                 <div className="flex gap-2"><div className="h-6 w-14 rounded bg-white/[0.1]" /><div className="h-6 w-16 rounded bg-white/[0.1]" /><div className="h-6 w-12 rounded bg-white/[0.1]" /></div>
                 <div className="h-3 w-full max-w-xl rounded bg-white/[0.08]" /><div className="h-3 w-5/6 max-w-lg rounded bg-white/[0.08]" /><div className="h-3 w-2/3 max-w-md rounded bg-white/[0.08]" />
@@ -130,9 +130,9 @@ export default function MovieDetailPage({
         </div>
         <section className="mx-auto max-w-7xl px-4 -mt-2 pb-20 space-y-6">
           <div className="h-6 w-36 rounded bg-white/[0.1]" />
-          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-8 gap-3">{Array.from({ length: 8 }, (_, i) => <div key={i} className="aspect-video rounded-xl bg-white/[0.08]" />)}</div>
+          <div className="grid grid-cols-3 gap-3">{Array.from({ length: 8 }, (_, i) => <div key={i} className="aspect-video rounded-xl bg-white/[0.08]" />)}</div>
           <div className="h-6 w-44 rounded bg-white/[0.1] mt-8" />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">{Array.from({ length: 6 }, (_, i) => <div key={i} className="space-y-2"><div className="aspect-[2/3] rounded-xl bg-white/[0.08]" /><div className="h-3 w-4/5 rounded bg-white/[0.08]" /></div>)}</div>
+          <div className="grid grid-cols-2 gap-4">{Array.from({ length: 6 }, (_, i) => <div key={i} className="space-y-2"><div className="aspect-[2/3] rounded-xl bg-white/[0.08]" /><div className="h-3 w-4/5 rounded bg-white/[0.08]" /></div>)}</div>
         </section>
       </main>
     );

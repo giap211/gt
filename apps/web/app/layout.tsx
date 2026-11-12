@@ -64,9 +64,11 @@ export default function RootLayout({
         <PosterScrollMotion />
         <HideDevBadge />
         <MemberProvider>
-          <Navbar />
-          <div className="pb-0"><PersistentTabShell>{children}</PersistentTabShell></div>
-          <BottomDock />
+          <div className="mobile-app-shell">
+            <Navbar />
+            <div className="pb-0"><PersistentTabShell>{children}</PersistentTabShell></div>
+            <BottomDock />
+          </div>
         </MemberProvider>
       </body>
     </html>
