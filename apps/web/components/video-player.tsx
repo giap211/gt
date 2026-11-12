@@ -93,6 +93,13 @@ export const VideoPlayer = ({
 
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showPlayerHeader, setShowPlayerHeader] = useState(true);
+  const [subtitlePanelOpen, setSubtitlePanelOpen] = useState(false);
+  const [subtitleCandidates, setSubtitleCandidates] = useState<any[]>([]);
+  const [subtitleLoading, setSubtitleLoading] = useState(false);
+  const [subtitleError, setSubtitleError] = useState("");
+  const [subtitleDownloading, setSubtitleDownloading] = useState("");
+  const [selectedSubtitle, setSelectedSubtitle] = useState("");
+  const subtitleSelectRef = useRef<(candidate: any) => void>(() => {});
   const [showDebug, setShowDebug] = useState(() => {
     try {
       return typeof window !== "undefined" && window.localStorage.getItem("player-skip-intro-debug") === "on";
@@ -185,7 +192,7 @@ export const VideoPlayer = ({
             index: 98,
             html: '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:24px;padding:0 6px;border:1px solid currentColor;border-radius:6px;font-size:11px;font-weight:850;letter-spacing:.04em">SUB</span>',
             tooltip: "Bật / tắt phụ đề",
-            click: () => subtitleToggleRef.current(),
+            click: () => setSubtitlePanelOpen(true),
           },
           ...(showNextEpisode ? [{
             name: "next-episode",
@@ -720,171 +727,106 @@ export const VideoPlayer = ({
     };
   }, [url, poster, title, onReady, isEmbed, startAtSeconds, onProgress, showNextEpisode]);
 
-  // Tự tìm phụ đề tiếng Việt qua SubDL và thêm bộ chọn vào Cài đặt player.
+  // Tìm danh sách phụ đề SubDL; chỉ tải file khi người xem chọn một bản.
   useEffect(() => {
     if (!subtitleSearch?.title?.trim() || isEmbed) return;
 
     let cancelled = false;
     const subtitleObjectUrls: string[] = [];
     const attachedTracks: HTMLTrackElement[] = [];
-    const settingName = "external-subtitles";
-    const loaded: Array<{ label: string; track: HTMLTrackElement }> = [];
-    const player = artPlayerRef.current as any;
+    const loaded: Array<{ key: string; label: string; track: HTMLTrackElement }> = [];
+    setSubtitleCandidates([]);
+    setSubtitleLoading(true);
+    setSubtitleError("");
+    setSelectedSubtitle("");
+    subtitleSelectRef.current = async (candidate: any) => {
+      const key = String(candidate?.nId || "") + ":" + String(candidate?.fileNId || candidate?.downloadUrl || "");
+      const existing = loaded.find((item) => item.key === key);
+      if (existing) {
+        loaded.forEach((item) => { item.track.track.mode = item === existing ? "showing" : "disabled"; });
+        setSelectedSubtitle(existing.label);
+        return;
+      }
 
-    const toVtt = (content: string, format: string) => {
-      const normalized = content.replace(/^\uFEFF/, "").replace(/\r/g, "").trim();
-      if (format === "vtt" || /^WEBVTT(?:\s|$)/i.test(normalized)) return normalized;
-      return "WEBVTT\n\n" + normalized
-        .replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2")
-        .replace(/^\d+\s*$/gm, "")
-        .trim();
-    };
-
-    const installSelector = (emptyLabel?: string) => {
-      const activePlayer = artPlayerRef.current as any;
-      if (!activePlayer?.setting) return;
-      try { activePlayer.setting.remove(settingName); } catch { /* setting chưa tồn tại */ }
-      const selector = loaded.length
-        ? [
-            { html: "Tắt phụ đề", trackIndex: -1 },
-            ...loaded.map((item, index) => ({
-              html: item.label.replace(/[<>]/g, ""),
-              trackIndex: index,
-              default: index === 0,
-            })),
-          ]
-        : [{ html: emptyLabel || "Chưa tìm thấy phụ đề", trackIndex: -2 }];
-      activePlayer.setting.add({
-        name: settingName,
-        html: "Phụ đề",
-        tooltip: loaded[0]?.label || emptyLabel || "Đang tìm phụ đề tiếng Việt",
-        width: 280,
-        selector,
-        onSelect: (item: { html: string; trackIndex: number }) => {
-          loaded.forEach((entry, index) => {
-            entry.track.track.mode = index === item.trackIndex ? "showing" : "disabled";
-          });
-          subtitleEnabledRef.current = item.trackIndex >= 0;
-          if (item.trackIndex === -2) return item.html;
-          return item.trackIndex < 0
-            ? "Tắt phụ đề"
-            : loaded[item.trackIndex]?.label || item.html;
-        },
-      });
-      subtitleToggleRef.current = () => {
-        const activePlayer = artPlayerRef.current as any;
-        if (!loaded.length) {
-          if (activePlayer?.setting) activePlayer.setting.show = true;
-          return;
-        }
-        const enable = !subtitleEnabledRef.current;
-        loaded.forEach((entry) => {
-          entry.track.track.mode = enable && entry === loaded[0] ? "showing" : "disabled";
+      setSubtitleDownloading(key);
+      setSubtitleError("");
+      try {
+        const response = await fetch("/api/subtitles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nId: candidate.nId, fileNId: candidate.fileNId, downloadUrl: candidate.downloadUrl }),
         });
-        subtitleEnabledRef.current = enable;
-        if (activePlayer?.notice) activePlayer.notice.show = enable ? "Đã bật phụ đề" : "Đã tắt phụ đề";
-      };
+        const data = await response.json().catch(() => null);
+        if (!response.ok || typeof data?.content !== "string") {
+          throw new Error(data?.error || "Không tải được phụ đề này.");
+        }
+        const format = String(candidate.format || "srt").toLowerCase();
+        const normalized = data.content.replace(/^\\uFEFF/, "").replace(/\\r/g, "").trim();
+        const vtt = format === "vtt" || /^WEBVTT(?:\\s|$)/i.test(normalized)
+          ? normalized
+          : "WEBVTT\\n\\n" + normalized
+              .replace(/(\\d{2}:\\d{2}:\\d{2}),(\\d{3})/g, "$1.$2")
+              .replace(/^\\d+\\s*$/gm, "")
+              .trim();
+        const objectUrl = URL.createObjectURL(new Blob([vtt], { type: "text/vtt;charset=utf-8" }));
+        subtitleObjectUrls.push(objectUrl);
+        const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
+        if (!video) throw new Error("Trình phát chưa sẵn sàng.");
+        const track = document.createElement("track");
+        track.kind = "subtitles";
+        track.label = String(candidate.label || candidate.fileName || "Phụ đề tiếng Việt");
+        track.srclang = "vi";
+        track.src = objectUrl;
+        video.appendChild(track);
+        track.track.mode = "disabled";
+        attachedTracks.push(track);
+        const entry = { key, label: track.label, track };
+        loaded.push(entry);
+        loaded.forEach((item) => { item.track.track.mode = item === entry ? "showing" : "disabled"; });
+        setSelectedSubtitle(entry.label);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Không tải được phụ đề.";
+        setSubtitleError(message);
+      } finally {
+        setSubtitleDownloading("");
+      }
     };
-
-    // Nút Phụ đề luôn xuất hiện, kể cả lúc đang tìm hoặc không có kết quả.
-    installSelector("Đang tìm phụ đề...");
 
     const loadSubtitles = async () => {
       try {
-        const params = new URLSearchParams({
-          title: subtitleSearch.title.trim(),
-          language: "vi",
-        });
+        const params = new URLSearchParams({ title: subtitleSearch.title.trim(), language: "vi" });
         if (subtitleSearch.year) params.set("year", String(subtitleSearch.year));
         if (subtitleSearch.tmdbId) params.set("tmdbId", String(subtitleSearch.tmdbId));
         if (subtitleSearch.type) params.set("type", subtitleSearch.type);
         if (subtitleSearch.type === "tv" && Number.isInteger(subtitleSearch.season) && Number(subtitleSearch.season) > 0) params.set("season", String(subtitleSearch.season));
         if (subtitleSearch.type === "tv" && Number.isInteger(subtitleSearch.episode) && Number(subtitleSearch.episode) > 0) params.set("episode", String(subtitleSearch.episode));
 
-        let searchResponse = await fetch("/api/subtitles?" + params.toString());
-        let searchData = await searchResponse.json().catch(() => null);
-        if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
-        let candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
-
+        let response = await fetch("/api/subtitles?" + params.toString());
+        let data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(data?.error || "Không thể tìm phụ đề SubDL.");
+        let candidates = Array.isArray(data?.subtitles) ? data.subtitles : [];
         if (!candidates.length && subtitleSearch.tmdbId) {
           params.delete("tmdbId");
-          searchResponse = await fetch("/api/subtitles?" + params.toString());
-          searchData = await searchResponse.json().catch(() => null);
-          if (!searchResponse.ok) throw new Error(searchData?.error || "Không tìm thấy phụ đề");
-          candidates = Array.isArray(searchData?.subtitles) ? searchData.subtitles : [];
+          response = await fetch("/api/subtitles?" + params.toString());
+          data = await response.json().catch(() => null);
+          if (!response.ok) throw new Error(data?.error || "Không thể tìm phụ đề SubDL.");
+          candidates = Array.isArray(data?.subtitles) ? data.subtitles : [];
         }
-
         if (cancelled) return;
-        if (!candidates.length) {
-          installSelector("Không tìm thấy phụ đề tiếng Việt");
-          return;
-        }
-
-        const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
-        if (!video) {
-          installSelector("Player chưa sẵn sàng");
-          return;
-        }
-
-        // Giới hạn tối đa 6 bản để tiết kiệm quota tải xuống.
-        for (const candidate of candidates.slice(0, 6)) {
-          if (cancelled) return;
-          try {
-            const downloadResponse = await fetch("/api/subtitles", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ nId: candidate.nId, fileNId: candidate.fileNId, downloadUrl: candidate.downloadUrl }),
-            });
-            const downloadData = await downloadResponse.json().catch(() => null);
-            if (!downloadResponse.ok || typeof downloadData?.content !== "string") continue;
-
-            const format = String(candidate.format || "srt").toLowerCase();
-            const subtitleContent = toVtt(downloadData.content, format);
-            const objectUrl = URL.createObjectURL(
-              new Blob([subtitleContent], { type: "text/vtt;charset=utf-8" }),
-            );
-            subtitleObjectUrls.push(objectUrl);
-
-            const track = document.createElement("track");
-            track.kind = "subtitles";
-            track.label = String(candidate.label || candidate.fileName || "Phụ đề tiếng Việt");
-            track.srclang = "vi";
-            track.src = objectUrl;
-            track.default = loaded.length === 0;
-            video.appendChild(track);
-            track.track.mode = "disabled";
-            attachedTracks.push(track);
-            loaded.push({ label: track.label, track });
-          } catch (error) {
-            console.warn("[Subtitles] Không tải được một bản SubDL:", error);
-          }
-        }
-
-        if (cancelled) return;
-        installSelector(loaded.length ? undefined : "Không tải được file phụ đề");
-        if (loaded[0]) {
-          loaded[0].track.track.mode = "showing";
-          subtitleEnabledRef.current = true;
-        }
+        setSubtitleCandidates(candidates);
+        if (!candidates.length) setSubtitleError("SubDL không có phụ đề tiếng Việt phù hợp cho phim/tập này.");
       } catch (error) {
-        console.warn("[Subtitles] SubDL search failed:", error);
-        if (!cancelled) {
-          const message = error instanceof Error ? error.message : "Không thể tìm phụ đề";
-          installSelector(message.slice(0, 90));
-        }
+        if (!cancelled) setSubtitleError(error instanceof Error ? error.message : "Không thể kết nối SubDL.");
+      } finally {
+        if (!cancelled) setSubtitleLoading(false);
       }
     };
 
     void loadSubtitles();
     return () => {
       cancelled = true;
-      subtitleToggleRef.current = () => {};
-      subtitleEnabledRef.current = false;
-      const activePlayer = artPlayerRef.current as any;
-      try { activePlayer?.setting?.remove(settingName); } catch { /* player đã bị hủy */ }
-      attachedTracks.forEach((track) => {
-        if (track.parentNode) track.parentNode.removeChild(track);
-      });
+      subtitleSelectRef.current = () => {};
+      attachedTracks.forEach((track) => { if (track.parentNode) track.parentNode.removeChild(track); });
       subtitleObjectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
     };
   }, [url, isEmbed, subtitleSearch?.title, subtitleSearch?.year, subtitleSearch?.tmdbId, subtitleSearch?.type, subtitleSearch?.season, subtitleSearch?.episode]);
@@ -910,9 +852,67 @@ export const VideoPlayer = ({
   return (
     <div className="player-controls-frame relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl transition-all duration-300 border border-white/5 ring-1 ring-white/10">
       <div ref={artRef} className="h-full w-full" />
+      {subtitlePanelOpen && (
+        <div className="absolute inset-0 z-[80] flex items-end justify-center bg-black/65 p-3 backdrop-blur-sm sm:items-center sm:p-5" onClick={() => setSubtitlePanelOpen(false)}>
+          <section role="dialog" aria-modal="true" aria-label="Chọn phụ đề" className="max-h-[82%] w-full max-w-lg overflow-hidden rounded-3xl border border-white/15 bg-[#111018]/95 text-white shadow-2xl shadow-purple-950/40" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+              <div>
+                <div className="text-base font-bold">Chọn phụ đề</div>
+                <div className="mt-1 text-xs text-white/55">Nguồn SubDL · Tiếng Việt</div>
+              </div>
+              <button type="button" onClick={() => setSubtitlePanelOpen(false)} aria-label="Đóng bảng phụ đề" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-xl text-white/80 hover:bg-white/15">×</button>
+            </div>
+            <div className="max-h-[min(58vh,480px)] overflow-y-auto p-3">
+              <button type="button" onClick={() => {
+                const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
+                if (video) Array.from(video.querySelectorAll("track")).forEach((track) => { track.track.mode = "disabled"; });
+                setSelectedSubtitle("");
+                setSubtitlePanelOpen(false);
+              }} className="mb-2 flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-left text-sm hover:bg-white/10">
+                <span><span className="block font-semibold">Tắt phụ đề</span><span className="mt-1 block text-xs text-white/45">Không hiển thị phụ đề</span></span>
+                {!selectedSubtitle && <span className="text-purple-300">✓</span>}
+              </button>
+              {subtitleLoading && <div className="px-4 py-8 text-center text-sm text-white/65">Đang tìm phụ đề trên SubDL…</div>}
+              {!subtitleLoading && subtitleCandidates.map((candidate, index) => {
+                const key = String(candidate.nId || "") + ":" + String(candidate.fileNId || candidate.downloadUrl || "");
+                const label = String(candidate.label || candidate.fileName || "Phụ đề tiếng Việt");
+                return (
+                  <button key={key || index} type="button" disabled={Boolean(subtitleDownloading)} onClick={async () => {
+                    await subtitleSelectRef.current(candidate);
+                    if (!subtitleError) setSubtitlePanelOpen(false);
+                  }} className="mb-2 flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-left transition hover:border-purple-400/60 hover:bg-purple-500/10 disabled:opacity-60">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-500/20 text-[10px] font-black text-purple-200">{String(candidate.format || "SUB").toUpperCase()}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold">{label}</span>
+                      <span className="mt-1 block text-xs text-white/45">{candidate.fileName || "Phụ đề tiếng Việt"} · SubDL</span>
+                    </span>
+                    {subtitleDownloading === key ? <span className="text-xs text-purple-200">Đang tải…</span> : selectedSubtitle === label ? <span className="text-purple-300">✓</span> : <span className="text-white/45">›</span>}
+                  </button>
+                );
+              })}
+              {subtitleError && <div className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-200">{subtitleError}</div>}
+              {!subtitleLoading && !subtitleCandidates.length && !subtitleError && <div className="px-4 py-8 text-center text-sm text-white/55">Chưa có phụ đề để hiển thị.</div>}
+            </div>
+            <div className="border-t border-white/10 px-5 py-3 text-xs text-white/40">Chọn một bản để tải và phát trực tiếp trong player.</div>
+          </section>
+        </div>
+      )}
       <style jsx global>{`
-        .player-controls-frame .artplayer-app .art-controls-right .art-control:not(.art-control-next-episode) {
+        .player-controls-frame .artplayer-app .art-controls-right .art-control:not(.art-control-next-episode):not(.art-control-subtitle-toggle) {
           display: none !important;
+        }
+        .player-controls-frame .artplayer-app .art-control-subtitle-toggle {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          min-height: 34px !important;
+          margin-left: 8px !important;
+          color: #fff !important;
+          border: 1px solid rgba(255,255,255,.32) !important;
+          border-radius: 999px !important;
+          background: rgba(124,58,237,.55) !important;
+          backdrop-filter: blur(14px) !important;
+          -webkit-backdrop-filter: blur(14px) !important;
         }
         .player-controls-frame .artplayer-app .art-control-next-episode {
           display: ${showNextEpisode ? 'flex' : 'none'} !important;
