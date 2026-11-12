@@ -296,14 +296,13 @@ export function BottomDock() {
         .gt-dock-nav {
           position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between;
           gap: 4px; width: 100%; height: 72px; padding: 7px 9px; overflow: hidden; border-radius: 9999px;
-          background: transparent; border: 1px solid rgba(255,255,255,.2);
+          background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.2);
           box-shadow: 0 18px 48px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(255,255,255,.04);
-          -webkit-backdrop-filter: none;
-          backdrop-filter: none;
+          -webkit-backdrop-filter: blur(14px) saturate(150%);
+          backdrop-filter: blur(14px) saturate(150%);
           -webkit-tap-highlight-color: transparent;
         }
         .gt-liquid-glass-blur { position:absolute; inset:0; z-index:0; border-radius:inherit; pointer-events:none; background:rgba(255,255,255,.045); -webkit-backdrop-filter:blur(16px) saturate(145%); backdrop-filter:blur(16px) saturate(145%); }
-        .gt-liquid-glass-canvas { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; border-radius:inherit; pointer-events:none; opacity:1; }
         .gt-liquid-glass-rim { display:none !important; }
         .gt-liquid-glass-bubble {
           position:absolute; top:7px; bottom:7px; left:0; width:0; z-index:2; pointer-events:none; border-radius:9999px;
@@ -322,15 +321,9 @@ export function BottomDock() {
         .gt-dock-item.is-active { color:#fff; transform:translateY(-1px); }
         .gt-dock-item:active { transform:scale(1.09); }
         html[data-mobile-theme="light"] .gt-dock-nav {
-          background:transparent; border-color:rgba(255,255,255,.62);
+          background:rgba(255,255,255,.58); border-color:rgba(255,255,255,.72);
           box-shadow:0 18px 48px rgba(77,55,128,.14), inset 0 1px 0 rgba(255,255,255,.82);
-          -webkit-backdrop-filter:none; backdrop-filter:none;
-        }
-        html[data-mobile-theme="light"] .gt-liquid-glass-canvas { opacity:1; }
-        .gt-dock-nav.gt-fb {
-          background:rgba(255,255,255,.06);
-          -webkit-backdrop-filter:blur(32px) saturate(200%);
-          backdrop-filter:blur(32px) saturate(200%);
+          -webkit-backdrop-filter:blur(14px) saturate(150%); backdrop-filter:blur(14px) saturate(150%);
         }
         html[data-mobile-theme="light"] .gt-liquid-glass-bubble { background:rgba(124,58,237,.11); border-color:rgba(124,58,237,.18); }
         html[data-mobile-theme="light"] .gt-dock-item { color:rgba(48,39,67,.72); }
