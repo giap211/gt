@@ -28,6 +28,7 @@ export function BottomDock() {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<"home" | "list" | "search">("home");
   const [mobileTheme, setMobileTheme] = useState<"dark" | "light">("dark");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ListMovie[]>([]);
@@ -40,10 +41,35 @@ export function BottomDock() {
     pathname.startsWith("/the-loai") ||
     pathname.startsWith("/quoc-gia");
   const isWatchPage = pathname.startsWith("/xem-phim/");
+  const isDetailPage = pathname.startsWith("/phim/");
+  const dockHomeActive = isHome || (isDetailPage && activeSection === "home");
+  const dockListActive = isList || (isDetailPage && activeSection === "list");
+  const dockSearchActive = pathname.startsWith("/tim-kiem") || (isDetailPage && activeSection === "search");
 
   useEffect(() => {
     setSearchOpen(false);
     setAccountOpen(false);
+  }, [pathname]);
+
+  // Keep the last main dock section selected while visiting a movie detail page.
+  useEffect(() => {
+    const saved = window.sessionStorage.getItem("gt:last-dock-section");
+    if (saved === "home" || saved === "list" || saved === "search") {
+      setActiveSection(saved);
+    }
+
+    const routeSection = pathname === "/"
+      ? "home"
+      : pathname.startsWith("/danh-sach") || pathname.startsWith("/the-loai") || pathname.startsWith("/quoc-gia")
+        ? "list"
+        : pathname.startsWith("/tim-kiem")
+          ? "search"
+          : null;
+
+    if (routeSection) {
+      setActiveSection(routeSection);
+      window.sessionStorage.setItem("gt:last-dock-section", routeSection);
+    }
   }, [pathname]);
 
   useEffect(() => {
@@ -116,7 +142,10 @@ export function BottomDock() {
   const handleDockNavigation = (
     event: React.MouseEvent<HTMLAnchorElement>,
     active: boolean,
+    section: "home" | "list",
   ) => {
+    setActiveSection(section);
+    window.sessionStorage.setItem("gt:last-dock-section", section);
     closeDockPanels();
     if (active) {
       event.preventDefault();
@@ -125,6 +154,8 @@ export function BottomDock() {
   };
   const handleSearch = () => {
     setAccountOpen(false);
+    setActiveSection("search");
+    window.sessionStorage.setItem("gt:last-dock-section", "search");
     setSearchOpen((open) => !open);
   };
   const handleAccount = () => {
@@ -135,6 +166,8 @@ export function BottomDock() {
     const q = query.trim();
     if (!q) return;
     setSearchOpen(false);
+    setActiveSection("search");
+    window.sessionStorage.setItem("gt:last-dock-section", "search");
     router.push(`/tim-kiem?keyword=${encodeURIComponent(q)}`);
   };
 
@@ -250,18 +283,18 @@ export function BottomDock() {
             <LiquidGlassDockSurface />
             <Link
               href="/"
-              onClick={(e) => handleDockNavigation(e, isHome)}
-              className={`gt-dock-item ${isHome && !searchOpen && !accountOpen ? "is-active" : ""}`}
-              aria-current={isHome && !searchOpen && !accountOpen ? "page" : undefined}
+              onClick={(e) => handleDockNavigation(e, isHome, "home")}
+              className={`gt-dock-item ${dockHomeActive && !searchOpen && !accountOpen ? "is-active" : ""}`}
+              aria-current={dockHomeActive && !searchOpen && !accountOpen ? "page" : undefined>
             >
               <Home size={22} strokeWidth={isHome && !searchOpen && !accountOpen ? 2.4 : 1.8} />
               <span>Trang chủ</span>
             </Link>
             <Link
               href="/danh-sach/phim-bo"
-              onClick={(e) => handleDockNavigation(e, isList)}
-              className={`gt-dock-item ${isList && !searchOpen && !accountOpen ? "is-active" : ""}`}
-              aria-current={isList && !searchOpen && !accountOpen ? "page" : undefined}
+              onClick={(e) => handleDockNavigation(e, isList, "list")}
+              className={`gt-dock-item ${dockListActive && !searchOpen && !accountOpen ? "is-active" : ""}`}
+              aria-current={dockListActive && !searchOpen && !accountOpen ? "page" : undefined>
             >
               <Clapperboard size={22} strokeWidth={isList && !searchOpen && !accountOpen ? 2.4 : 1.8} />
               <span>Danh sách</span>
@@ -269,7 +302,7 @@ export function BottomDock() {
             <button
               type="button"
               onClick={handleSearch}
-              className={`gt-dock-item ${searchOpen ? "is-active" : ""}`}
+              className={`gt-dock-item ${searchOpen || (dockSearchActive && !accountOpen) ? "is-active" : ""}`}
               aria-label="Tìm kiếm"
               aria-pressed={searchOpen}
             >
