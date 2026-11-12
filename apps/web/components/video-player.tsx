@@ -795,10 +795,15 @@ export const VideoPlayer = ({
         const speech = window.speechSynthesis;
         const originalVolume = video.volume;
         let lastSpokenCue = -1;
+        let speechUnlocked = false;
         if (speech && cues.length) {
           video.volume = Math.min(originalVolume, 0.28);
+          const unlockSpeech = () => {
+            speechUnlocked = true;
+            speech.resume();
+          };
           const onTimeUpdate = () => {
-            if (video.paused) return;
+            if (video.paused || !speechUnlocked) return;
             const currentTime = video.currentTime;
             const cueIndex = cues.findIndex((cue: { start: number; end: number }) => currentTime >= cue.start && currentTime < cue.end);
             if (cueIndex < 0 || cueIndex === lastSpokenCue) return;
@@ -818,11 +823,13 @@ export const VideoPlayer = ({
             lastSpokenCue = -1;
           };
           const onPause = () => speech.cancel();
+          artRef.current?.addEventListener("pointerdown", unlockSpeech, { once: true });
           video.addEventListener("timeupdate", onTimeUpdate);
           video.addEventListener("seeking", onSeek);
           video.addEventListener("pause", onPause);
           video.addEventListener("play", onTimeUpdate);
           (video as HTMLVideoElement & { __subtitleVoiceCleanup?: () => void }).__subtitleVoiceCleanup = () => {
+            artRef.current?.removeEventListener("pointerdown", unlockSpeech);
             video.removeEventListener("timeupdate", onTimeUpdate);
             video.removeEventListener("seeking", onSeek);
             video.removeEventListener("pause", onPause);
