@@ -584,6 +584,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             onRotate={handlePlayerRotate}
             showNextEpisode={Boolean(nextEp)}
             onNextEpisode={nextEp ? () => router.push(`/xem-phim/${slug}?tap=${nextEp.slug}&sv=${currentServer}`) : undefined}
+            subtitleSearch={{ title: movie.name, year: movie.year, tmdbId: movie.tmdb?.id }}
           />
         )}
       </div>
