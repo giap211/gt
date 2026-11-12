@@ -32,7 +32,9 @@ function parseWebVttSpeechCues(vtt: string): SpeechCue[] {
       const lines = block.split(/\n/).map((line) => line.trim()).filter(Boolean);
       const timingIndex = lines.findIndex((line) => line.includes("-->"));
       if (timingIndex < 0) return [];
-      const [startText, endText] = (lines[timingIndex] || "").split("-->").map((part) => part.trim().split(/\s+/)[0] || "");
+      const timingParts = (lines[timingIndex] || "").split("-->").map((part) => part.trim().split(/\s+/)[0] || "");
+      const startText = timingParts[0] || "";
+      const endText = timingParts[1] || "";
       const start = parseVttTime(startText);
       const end = parseVttTime(endText);
       const text = lines.slice(timingIndex + 1).join(" ")
