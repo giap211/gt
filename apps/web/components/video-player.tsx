@@ -882,7 +882,7 @@ export const VideoPlayer = ({
             }
             if (!inEvents) continue;
             if (/^Format\s*:/i.test(trimmed)) {
-              fields = trimmed.slice(trimmed.indexOf(":") + 1).split(",").map((field) => field.trim());
+              fields = trimmed.slice(trimmed.indexOf(":") + 1).split(",").map((field: string) => field.trim());
               continue;
             }
             if (!/^Dialogue\s*:/i.test(trimmed)) continue;
