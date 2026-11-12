@@ -786,7 +786,8 @@ export const VideoPlayer = ({
           }
         }
 
-        if (!loaded.length || cancelled) return;
+        const firstSubtitle = loaded[0];
+        if (!firstSubtitle || cancelled) return;
 
         const player = artPlayerRef.current as any;
         if (!player?.setting) return;
@@ -804,7 +805,7 @@ export const VideoPlayer = ({
         player.setting.add({
           name: settingName,
           html: "Phụ đề",
-          tooltip: loaded[0].label,
+          tooltip: firstSubtitle.label,
           width: 260,
           selector,
           onSelect: (item: { html: string; trackIndex: number }) => {
@@ -817,7 +818,7 @@ export const VideoPlayer = ({
         });
 
         // Mặc định bật bản đầu tiên đã tải thành công.
-        loaded[0].track.track.mode = "showing";
+        firstSubtitle.track.track.mode = "showing";
       } catch (error) {
         console.warn("[Subtitles] Không thể tự tải phụ đề:", error);
       }
