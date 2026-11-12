@@ -10,6 +10,43 @@ import Hls from "hls.js";
 Artplayer.DBCLICK_FULLSCREEN = false;
 Artplayer.MOBILE_DBCLICK_PLAY = false;
 
+interface SpeechCue {
+  start: number;
+  end: number;
+  text: string;
+}
+
+function parseVttTime(value: string): number {
+  const parts = value.trim().replace(",", ".").split(":");
+  const seconds = Number(parts.pop()?.replace(",", ".") || 0);
+  const minutesOrHours = Number(parts.pop() || 0);
+  const hours = Number(parts.pop() || 0);
+  return hours * 3600 + minutesOrHours * 60 + seconds;
+}
+
+function parseWebVttSpeechCues(vtt: string): SpeechCue[] {
+  return vtt
+    .replace(/^\uFEFF?WEBVTT[^\n]*\n/i, "")
+    .split(/\n{2,}/)
+    .flatMap((block) => {
+      const lines = block.split(/\n/).map((line) => line.trim()).filter(Boolean);
+      const timingIndex = lines.findIndex((line) => line.includes("-->"));
+      if (timingIndex < 0) return [];
+      const [startText, endText] = (lines[timingIndex] || "").split("-->").map((part) => part.trim().split(/\s+/)[0] || "");
+      const start = parseVttTime(startText);
+      const end = parseVttTime(endText);
+      const text = lines.slice(timingIndex + 1).join(" ")
+        .replace(/<[^>]*>/g, " ")
+        .replace(/&nbsp;/gi, " ")
+        .replace(/&amp;/gi, "&")
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;|&apos;/gi, "'")
+        .replace(/\s+/g, " ")
+        .trim();
+      return Number.isFinite(start) && Number.isFinite(end) && end > start && text ? [{ start, end, text }] : [];
+    });
+}
+
 interface VideoPlayerProps {
   url: string;
   poster?: string;
@@ -99,6 +136,11 @@ export const VideoPlayer = ({
   const [subtitleError, setSubtitleError] = useState("");
   const [subtitleDownloading, setSubtitleDownloading] = useState("");
   const [selectedSubtitle, setSelectedSubtitle] = useState("");
+  const [voiceoverEnabled, setVoiceoverEnabled] = useState(false);
+  const [voiceoverReady, setVoiceoverReady] = useState(false);
+  const [voiceoverStatus, setVoiceoverStatus] = useState("");
+  const speechCuesRef = useRef<SpeechCue[]>([]);
+  const speechEnabledRef = useRef(false);
   const subtitleSelectRef = useRef<(candidate: any) => void>(() => {});
   const [showDebug, setShowDebug] = useState(() => {
     try {
@@ -407,7 +449,38 @@ export const VideoPlayer = ({
 
       if (art) {
         const video = art.video as HTMLVideoElement;
+        let activeSpeechCue = -1;
+        const cancelVoiceover = () => {
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            window.speechSynthesis.cancel();
+          }
+          activeSpeechCue = -1;
+        };
+        const syncVoiceover = () => {
+          if (!speechEnabledRef.current || video.paused || video.ended ||
+              typeof window === "undefined" || !("speechSynthesis" in window)) return;
+          const now = video.currentTime;
+          const cueIndex = speechCuesRef.current.findIndex((cue) => now >= cue.start && now < cue.end);
+          if (cueIndex === activeSpeechCue) return;
+          window.speechSynthesis.cancel();
+          activeSpeechCue = cueIndex;
+          if (cueIndex < 0) return;
+          const cue = speechCuesRef.current[cueIndex];
+          if (!cue) return;
+          const utterance = new SpeechSynthesisUtterance(cue.text);
+          utterance.lang = "vi-VN";
+          utterance.rate = 1.04;
+          utterance.pitch = 1;
+          utterance.volume = 1;
+          const vietnameseVoice = window.speechSynthesis.getVoices().find((voice) => /^vi([_-]|$)/i.test(voice.lang));
+          if (vietnameseVoice) utterance.voice = vietnameseVoice;
+          window.speechSynthesis.speak(utterance);
+        };
+        const onVideoPauseForVoiceover = () => cancelVoiceover();
+        const onVideoSeekForVoiceover = () => cancelVoiceover();
+        const onVideoPlayForVoiceover = () => syncVoiceover();
         const reportProgress = () => {
+          syncVoiceover();
           const intro = introSegmentRef.current;
           if (showDebug) {
             setDebugCurrentTime(Number(video.currentTime.toFixed(2)));
@@ -475,12 +548,21 @@ export const VideoPlayer = ({
         video.addEventListener("timeupdate", reportProgress);
         video.addEventListener("pause", reportFinalProgress);
         video.addEventListener("ended", reportFinalProgress);
+        video.addEventListener("pause", onVideoPauseForVoiceover);
+        video.addEventListener("seeking", onVideoSeekForVoiceover);
+        video.addEventListener("seeked", onVideoPlayForVoiceover);
+        video.addEventListener("play", onVideoPlayForVoiceover);
 
         const previousCleanup = (art as any).__seekCleanup as (() => void) | undefined;
         (art as any).__seekCleanup = () => {
+          cancelVoiceover();
           video.removeEventListener("timeupdate", reportProgress);
           video.removeEventListener("pause", reportFinalProgress);
           video.removeEventListener("ended", reportFinalProgress);
+          video.removeEventListener("pause", onVideoPauseForVoiceover);
+          video.removeEventListener("seeking", onVideoSeekForVoiceover);
+          video.removeEventListener("seeked", onVideoPlayForVoiceover);
+          video.removeEventListener("play", onVideoPlayForVoiceover);
           previousCleanup?.();
         };
       }
@@ -734,7 +816,12 @@ export const VideoPlayer = ({
     let cancelled = false;
     const subtitleObjectUrls: string[] = [];
     const attachedTracks: HTMLTrackElement[] = [];
-    const loaded: Array<{ key: string; label: string; track: HTMLTrackElement }> = [];
+    const loaded: Array<{ key: string; label: string; track: HTMLTrackElement; cues: SpeechCue[] }> = [];
+    speechCuesRef.current = [];
+    speechEnabledRef.current = false;
+    setVoiceoverEnabled(false);
+    setVoiceoverReady(false);
+    setVoiceoverStatus("");
     setSubtitleCandidates([]);
     setSubtitleLoading(true);
     setSubtitleError("");
@@ -744,6 +831,8 @@ export const VideoPlayer = ({
       const existing = loaded.find((item) => item.key === key);
       if (existing) {
         loaded.forEach((item) => { item.track.track.mode = item === existing ? "showing" : "disabled"; });
+        speechCuesRef.current = existing.cues;
+        setVoiceoverReady(existing.cues.length > 0);
         setSelectedSubtitle(existing.label);
         return;
       }
@@ -827,6 +916,10 @@ export const VideoPlayer = ({
         if (!/^WEBVTT(?:\s|$)/i.test(vtt) || !/-->/.test(vtt)) {
           throw new Error("File phụ đề không có câu thoại hợp lệ hoặc định dạng không được hỗ trợ.");
         }
+        const speechCues = parseWebVttSpeechCues(vtt);
+        if (!speechCues.length) {
+          throw new Error("Không đọc được mốc thời gian và lời thoại trong phụ đề này.");
+        }
         const objectUrl = URL.createObjectURL(new Blob([vtt], { type: "text/vtt;charset=utf-8" }));
         subtitleObjectUrls.push(objectUrl);
         const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
@@ -839,8 +932,10 @@ export const VideoPlayer = ({
         track.default = true;
         video.appendChild(track);
         attachedTracks.push(track);
-        const entry = { key, label: track.label, track };
+        const entry = { key, label: track.label, track, cues: speechCues };
         loaded.push(entry);
+        speechCuesRef.current = speechCues;
+        setVoiceoverReady(true);
         const activateTrack = () => {
           if (cancelled || !video.isConnected) return;
           loaded.forEach((item) => {
@@ -935,6 +1030,36 @@ export const VideoPlayer = ({
               <button type="button" onClick={() => setSubtitlePanelOpen(false)} aria-label="Đóng bảng phụ đề" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-xl text-white/80 hover:bg-white/15">×</button>
             </div>
             <div className="max-h-[min(58vh,480px)] overflow-y-auto p-3">
+              <button
+                type="button"
+                disabled={!voiceoverReady}
+                onClick={() => {
+                  const nextEnabled = !speechEnabledRef.current;
+                  speechEnabledRef.current = nextEnabled;
+                  setVoiceoverEnabled(nextEnabled);
+                  if (!nextEnabled) {
+                    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+                    setVoiceoverStatus("Đã tắt thuyết minh");
+                    return;
+                  }
+                  if (!("speechSynthesis" in window)) {
+                    speechEnabledRef.current = false;
+                    setVoiceoverEnabled(false);
+                    setVoiceoverStatus("Trình duyệt không hỗ trợ đọc văn bản");
+                    return;
+                  }
+                  setVoiceoverStatus("Đang thuyết minh bằng giọng có sẵn trên thiết bị");
+                  const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
+                  if (video && !video.paused) video.dispatchEvent(new Event("timeupdate"));
+                }}
+                className="mb-3 flex w-full items-center justify-between rounded-2xl border border-purple-400/40 bg-purple-500/15 px-4 py-3 text-left text-sm transition hover:bg-purple-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <span>
+                  <span className="block font-semibold">Thuyết minh tiếng Việt</span>
+                  <span className="mt-1 block text-xs text-white/55">{voiceoverStatus || (voiceoverReady ? "Đọc lời thoại bằng giọng có sẵn trên thiết bị" : "Chọn một phụ đề tiếng Việt trước")}</span>
+                </span>
+                <span className="rounded-full bg-purple-400/20 px-3 py-1 text-xs font-bold text-purple-200">{voiceoverEnabled ? "ĐANG BẬT" : "TẮT"}</span>
+              </button>
               <button type="button" onClick={() => {
                 const video = artRef.current?.querySelector("video") as HTMLVideoElement | null;
                 if (video) Array.from(video.querySelectorAll("track")).forEach((track) => { track.track.mode = "disabled"; });
