@@ -777,8 +777,8 @@ export const VideoPlayer = ({
             track.srclang = "vi";
             track.src = objectUrl;
             track.default = loaded.length === 0;
-            track.track.mode = "disabled";
             video.appendChild(track);
+            track.track.mode = "disabled";
             attachedTracks.push(track);
             loaded.push({ label: track.label, track });
           } catch (error) {
@@ -793,10 +793,11 @@ export const VideoPlayer = ({
 
         try { player.setting.remove(settingName); } catch { /* setting chưa tồn tại */ }
         const selector = [
-          { html: "Tắt phụ đề", trackIndex: -1, default: true },
+          { html: "Tắt phụ đề", trackIndex: -1 },
           ...loaded.map((item, index) => ({
             html: item.label.replace(/[<>]/g, ""),
             trackIndex: index,
+            default: index === 0,
           })),
         ];
 
