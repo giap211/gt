@@ -75,8 +75,12 @@ export async function GET(request: NextRequest) {
       return files.map((file: any) => {
         const fileName = String(file?.name || item?.name || item?.release_name || "subtitle.srt");
         const format = String(file?.format || fileName.split(".").pop() || "").toLowerCase();
+        const fileNId = String(file?.file_n_id || file?.fileNId || "");
+        const downloadUrl = typeof file?.url === "string" ? file.url : "";
         return {
-          nId: String(file?.n_id || file?.nId || parentNId),
+          nId: parentNId,
+          fileNId,
+          downloadUrl,
           label: String(file?.release_name || item?.release_name || fileName),
           fileName,
           language: String(file?.lang || file?.language || language),
@@ -86,6 +90,7 @@ export async function GET(request: NextRequest) {
     })
       .filter((item: any) =>
         /^[a-zA-Z0-9_-]{4,80}$/.test(item.nId) &&
+        (!item.fileNId || /^[a-zA-Z0-9_-]{1,100}$/.test(item.fileNId)) &&
         /^(vi|vietnamese|vietnam)$/i.test(item.language) &&
         /^(srt|vtt|ass|ssa)$/.test(item.format),
       )
@@ -105,12 +110,27 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => null);
   const nId = String(body?.nId || "");
-  if (!/^[a-zA-Z0-9_-]{4,80}$/.test(nId)) {
+  const fileNId = String(body?.fileNId || "");
+  const rawDownloadUrl = typeof body?.downloadUrl === "string" ? body.downloadUrl : "";
+  if (!/^[a-zA-Z0-9_-]{4,80}$/.test(nId) ||
+      (fileNId && !/^[a-zA-Z0-9_-]{1,100}$/.test(fileNId))) {
     return subtitleError("Mã phụ đề SubDL không hợp lệ.", 400);
   }
 
   try {
-    const response = await fetch(`${API_BASE}/subtitles/${encodeURIComponent(nId)}/download?format=file`, {
+    let targetUrl = `${API_BASE}/subtitles/${encodeURIComponent(nId)}/download?format=file`;
+    if (fileNId) {
+      if (rawDownloadUrl) {
+        const parsed = new URL(rawDownloadUrl.startsWith("/") ? new URL(rawDownloadUrl, "https://dl.subdl.com").toString() : rawDownloadUrl);
+        if (!["dl.subdl.com", "api.subdl.com", "subdl.com"].includes(parsed.hostname)) {
+          return subtitleError("SubDL trả về host tải file không hợp lệ.");
+        }
+        targetUrl = parsed.toString();
+      } else {
+        targetUrl = `https://dl.subdl.com/subtitle/${encodeURIComponent(nId)}/${encodeURIComponent(fileNId)}`;
+      }
+    }
+    const response = await fetch(targetUrl, {
       headers: subdlHeaders(),
       cache: "no-store",
       redirect: "follow",
