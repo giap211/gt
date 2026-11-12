@@ -516,7 +516,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         .watch-player-episode-grid { display:grid; width:100%; min-height:min-content; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); align-content:start; gap:8px; padding:4px 2px 16px 0; }
         .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
-        .watch-player-menu .active-choice { color:#171717; background:#ffd875; border-color:#ffd875; }
+        .watch-player-menu .active-choice { color:#fff; background:linear-gradient(135deg,#7c3aed,#a855f7); border-color:#c4b5fd; }
         .watch-player-round { width:54px;height:54px;border-radius:999px;display:grid;place-items:center; flex:0 0 54px; cursor:pointer; }
         .watch-player-page > .watch-player-round { position:absolute; z-index:70; pointer-events:auto; }
         .watch-player-page .watch-player-top { z-index:50; }
@@ -654,6 +654,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
             backLabel={movie.name}
             onBack={handlePlayerBack}
             onRotate={handlePlayerRotate}
+            onOpenEpisodePicker={() => { setOverlayOpen(true); setShowPlayerChrome(true); }}
             showNextEpisode={Boolean(nextEp)}
             onNextEpisode={nextEp ? () => router.push(`/xem-phim/${slug}?tap=${nextEp.slug}&sv=${currentServer}`) : undefined}
             subtitleSearch={{
@@ -676,8 +677,61 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
           />
         )}
       </div>
-
-
+      {overlayOpen && (
+        <section className="watch-player-menu" role="dialog" aria-modal="true" aria-label="Chọn tập và máy chủ">
+          <header className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 pb-4">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[.2em] text-purple-300">Danh sách phát</p>
+              <h2 className="mt-1 truncate text-xl font-bold">{movie.name}</h2>
+              <p className="mt-1 text-xs text-white/50">{currentServerEpisodes.length} tập · {episodes[currentServer]?.server_name || "SV " + (currentServer + 1)}</p>
+            </div>
+            <button type="button" onClick={() => setOverlayOpen(false)} aria-label="Đóng danh sách tập" className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 bg-white/10 text-2xl text-white">×</button>
+          </header>
+          {episodes.length > 1 && (
+            <div className="flex shrink-0 gap-2 overflow-x-auto py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {episodes.map((server, index) => (
+                <button key={server.server_name + "-" + index} type="button" onClick={() => {
+                  const list = server.server_data || [];
+                  const matched = list.find((ep) => ep.slug === currentEpisode?.slug || ep.name === currentEpisode?.name) || list[0];
+                  if (!matched) return;
+                  setOverlayOpen(false);
+                  router.push("/xem-phim/" + slug + "?tap=" + matched.slug + "&sv=" + index);
+                }} className={"shrink-0 rounded-full border px-4 py-2.5 text-xs font-bold " + (currentServer === index ? "active-choice" : "border-white/15 bg-white/[.06] text-white/65")}>
+                  {server.server_name || "SV " + (index + 1)}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="mb-2 flex shrink-0 items-center justify-between">
+            <h3 className="text-sm font-bold">Chọn tập</h3>
+            <span className="text-xs text-white/45">Đang xem: {formatEpisodeName(currentEpisode?.name)}</span>
+          </div>
+          <div className="watch-player-episode-scroll">
+            <div className="watch-player-episode-grid">
+              {currentServerEpisodes.map((ep, index) => {
+                const match = ep.name.match(/(?:tập|episode|ep)\s*0*(\d+)/i) || ep.name.match(/^0*(\d+)$/);
+                const number = Number(match?.[1] || index + 1);
+                const still = episodeStills[number] || movie.thumb_url || movie.poster_url;
+                const active = ep.slug === currentEpisode?.slug;
+                return (
+                  <button key={ep.slug || ep.name + "-" + index} type="button" onClick={() => {
+                    setOverlayOpen(false);
+                    router.push("/xem-phim/" + slug + "?tap=" + ep.slug + "&sv=" + currentServer);
+                  }} className={"group min-w-0 overflow-hidden rounded-2xl border text-left " + (active ? "active-choice" : "border-white/10 bg-white/[.055] text-white hover:border-purple-300/60")}>
+                    <div className="relative aspect-video w-full overflow-hidden bg-white/5">
+                      {still ? <Image src={still} alt={formatEpisodeName(ep.name)} fill sizes="(max-width: 700px) 33vw, 180px" className="object-cover" /> : null}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                      <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-1 text-[10px] font-bold text-white">TẬP {number}</span>
+                      {active && <span className="absolute right-2 top-2 rounded-full bg-purple-500 px-2 py-1 text-[9px] font-black text-white">ĐANG XEM</span>}
+                    </div>
+                    <span className="block truncate px-3 py-2.5 text-xs font-semibold">{formatEpisodeName(ep.name)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
     </main>
   );
