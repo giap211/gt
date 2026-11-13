@@ -7,6 +7,7 @@ import { ResilientMovieImage } from "@/components/resilient-movie-image";
 import {
   getMovieDetail,
   getLatestMovies,
+  searchMovies,
   type DetailMovie,
   type Episode,
   type ListMovie,
@@ -31,6 +32,7 @@ export default function MovieDetailPage({
   const [movie, setMovie] = useState<DetailMovie | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [latestMovies, setLatestMovies] = useState<ListMovie[]>([]);
+  const [relatedMovies, setRelatedMovies] = useState<ListMovie[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("tập phim");
   const [showInfo, setShowInfo] = useState(false);
@@ -80,6 +82,38 @@ export default function MovieDetailPage({
       c = true;
     };
   }, [slug]);
+
+  useEffect(() => {
+    if (!movie?.name) {
+      setRelatedMovies([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const titles = Array.from(new Set(
+          [movie.name, movie.origin_name].map((value) => value?.trim()).filter((value): value is string => Boolean(value))
+        ));
+        const results = await Promise.all(titles.map((title) => searchMovies(title, 1, 24)));
+        const seen = new Set<string>([movie.slug]);
+        const matches = results
+          .flatMap((result) => result.status ? result.items : [])
+          .filter((item) => {
+            if (!item.slug || seen.has(item.slug)) return false;
+            seen.add(item.slug);
+            return true;
+          })
+          .slice(0, 24);
+        if (!cancelled) setRelatedMovies(matches);
+      } catch (error) {
+        console.error("Không thể tìm phim cùng tên:", error);
+        if (!cancelled) setRelatedMovies([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [movie?.slug, movie?.name, movie?.origin_name]);
 
   useEffect(() => {
     if (!movie?.actor?.length || !movie.tmdb?.id) {
@@ -264,7 +298,7 @@ export default function MovieDetailPage({
   const topWeek = [...latestMovies]
     .sort((a, b) => (b.view || 0) - (a.view || 0))
     .slice(0, 10);
-  const related = latestMovies.filter((m) => m.slug !== movie.slug).slice(0, 12);
+  const related = relatedMovies;
 
   const faqItems = [
     {
