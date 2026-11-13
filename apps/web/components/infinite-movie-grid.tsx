@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { MovieCard } from "./movie-card";
-import { ListMovie, LatestMoviesResponse } from "@/lib/ophim-client";
+import { getAnimeMoviesByCountry, ListMovie, LatestMoviesResponse } from "@/lib/ophim-client";
 import type { MovieListingFilters } from "./filter-bar";
 
 interface InfiniteMovieGridProps {
@@ -32,6 +32,7 @@ export const InfiniteMovieGrid = ({
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(initialTotalPages);
   const [filters, setFilters] = useState<MovieListingFilters>(EMPTY_FILTERS);
+  const [isAnimeJapanSearch, setIsAnimeJapanSearch] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
   const loadMore = useCallback(
@@ -65,8 +66,8 @@ export const InfiniteMovieGrid = ({
       const countries = (movie.country || []).flatMap((item) => [item.slug || "", item.name || ""]);
       const quality = normalizeFilterValue(movie.quality || "HD");
       const language = normalizeFilterValue(movie.lang || "Vietsub");
-      return matchesAny(filters.genres, categories) &&
-        matchesAny(filters.countries, countries) &&
+      return (isAnimeJapanSearch || matchesAny(filters.genres, categories)) &&
+        (isAnimeJapanSearch || matchesAny(filters.countries, countries)) &&
         (filters.years.length === 0 || filters.years.includes(String(movie.year))) &&
         (filters.qualities.length === 0 || filters.qualities.some((value) => quality.includes(normalizeFilterValue(value)))) &&
         (filters.languages.length === 0 || filters.languages.some((value) => language.includes(normalizeFilterValue(value))));
@@ -79,7 +80,54 @@ export const InfiniteMovieGrid = ({
       if (filters.sort === "rating") return Number(b.rating || 0) - Number(a.rating || 0);
       return 0;
     });
-  }, [movies, filters]);
+  }, [movies, filters, isAnimeJapanSearch]);
+
+  useEffect(() => {
+    const isAnimeJapan =
+      filters.genres.length === 1 &&
+      filters.genres[0] === "hoat-hinh" &&
+      filters.countries.length === 1 &&
+      filters.countries[0] === "nhat-ban" &&
+      filters.years.length === 0 &&
+      filters.qualities.length === 0 &&
+      filters.languages.length === 0;
+
+    if (!isAnimeJapan) {
+      if (isAnimeJapanSearch) {
+        setIsAnimeJapanSearch(false);
+        setMovies(initialItems);
+        setTotalPages(initialTotalPages);
+        setCurrentPage(initialPage);
+      }
+      return;
+    }
+
+    let cancelled = false;
+    setIsAnimeJapanSearch(true);
+    setLoadingMore(true);
+    void getAnimeMoviesByCountry("nhat-ban", 1, false)
+      .then((result) => {
+        if (cancelled) return;
+        setMovies(result.status ? result.items : []);
+        setTotalPages(1);
+        setCurrentPage(1);
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error("Failed to load Japanese animation", error);
+          setMovies([]);
+          setTotalPages(1);
+          setCurrentPage(1);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingMore(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters, initialItems, initialTotalPages, initialPage, isAnimeJapanSearch]);
 
   useEffect(() => {
     const handleFilters = (event: Event) => {
