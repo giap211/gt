@@ -150,6 +150,14 @@ export const InfiniteMovieGrid = ({
         </div>
       )}
 
+      {activeFilters && currentPage < totalPages && !loadingMore && (
+        <div className="mt-8 flex justify-center">
+          <button type="button" onClick={() => { const next = currentPage + 1; setCurrentPage(next); void loadMore(next); }} className="rounded-xl border border-violet-400/25 bg-violet-500/10 px-5 py-3 text-xs font-bold text-violet-200 transition-colors hover:bg-violet-500/20">
+            Tải thêm phim để lọc tiếp
+          </button>
+        </div>
+      )}
+
       {loadingMore && (
         <div className="mt-20 flex flex-col items-center justify-center gap-4 py-8">
           <div className="w-8 h-8 border-[3px] border-violet-400/40 border-t-violet-400 rounded-full animate-spin" />
