@@ -142,7 +142,6 @@ export function MovieListingScreen({ type }: { type: string }) {
           color: var(--listing-text) !important;
           backdrop-filter: blur(22px) saturate(150%) !important;
         }
-        .listing-page .listing-filter-shell button { color: var(--listing-text); }
         .listing-page .listing-filter-shell button:hover { border-color: rgba(167,139,250,.45); }
         .listing-page .listing-filter-shell [class*="bg-[#0b0d14]"] {
           background: var(--listing-panel-solid) !important;
