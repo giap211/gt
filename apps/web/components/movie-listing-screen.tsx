@@ -261,7 +261,7 @@ export function MovieListingScreen({ type }: { type: string }) {
           </div>
         )}
 
-        <div className="listing-filter-shell"><FilterBar /></div>
+        <div className="listing-filter-shell"><FilterBar key={type} /></div>
 
         <div className="mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -275,7 +275,7 @@ export function MovieListingScreen({ type }: { type: string }) {
           <div className="relative">
             {isLoading && hasLoaded && <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold text-violet-400" role="status"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-violet-400" /> Đang chuyển danh mục...</div>}
             <div className={`transition-opacity duration-200 ${isLoading && hasLoaded ? "opacity-75" : "opacity-100"}`}>
-              <InfiniteMovieGrid initialItems={movies} initialTotalPages={totalPages} initialPage={1} fetchMore={fetchMoviesFromAPI} type={type} />
+              <InfiniteMovieGrid key={type} initialItems={movies} initialTotalPages={totalPages} initialPage={1} fetchMore={fetchMoviesFromAPI} type={type} />
             </div>
           </div>
         ) : (

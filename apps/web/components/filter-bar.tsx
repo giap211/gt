@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown, Filter, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 
 export interface MovieListingFilters {
@@ -13,7 +14,7 @@ export interface MovieListingFilters {
 }
 
 type MenuKey = "genre" | "country" | "year" | "quality" | "language" | "sort";
-type MenuPosition = { top: number; left: number; width: number };
+type MenuPosition = { top: number; left: number; width: number; maxHeight: number };
 
 const EMPTY_FILTERS: MovieListingFilters = {
   genres: [],
@@ -68,9 +69,11 @@ export const FilterBar = () => {
     const rect = event.currentTarget.getBoundingClientRect();
     const width = Math.min(360, window.innerWidth - 24);
     const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
-    const maxHeight = Math.min(window.innerHeight * 0.66, 440);
-    const top = Math.max(12, Math.min(rect.bottom + 8, window.innerHeight - maxHeight - 12));
-    setPosition({ top, left, width });
+    // Reserve the bottom-dock area on phones so the panel never sits behind it.
+    const safeBottom = window.innerWidth < 1024 ? 112 : 24;
+    const maxHeight = Math.max(180, Math.min(window.innerHeight * 0.66, 440, window.innerHeight - safeBottom - 24));
+    const top = Math.max(12, Math.min(rect.bottom + 8, window.innerHeight - maxHeight - safeBottom));
+    setPosition({ top, left, width, maxHeight });
     setOpenMenu(key);
   };
 
@@ -177,8 +180,8 @@ export const FilterBar = () => {
           ref={panelRef}
           role="dialog"
           aria-label={groups.find((group) => group.key === openMenu)?.label}
-          style={{ position: "fixed", top: position.top, left: position.left, width: position.width, maxHeight: "min(66dvh, 440px)" }}
-          className="z-[999] flex flex-col overflow-hidden rounded-2xl border border-violet-300/20 bg-[#11111d]/95 p-3 text-white shadow-[0_24px_70px_rgba(0,0,0,.55)] backdrop-blur-2xl"
+          style={{ position: "fixed", top: position.top, left: position.left, width: position.width, maxHeight: position.maxHeight }}
+          className="z-[10000] flex flex-col overflow-hidden rounded-2xl border border-violet-300/20 bg-[#11111d]/95 p-3 text-white shadow-[0_24px_70px_rgba(0,0,0,.55)] backdrop-blur-2xl"
         >
           <div className="mb-2 flex shrink-0 items-center justify-between border-b border-white/10 pb-2">
             <span className="text-xs font-extrabold uppercase tracking-wider text-violet-200">{groups.find((group) => group.key === openMenu)?.label}</span>
