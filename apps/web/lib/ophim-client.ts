@@ -511,6 +511,45 @@ async function filterMoviesByVerifiedCountry(
   return output;
 }
 
+/** Lấy Anime Nhật Bản: kết hợp danh sách hoạt hình với xác minh quốc gia từ metadata PhimAPI/TMDB. */
+export const getAnimeMoviesByCountry = async (
+  country: string = "nhat-ban",
+  page: number = 1,
+  isHome: boolean = true,
+): Promise<LatestMoviesResponse> => {
+  try {
+    // Đọc vài trang Anime để sau khi lọc quốc gia, kệ trang chủ vẫn có đủ lựa chọn.
+    const pages = await Promise.all(
+      [page, page + 1, page + 2].map((currentPage) =>
+        getMoviesByType("hoat-hinh", currentPage, isHome),
+      ),
+    );
+    const successful = pages.filter((result) => result.status);
+    if (!successful.length) return failedListResponse();
+
+    const combined = Array.from(
+      new Map(
+        successful.flatMap((result) => result.items)
+          .map((movie) => [movie._id || movie.slug, movie] as const),
+      ).values(),
+    );
+    const filtered = await filterMoviesByVerifiedCountry(
+      combined,
+      normalizeCountryIdentifier(country),
+    );
+
+    return {
+      status: true,
+      items: filtered,
+      pathImage: successful[0]?.pathImage || DEFAULT_CDN_IMAGE,
+      pagination: successful[0]?.pagination || emptyPagination(),
+    };
+  } catch (error) {
+    console.error(`Error fetching Anime by country [${country}]:`, error);
+    return failedListResponse();
+  }
+};
+
 export const getMoviesByCountry = async (
   country: string,
   page: number = 1,
