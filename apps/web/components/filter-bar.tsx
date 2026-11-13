@@ -175,7 +175,7 @@ export const FilterBar = () => {
         </div>
       )}
 
-      {openMenu && position && (
+      {openMenu && position && typeof document !== "undefined" && createPortal(
         <div
           ref={panelRef}
           role="dialog"
@@ -212,7 +212,8 @@ export const FilterBar = () => {
             <button type="button" onClick={() => setDraft((current) => openMenu === "sort" ? { ...current, sort: "latest" } : { ...current, [groupForMenu]: [] })} className="px-2 py-2 text-[11px] font-semibold text-white/55 hover:text-white">Bỏ chọn nhóm này</button>
             <button type="button" onClick={apply} className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-4 py-2 text-[11px] font-extrabold text-white">Xong</button>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
