@@ -297,7 +297,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                         priority={index === 0}
                         loading={index === 0 ? undefined : "lazy"}
                         sizes="100vw"
-                        quality={90}
+                        quality={80}
                         className="object-cover object-center"
                       />
                       <div className="hero-card-overlay absolute inset-0" />

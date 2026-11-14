@@ -55,7 +55,7 @@ const nextConfig = {
 
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
 
-    qualities: [75, 90],
+    qualities: [75, 80],
 
     formats: ["image/webp", "image/avif"],
   },

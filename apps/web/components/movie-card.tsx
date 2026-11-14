@@ -129,7 +129,7 @@ export const MovieCard = ({
               : "(max-width: 640px) 45vw, 20vw"
           }
           className="object-cover transition-transform duration-400 group-hover:scale-[1.03]"
-          quality={80}
+          quality={75}
           loading="lazy"
         />
 
