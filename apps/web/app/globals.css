@@ -355,19 +355,10 @@ body {
   border-radius: 10px;
 }
 
-.artplayer-app {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-}
-
-.art-control-progress-inner {
-  background: #ffd875 !important;
-}
-
 #nextjs-portal,
 [data-nextjs-toast],
-[data-nextjs-dialog] {
+[data-nextjs-dialog],
+.__next-dev-tools-icon {
   display: none !important;
 }
 
@@ -558,7 +549,6 @@ div[class*="z-[200]"] {
 header.fixed button,
 div[class*="z-[190]"] button,
 div[class*="z-[200]"] button,
-.artplayer-app button {
   transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 header.fixed button:hover,
@@ -578,18 +568,6 @@ header.fixed input:focus,
 div[class*="z-[200]"] input:focus {
   border-color: rgba(255,216,117,.65) !important;
   box-shadow: 0 0 0 3px rgba(255,216,117,.09), inset 0 1px 0 rgba(255,255,255,.15);
-}
-.artplayer-app {
-  border: 1px solid rgba(255,255,255,.2);
-  box-shadow: 0 24px 65px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.16);
-}
-.artplayer-app .art-controls,
-.artplayer-app .art-bottom,
-.artplayer-app .art-contextmenus,
-.artplayer-app .art-settings,
-.artplayer-app .art-layer-auto-playback {
-  -webkit-backdrop-filter: blur(18px) saturate(155%);
-  backdrop-filter: blur(18px) saturate(155%);
 }
 @media (prefers-reduced-transparency: reduce) {
   header.fixed, header.fixed .absolute.top-full, header.fixed .fixed.inset-y-0,
@@ -671,10 +649,6 @@ svg[class*="text-yellow-400"] {
 
 .thumbs-slider .swiper-slide-thumb-active {
   border-color: #c084fc !important;
-}
-
-.art-control-progress-inner {
-  background: linear-gradient(90deg, #8b5cf6, #d946ef) !important;
 }
 
 

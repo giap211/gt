@@ -19,8 +19,6 @@ model Movie {
   imdbRating   Float?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  @@index([slug])
 }
 
 model User {

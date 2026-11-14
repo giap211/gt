@@ -24,7 +24,6 @@ const oswald = Oswald({
 
 import { Navbar } from "@/components/navbar";
 import { BottomDock } from "@/components/bottom-dock";
-import { HideDevBadge } from "@/components/hide-dev-badge";
 import { MemberProvider } from "@/components/member-provider";
 import { RouteScrollReset } from "@/components/route-scroll-reset";
 import { PersistentTabShell } from "@/components/persistent-tab-shell";
@@ -62,7 +61,6 @@ export default function RootLayout({
       >
         <RouteScrollReset />
         <PosterScrollMotion />
-        <HideDevBadge />
         <MemberProvider>
           <div className="mobile-app-shell">
             <Navbar />

@@ -25,8 +25,6 @@ const nextConfig = {
       { protocol: "https", hostname: "rophimm.net", pathname: "/**" },
       { protocol: "https", hostname: "**.ophim1.com", pathname: "/**" },
       { protocol: "https", hostname: "img.ophim1.com", pathname: "/**" },
-      { protocol: "https", hostname: "vsmov.com", pathname: "/**" },
-      { protocol: "https", hostname: "**.vsmov.com", pathname: "/**" },
 
       // TMDB image CDN
       {

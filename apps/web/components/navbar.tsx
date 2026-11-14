@@ -139,11 +139,9 @@ export const Navbar = () => {
     };
     updateScrollState();
     window.addEventListener("scroll", updateScrollState, { passive: true });
-    document.addEventListener("scroll", updateScrollState, { passive: true });
     window.addEventListener("pageshow", updateScrollState);
     return () => {
       window.removeEventListener("scroll", updateScrollState);
-      document.removeEventListener("scroll", updateScrollState);
       window.removeEventListener("pageshow", updateScrollState);
     };
   }, []);

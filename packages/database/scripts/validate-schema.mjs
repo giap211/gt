@@ -1,10 +1,13 @@
 import { spawnSync } from "node:child_process";
 
+const databaseUrl =
+  process.env.DATABASE_URL ||
+  "postgresql://postgres:postgres@localhost:5432/rophim";
+
 const env = {
   ...process.env,
-  DATABASE_URL:
-    process.env.DATABASE_URL ||
-    "postgresql://postgres:postgres@localhost:5432/rophim",
+  DATABASE_URL: databaseUrl,
+  DATABASE_URL_UNPOOLED: process.env.DATABASE_URL_UNPOOLED || databaseUrl,
 };
 
 const result = spawnSync(
