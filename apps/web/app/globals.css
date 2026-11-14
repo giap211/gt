@@ -548,7 +548,7 @@ div[class*="z-[200]"] {
 }
 header.fixed button,
 div[class*="z-[190]"] button,
-div[class*="z-[200]"] button,
+div[class*="z-[200]"] button {
   transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 header.fixed button:hover,
