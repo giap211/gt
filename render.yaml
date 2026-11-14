@@ -18,6 +18,10 @@ services:
         fromDatabase:
           name: rophim-postgres-sg
           property: connectionString
+      - key: DATABASE_URL_UNPOOLED
+        fromDatabase:
+          name: rophim-postgres-sg
+          property: connectionString
 
 databases:
   - name: rophim-postgres-sg
