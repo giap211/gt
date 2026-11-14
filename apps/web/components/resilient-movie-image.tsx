@@ -52,6 +52,7 @@ export function ResilientMovieImage({
       {...imageProps}
       src={src}
       alt={alt}
+      unoptimized={!usingFallback}
       onError={() => {
         if (!usingFallback) setAttempt((current) => current + 1);
       }}
