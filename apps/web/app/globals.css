@@ -857,6 +857,14 @@ html[data-mobile-theme="light"] .comments-panel,
 html[data-theme="light"] .comments-panel {
   color: #292638 !important;
 }
+html[data-mobile-theme="light"] .comments-panel :not(button)[class*="text-white"],
+html[data-theme="light"] .comments-panel :not(button)[class*="text-white"] {
+  color: #777386 !important;
+}
+html[data-mobile-theme="light"] .comments-panel svg,
+html[data-theme="light"] .comments-panel svg {
+  color: #65577f !important;
+}
 html[data-mobile-theme="light"] .comments-panel h3,
 html[data-mobile-theme="light"] .comments-panel p,
 html[data-mobile-theme="light"] .comments-panel span,
