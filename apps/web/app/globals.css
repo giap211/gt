@@ -1118,3 +1118,50 @@ html[data-theme="light"] [class*="text-fuchsia-"] {
   -webkit-backdrop-filter: blur(8px);
 }
 .badge-primary { background: rgba(38, 42, 48, .96) !important; }
+
+
+/* Definitive poster cleanup: no violet rim, outline, ring or hover highlight
+   on either landscape or portrait poster, including nested image wrappers. */
+a.movie-poster-frame,
+a.movie-poster-frame:hover,
+a.movie-poster-frame:focus,
+a.movie-poster-frame:focus-visible,
+a.movie-poster-frame *,
+a.movie-poster-frame *::before,
+a.movie-poster-frame *::after,
+a.movie-poster-frame::before,
+a.movie-poster-frame::after {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-color: transparent !important;
+  filter: none;
+}
+a.movie-poster-frame:hover,
+a.movie-poster-frame:focus-visible {
+  transform: none;
+}
+a.movie-poster-frame img,
+a.movie-poster-frame:hover img {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Make the QL. HD / QL. FHD quality label readable over any artwork. */
+a.movie-poster-frame span[class*="bg-[#f0c24d]"] {
+  background: #f4f4f5 !important;
+  background-color: #f4f4f5 !important;
+  color: #17181c !important;
+  -webkit-text-fill-color: #17181c !important;
+  border: 0 !important;
+  text-shadow: none !important;
+  box-shadow: 0 2px 7px rgba(0,0,0,.48) !important;
+  opacity: 1 !important;
+  font-weight: 800 !important;
+  letter-spacing: .02em;
+  padding: 3px 7px !important;
+}
