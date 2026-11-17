@@ -210,7 +210,7 @@ export function BottomDock() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Tìm phim, diễn viên..."
-                className="w-full h-11 rounded-xl bg-white/[0.06] border border-white/10 pl-10 pr-10 text-base text-white placeholder:text-white/35 outline-none focus:border-violet-400/50"
+                className="w-full h-11 rounded-xl bg-white/[0.06] border border-white/10 pl-10 pr-10 text-base text-white placeholder:text-white/35 outline-none focus:border-white/15"
               />
               {query && (
                 <button type="button" onClick={() => { setQuery(""); setResults([]); inputRef.current?.focus({ preventScroll: true }); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40">
@@ -222,7 +222,7 @@ export function BottomDock() {
           <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-2">
             {isSearching && (
               <div className="flex items-center justify-center gap-2 py-10 text-white/40 text-sm">
-                <Loader2 size={16} className="animate-spin text-violet-400" />
+                <Loader2 size={16} className="animate-spin text-white/70" />
                 Đang tìm...
               </div>
             )}
@@ -239,7 +239,7 @@ export function BottomDock() {
                     <div className="min-w-0 flex-1">
                       <p className="text-[14px] font-semibold text-white line-clamp-1">{item.name}</p>
                       <p className="text-[12px] text-white/45 line-clamp-1 mt-0.5">{item.origin_name}</p>
-                      <p className="text-[11px] text-violet-300/90 mt-1">{item.year || "—"} · HD</p>
+                      <p className="text-[11px] text-white/70 mt-1">{item.year || "—"} · HD</p>
                     </div>
                   </Link>
                 ))}
@@ -268,13 +268,13 @@ export function BottomDock() {
                   <p className="text-xs text-white/45 mt-0.5">{user.email}</p>
                 </div>
                 <button type="button" onClick={() => { setAccountOpen(false); openLibrary("history"); }} className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-white/85">
-                  <History size={18} className="text-violet-400" /> Lịch sử xem
+                  <History size={18} className="text-white/70" /> Lịch sử xem
                 </button>
                 <button type="button" onClick={() => { setAccountOpen(false); openLibrary("favorites"); }} className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-white/85">
-                  <Bookmark size={18} className="text-violet-400" /> Đã lưu
+                  <Bookmark size={18} className="text-white/70" /> Đã lưu
                 </button>
                 <button type="button" onClick={toggleMobileTheme} className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-white/85">
-                  {mobileTheme === "dark" ? <Sun size={18} className="text-violet-400" /> : <Moon size={18} className="text-violet-400" />}
+                  {mobileTheme === "dark" ? <Sun size={18} className="text-white/70" /> : <Moon size={18} className="text-white/70" />}
                   {mobileTheme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
                 </button>
                 <button type="button" onClick={() => { logout(); setAccountOpen(false); }} className="w-full flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-left text-sm text-red-300">
@@ -283,7 +283,7 @@ export function BottomDock() {
               </>
             ) : (
               <>
-                <button type="button" onClick={() => { setAccountOpen(false); openAuth("login"); }} className="w-full rounded-xl bg-violet-600 py-3 text-center text-sm font-bold text-white">
+                <button type="button" onClick={() => { setAccountOpen(false); openAuth("login"); }} className="w-full rounded-xl bg-white/10 py-3 text-center text-sm font-bold text-white">
                   Đăng nhập
                 </button>
                 <button type="button" onClick={() => { setAccountOpen(false); openAuth("register"); }} className="w-full rounded-xl border border-white/15 py-3 text-center text-sm font-semibold text-white/80">

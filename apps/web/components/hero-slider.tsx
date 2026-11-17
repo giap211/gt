@@ -403,7 +403,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
               </button>
             </header>
             <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
-              <Bell size={28} className="text-violet-400/80" />
+              <Bell size={28} className="text-white/70" />
               <p className="text-sm text-white/50">Chưa có thông báo mới</p>
             </div>
           </div>,

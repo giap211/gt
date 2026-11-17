@@ -221,14 +221,14 @@ export function MovieListingScreen({ type }: { type: string }) {
             className="listing-hero relative mb-6 overflow-hidden rounded-[26px] px-4 py-5 sm:mb-8 sm:px-7 sm:py-7"
             style={{ "--listing-hero-image": heroImage ? `url("${heroImage}")` : "none" } as CSSProperties}
           >
-            <div className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-28 right-1/4 h-48 w-64 rounded-full bg-fuchsia-500/15 blur-3xl" />
+            <div className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-28 right-1/4 h-48 w-64 rounded-full bg-white/10 blur-3xl" />
             <div className="relative z-10 max-w-2xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-300/25 bg-violet-400/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.18em] text-violet-200">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/70">
                 <Sparkles size={12} /> XEM PHIM · KHÔNG GIAN ĐIỆN ẢNH
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-300/25 bg-violet-400/15 text-violet-200 sm:h-14 sm:w-14">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white/70 sm:h-14 sm:w-14">
                   {isSeries ? <Tv size={25} /> : <Clapperboard size={25} />}
                 </div>
                 <div>
@@ -249,7 +249,7 @@ export function MovieListingScreen({ type }: { type: string }) {
                 </Link>
               </div>
               {movies[0] && (
-                <Link href={`/phim/${movies[0].slug}`} className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-violet-200 transition-colors hover:text-fuchsia-200">
+                <Link href={`/phim/${movies[0].slug}`} className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-white/70 transition-colors hover:text-white/70">
                   <Play size={13} fill="currentColor" /> Khám phá phim nổi bật <ArrowUpRight size={13} />
                 </Link>
               )}
@@ -257,7 +257,7 @@ export function MovieListingScreen({ type }: { type: string }) {
           </section>
         ) : (
           <div className="mb-6 flex items-end justify-between gap-3">
-            <div><p className="mb-1 text-[10px] font-extrabold uppercase tracking-[.2em] text-violet-400">Xem phim · Thư viện</p><h1 className="text-2xl font-black tracking-tight sm:text-4xl">{pageTitle}</h1></div>
+            <div><p className="mb-1 text-[10px] font-extrabold uppercase tracking-[.2em] text-white/70">Xem phim · Thư viện</p><h1 className="text-2xl font-black tracking-tight sm:text-4xl">{pageTitle}</h1></div>
             <span className="text-xs text-[var(--listing-muted)]">{movies.length.toLocaleString("vi-VN")} phim</span>
           </div>
         )}
@@ -266,7 +266,7 @@ export function MovieListingScreen({ type }: { type: string }) {
 
         <div className="mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Film size={17} className="text-violet-400" />
+            <Film size={17} className="text-white/70" />
             <h2 className="text-base font-extrabold tracking-tight sm:text-lg">{isSeries ? "Series nổi bật" : isSingle ? "Phim điện ảnh" : "Danh sách phim"}</h2>
           </div>
           <span className="text-[10px] font-semibold text-[var(--listing-muted)] sm:text-xs">Mới cập nhật</span>
@@ -274,7 +274,7 @@ export function MovieListingScreen({ type }: { type: string }) {
 
         {isLoading && !hasLoaded ? renderSkeleton() : movies.length > 0 ? (
           <div className="relative">
-            {isLoading && hasLoaded && <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold text-violet-400" role="status"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-violet-400" /> Đang chuyển danh mục...</div>}
+            {isLoading && hasLoaded && <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold text-white/70" role="status"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/10" /> Đang chuyển danh mục...</div>}
             <div className={`transition-opacity duration-200 ${isLoading && hasLoaded ? "opacity-75" : "opacity-100"}`}>
               <InfiniteMovieGrid initialItems={movies} initialTotalPages={totalPages} initialPage={1} fetchMore={fetchMoviesFromAPI} type={type} />
             </div>

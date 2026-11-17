@@ -150,7 +150,7 @@ export default function MovieDetailPage({
         {/* Skeleton khớp trực tiếp với hero mobile thật: backdrop tràn khung, nội dung neo đáy. */}
         <section className="movie-detail-mobile">
           <div className="relative h-[570px] w-full overflow-hidden bg-[#19172b]">
-            <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-violet-950/30 via-[#171528]/35 to-[#100f1e]" />
+            <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-white/10 via-[#171528]/35 to-[#100f1e]" />
             <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),14px)]">
               <div className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.08]" />
             </div>
@@ -184,7 +184,7 @@ export default function MovieDetailPage({
               <div className="h-3 w-full rounded bg-white/[0.11]" />
               <div className="h-3 w-[94%] rounded bg-white/[0.09]" />
               <div className="h-3 w-[72%] rounded bg-white/[0.08]" />
-              <div className="h-3 w-20 rounded bg-violet-300/15" />
+              <div className="h-3 w-20 rounded bg-white/10" />
             </div>
 
             {/* Thanh thao tác phim */}
@@ -213,16 +213,16 @@ export default function MovieDetailPage({
             </section>
 
             {/* Tập phim — khớp panel, server, tìm kiếm và lưới tập thật */}
-            <section className="scroll-mt-5 rounded-2xl border border-violet-300/10 bg-white/[0.025] p-3.5">
+            <section className="scroll-mt-5 rounded-2xl border border-white/15 bg-white/[0.025] p-3.5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <div className="h-5 w-20 rounded bg-white/[0.12] animate-pulse" />
                   <div className="mt-2 h-3 w-24 rounded bg-white/[0.07] animate-pulse" />
                 </div>
-                <div className="h-7 w-24 rounded-full bg-violet-300/10 animate-pulse" />
+                <div className="h-7 w-24 rounded-full bg-white/10 animate-pulse" />
               </div>
               <div className="mb-3 flex gap-2 overflow-hidden">
-                <div className="h-9 w-24 shrink-0 rounded-xl bg-violet-300/15 animate-pulse" />
+                <div className="h-9 w-24 shrink-0 rounded-xl bg-white/10 animate-pulse" />
                 <div className="h-9 w-24 shrink-0 rounded-xl bg-white/[0.06] animate-pulse" />
                 <div className="h-9 w-24 shrink-0 rounded-xl bg-white/[0.06] animate-pulse" />
               </div>
@@ -520,7 +520,7 @@ export default function MovieDetailPage({
           />
           <div className="movie-detail-mobile-fade absolute inset-0" />
           <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),14px)]">
-            <Link href="/" aria-label="Quay lại" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white shadow-lg backdrop-blur-xl">
+            <Link href="/" aria-label="Quay lại" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white  backdrop-blur-xl">
               <span className="text-[26px] leading-none">‹</span>
             </Link>
 
@@ -528,7 +528,7 @@ export default function MovieDetailPage({
 
           <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-7 pt-24">
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.34em] text-white/65">PHIM ĐẶC SẮC</p>
-            <h1 className="max-w-[95%] text-[34px] font-bold leading-[1.06] tracking-[-0.04em] text-white drop-shadow-lg">{movie.name}</h1>
+            <h1 className="max-w-[95%] text-[34px] font-bold leading-[1.06] tracking-[-0.04em] text-white ">{movie.name}</h1>
             {movie.origin_name && <p className="mt-2 text-sm font-medium text-white/70">{movie.origin_name}</p>}
             <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-white/80">
               {movie.year && <span>{movie.year}</span>}
@@ -599,20 +599,20 @@ export default function MovieDetailPage({
             </section>
           )}
 
-          <section id="movie-episodes" className="movie-glass-panel scroll-mt-5 rounded-2xl border border-violet-300/10 bg-white/[0.025] p-3.5 sm:p-4">
+          <section id="movie-episodes" className="movie-glass-panel scroll-mt-5 rounded-2xl border border-white/15 bg-white/[0.025] p-3.5 sm:p-4">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="text-[17px] font-semibold tracking-tight text-white">Tập phim</h2>
                 <p className="mt-0.5 text-[11px] text-white/40">{mobileFilteredEpisodes.length.toLocaleString("vi-VN")} tập{mobileEpisodeSearch.trim() ? " phù hợp" : ""}</p>
               </div>
-              <span className="max-w-[48%] truncate rounded-full border border-violet-300/20 bg-violet-400/10 px-3 py-1.5 text-[10px] font-semibold text-violet-200">{episodes[selectedServer]?.server_name || "Bản chiếu"}</span>
+              <span className="max-w-[48%] truncate rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-semibold text-white/70">{episodes[selectedServer]?.server_name || "Bản chiếu"}</span>
             </div>
             {episodes.length > 1 && (
               <div className="mb-3">
                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-[.14em] text-white/35">Chọn server</p>
                 <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
                   {episodes.map((ep, idx) => (
-                    <button key={idx} type="button" onClick={() => { setSelectedServer(idx); setMobileEpisodePage(0); setMobileEpisodeSearch(""); }} aria-pressed={selectedServer === idx} className={`shrink-0 rounded-xl border px-3 py-2 text-[11px] font-semibold transition-all ${selectedServer === idx ? "border-violet-300/45 bg-gradient-to-r from-fuchsia-500/20 to-violet-500/20 text-violet-100" : "border-white/[0.08] bg-white/[0.035] text-white/55"}`}>{ep.server_name || `Server ${idx + 1}`}</button>
+                    <button key={idx} type="button" onClick={() => { setSelectedServer(idx); setMobileEpisodePage(0); setMobileEpisodeSearch(""); }} aria-pressed={selectedServer === idx} className={`shrink-0 rounded-xl border px-3 py-2 text-[11px] font-semibold transition-all ${selectedServer === idx ? "border-white/15 bg-gradient-to-r from-white/10 to-white/10 text-white/70" : "border-white/[0.08] bg-white/[0.035] text-white/55"}`}>{ep.server_name || `Server ${idx + 1}`}</button>
                   ))}
                 </div>
               </div>
@@ -627,14 +627,14 @@ export default function MovieDetailPage({
                 {Array.from({ length: mobileEpisodePageCount }, (_, page) => {
                   const from = page * mobileEpisodePageSize + 1;
                   const to = Math.min((page + 1) * mobileEpisodePageSize, mobileFilteredEpisodes.length);
-                  return <button key={page} type="button" onClick={() => setMobileEpisodePage(page)} aria-pressed={safeMobileEpisodePage === page} className={`shrink-0 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold tabular-nums ${safeMobileEpisodePage === page ? "border-violet-300/40 bg-violet-400/15 text-violet-100" : "border-white/[0.07] bg-white/[0.025] text-white/45"}`}>{from}–{to}</button>;
+                  return <button key={page} type="button" onClick={() => setMobileEpisodePage(page)} aria-pressed={safeMobileEpisodePage === page} className={`shrink-0 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold tabular-nums ${safeMobileEpisodePage === page ? "border-white/15 bg-white/10 text-white/70" : "border-white/[0.07] bg-white/[0.025] text-white/45"}`}>{from}–{to}</button>;
                 })}
               </div>
             )}
             {mobileVisibleEpisodes.length ? (
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
                 {mobileVisibleEpisodes.map((ep, idx) => (
-                  <Link key={ep.slug || ep.name} href={"/xem-phim/" + movie.slug + "?sv=" + selectedServer + "&tap=" + encodeURIComponent(ep.slug || ep.name)} className="group flex min-h-10 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.035] px-1.5 py-2 text-center text-[11px] font-semibold text-white/70 transition-all hover:border-violet-300/40 hover:bg-violet-400/10 hover:text-violet-100 active:scale-[.97]">
+                  <Link key={ep.slug || ep.name} href={"/xem-phim/" + movie.slug + "?sv=" + selectedServer + "&tap=" + encodeURIComponent(ep.slug || ep.name)} className="group flex min-h-10 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.035] px-1.5 py-2 text-center text-[11px] font-semibold text-white/70 transition-all hover:border-white/15 hover:bg-white/10 hover:text-white/70 active:scale-[.97]">
                     <span className="truncate">{formatEpisodeName(ep.name) || "Tập " + (safeMobileEpisodePage * mobileEpisodePageSize + idx + 1)}</span>
                   </Link>
                 ))}
@@ -711,7 +711,7 @@ export default function MovieDetailPage({
                         />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-white/80 line-clamp-1 group-hover:text-violet-300">
+                        <p className="text-xs font-medium text-white/80 line-clamp-1 group-hover:text-white/70">
                           {m.name}
                         </p>
                         <p className="text-[10px] text-white/35 line-clamp-1">
@@ -730,7 +730,7 @@ export default function MovieDetailPage({
               <div className="movie-glass-panel flex items-center gap-4 rounded-[24px] border px-5 py-3 backdrop-blur-2xl">
                 <Link
                   href={watchHref}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-fuchsia-500 via-violet-500 to-indigo-600 text-white font-bold text-[15px] px-6 py-2.5 rounded-full shrink-0 hover:brightness-105"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-white/10 via-white/10 to-indigo-600 text-white font-bold text-[15px] px-6 py-2.5 rounded-full shrink-0 hover:brightness-105"
                 >
                   <Play size={16} className="fill-current" />
                   Xem Ngay
@@ -745,7 +745,7 @@ export default function MovieDetailPage({
                     }}
                   />
                   <button className="flex items-center gap-1.5 rounded-full bg-[#282b3a] px-3 py-1.5">
-                    <Star size={14} className="fill-fuchsia-300 text-fuchsia-300" />
+                    <Star size={14} className="text-white/70 text-white/70" />
                     <span className="text-sm font-bold">0</span>
                     <span className="text-[11px] text-white/50">Đánh giá</span>
                   </button>
@@ -770,11 +770,11 @@ export default function MovieDetailPage({
                       <button
                         key={tab}
                         onClick={() => setActiveTab(key)}
-                        className={`relative pb-3 text-sm font-medium ${activeTab === key ? "text-violet-300" : "text-white/45 hover:text-white/80"}`}
+                        className={`relative pb-3 text-sm font-medium ${activeTab === key ? "text-white/70" : "text-white/45 hover:text-white/80"}`}
                       >
                         {tab}
                         {activeTab === key && (
-                          <span className="absolute bottom-0 inset-x-0 h-0.5 bg-gradient-to-r from-fuchsia-400 to-violet-500 rounded-full" />
+                          <span className="absolute bottom-0 inset-x-0 h-0.5 bg-gradient-to-r from-white/10 to-white/10 rounded-full" />
                         )}
                       </button>
                     );
@@ -868,7 +868,7 @@ function TabContent({
                 onClick={() => { setSelectedServer(idx); setEpisodePage(0); setEpisodeSearch(""); }}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-medium border ${
                   selectedServer === idx
-                    ? "bg-violet-400/15 border-violet-300/40 text-violet-200"
+                    ? "bg-white/10 border-white/15 text-white/70"
                     : "bg-white/5 border-white/10 text-white/50"
                 }`}
               >
@@ -908,7 +908,7 @@ function TabContent({
                       type="button"
                       onClick={() => setEpisodePage(page)}
                       aria-pressed={safeEpisodePage === page}
-                      className={`shrink-0 rounded-full border px-3.5 py-2 text-[11px] font-semibold transition-all ${safeEpisodePage === page ? "border-violet-300/50 bg-gradient-to-r from-fuchsia-500/20 to-violet-500/20 text-violet-200 shadow-[0_0_16px_rgba(139,92,246,.12)]" : "border-white/10 bg-white/[0.035] text-white/50 hover:border-violet-300/30 hover:text-white/80"}`}
+                      className={`shrink-0 rounded-full border px-3.5 py-2 text-[11px] font-semibold transition-all ${safeEpisodePage === page ? "border-white/15 bg-gradient-to-r from-white/10 to-white/10 text-white/70 shadow-[0_0_16px_rgba(139,92,246,.12)]" : "border-white/10 bg-white/[0.035] text-white/50 hover:border-white/15 hover:text-white/80"}`}
                     >
                       {start}–{end}
                     </button>
@@ -922,7 +922,7 @@ function TabContent({
                   <Link
                     key={ep.slug || ep.name}
                     href={`/xem-phim/${movie.slug}?sv=${selectedServer}&tap=${encodeURIComponent(ep.slug || ep.name)}`}
-                    className="flex min-h-10 items-center justify-center gap-1 rounded-xl border border-white/[0.06] bg-[#1c1e2a]/80 px-2 py-2.5 text-[12px] text-white/75 transition-colors hover:border-violet-300/40 hover:bg-violet-400/15 hover:text-violet-200"
+                    className="flex min-h-10 items-center justify-center gap-1 rounded-xl border border-white/[0.06] bg-[#1c1e2a]/80 px-2 py-2.5 text-[12px] text-white/75 transition-colors hover:border-white/15 hover:bg-white/10 hover:text-white/70"
                   >
                     <Play size={10} className="shrink-0 opacity-40" />
                     <span className="truncate">{formatEpisodeName(ep.name)}</span>
@@ -979,7 +979,7 @@ function TabContent({
               onClick={() => { setSelectedServer(idx); setEpisodePage(0); setEpisodeSearch(""); }}
               className={`rounded-lg border px-2.5 py-1.5 text-[13px] font-medium transition-all sm:text-sm ${
                 selectedServer === idx
-                  ? "border-violet-300/50 bg-violet-400/15 text-violet-200 shadow-[0_0_18px_rgba(139,92,246,.16)]"
+                  ? "border-white/15 bg-white/10 text-white/70 shadow-[0_0_18px_rgba(139,92,246,.16)]"
                   : "border-white/15 bg-[#202331] text-white/85 hover:border-white/30"
               }`}
             >
@@ -994,7 +994,7 @@ function TabContent({
 
         <Link
           href={versionHref}
-          className="group relative flex min-h-[148px] w-full items-center overflow-hidden rounded-xl border border-white/[0.06] bg-[#626474] transition-colors hover:border-violet-300/40 sm:min-h-[164px]"
+          className="group relative flex min-h-[148px] w-full items-center overflow-hidden rounded-xl border border-white/[0.06] bg-[#626474] transition-colors hover:border-white/15 sm:min-h-[164px]"
         >
           <div className="absolute inset-y-0 right-0 w-[40%] sm:w-[32%]">
             <ResilientMovieImage
@@ -1018,14 +1018,14 @@ function TabContent({
                 strokeWidth={2.5}
                 fill="#6675ee"
                 color="#6675ee"
-                className="shrink-0 drop-shadow-sm"
+                className="shrink-0 "
               />
               <span className="text-sm font-medium sm:text-base">{versionName}</span>
             </div>
             <p className="max-w-[72%] text-lg font-bold leading-snug text-white sm:text-xl">
               {movie.name}
             </p>
-            <span className="mt-3 inline-flex items-center rounded-md bg-white px-3.5 py-2 text-xs font-semibold text-[#171923] shadow-sm transition-colors group-hover:bg-violet-300">
+            <span className="mt-3 inline-flex items-center rounded-md bg-white px-3.5 py-2 text-xs font-semibold text-[#171923]  transition-colors group-hover:bg-white/10">
               Xem bản này
             </span>
           </div>
@@ -1081,7 +1081,7 @@ function TabContent({
                 className="object-cover group-hover:scale-105 transition-transform"
               />
             </div>
-            <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-violet-300">
+            <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-white/70">
               {m.name}
             </p>
           </Link>
@@ -1129,7 +1129,7 @@ function RelatedSection({ related }: { related: ListMovie[] }) {
                 Song ngữ
               </span>
             </div>
-            <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-violet-300">
+            <p className="mt-1.5 text-xs font-medium text-white/80 line-clamp-1 group-hover:text-white/70">
               {m.name}
             </p>
             <p className="text-[11px] text-white/35 line-clamp-1">{m.origin_name}</p>

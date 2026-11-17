@@ -27,7 +27,7 @@ function HomeSkeletonHero() {
   return (
     <div className="px-4 pt-3 pb-2" aria-hidden="true">
       <div className="relative h-[min(66svh,610px)] min-h-[420px] overflow-hidden rounded-[28px] bg-[#171321]">
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-violet-950/70 via-[#211a32] to-[#111018]" />
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-white/10 via-[#211a32] to-[#111018]" />
         <div className="absolute inset-x-0 bottom-0 space-y-4 bg-gradient-to-t from-[#08090d] via-[#08090d]/70 to-transparent px-5 pb-12 pt-28">
           <div className="h-3 w-24 animate-pulse rounded-full bg-white/10" />
           <div className="h-10 w-3/4 max-w-[280px] animate-pulse rounded-xl bg-white/15" />
@@ -352,7 +352,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
             {coreLoaded ? (
               <MovieCarousel
                 title="Phim nổi bật"
-                titleGradient="linear-gradient(235deg, #ffffff 20%, #a78bfa 125%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 layout="poster"
                 items={transformMovies(data.latest)}
               />
@@ -362,7 +362,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
             {shouldLoadSecondary && (!secondaryLoaded ? <HomeSecondarySkeleton /> : <div className="space-y-1 md:space-y-2">
               <MovieCarousel
                 title="Điện ảnh Hàn Quốc"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/han-quoc"
                 layout="poster"
                 items={transformMovies(data.korean)}
@@ -370,7 +370,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Mọt phim Hoa Ngữ"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #f472b6 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/trung-quoc"
                 layout="poster"
                 items={transformMovies(data.chinese)}
@@ -378,7 +378,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Thiên đường Phim Thái"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #34d399 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/thai-lan"
                 layout="poster"
                 items={transformMovies(data.thai)}
@@ -386,7 +386,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Phim US-UK Mới"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #60a5fa 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/au-my"
                 layout="poster"
                 items={transformMovies(data.usuk)}
@@ -394,7 +394,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Phim Thuyết Minh Mới Nhất"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #fbbf24 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/danh-sach/phim-thuyet-minh"
                 layout="compact"
                 items={transformMovies(data.dubbed.slice(0, 14))}
@@ -402,7 +402,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Phim Điện Ảnh Mới Coóng"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #fb923c 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/danh-sach/phim-le"
                 layout="poster"
                 items={transformMovies(data.single)}
@@ -410,7 +410,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Dấu ấn điện ảnh Việt"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #ef4444 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/viet-nam"
                 layout="poster"
                 items={transformMovies(data.viet)}
@@ -418,7 +418,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Đêm Kinh Hoàng"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #a855f7 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/the-loai/kinh-di"
                 layout="poster"
                 items={transformMovies(data.horror)}
@@ -426,7 +426,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Mê Cung Phim Nhật"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #f43f5e 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/nhat-ban"
                 layout="poster"
                 items={transformMovies(data.japanese)}
@@ -434,7 +434,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Phim Bộ Đã Hoàn Thành"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #22d3ee 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/danh-sach/phim-bo"
                 layout="poster"
                 items={transformMovies(data.series)}
@@ -442,7 +442,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Hành Động Nghẹt Thở"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #f97316 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/the-loai/hanh-dong"
                 layout="compact"
                 items={transformMovies(
@@ -452,7 +452,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Trinh Thám & Bí Ẩn"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #818cf8 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/the-loai/hinh-su"
                 layout="compact"
                 items={transformMovies(
@@ -462,7 +462,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Tinh Hoa Điện Ảnh Hồng Kông"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #eab308 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/hong-kong"
                 layout="poster"
                 items={transformMovies(data.hongkong)}
@@ -479,7 +479,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Thế giới Anime"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #38bdf8 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/danh-sach/hoat-hinh"
                 layout="poster"
                 items={transformMovies(data.cartoon)}
@@ -487,7 +487,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Cổ Trang Trung Quốc"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #c084fc 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/the-loai/co-trang"
                 layout="poster"
                 items={transformMovies(data.costume)}
@@ -504,7 +504,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
 
               <MovieCarousel
                 title="Mãn Nhãn với Phim Chiếu Rạp"
-                titleGradient="linear-gradient(235deg, #ffffff 30%, #4ade80 130%)"
+                titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/the-loai/chieu-rap"
                 layout="ranked"
                 items={transformMovies(data.cinema)}
