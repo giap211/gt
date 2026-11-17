@@ -37,6 +37,7 @@ export function BottomDock() {
 
   const isHome = pathname === "/";
   const isList =
+    pathname.startsWith("/bo-loc") ||
     pathname.startsWith("/danh-sach") ||
     pathname.startsWith("/the-loai") ||
     pathname.startsWith("/quoc-gia");
@@ -60,7 +61,7 @@ export function BottomDock() {
 
     const routeSection = pathname === "/"
       ? "home"
-      : pathname.startsWith("/danh-sach") || pathname.startsWith("/the-loai") || pathname.startsWith("/quoc-gia")
+      : pathname.startsWith("/bo-loc") || pathname.startsWith("/danh-sach") || pathname.startsWith("/the-loai") || pathname.startsWith("/quoc-gia")
         ? "list"
         : pathname.startsWith("/tim-kiem")
           ? "search"
@@ -313,7 +314,7 @@ export function BottomDock() {
               <span>Trang chủ</span>
             </Link>
             <Link
-              href="/danh-sach/phim-bo"
+              href="/bo-loc"
               onClick={(e) => handleDockNavigation(e, isList, "list")}
               className={`gt-dock-item ${dockListActive && !searchOpen && !accountOpen ? "is-active" : ""}`}
               aria-current={dockListActive && !searchOpen && !accountOpen ? "page" : undefined}
