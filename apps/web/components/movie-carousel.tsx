@@ -166,10 +166,10 @@ export const MovieCarousel = ({
                 <SwiperSlide key="view-more" className="h-auto">
                   <Link
                     href={effectiveViewMoreLink}
-                    className="group flex h-full min-h-[220px] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-violet-300/15 bg-gradient-to-br from-violet-500/[0.08] via-white/[0.025] to-fuchsia-500/[0.08] text-center transition-all duration-300 hover:border-violet-300/35 hover:from-violet-500/[0.14] hover:to-fuchsia-500/[0.14]"
+                    className="group flex h-full min-h-[220px] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/[0.06] bg-transparent text-center transition-colors duration-300 hover:border-white/[0.12]"
                     aria-label={`Xem thêm phim trong mục ${title}`}
                   >
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/[0.09] text-white shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-violet-500/20">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/[0.07] text-white shadow-none transition-transform duration-300 group-hover:scale-110 group-hover:bg-white/[0.12]">
                       <ChevronRight size={28} strokeWidth={2.1} />
                     </span>
                     <span className="text-sm font-semibold text-white/85">Xem thêm</span>
