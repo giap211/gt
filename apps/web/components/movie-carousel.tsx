@@ -47,8 +47,10 @@ export const MovieCarousel = ({
 }: MovieCarouselProps) => {
   const navigationPrevRef = useRef<HTMLButtonElement | null>(null);
   const navigationNextRef = useRef<HTMLButtonElement | null>(null);
+  const effectiveViewMoreLink = viewMoreLink || (title === "Phim nổi bật" ? "/danh-sach/phim-moi" : undefined);
+  const visibleItems = items?.slice(0, 8) ?? [];
 
-  if (!items || items.length === 0) return null;
+  if (!visibleItems.length) return null;
 
   return (
     <section className={`w-full relative py-3 md:py-5 ${title === "Phim đang xem" ? "movie-carousel-continue-watching" : ""}`}>
@@ -76,16 +78,8 @@ export const MovieCarousel = ({
             >
               {title}
             </h2>
-            {viewMoreLink && (
-              <Link
-                href={viewMoreLink}
-                className="movie-carousel-view-more group inline-flex min-w-0 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full px-2 py-1.5 text-[11px] md:gap-1.5 md:px-2.5 md:py-1.5 md:text-xs font-semibold transition-all duration-200 self-center mt-0"
-              >
-                <span className="truncate">Xem thêm</span>
-                <span className="movie-carousel-view-more-icon flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-0.5 ">
-                  <ChevronRight size={15} strokeWidth={2.4} />
-                </span>
-              </Link>
+            {effectiveViewMoreLink && (
+              <span className="shrink-0 text-[10px] font-semibold text-white/45">8 phim</span>
             )}
           </div>
 
@@ -130,7 +124,7 @@ export const MovieCarousel = ({
               }}
               className={`movie-carousel-swiper w-full !overflow-hidden ${layout === "poster" ? "movie-carousel-poster" : ""}`}
             >
-              {items.map((movie, index) => (
+              {visibleItems.map((movie, index) => (
                 <SwiperSlide key={movie.id} className="h-auto">
                   {layout === "ranked" ? (
                     <div className="group/ranked ranked-poster-card flex h-full flex-col">
@@ -168,6 +162,20 @@ export const MovieCarousel = ({
                   )}
                 </SwiperSlide>
               ))}
+              {effectiveViewMoreLink && (
+                <SwiperSlide key="view-more" className="h-auto">
+                  <Link
+                    href={effectiveViewMoreLink}
+                    className="group flex h-full min-h-[220px] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-violet-300/15 bg-gradient-to-br from-violet-500/[0.08] via-white/[0.025] to-fuchsia-500/[0.08] text-center transition-all duration-300 hover:border-violet-300/35 hover:from-violet-500/[0.14] hover:to-fuchsia-500/[0.14]"
+                    aria-label={`Xem thêm phim trong mục ${title}`}
+                  >
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/[0.09] text-white shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-violet-500/20">
+                      <ChevronRight size={28} strokeWidth={2.1} />
+                    </span>
+                    <span className="text-sm font-semibold text-white/85">Xem thêm</span>
+                  </Link>
+                </SwiperSlide>
+              )}
             </Swiper>
           </div>
         </div>
