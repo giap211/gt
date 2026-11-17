@@ -166,7 +166,7 @@ export const MovieCarousel = ({
                 <SwiperSlide key="view-more" className="h-auto">
                   <Link
                     href={effectiveViewMoreLink}
-                    className="group flex h-full min-h-[220px] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/[0.06] bg-transparent text-center transition-colors duration-300 hover:border-white/[0.12]"
+                    className="group flex h-full w-full flex-col items-center justify-center gap-3 bg-transparent text-center"
                     aria-label={`Xem thêm phim trong mục ${title}`}
                   >
                     <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/[0.07] text-white shadow-none transition-transform duration-300 group-hover:scale-110 group-hover:bg-white/[0.12]">
