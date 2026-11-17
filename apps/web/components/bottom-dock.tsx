@@ -154,8 +154,8 @@ export function BottomDock() {
     setIsSearching(true);
     const timer = setTimeout(async () => {
       try {
-        const res = await searchMovies(q, 1, 12);
-        setResults(res?.items?.slice(0, 10) || []);
+        const res = await searchMovies(q, 1, 5);
+        setResults(res?.items?.slice(0, 5) || []);
       } catch {
         setResults([]);
       } finally {
@@ -240,7 +240,7 @@ export function BottomDock() {
             )}
             {!isSearching && results.length > 0 && (
               <div className="space-y-1">
-                {results.map((item) => (
+                {results.slice(0, 4).map((item) => (
                   <Link key={item._id} href={`/phim/${item.slug}`} onClick={() => setSearchOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl active:bg-white/[0.06]">
                     <div className="relative w-11 h-14 rounded-lg overflow-hidden bg-white/5 shrink-0 border border-white/10">
                       <ResilientMovieImage sources={[item.poster_url, item.thumb_url]} fallbackSrc="/images/fallback-vertical.svg" alt={item.name} fill sizes="44px" className="object-cover" />
@@ -252,6 +252,15 @@ export function BottomDock() {
                     </div>
                   </Link>
                 ))}
+                {results.length > 4 && (
+                  <Link
+                    href={`/tim-kiem?keyword=${encodeURIComponent(query.trim())}`}
+                    onClick={() => setSearchOpen(false)}
+                    className="mt-2 flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-3 py-3 text-sm font-semibold text-white/80 active:bg-white/10"
+                  >
+                    Xem toàn bộ kết quả
+                  </Link>
+                )}
               </div>
             )}
             {!isSearching && query.trim().length < 2 && (

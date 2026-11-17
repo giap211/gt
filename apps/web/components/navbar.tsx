@@ -162,7 +162,7 @@ export const Navbar = () => {
     setIsSearching(true);
     const timer = setTimeout(async () => {
       try {
-        const res = await searchMovies(cleanQuery, 1, 6);
+        const res = await searchMovies(cleanQuery, 1, 5);
         if (res && res.status && res.items) {
           setSearchResults(res.items.slice(0, 5));
         } else {
@@ -365,7 +365,7 @@ export const Navbar = () => {
                   </div>
                   <div className="max-h-[340px] overflow-y-auto p-1.5 space-y-1">
                     {searchResults.length > 0 ? (
-                      searchResults.map((item) => (
+                      searchResults.slice(0, 4).map((item) => (
                         <Link
                           key={item._id}
                           href={`/phim/${item.slug}`}
@@ -385,13 +385,15 @@ export const Navbar = () => {
                       <div className="py-6 text-center text-xs text-white/40">Không tìm thấy phim phù hợp</div>
                     ) : null}
                   </div>
-                  <Link
-                    href={`/tim-kiem?keyword=${encodeURIComponent(searchQuery.trim())}`}
-                    onClick={() => setShowLiveSearch(false)}
-                    className="block p-2.5 text-center bg-[#111521] hover:bg-[#ffd875] text-[11px] font-bold text-white hover:text-black border-t border-white/10"
-                  >
-                    Xem tất cả kết quả →
-                  </Link>
+                  {searchResults.length > 4 && (
+                    <Link
+                      href={`/tim-kiem?keyword=${encodeURIComponent(searchQuery.trim())}`}
+                      onClick={() => setShowLiveSearch(false)}
+                      className="block p-2.5 text-center bg-[#111521] hover:bg-[#d1d5db] text-[11px] font-bold text-white hover:text-black border-t border-white/10"
+                    >
+                      Xem toàn bộ kết quả →
+                    </Link>
+                  )}
                 </div>
               )}
             </div>
