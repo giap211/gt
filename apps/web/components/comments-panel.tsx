@@ -58,7 +58,7 @@ export function CommentsPanel({ movie }: { movie: MoviePayload }) {
   };
 
   return (
-    <div id="comment-area" className="pt-6 space-y-4">
+    <div id="comment-area" className="comments-panel pt-6 space-y-4">
       <div className="flex items-center gap-3">
         <MessageSquare size={22} className="text-white/60" />
         <h3 className="text-xl font-bold text-white">Bình luận</h3>

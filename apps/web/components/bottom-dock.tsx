@@ -382,7 +382,7 @@ export function BottomDock() {
         }
         html[data-mobile-theme="light"] .gt-liquid-glass-bubble { background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.18); }
         html[data-mobile-theme="light"] .gt-dock-item { color:rgba(48,39,67,.72); }
-        html[data-mobile-theme="light"] .gt-dock-item.is-active { color:#d1d5db; }
+        html[data-mobile-theme="light"] .gt-dock-item.is-active { color:#4b3b70; }
         @media (prefers-reduced-motion:reduce) { .gt-dock-item,.gt-liquid-glass-bubble { transition:none; } }
         @media (min-width:1024px) { .gt-dock { display:none !important; } }
       `}</style>

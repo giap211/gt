@@ -788,3 +788,111 @@ html[data-mobile-theme="light"] .home-notification-overlay {
 }
 html[data-mobile-theme="light"] .home-notification-overlay [class*="text-white"] { color: #514b63 !important; }
 html[data-mobile-theme="light"] .home-notification-overlay [class*="border-white/"] { border-color: rgba(65,55,90,.13) !important; }
+
+/* Light-mode movie shelves: poster captions and section headings must contrast with the canvas. */
+html[data-mobile-theme="light"] .movie-carousel-section .movie-carousel-title,
+html[data-theme="light"] .movie-carousel-section .movie-carousel-title {
+  background-image: none !important;
+  color: #292638 !important;
+  -webkit-text-fill-color: #292638 !important;
+}
+html[data-mobile-theme="light"] .movie-carousel-section > div > div:first-child > a,
+html[data-theme="light"] .movie-carousel-section > div > div:first-child > a {
+  color: #625873 !important;
+}
+html[data-mobile-theme="light"] .movie-carousel-ranked .ranked-poster-card a,
+html[data-theme="light"] .movie-carousel-ranked .ranked-poster-card a {
+  color: #292638 !important;
+  -webkit-text-fill-color: #292638 !important;
+}
+html[data-mobile-theme="light"] .movie-carousel-ranked .ranked-poster-card p,
+html[data-theme="light"] .movie-carousel-ranked .ranked-poster-card p {
+  color: #777386 !important;
+}
+
+/* Restore a readable selected dock label on the translucent light glass. */
+html[data-mobile-theme="light"] .gt-dock-item.is-active { color: #4b3b70 !important; }
+
+/* Movie detail: replace white-on-white controls and text with a restrained dark ink palette. */
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content,
+html[data-theme="light"] .movie-detail-page .movie-detail-content {
+  color: #292638 !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*="text-white"],
+html[data-theme="light"] .movie-detail-page .movie-detail-content [class*="text-white"] {
+  color: #5b556b !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content h2,
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content h3,
+html[data-theme="light"] .movie-detail-page .movie-detail-content h2,
+html[data-theme="light"] .movie-detail-page .movie-detail-content h3 {
+  color: #292638 !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*="bg-white/"],
+html[data-theme="light"] .movie-detail-page .movie-detail-content [class*="bg-white/"] {
+  background: rgba(80,65,120,.075) !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*="bg-black/"],
+html[data-theme="light"] .movie-detail-page .movie-detail-content [class*="bg-black/"] {
+  background: rgba(80,65,120,.045) !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*="border-white/"],
+html[data-theme="light"] .movie-detail-page .movie-detail-content [class*="border-white/"] {
+  border-color: rgba(65,55,90,.16) !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content button:has(svg),
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content a:has(svg),
+html[data-theme="light"] .movie-detail-page .movie-detail-content button:has(svg),
+html[data-theme="light"] .movie-detail-page .movie-detail-content a:has(svg) {
+  color: #55466f !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-glass-panel button:has(svg),
+html[data-theme="light"] .movie-detail-page .movie-glass-panel button:has(svg) {
+  background: rgba(80,65,120,.075) !important;
+  border-color: rgba(65,55,90,.15) !important;
+}
+
+/* Comments panel was hard-coded to dark surfaces; give the complete component a light skin. */
+html[data-mobile-theme="light"] .comments-panel,
+html[data-theme="light"] .comments-panel {
+  color: #292638 !important;
+}
+html[data-mobile-theme="light"] .comments-panel h3,
+html[data-mobile-theme="light"] .comments-panel p,
+html[data-mobile-theme="light"] .comments-panel span,
+html[data-theme="light"] .comments-panel h3,
+html[data-theme="light"] .comments-panel p,
+html[data-theme="light"] .comments-panel span {
+  color: #514b63 !important;
+}
+html[data-mobile-theme="light"] .comments-panel > div:nth-child(2),
+html[data-theme="light"] .comments-panel > div:nth-child(2) {
+  background: #fff !important;
+  border-color: rgba(65,55,90,.14) !important;
+  box-shadow: 0 8px 24px rgba(38,30,60,.045);
+}
+html[data-mobile-theme="light"] .comments-panel textarea,
+html[data-theme="light"] .comments-panel textarea {
+  color: #292638 !important;
+}
+html[data-mobile-theme="light"] .comments-panel textarea::placeholder,
+html[data-theme="light"] .comments-panel textarea::placeholder {
+  color: #9691a2 !important;
+}
+html[data-mobile-theme="light"] .comments-panel [class*="border-white/"],
+html[data-theme="light"] .comments-panel [class*="border-white/"] {
+  border-color: rgba(65,55,90,.13) !important;
+}
+html[data-mobile-theme="light"] .comments-panel [class*="bg-white/"],
+html[data-theme="light"] .comments-panel [class*="bg-white/"] {
+  background: rgba(80,65,120,.045) !important;
+}
+html[data-mobile-theme="light"] .comments-panel button,
+html[data-theme="light"] .comments-panel button {
+  background: linear-gradient(120deg,#6652a0,#8068b8) !important;
+  color: #fff !important;
+}
+html[data-mobile-theme="light"] .comments-panel button svg,
+html[data-theme="light"] .comments-panel button svg {
+  color: #fff !important;
+}

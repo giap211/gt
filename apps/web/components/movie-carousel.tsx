@@ -53,7 +53,7 @@ export const MovieCarousel = ({
   if (!visibleItems.length) return null;
 
   return (
-    <section className={`w-full relative py-3 md:py-5 ${title === "Phim đang xem" ? "movie-carousel-continue-watching" : ""}`}>
+    <section className={`movie-carousel-section w-full relative py-3 md:py-5 ${layout === "ranked" ? "movie-carousel-ranked" : ""} ${title === "Phim đang xem" ? "movie-carousel-continue-watching" : ""}`}>
       <style jsx global>{`
         html[data-mobile-theme="light"] .movie-carousel-continue-watching .movie-poster-frame + div,
         html[data-theme="light"] .movie-carousel-continue-watching .movie-poster-frame + div {
@@ -68,7 +68,7 @@ export const MovieCarousel = ({
         <div className="flex flex-col gap-3">
           <div className="flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden">
             <h2
-              className={`min-w-0 flex-1 text-xl md:text-2xl font-bold leading-tight ${layout === "ranked" ? "md:text-2xl" : ""}`}
+              className={`movie-carousel-title min-w-0 flex-1 text-xl md:text-2xl font-bold leading-tight ${layout === "ranked" ? "md:text-2xl" : ""}`}
               style={{
                 backgroundImage: titleGradient,
                 WebkitBackgroundClip: "text",
