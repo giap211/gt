@@ -993,7 +993,7 @@ export const getMovieFilterOptions = async (): Promise<MovieFilterOptions> => {
   const countries = extractFilterItems(countryData).sort((a, b) => a.name.localeCompare(b.name, "vi"));
   const years = extractFilterItems(yearData)
     .map((item) => item.slug)
-    .filter((year) => /^\\d{4}$/.test(year))
+    .filter((year) => year.length === 4 && Number.isInteger(Number(year)))
     .sort((a, b) => Number(b) - Number(a));
   return { categories, countries, years };
 };
