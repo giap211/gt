@@ -669,3 +669,113 @@ body { min-width: 320px; background: #050509 !important; }
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
+
+/* Light theme surface contract: one consistent canvas and panel palette. */
+html[data-mobile-theme="light"] { color-scheme: light; background: #f5f4f8 !important; }
+html[data-mobile-theme="light"] body { background: #f5f4f8 !important; color: #292638 !important; }
+html[data-mobile-theme="light"] .mobile-app-shell { background: #f5f4f8 !important; color: #292638; }
+
+/* Collection and search routes were still using hard-coded dark page surfaces. */
+html[data-mobile-theme="light"] .collection-page,
+html[data-mobile-theme="light"] .search-page { background: #f5f4f8 !important; color: #292638 !important; }
+html[data-mobile-theme="light"] .collection-page h1,
+html[data-mobile-theme="light"] .search-page h1,
+html[data-mobile-theme="light"] .collection-page h2,
+html[data-mobile-theme="light"] .search-page h2 { color: #292638 !important; }
+html[data-mobile-theme="light"] .collection-page p,
+html[data-mobile-theme="light"] .search-page p { color: #777386; }
+html[data-mobile-theme="light"] .collection-page .card-title,
+html[data-mobile-theme="light"] .search-page .card-title,
+html[data-mobile-theme="light"] .collection-page .movie-card-title,
+html[data-mobile-theme="light"] .search-page .movie-card-title { color: #292638 !important; }
+html[data-mobile-theme="light"] .collection-page .card-subtitle,
+html[data-mobile-theme="light"] .search-page .card-subtitle { color: #777386 !important; }
+html[data-mobile-theme="light"] .collection-page [class*="bg-[#0b0d14]"],
+html[data-mobile-theme="light"] .collection-page [class*="bg-[#0f111a]"],
+html[data-mobile-theme="light"] .search-page [class*="bg-[#0b0d14]"] { background: #f5f4f8 !important; }
+html[data-mobile-theme="light"] .collection-page [class*="border-white/"],
+html[data-mobile-theme="light"] .search-page [class*="border-white/"] { border-color: rgba(65,55,90,.13) !important; }
+html[data-mobile-theme="light"] .collection-page [class*="bg-white/"],
+html[data-mobile-theme="light"] .search-page [class*="bg-white/"] { background-color: rgba(75,62,105,.045) !important; }
+
+/* Filters and dropdowns must not retain dark surfaces. */
+html[data-mobile-theme="light"] .filter-bar {
+  background: rgba(255,255,255,.92) !important; border-color: rgba(65,55,90,.12) !important;
+  color: #292638 !important; box-shadow: 0 8px 28px rgba(38,30,60,.045);
+}
+html[data-mobile-theme="light"] .filter-bar button,
+html[data-mobile-theme="light"] .filter-bar [class*="text-white"] { color: #5d586e !important; }
+html[data-mobile-theme="light"] .filter-bar [class*="bg-[#0b0d14]"],
+html[data-mobile-theme="light"] .filter-bar [class*="bg-[#11131d]"] {
+  background: #fff !important; color: #292638 !important; border-color: rgba(65,55,90,.14) !important;
+}
+html[data-mobile-theme="light"] .filter-bar button[aria-pressed="true"],
+html[data-mobile-theme="light"] .filter-bar button[aria-expanded="true"] {
+  color: #292638 !important; background: rgba(80,65,120,.09) !important;
+}
+
+/* Search/account sheets and member dialogs share the light app surface. */
+html[data-mobile-theme="light"] .mobile-search-overlay,
+html[data-mobile-theme="light"] .mobile-account-sheet {
+  background: rgba(248,247,251,.98) !important; color: #292638 !important;
+  border-color: rgba(65,55,90,.12) !important; backdrop-filter: blur(22px) saturate(130%);
+}
+html[data-mobile-theme="light"] .mobile-search-overlay [class*="text-white"],
+html[data-mobile-theme="light"] .mobile-account-sheet [class*="text-white"] { color: #514b63 !important; }
+html[data-mobile-theme="light"] .mobile-search-overlay input,
+html[data-mobile-theme="light"] .mobile-account-sheet input {
+  color: #292638 !important; background: #fff !important; border-color: rgba(65,55,90,.14) !important;
+}
+html[data-mobile-theme="light"] .mobile-search-overlay input::placeholder { color: #9691a2 !important; }
+html[data-mobile-theme="light"] .mobile-search-overlay [class*="border-white/"],
+html[data-mobile-theme="light"] .mobile-account-sheet [class*="border-white/"] { border-color: rgba(65,55,90,.13) !important; }
+html[data-mobile-theme="light"] .mobile-search-overlay [class*="bg-white/"],
+html[data-mobile-theme="light"] .mobile-account-sheet [class*="bg-white/"] { background: rgba(80,65,120,.055) !important; }
+html[data-mobile-theme="light"] .member-modal-backdrop { background: rgba(36,31,51,.32) !important; }
+html[data-mobile-theme="light"] .member-modal-panel {
+  background: #fff !important; border-color: rgba(65,55,90,.13) !important; color: #292638 !important;
+}
+html[data-mobile-theme="light"] .member-modal-panel [class*="text-white"] { color: #514b63 !important; }
+html[data-mobile-theme="light"] .member-modal-panel input {
+  color: #292638 !important; background: #f7f6fa !important; border-color: rgba(65,55,90,.16) !important;
+}
+html[data-mobile-theme="light"] .member-modal-panel input::placeholder { color: #9691a2 !important; }
+
+/* Desktop navigation, menus and live-search suggestions. */
+html[data-mobile-theme="light"] header.fixed {
+  background: rgba(250,249,252,.9) !important; border-bottom-color: rgba(65,55,90,.12) !important;
+  color: #292638 !important; -webkit-backdrop-filter: blur(24px) saturate(150%); backdrop-filter: blur(24px) saturate(150%);
+}
+html[data-mobile-theme="light"] header.fixed nav a,
+html[data-mobile-theme="light"] header.fixed nav button,
+html[data-mobile-theme="light"] header.fixed [class*="text-white"] { color: #514b63 !important; }
+html[data-mobile-theme="light"] header.fixed input {
+  color: #292638 !important; background: rgba(80,65,120,.055) !important; border-color: rgba(65,55,90,.14) !important;
+}
+html[data-mobile-theme="light"] header.fixed input::placeholder { color: #9691a2 !important; }
+html[data-mobile-theme="light"] header.fixed [class*="bg-[#10121a]"],
+html[data-mobile-theme="light"] header.fixed [class*="bg-[#090b12]"],
+html[data-mobile-theme="light"] header.fixed [class*="bg-[#111521]"] {
+  background: rgba(255,255,255,.98) !important; border-color: rgba(65,55,90,.13) !important;
+}
+html[data-mobile-theme="light"] header.fixed [class*="border-white/"] { border-color: rgba(65,55,90,.13) !important; }
+
+/* Movie-detail information follows the light page surface; keep the image hero intact. */
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content {
+  background: #f5f4f8 !important; color: #292638 !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content h2,
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content h3 { color: #292638 !important; }
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content p,
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content span { color: #6f6a7d; }
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*="bg-[#1c1e2a]"],
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*="bg-[#202331]"],
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*="bg-[#282b3a]"] {
+  background: rgba(80,65,120,.07) !important;
+}
+html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*="border-white/"] {
+  border-color: rgba(65,55,90,.14) !important;
+}
+
+/* The player remains intentionally black in both themes. */
+html[data-mobile-theme="light"] .watch-player-page { background: #000 !important; color: #fff !important; }

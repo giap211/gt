@@ -25,7 +25,7 @@ export const FilterBar = () => {
   return (
     <div
       ref={containerRef}
-      className="relative z-30 bg-[#11131d]/90 backdrop-blur-xl rounded-2xl p-3 sm:p-4 mb-8 flex flex-wrap gap-2.5 sm:gap-4 items-center border border-white/10 "
+      className="filter-bar relative z-30 bg-[#11131d]/90 backdrop-blur-xl rounded-2xl p-3 sm:p-4 mb-8 flex flex-wrap gap-2.5 sm:gap-4 items-center border border-white/10 "
     >
       <div className="flex items-center gap-2 text-[#ffd875] font-black uppercase text-xs sm:text-sm tracking-wider mr-2">
         <Filter className="w-4 h-4 text-[#ffd875]" />

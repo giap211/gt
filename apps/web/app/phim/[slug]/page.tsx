@@ -468,7 +468,6 @@ export default function MovieDetailPage({
         html[data-theme="light"] .movie-detail-page,html[data-mobile-theme="light"] .movie-detail-page{background-color:#f5f5f7!important;color:#28243a}
         html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-hero-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 34%,rgba(247,246,252,.08) 54%,rgba(247,246,252,.58) 78%,#f5f5f7 100%)!important}
         html[data-theme="light"] .movie-detail-mobile-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.42) 68%,#f5f5f7 100%)!important}
-        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.56) 72%,#0f111a 100%)!important}
         html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:transparent!important;border:0!important;}
         html[data-theme="light"] .movie-poster-glass,html[data-mobile-theme="light"] .movie-poster-glass{background:transparent!important;border:0!important;}
         html[data-theme="light"] .movie-tabs,html[data-mobile-theme="light"] .movie-tabs{border-color:transparent}

@@ -65,7 +65,7 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <main className="min-h-screen bg-[#0b0d14] text-white">
+    <main className="search-page min-h-screen bg-[#0b0d14] text-white">
       <Suspense fallback={<div className="min-h-screen" aria-hidden="true" />}>
         <SearchContent />
       </Suspense>

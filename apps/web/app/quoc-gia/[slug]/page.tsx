@@ -91,7 +91,7 @@ export default function CountryPage({
   }, [slug]);
 
   return (
-    <main className="min-h-screen bg-[#0b0d14] text-white">
+    <main className="collection-page min-h-screen bg-[#0b0d14] text-white">
       <div className="pt-24 container mx-auto px-4 lg:px-8 pb-20">
         <div className="mb-8 flex items-center gap-3">
           <div className="w-1.5 h-8 bg-[#d1d5db] rounded-full "></div>
