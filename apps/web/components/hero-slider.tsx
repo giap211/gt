@@ -126,10 +126,10 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           overflow: hidden;
           isolation: isolate;
           min-height: 420px;
-          box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+          
         }
         html[data-mobile-theme="dark"] .hero-card {
-          box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+          
         }
         .hero-card-overlay {
           background: linear-gradient(
@@ -146,7 +146,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           max-width: 420px;
           height: auto;
           overflow: visible;
-          filter: drop-shadow(0 2px 16px rgba(0, 0, 0, 0.35));
+          
         }
         .hero-card-title-svg text {
           font-family: inherit;
@@ -209,7 +209,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           color: #17181c;
           font-size: 13px;
           font-weight: 700;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
+          
         }
         .hero-btn-secondary {
           display: inline-flex;
@@ -255,7 +255,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           .hero-card {
             border-radius: 0;
             min-height: 620px;
-            box-shadow: none;
+            
           }
         }
       `}</style>

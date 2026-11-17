@@ -458,8 +458,8 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
     return (
       <main className="min-h-screen bg-[#0b0d14] text-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-[#ffd875] font-black uppercase tracking-widest text-sm animate-pulse">
+          <div className="w-14 h-14 border-4 border-[#d1d5db] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#d1d5db] font-black uppercase tracking-widest text-sm animate-pulse">
             Đang đồng bộ luồng phát...
           </p>
         </div>
@@ -501,30 +501,30 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
       <style jsx global>{`
         .watch-player-page { width:100vw; height:100dvh; }
         .watch-player-shell { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; }
-        .watch-player-shell > div { width:100%; height:100%; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
-        .watch-player-shell .native-player { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
+        .watch-player-shell > div { width:100%; height:100%; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important;  }
+        .watch-player-shell .native-player { width:100% !important; height:100% !important; aspect-ratio:auto !important; border:0 !important; border-radius:0 !important;  }
         .watch-player-top { position:absolute; z-index:50; top:max(14px,env(safe-area-inset-top)); left:max(16px,env(safe-area-inset-left)); right:max(16px,env(safe-area-inset-right)); display:flex; align-items:center; justify-content:space-between; pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
         .watch-player-top > * { pointer-events:auto; }
         .watch-player-top > div { min-width:0; max-width:calc(100% - 112px); }
         .watch-player-top > div > div { min-width:0; flex:1 1 auto; overflow:hidden; }
         .watch-player-top > div > div > div { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .watch-player-glass { background:rgba(224,230,238,.10); border:1px solid rgba(255,255,255,.28); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%); box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16); }
-        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; min-height:0; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left)); border-radius:0; background:radial-gradient(ellipse at 78% 12%,rgba(105,128,158,.24),transparent 42%),linear-gradient(135deg,rgba(27,37,51,.97),rgba(9,14,22,.985) 62%,rgba(18,25,36,.98)); border:0; color:#f3f6fa; backdrop-filter:blur(34px) saturate(145%); -webkit-backdrop-filter:blur(34px) saturate(145%); box-shadow:none; }
-        .watch-player-picker-layout { display:grid; grid-template-columns:minmax(220px,.34fr) minmax(0,1fr); flex:1 1 0%; min-height:0; gap:0; border:1px solid rgba(218,228,240,.19); border-radius:26px; background:linear-gradient(145deg,rgba(207,218,232,.075),rgba(93,111,135,.055)); box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 50px rgba(0,0,0,.2); overflow:hidden; }
+        .watch-player-glass { background:rgba(224,230,238,.10); border:1px solid rgba(255,255,255,.28); color:#fff; backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%);  }
+        .watch-player-menu { position:absolute; z-index:60; inset:0; width:100%; height:100%; min-height:0; max-height:none; overflow:hidden; display:flex; flex-direction:column; gap:0; padding:max(18px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left)); border-radius:0; background:radial-gradient(ellipse at 78% 12%,rgba(105,128,158,.24),transparent 42%),linear-gradient(135deg,rgba(27,37,51,.97),rgba(9,14,22,.985) 62%,rgba(18,25,36,.98)); border:0; color:#f3f6fa; backdrop-filter:blur(34px) saturate(145%); -webkit-backdrop-filter:blur(34px) saturate(145%);  }
+        .watch-player-picker-layout { display:grid; grid-template-columns:minmax(220px,.34fr) minmax(0,1fr); flex:1 1 0%; min-height:0; gap:0; border:1px solid rgba(218,228,240,.19); border-radius:26px; background:linear-gradient(145deg,rgba(207,218,232,.075),rgba(93,111,135,.055));  overflow:hidden; }
         .watch-player-server-column { min-width:0; padding:22px 20px; border-right:1px solid rgba(221,230,241,.17); background:linear-gradient(180deg,rgba(190,204,222,.055),rgba(16,23,34,.12)); }
         .watch-player-episode-column { display:flex; min-width:0; min-height:0; flex-direction:column; padding:22px 24px; }
         .watch-player-episode-scroll { position:relative; z-index:1; display:block; flex:1 1 0%; min-height:0; height:0; width:100%; overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; touch-action:pan-y; pointer-events:auto; scrollbar-width:thin; scrollbar-color:rgba(220,230,242,.28) transparent; }
         .watch-player-episode-grid { display:grid; width:100%; min-height:min-content; grid-template-columns:repeat(5,minmax(0,1fr)); align-content:start; gap:8px; padding:4px 8px 16px 0; }
         .watch-player-menu button { transition:background .18s ease,border-color .18s ease,transform .18s ease,color .18s ease; }
         .watch-player-menu button:active { transform:scale(.98); }
-        .watch-player-menu .active-choice { color:#182230; background:linear-gradient(145deg,#f5f7fa 0%,#c4cedb 100%); border-color:rgba(255,255,255,.92); box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 5px 18px rgba(207,220,237,.2); }
-        .watch-player-menu > header { margin:0 0 18px; padding:16px 20px; border:1px solid rgba(218,228,240,.2); border-radius:22px; background:linear-gradient(120deg,rgba(194,207,224,.12),rgba(92,109,132,.09)); box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 12px 30px rgba(0,0,0,.16); backdrop-filter:blur(26px) saturate(135%); -webkit-backdrop-filter:blur(26px) saturate(135%); }
+        .watch-player-menu .active-choice { color:#182230; background:linear-gradient(145deg,#f5f7fa 0%,#c4cedb 100%); border-color:rgba(255,255,255,.92);  }
+        .watch-player-menu > header { margin:0 0 18px; padding:16px 20px; border:1px solid rgba(218,228,240,.2); border-radius:22px; background:linear-gradient(120deg,rgba(194,207,224,.12),rgba(92,109,132,.09));  backdrop-filter:blur(26px) saturate(135%); -webkit-backdrop-filter:blur(26px) saturate(135%); }
         .watch-player-server-list { display:flex; flex-direction:column; gap:10px; margin-top:18px; }
-        .watch-player-server-list > button { display:flex; width:100%; min-height:54px; align-items:center; gap:12px; border:1px solid rgba(219,229,241,.17); border-radius:16px; padding:10px 14px; text-align:left; color:rgba(239,244,250,.82); background:linear-gradient(145deg,rgba(205,216,230,.11),rgba(116,132,153,.07)); box-shadow:inset 0 1px 0 rgba(255,255,255,.09); backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%); }
+        .watch-player-server-list > button { display:flex; width:100%; min-height:54px; align-items:center; gap:12px; border:1px solid rgba(219,229,241,.17); border-radius:16px; padding:10px 14px; text-align:left; color:rgba(239,244,250,.82); background:linear-gradient(145deg,rgba(205,216,230,.11),rgba(116,132,153,.07));  backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%); }
         .watch-player-server-list > button.active-choice { color:#182230; background:linear-gradient(145deg,#f5f7fa 0%,#c4cedb 100%); border-color:rgba(255,255,255,.92); }
         .watch-player-server-index { display:grid; width:28px; height:28px; flex:0 0 28px; place-items:center; border-radius:9px; color:inherit; background:rgba(116,132,153,.2); font-size:10px; font-weight:800; }
-        .watch-player-episode-grid > button { display:flex; min-width:0; min-height:42px; align-items:center; justify-content:center; gap:5px; border:1px solid rgba(219,229,241,.17); border-radius:12px; padding:7px 7px; color:rgba(241,245,250,.9); font-size:12px; background:linear-gradient(145deg,rgba(205,216,230,.12),rgba(116,132,153,.075)); box-shadow:inset 0 1px 0 rgba(255,255,255,.09); backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%); }
-        .watch-player-episode-grid > button.active-choice { color:#182230; border-color:rgba(255,255,255,.96); background:linear-gradient(145deg,#f7f9fc 0%,#c5cfdd 100%); box-shadow:inset 0 1px 0 #fff,0 5px 18px rgba(207,220,237,.18); }
+        .watch-player-episode-grid > button { display:flex; min-width:0; min-height:42px; align-items:center; justify-content:center; gap:5px; border:1px solid rgba(219,229,241,.17); border-radius:12px; padding:7px 7px; color:rgba(241,245,250,.9); font-size:12px; background:linear-gradient(145deg,rgba(205,216,230,.12),rgba(116,132,153,.075));  backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%); }
+        .watch-player-episode-grid > button.active-choice { color:#182230; border-color:rgba(255,255,255,.96); background:linear-gradient(145deg,#f7f9fc 0%,#c5cfdd 100%);  }
         .watch-player-episode-grid > button:not(.active-choice):hover,.watch-player-server-list > button:not(.active-choice):hover { border-color:rgba(232,240,249,.42); background:linear-gradient(145deg,rgba(218,228,240,.17),rgba(129,146,168,.12)); }
         .watch-player-menu .picker-section-label { color:rgba(226,235,246,.72); font-size:12px; font-weight:750; letter-spacing:.04em; text-transform:uppercase; }
         .watch-player-menu .picker-muted { color:rgba(220,230,242,.5); }
@@ -735,7 +735,7 @@ function EpisodeList({
                 key={`${server.server_name}-${i}`}
                 onClick={() => onServerChange(i)}
                 className={`rounded-full px-3 py-2 text-[10px] font-semibold transition-all ${
-                  currentServer === i ? "bg-white text-[#10131a] shadow-lg" : "text-white/55 hover:text-white"
+                  currentServer === i ? "bg-white text-[#10131a] " : "text-white/55 hover:text-white"
                 }`}
               >
                 {server.server_name}
@@ -756,7 +756,7 @@ function EpisodeList({
               key={ep.slug}
               href={`/xem-phim/${slug}?tap=${ep.slug}&sv=${currentServer}`}
               className={`watch-episode-card group relative flex w-[142px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border text-left transition-all xl:w-auto ${
-                active ? "border-white/75 bg-white/[0.12] shadow-[0_8px_28px_rgba(255,255,255,.08)]" : "border-white/[0.08] bg-white/[0.045] hover:border-white/25"
+                active ? "border-white/75 bg-white/[0.12] " : "border-white/[0.08] bg-white/[0.045] hover:border-white/25"
               }`}
             >
               <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-white/15 to-white/[0.025]">
@@ -773,7 +773,7 @@ function EpisodeList({
               </div>
               <div className="flex items-center justify-between gap-2 px-3 py-2.5">
                 <span className={`episode-card-title truncate text-xs font-semibold ${active ? "text-white" : "text-white/65"}`}>{formatEpisodeName(ep.name)}</span>
-                {active ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white shadow-[0_0_8px_white]" /> : <Play size={12} className="shrink-0 text-white/35" />}
+                {active ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white " /> : <Play size={12} className="shrink-0 text-white/35" />}
               </div>
             </Link>
           );
@@ -792,7 +792,7 @@ export default function WatchPage({
     <Suspense
       fallback={
         <main className="min-h-screen bg-[#0b0d14] text-white flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-[#d1d5db] border-t-transparent rounded-full animate-spin"></div>
         </main>
       }
     >

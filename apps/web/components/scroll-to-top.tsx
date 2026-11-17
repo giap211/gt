@@ -29,9 +29,9 @@ export const ScrollToTop = () => {
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-8 right-8 z-[60] flex flex-col items-center justify-center gap-1 bg-white text-black p-3 rounded-xl shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 group ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"}`}
+      className={`fixed bottom-8 right-8 z-[60] flex flex-col items-center justify-center gap-1 bg-white text-black p-3 rounded-xl  transition-all duration-300 hover:scale-110 active:scale-95 group ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"}`}
     >
-      <div className="bg-black text-white p-1 rounded-full group-hover:bg-[#ffd875] group-hover:text-black transition-colors">
+      <div className="bg-black text-white p-1 rounded-full group-hover:bg-[#d1d5db] group-hover:text-black transition-colors">
         <ArrowUp size={16} />
       </div>
       <span className="text-[10px] font-black uppercase tracking-tighter leading-none text-center">

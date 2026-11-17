@@ -94,7 +94,7 @@ export default function CountryPage({
     <main className="min-h-screen bg-[#0b0d14] text-white">
       <div className="pt-24 container mx-auto px-4 lg:px-8 pb-20">
         <div className="mb-8 flex items-center gap-3">
-          <div className="w-1.5 h-8 bg-[#ffd875] rounded-full shadow-[0_0_10px_rgba(255,216,117,0.3)]"></div>
+          <div className="w-1.5 h-8 bg-[#d1d5db] rounded-full "></div>
           <h1 className="text-3xl font-bold tracking-tight uppercase">
             {countryMap[slug] || `Phim ${slug}`}
           </h1>
@@ -104,8 +104,8 @@ export default function CountryPage({
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 space-y-6">
-            <div className="w-12 h-12 border-4 border-[#ffd875] border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-[#ffd875]/40 animate-pulse text-xs font-black uppercase tracking-[0.3em]">
+            <div className="w-12 h-12 border-4 border-[#d1d5db] border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-[#d1d5db]/40 animate-pulse text-xs font-black uppercase tracking-[0.3em]">
               Hệ não đang đồng bộ quốc gia...
             </p>
           </div>
