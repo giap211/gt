@@ -24,10 +24,7 @@ const config: Config = {
           border: "var(--border-color)",
         },
       },
-      boxShadow: {
-        card: "var(--h-shadow)",
-        large: "var(--shadow-large)",
-      },
+      
       borderRadius: {
         rophim: "6.4px",
         badge: "5.28px",

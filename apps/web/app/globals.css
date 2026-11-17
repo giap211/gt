@@ -38,8 +38,8 @@
   --border-color: #ffffff10;
 
   /* Component Specific */
-  --h-shadow: 0 2px 3px rgba(0, 0, 0, 0.4);
-  --shadow-large: 0 0 20px 20px rgba(0, 0, 0, 0.1);
+  --h-shadow: none;
+  --shadow-large: none;
   --phim-lau-glow: none;
 }
 
@@ -64,7 +64,7 @@
 }
 
 .group\/slide:hover .ranking-number-hollow {
-  -webkit-text-stroke: 2px rgba(255, 216, 117, 0.8);
+  -webkit-text-stroke: 2px rgba(255,255,255,0.8);
   opacity: 1;
   
   transform: scaleY(1.1) translateY(-10px);
@@ -86,12 +86,12 @@
 
 .search-bar-glow:focus-within {
   
-  border-color: #ffd875aa !important;
+  border-color: #d1d5dbaa !important;
 }
 
 /* Shrink-to-Border Effect (Xem phim Original) */
 .premium-border-container {
-  background-color: #ffd875;
+  background-color: #d1d5db;
   transition: all 0.3s ease;
 }
 
@@ -336,7 +336,7 @@ body {
 }
 
 .thumbs-slider .swiper-slide-thumb-active {
-  border-color: #ffd875 !important;
+  border-color: #d1d5db !important;
   transform: scale(1.05);
   z-index: 10;
 }
@@ -351,7 +351,7 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #ffd87533;
+  background: #d1d5db33;
   border-radius: 10px;
 }
 
@@ -387,11 +387,11 @@ body {
 }
 
 .tag-badge {
-  @apply px-2 py-0.5 border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider text-white/60 transition-colors hover:border-[#ffd875] hover:text-[#ffd875];
+  @apply px-2 py-0.5 border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider text-white/60 transition-colors hover:border-[#d1d5db] hover:text-[#d1d5db];
 }
 
 .tag-badge-yellow {
-  @apply px-2 py-0.5 border border-[#ffd875] rounded-md text-[10px] font-bold uppercase tracking-wider text-[#ffd875];
+  @apply px-2 py-0.5 border border-[#d1d5db] rounded-md text-[10px] font-bold uppercase tracking-wider text-[#d1d5db];
 }
 
 /* Custom Scrollbar for sidebars */
@@ -439,7 +439,7 @@ body {
   isolation: isolate;
   background:
     radial-gradient(ellipse at 28% 12%, rgba(255, 255, 255, 0.48), transparent 48%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.07) 52%, rgba(255, 216, 117, 0.16));
+    linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.07) 52%, rgba(255,255,255,0.16));
   border: 1px solid rgba(255, 255, 255, 0.68);
   -webkit-backdrop-filter: blur(16px) saturate(185%);
   backdrop-filter: blur(16px) saturate(185%);
@@ -464,7 +464,7 @@ body {
   pointer-events: none;
   background:
     radial-gradient(ellipse at 26% 10%, rgba(255, 255, 255, 0.78), transparent 40%),
-    radial-gradient(ellipse at 72% 88%, rgba(255, 216, 117, 0.2), transparent 48%),
+    radial-gradient(ellipse at 72% 88%, rgba(255,255,255,0.2), transparent 48%),
     linear-gradient(145deg, rgba(255, 255, 255, 0.2), transparent 48%);
   
   animation: liquid-glass-reflection 3.2s ease-in-out infinite;
@@ -527,7 +527,7 @@ header.fixed .absolute.top-full,
 header.fixed .fixed.inset-y-0,
 div[class*="z-[190]"],
 div[class*="z-[200]"] {
-  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.055) 52%, rgba(255,216,117,.055)) !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.055) 52%, rgba(255,255,255,.055)) !important;
   border: 1px solid rgba(255,255,255,.2) !important;
   -webkit-backdrop-filter: blur(22px) saturate(165%);
   backdrop-filter: blur(22px) saturate(165%);
@@ -553,7 +553,7 @@ div[class*="z-[200]"] input {
 }
 header.fixed input:focus,
 div[class*="z-[200]"] input:focus {
-  border-color: rgba(255,216,117,.65) !important;
+  border-color: rgba(255,255,255,.65) !important;
   
 }
 @media (prefers-reduced-transparency: reduce) {
@@ -630,156 +630,4 @@ body { min-width: 320px; background: #050509 !important; }
   .mobile-app-shell .movie-detail-page .movie-detail-mobile [class*="md:grid-cols-"] {
     grid-template-columns: minmax(0, 1fr) !important;
   }
-}
-
-
-/* Apple-inspired neutral accent system: replace the former purple gradient brand. */
-:root {
-  --phim-lau-primary: #d1d5db;
-  --primary-color: #e5e7eb;
-  --primary-color-hover: #ffffff;
-  --primary-text: #f3f4f6;
-  --accent-pink: #cbd5e1;
-  --brand-gradient: linear-gradient(135deg, #f5f5f7, #cbd0d8);
-  --brand-gradient-soft: linear-gradient(135deg, rgba(255,255,255,.09), rgba(203,208,216,.04));
-  --brand-highlight: rgba(255,255,255,.3);
-  --phim-lau-glow: none;
-}
-
-/* Utility-driven accents across cards, controls, filters and navigation. */
-[class*="violet-"], [class*="purple-"], [class*="fuchsia-"] {
-  --tw-ring-color: rgba(255,255,255,.28) !important;
-}
-[class*="text-violet-"], [class*="text-purple-"], [class*="text-fuchsia-"] {
-  color: #d1d5db !important;
-  -webkit-text-fill-color: currentColor !important;
-}
-[class*="border-violet-"], [class*="border-purple-"], [class*="border-fuchsia-"] {
-  border-color: rgba(255,255,255,.16) !important;
-}
-[class*="bg-violet-"], [class*="bg-purple-"], [class*="bg-fuchsia-"] {
-  background-color: rgba(255,255,255,.08) !important;
-  background-image: none !important;
-}
-[class*="from-violet-"], [class*="via-violet-"], [class*="to-violet-"],
-[class*="from-purple-"], [class*="via-purple-"], [class*="to-purple-"],
-[class*="from-fuchsia-"], [class*="via-fuchsia-"], [class*="to-fuchsia-"] {
-  --tw-gradient-from: rgba(255,255,255,.12) var(--tw-gradient-from-position) !important;
-  --tw-gradient-to: rgba(255,255,255,.02) var(--tw-gradient-to-position) !important;
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
-}
-
-.movie-carousel-view-more-icon,
-.movie-carousel-view-more-icon:hover {
-  background: rgba(255,255,255,.08) !important;
-  color: inherit !important;
-  
-}
-.listing-gradient-text {
-  background: none !important;
-  color: inherit !important;
-  -webkit-text-fill-color: currentColor !important;
-}
-.listing-page .listing-chip-active,
-.listing-page .listing-filter-shell a:hover {
-  background: rgba(255,255,255,.14) !important;
-  color: inherit !important;
-  border-color: rgba(255,255,255,.22) !important;
-}
-.hero-bottom-fade {
-  background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.08) 40%, rgba(0,0,0,.68) 100%) !important;
-}
-html[data-mobile-theme="light"] .hero-bottom-fade,
-html[data-theme="light"] .hero-bottom-fade {
-  background: linear-gradient(to bottom, transparent 0%, rgba(245,245,247,.08) 40%, #f5f5f7 100%) !important;
-}
-html[data-mobile-theme="light"] .listing-page .listing-chip-active,
-html[data-theme="light"] .listing-page .listing-chip-active {
-  background: rgba(35,35,40,.08) !important;
-  color: #242428 !important;
-  border-color: rgba(35,35,40,.16) !important;
-}
-html[data-mobile-theme="light"] [class*="text-violet-"],
-html[data-theme="light"] [class*="text-violet-"],
-html[data-mobile-theme="light"] [class*="text-purple-"],
-html[data-theme="light"] [class*="text-purple-"],
-html[data-mobile-theme="light"] [class*="text-fuchsia-"],
-html[data-theme="light"] [class*="text-fuchsia-"] {
-  color: #55565c !important;
-}
-
-
-/* Final neutral pass: hero actions and poster tiles must not retain violet accents. */
-.hero-btn-primary {
-  background: linear-gradient(135deg, #f5f5f7 0%, #cbd0d8 100%) !important;
-  color: #17181c !important;
-  
-  border: 1px solid rgba(255,255,255,.72) !important;
-}
-.hero-btn-secondary,
-.hero-btn-secondary[aria-pressed="true"] {
-  background: rgba(255,255,255,.14) !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,.38) !important;
-  
-}
-.hero-card {  }
-.hero-card-overlay {
-  background: linear-gradient(180deg, rgba(8,9,13,.12) 0%, rgba(8,9,13,.28) 36%, rgba(8,9,13,.76) 74%, rgba(8,9,13,.94) 100%) !important;
-}
-/* Give poster artwork its own readable surface instead of letting it sink into the page. */
-.movie-poster-frame-vertical {
-  background: #17191e !important;
-  border: 1px solid rgba(255,255,255,.2) !important;
-  
-  isolation: isolate;
-}
-.movie-poster-frame-vertical img {
-  border: 0 !important;
-  filter: brightness(1.1) contrast(1.07) saturate(1.04) !important;
-  transition: filter .22s ease, transform .3s ease !important;
-}
-.movie-poster-frame-vertical:hover img {
-  filter: brightness(1.16) contrast(1.08) saturate(1.06) !important;
-}
-.movie-poster-frame-vertical:hover {
-  border-color: rgba(255,255,255,.38) !important;
-  
-}
-.movie-carousel-continue-watching .movie-poster-frame + div span:last-child {
-  color: #d1d5db !important;
-}
-@media (prefers-reduced-motion: reduce) {
-  .movie-poster-frame-vertical img { transition: none !important; }
-}
-
-
-/* Poster metadata tags need a solid, high-contrast backing over busy artwork. */
-.card-badge,
-.badge-item,
-.badge-primary {
-  color: #fff !important;
-  background: rgba(24, 26, 31, .92) !important;
-  border: 1px solid rgba(255,255,255,.24) !important;
-  
-  
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-.badge-primary { background: rgba(38, 42, 48, .96) !important; }
-
-
-/* Make the QL. HD / QL. FHD quality label readable over any artwork. */
-a.movie-poster-frame span[class*="bg-[#f0c24d]"] {
-  background: #f4f4f5 !important;
-  background-color: #f4f4f5 !important;
-  color: #17181c !important;
-  -webkit-text-fill-color: #17181c !important;
-  border: 0 !important;
-  
-  
-  opacity: 1 !important;
-  font-weight: 800 !important;
-  letter-spacing: .02em;
-  padding: 3px 7px !important;
 }

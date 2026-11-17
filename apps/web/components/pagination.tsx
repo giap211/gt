@@ -86,7 +86,7 @@ export const Pagination = ({
             w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-black
             ${
               currentPage === page
-                ? "bg-[#ffd875] text-black border-[#ffd875] shadow-[0_0_15px_rgba(255,216,117,0.35)] scale-105"
+                ? "bg-[#ffd875] text-black border-[#ffd875]  scale-105"
                 : "bg-white/5 border-white/10 hover:bg-white/10 hover:text-white text-white/70"
             }
           `}

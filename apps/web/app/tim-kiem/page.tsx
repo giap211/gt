@@ -35,7 +35,7 @@ function SearchContent() {
       <div className="mb-8">
         <h1 className="text-2xl md:text-3xl font-black uppercase flex items-center gap-2">
           Kết quả tìm kiếm cho:{" "}
-          <span className="text-[#ffd875]">&quot;{query}&quot;</span>
+          <span className="text-[#d1d5db]">&quot;{query}&quot;</span>
         </h1>
         <p className="text-white/40 text-xs font-bold mt-1 uppercase tracking-wider">
           Tìm thấy {results.length} kết quả
