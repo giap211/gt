@@ -39,6 +39,7 @@ function filtersToUrl(filters: MovieFilters) {
 export const FilterBar = () => {
   const router = useRouter();
   const initialized = useRef(false);
+  const [ready, setReady] = useState(false);
   const [options, setOptions] = useState<MovieFilterOptions>(EMPTY_OPTIONS);
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [filters, setFilters] = useState<MovieFilters>(DEFAULT_FILTERS);
@@ -51,13 +52,14 @@ export const FilterBar = () => {
       .finally(() => { if (active) setLoadingOptions(false); });
     setFilters(readFiltersFromUrl());
     initialized.current = true;
+    setReady(true);
     return () => { active = false; };
   }, []);
 
   useEffect(() => {
-    if (!initialized.current) return;
+    if (!initialized.current || !ready) return;
     router.replace(filtersToUrl(filters), { scroll: false });
-  }, [filters, router]);
+  }, [filters, ready, router]);
 
   const update = (key: keyof MovieFilters, value: string) => {
     setFilters((current) => ({ ...current, [key]: value }));
