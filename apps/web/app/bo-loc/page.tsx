@@ -19,6 +19,7 @@ export default async function FilteredMoviesPage({
     year: value("year"),
     sortField: value("sort_field") || "modified.time",
     sortType: value("sort_type") || "desc",
+    sortLang: value("sort_lang"),
   };
   return <Suspense fallback={<main className="min-h-screen bg-[#0b0d14]"/>}><FilteredMovieScreen initialFilters={filters}/></Suspense>;
 }

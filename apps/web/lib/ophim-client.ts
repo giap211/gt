@@ -961,6 +961,7 @@ export interface MovieFilters {
   year?: string;
   sortField?: string;
   sortType?: string;
+  sortLang?: string;
 }
 
 function extractFilterItems(payload: unknown): MovieFilterOption[] {
@@ -986,7 +987,7 @@ export const getMovieFilterOptions = async (): Promise<MovieFilterOptions> => {
   const [categoryData, countryData, yearData] = await Promise.all([
     fetchWithFallback<unknown>("/the-loai"),
     fetchWithFallback<unknown>("/quoc-gia"),
-    fetchWithFallback<unknown>("/nam"),
+    fetchWithFallback<unknown>("/nam-phat-hanh"),
   ]);
   const categories = extractFilterItems(categoryData).sort((a, b) => a.name.localeCompare(b.name, "vi"));
   const countries = extractFilterItems(countryData).sort((a, b) => a.name.localeCompare(b.name, "vi"));
@@ -1013,6 +1014,7 @@ export const getFilteredMovies = async (
     if (filters.year) query.set("year", filters.year);
     if (filters.sortField) query.set("sort_field", filters.sortField);
     if (filters.sortType) query.set("sort_type", filters.sortType);
+    if (filters.sortLang) query.set("sort_lang", filters.sortLang);
     const data = await fetchWithFallback<V1ListApiResponse>(`${endpoint}?${query.toString()}`);
     if (!data?.data) return failedListResponse();
     const cdn =
@@ -1023,7 +1025,18 @@ export const getFilteredMovies = async (
       status: true,
       items: cleanAndFilterMovies(data.data.items || [], cdn),
       pathImage: cdn,
-      pagination: data.data.params?.pagination || emptyPagination(),
+      pagination: (() => {
+        const raw = data.data?.params?.pagination as (Pagination & { pageRanges?: number }) | undefined;
+        if (!raw) return emptyPagination();
+        const totalItems = Number(raw.totalItems || 0);
+        const perPage = Number(raw.totalItemsPerPage || 24);
+        return {
+          totalItems,
+          totalItemsPerPage: perPage,
+          currentPage: Number(raw.currentPage || page),
+          totalPages: Number(raw.totalPages || Math.ceil(totalItems / perPage) || 1),
+        };
+      })(),
     };
   } catch (error) {
     console.error("Error fetching filtered movies:", error);

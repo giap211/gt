@@ -32,7 +32,7 @@ export function FilteredMovieScreen({ initialFilters }: { initialFilters: MovieF
     return () => { cancelled = true; };
   }, [fetchPage]);
 
-  const activeCount = [filters.type, filters.category, filters.country, filters.year].filter(Boolean).length;
+  const activeCount = [filters.type, filters.category, filters.country, filters.year, filters.sortLang].filter(Boolean).length;
   return (
     <main className="collection-page min-h-screen bg-[#0b0d14] px-3 pb-28 pt-24 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1400px]">

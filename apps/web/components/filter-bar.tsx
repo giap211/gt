@@ -33,6 +33,7 @@ export const FilterBar = () => {
       year: params.get("year") || "",
       sortField: params.get("sort_field") || "modified.time",
       sortType: params.get("sort_type") || "desc",
+      sortLang: params.get("sort_lang") || "",
     });
     return () => { active = false; };
   }, []);
@@ -49,6 +50,7 @@ export const FilterBar = () => {
     if (filters.year) params.set("year", filters.year);
     if (filters.sortField) params.set("sort_field", filters.sortField);
     if (filters.sortType) params.set("sort_type", filters.sortType);
+    if (filters.sortLang) params.set("sort_lang", filters.sortLang);
     router.push(`/bo-loc?${params.toString()}`);
   };
 
