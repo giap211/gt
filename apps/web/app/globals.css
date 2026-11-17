@@ -948,3 +948,92 @@ body { min-width: 320px; background: #050509 !important; }
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
+
+
+/* Apple-inspired neutral accent system: replace the former purple gradient brand. */
+:root {
+  --phim-lau-primary: #d1d5db;
+  --primary-color: #e5e7eb;
+  --primary-color-hover: #ffffff;
+  --primary-text: #f3f4f6;
+  --accent-pink: #cbd5e1;
+  --brand-gradient: linear-gradient(135deg, #f5f5f7, #cbd0d8);
+  --brand-gradient-soft: linear-gradient(135deg, rgba(255,255,255,.09), rgba(203,208,216,.04));
+  --brand-highlight: rgba(255,255,255,.3);
+  --phim-lau-glow: 0 0 0 1px rgba(255,255,255,.12);
+}
+
+/* Utility-driven accents across cards, controls, filters and navigation. */
+[class*="violet-"], [class*="purple-"], [class*="fuchsia-"] {
+  --tw-ring-color: rgba(255,255,255,.28) !important;
+}
+[class*="text-violet-"], [class*="text-purple-"], [class*="text-fuchsia-"] {
+  color: #d1d5db !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+[class*="border-violet-"], [class*="border-purple-"], [class*="border-fuchsia-"] {
+  border-color: rgba(255,255,255,.16) !important;
+}
+[class*="bg-violet-"], [class*="bg-purple-"], [class*="bg-fuchsia-"] {
+  background-color: rgba(255,255,255,.08) !important;
+  background-image: none !important;
+}
+[class*="from-violet-"], [class*="via-violet-"], [class*="to-violet-"],
+[class*="from-purple-"], [class*="via-purple-"], [class*="to-purple-"],
+[class*="from-fuchsia-"], [class*="via-fuchsia-"], [class*="to-fuchsia-"] {
+  --tw-gradient-from: rgba(255,255,255,.12) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(255,255,255,.02) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+/* Quiet, restrained interaction states instead of neon glow. */
+.movie-poster-frame-horizontal img,
+.movie-poster-frame-vertical img,
+.listing-page .listing-movie-grid img {
+  border-color: rgba(255,255,255,.12) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,.12) !important;
+}
+.movie-poster-frame-horizontal:hover img,
+.movie-poster-frame-vertical:hover img,
+.listing-page .listing-movie-grid a:hover img {
+  border-color: rgba(255,255,255,.32) !important;
+  box-shadow: 0 4px 18px rgba(0,0,0,.18) !important;
+}
+.movie-carousel-view-more-icon,
+.movie-carousel-view-more-icon:hover {
+  background: rgba(255,255,255,.08) !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+.listing-gradient-text {
+  background: none !important;
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.listing-page .listing-chip-active,
+.listing-page .listing-filter-shell a:hover {
+  background: rgba(255,255,255,.14) !important;
+  color: inherit !important;
+  border-color: rgba(255,255,255,.22) !important;
+}
+.hero-bottom-fade {
+  background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.08) 40%, rgba(0,0,0,.68) 100%) !important;
+}
+html[data-mobile-theme="light"] .hero-bottom-fade,
+html[data-theme="light"] .hero-bottom-fade {
+  background: linear-gradient(to bottom, transparent 0%, rgba(245,245,247,.08) 40%, #f5f5f7 100%) !important;
+}
+html[data-mobile-theme="light"] .listing-page .listing-chip-active,
+html[data-theme="light"] .listing-page .listing-chip-active {
+  background: rgba(35,35,40,.08) !important;
+  color: #242428 !important;
+  border-color: rgba(35,35,40,.16) !important;
+}
+html[data-mobile-theme="light"] [class*="text-violet-"],
+html[data-theme="light"] [class*="text-violet-"],
+html[data-mobile-theme="light"] [class*="text-purple-"],
+html[data-theme="light"] [class*="text-purple-"],
+html[data-mobile-theme="light"] [class*="text-fuchsia-"],
+html[data-theme="light"] [class*="text-fuchsia-"] {
+  color: #55565c !important;
+}
