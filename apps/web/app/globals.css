@@ -1165,3 +1165,31 @@ a.movie-poster-frame span[class*="bg-[#f0c24d]"] {
   letter-spacing: .02em;
   padding: 3px 7px !important;
 }
+
+
+/* Landscape card edge: neutralize the card wrapper as well as the image.
+   The previous rim was being painted by the horizontal card's outer wrapper. */
+.group:has(> a.movie-poster-frame-horizontal),
+.group:has(> a.movie-poster-frame-horizontal):hover,
+.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal,
+.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal img,
+.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal span,
+.group:has(> a.movie-poster-frame-horizontal)::before,
+.group:has(> a.movie-poster-frame-horizontal)::after,
+.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal::before,
+.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal::after {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-color: transparent !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  background-image: none !important;
+}
+.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal img {
+  transform: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
