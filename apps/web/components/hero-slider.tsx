@@ -126,7 +126,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           overflow: hidden;
           isolation: isolate;
           min-height: 420px;
-          box-shadow: 0 18px 50px rgba(76, 29, 149, 0.18);
+          box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
         }
         html[data-mobile-theme="dark"] .hero-card {
           box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
@@ -205,11 +205,11 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           height: 42px;
           padding: 0 18px;
           border-radius: 999px;
-          background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-          color: #fff;
+          background: linear-gradient(135deg, #f5f5f7, #cbd0d8);
+          color: #17181c;
           font-size: 13px;
           font-weight: 700;
-          box-shadow: 0 8px 22px rgba(124, 58, 237, 0.4);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
         }
         .hero-btn-secondary {
           display: inline-flex;
@@ -227,8 +227,8 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           backdrop-filter: blur(10px);
         }
         .hero-btn-secondary[aria-pressed="true"] {
-          background: rgba(139, 92, 246, 0.45);
-          border-color: rgba(196, 181, 253, 0.55);
+          background: rgba(255, 255, 255, 0.18);
+          border-color: rgba(255, 255, 255, 0.42);
         }
         .hero-bell {
           width: 40px;
