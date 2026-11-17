@@ -284,7 +284,8 @@ export function HomeScreen() {
       id: m._id,
       title: m.name,
       originalTitle: m.origin_name,
-      posterUrl: m.poster_url,
+      // Home shelves use PhimAPI's lighter thumbnail image for compact cards.
+      posterUrl: m.thumb_url || m.poster_url,
       thumbUrl: m.thumb_url,
       slug: m.slug,
       year: m.year,
