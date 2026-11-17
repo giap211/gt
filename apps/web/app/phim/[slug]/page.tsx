@@ -146,11 +146,11 @@ export default function MovieDetailPage({
 
   if (loading) {
     return (
-      <main className="movie-detail-page min-h-screen bg-[#100f1e] text-white">
+      <main className="movie-detail-page min-h-screen bg-[#0f111a] text-white">
         {/* Skeleton khớp trực tiếp với hero mobile thật: backdrop tràn khung, nội dung neo đáy. */}
         <section className="movie-detail-mobile">
-          <div className="relative h-[570px] w-full overflow-hidden bg-[#19172b]">
-            <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-white/10 via-[#171528]/35 to-[#100f1e]" />
+          <div className="relative h-[570px] w-full overflow-hidden bg-[#0f111a]">
+            <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-white/10 via-[#0f111a]/35 to-[#0f111a]" />
             <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),14px)]">
               <div className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.08]" />
             </div>
@@ -257,7 +257,7 @@ export default function MovieDetailPage({
     return (
       <main className="min-h-screen bg-[#0f111a] text-white flex flex-col items-center justify-center gap-4">
         <h1 className="text-xl font-bold text-red-400">Không tìm thấy phim</h1>
-        <Link href="/" className="text-[#ffd875]">
+        <Link href="/" className="text-[#d1d5db]">
           Về trang chủ
         </Link>
       </main>
@@ -332,13 +332,13 @@ export default function MovieDetailPage({
           <h1 className="text-[22px] font-bold leading-snug text-white">
             {movie.name}
           </h1>
-          <p className="text-[13px] text-[#d4a84b] mt-1">{movie.origin_name}</p>
+          <p className="text-[13px] text-[#d1d5db] mt-1">{movie.origin_name}</p>
         </>
       )}
 
       <div className={`flex flex-wrap gap-1.5 mt-3 ${mobile ? "justify-center" : ""}`}>
         {imdbScore && (
-          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-[#f5c518]/60 text-[#f5c518] text-[11px] font-bold">
+          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-[#d1d5db]/60 text-[#d1d5db] text-[11px] font-bold">
             IMDb {imdbScore}
           </span>
         )}
@@ -438,45 +438,45 @@ export default function MovieDetailPage({
   );
 
   return (
-    <main className="movie-detail-page min-h-screen bg-[#100f1e] text-white">
+    <main className="movie-detail-page min-h-screen bg-[#0f111a] text-white">
       <style jsx global>{`
-        .movie-detail-content{background:radial-gradient(ellipse 78% 20% at 50% 0%,rgba(139,92,246,.11),transparent 78%),linear-gradient(180deg,#100f1e 0%,#100f1e 100%)}
-        .movie-detail-hero-fade{background:linear-gradient(180deg,transparent 34%,rgba(16,15,30,.18) 54%,rgba(16,15,30,.62) 78%,#100f1e 100%)}
-        .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,0) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.54) 70%,#100f1e 100%)}
+        .movie-detail-content{background:linear-gradient(180deg,#0f111a 0%,#0f111a 100%)}
+        .movie-detail-hero-fade{background:linear-gradient(180deg,transparent 34%,rgba(16,15,30,.18) 54%,rgba(16,15,30,.62) 78%,#0f111a 100%)}
+        .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,0) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.54) 70%,#0f111a 100%)}
         /* Remove the old card layout: content should flow freely, with glass only on controls. */
-        .movie-glass-panel{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding-left:0!important;padding-right:0!important}
-        .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
-        .movie-tabs{border-color:rgba(196,181,253,.2)}
+        .movie-glass-panel{background:transparent!important;border:0!important;border-radius:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding-left:0!important;padding-right:0!important}
+        .movie-poster-glass{background:transparent!important;border:0!important;padding:0!important}
+        .movie-tabs{border-color:rgba(255,255,255,.12)}
         .movie-detail-page a,.movie-detail-page button{-webkit-tap-highlight-color:transparent}
         .movie-detail-page :is(button,a){transition:background .22s ease,color .22s ease,transform .22s ease,border-color .22s ease}
         .movie-detail-page .movie-glass-panel :is(button,a){backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
         .movie-detail-page #movie-episodes>div:first-child h2,.movie-detail-page h2{letter-spacing:-.025em}
-        .movie-detail-page #movie-episodes>div:nth-child(2) button{border:1px solid rgba(196,181,253,.14);background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(139,92,246,.07));box-shadow:inset 0 1px 0 rgba(255,255,255,.1);backdrop-filter:blur(16px)}
+        .movie-detail-page #movie-episodes>div:nth-child(2) button{border:1px solid rgba(255,255,255,.12);background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.12));backdrop-filter:blur(16px)}
         .movie-detail-page #movie-episodes>div:nth-child(2) button:active{transform:scale(.96)}
-        .movie-detail-page #movie-episodes>div:nth-child(3)>a{border:0;background:linear-gradient(110deg,rgba(255,255,255,.075),rgba(139,92,246,.09));box-shadow:inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-        .movie-detail-page #movie-episodes>div:nth-child(3)>a:hover{background:linear-gradient(110deg,rgba(167,139,250,.18),rgba(217,70,239,.12))}
+        .movie-detail-page #movie-episodes>div:nth-child(3)>a{border:0;background:linear-gradient(110deg,rgba(255,255,255,.075),rgba(255,255,255,.12));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+        .movie-detail-page #movie-episodes>div:nth-child(3)>a:hover{background:linear-gradient(110deg,rgba(255,255,255,.12),rgba(255,255,255,.10))}
         .movie-detail-page .movie-tabs{position:relative;border:0}
-        .movie-detail-page .movie-tabs:after{content:"";display:block;height:1px;margin-top:-1px;background:linear-gradient(90deg,rgba(167,139,250,.55),rgba(255,255,255,.08),transparent)}
+        .movie-detail-page .movie-tabs:after{content:"";display:block;height:1px;margin-top:-1px;background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.08),transparent)}
         .movie-detail-page .movie-tabs button{border:0!important}
-        .movie-detail-page .movie-tabs button[aria-selected="true"]{color:#c4b5fd}
+        .movie-detail-page .movie-tabs button[aria-selected="true"]{color:#d1d5db}
         .movie-detail-page .movie-detail-content section>h2{color:#fff}
         .movie-detail-page .movie-detail-content .snap-x>div{transition:transform .25s ease}
         .movie-detail-page .movie-detail-content .snap-x>div:active{transform:scale(.97)}
-        html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:radial-gradient(ellipse 78% 14% at 50% 0%,rgba(167,139,250,.07),transparent 78%),linear-gradient(180deg,#f7f6fc 0%,#f7f6fc 100%);color:#28243a}
+        html[data-theme="light"] .movie-detail-content,html[data-mobile-theme="light"] .movie-detail-content{background:linear-gradient(180deg,#f5f5f7 0%,#f5f5f7 100%);color:#28243a}
         /* Keep the detail-page base surface theme-aware so the liquid-glass
            scene capture never paints its dark default over the light theme. */
-        html[data-theme="light"] .movie-detail-page,html[data-mobile-theme="light"] .movie-detail-page{background-color:#f7f6fc!important;color:#28243a}
-        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-hero-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 34%,rgba(247,246,252,.08) 54%,rgba(247,246,252,.58) 78%,#f7f6fc 100%)!important}
-        html[data-theme="light"] .movie-detail-mobile-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.42) 68%,#f7f6fc 100%)!important}
-        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.56) 72%,#100f1e 100%)!important}
-        html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:transparent!important;border:0!important;box-shadow:none!important}
-        html[data-theme="light"] .movie-poster-glass,html[data-mobile-theme="light"] .movie-poster-glass{background:transparent!important;border:0!important;box-shadow:none!important}
+        html[data-theme="light"] .movie-detail-page,html[data-mobile-theme="light"] .movie-detail-page{background-color:#f5f5f7!important;color:#28243a}
+        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-hero-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 34%,rgba(247,246,252,.08) 54%,rgba(247,246,252,.58) 78%,#f5f5f7 100%)!important}
+        html[data-theme="light"] .movie-detail-mobile-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.42) 68%,#f5f5f7 100%)!important}
+        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.56) 72%,#0f111a 100%)!important}
+        html[data-theme="light"] .movie-glass-panel,html[data-mobile-theme="light"] .movie-glass-panel{background:transparent!important;border:0!important;}
+        html[data-theme="light"] .movie-poster-glass,html[data-mobile-theme="light"] .movie-poster-glass{background:transparent!important;border:0!important;}
         html[data-theme="light"] .movie-tabs,html[data-mobile-theme="light"] .movie-tabs{border-color:transparent}
-        html[data-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(2) button,html[data-mobile-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(2) button{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(225,215,255,.55));border-color:rgba(139,92,246,.16);color:#55447d;box-shadow:inset 0 1px 0 #fff,0 5px 18px rgba(90,65,150,.06)}
-        html[data-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(3)>a,html[data-mobile-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(3)>a{background:linear-gradient(110deg,rgba(255,255,255,.72),rgba(226,217,255,.48));box-shadow:inset 0 1px 0 #fff}
+        html[data-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(2) button,html[data-mobile-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(2) button{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(225,215,255,.55));border-color:rgba(255,255,255,.12);color:#55447d;}
+        html[data-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(3)>a,html[data-mobile-theme="light"] .movie-detail-page #movie-episodes>div:nth-child(3)>a{background:linear-gradient(110deg,rgba(255,255,255,.72),rgba(226,217,255,.48));}
         /* Final light-theme override: keep the detail hero fade connected to the light page surface. */
-        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-hero-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 34%,rgba(247,246,252,.08) 54%,rgba(247,246,252,.58) 78%,#f7f6fc 100%)!important}
-        html[data-theme="light"] .movie-detail-mobile-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.42) 68%,#f7f6fc 100%)!important}
+        html[data-theme="light"] .movie-detail-hero-fade,html[data-mobile-theme="light"] .movie-detail-hero-fade{background:linear-gradient(180deg,rgba(247,246,252,0) 34%,rgba(247,246,252,.08) 54%,rgba(247,246,252,.58) 78%,#f5f5f7 100%)!important}
+        html[data-theme="light"] .movie-detail-mobile-fade,html[data-mobile-theme="light"] .movie-detail-mobile-fade{background:linear-gradient(180deg,rgba(16,15,30,.04) 0%,rgba(16,15,30,.10) 42%,rgba(16,15,30,.42) 68%,#f5f5f7 100%)!important}
       `}</style>
 
       {/* HERO — shorter + lighter overlay so image shows */}
@@ -498,7 +498,7 @@ export default function MovieDetailPage({
         <div className="absolute inset-0 hidden lg:flex items-center justify-center z-10 pointer-events-none">
           <Link
             href={watchHref}
-            className="pointer-events-auto w-16 h-16 rounded-full bg-[#ffd875] text-[#1a1a1a] flex items-center justify-center shadow-[0_0_32px_rgba(255,216,117,0.4)] hover:scale-105 transition-transform"
+            className="pointer-events-auto w-16 h-16 rounded-full bg-[#d1d5db] text-[#1a1a1a] flex items-center justify-center  hover:scale-105 transition-transform"
           >
             <Play size={26} className="fill-current ml-0.5" />
           </Link>
@@ -546,7 +546,7 @@ export default function MovieDetailPage({
               </div>
             )}
             <div className="mt-5 grid grid-cols-[1fr_1.25fr] gap-2.5">
-              <Link href={watchHref} className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full bg-white px-5 text-[15px] font-bold text-[#10131a] shadow-[0_8px_28px_rgba(255,255,255,.18)] active:scale-[.98]">
+              <Link href={watchHref} className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full bg-white px-5 text-[15px] font-bold text-[#10131a]  active:scale-[.98]">
                 <Play size={19} fill="currentColor" /> Phát ngay
               </Link>
               <SaveToLibraryButton
@@ -730,7 +730,7 @@ export default function MovieDetailPage({
               <div className="movie-glass-panel flex items-center gap-4 rounded-[24px] border px-5 py-3 backdrop-blur-2xl">
                 <Link
                   href={watchHref}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-white/10 via-white/10 to-indigo-600 text-white font-bold text-[15px] px-6 py-2.5 rounded-full shrink-0 hover:brightness-105"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-white/10 via-white/10 to-white/10 text-white font-bold text-[15px] px-6 py-2.5 rounded-full shrink-0 hover:brightness-105"
                 >
                   <Play size={16} className="fill-current" />
                   Xem Ngay
@@ -908,7 +908,7 @@ function TabContent({
                       type="button"
                       onClick={() => setEpisodePage(page)}
                       aria-pressed={safeEpisodePage === page}
-                      className={`shrink-0 rounded-full border px-3.5 py-2 text-[11px] font-semibold transition-all ${safeEpisodePage === page ? "border-white/15 bg-gradient-to-r from-white/10 to-white/10 text-white/70 shadow-[0_0_16px_rgba(139,92,246,.12)]" : "border-white/10 bg-white/[0.035] text-white/50 hover:border-white/15 hover:text-white/80"}`}
+                      className={`shrink-0 rounded-full border px-3.5 py-2 text-[11px] font-semibold transition-all ${safeEpisodePage === page ? "border-white/15 bg-gradient-to-r from-white/10 to-white/10 text-white/70 " : "border-white/10 bg-white/[0.035] text-white/50 hover:border-white/15 hover:text-white/80"}`}
                     >
                       {start}–{end}
                     </button>
@@ -979,14 +979,14 @@ function TabContent({
               onClick={() => { setSelectedServer(idx); setEpisodePage(0); setEpisodeSearch(""); }}
               className={`rounded-lg border px-2.5 py-1.5 text-[13px] font-medium transition-all sm:text-sm ${
                 selectedServer === idx
-                  ? "border-white/15 bg-white/10 text-white/70 shadow-[0_0_18px_rgba(139,92,246,.16)]"
+                  ? "border-white/15 bg-white/10 text-white/70 "
                   : "border-white/15 bg-[#202331] text-white/85 hover:border-white/30"
               }`}
             >
               {version.server_name || `Bản chiếu ${idx + 1}`}
             </button>
           )) : (
-            <span className="rounded-lg border border-[#ffd15a] bg-[#202331] px-2.5 py-1.5 text-[13px] font-medium text-[#ffd15a] sm:text-sm">
+            <span className="rounded-lg border border-[#d1d5db] bg-[#202331] px-2.5 py-1.5 text-[13px] font-medium text-[#d1d5db] sm:text-sm">
               Vietsub 1
             </span>
           )}

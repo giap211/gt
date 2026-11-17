@@ -26,8 +26,8 @@ type HeroMovie = ListMovie & {
 function HomeSkeletonHero() {
   return (
     <div className="px-4 pt-3 pb-2" aria-hidden="true">
-      <div className="relative h-[min(66svh,610px)] min-h-[420px] overflow-hidden rounded-[28px] bg-[#171321]">
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-white/10 via-[#211a32] to-[#111018]" />
+      <div className="relative h-[min(66svh,610px)] min-h-[420px] overflow-hidden rounded-[28px] bg-[#191b24]">
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-white/10 via-[#0f111a] to-[#111018]" />
         <div className="absolute inset-x-0 bottom-0 space-y-4 bg-gradient-to-t from-[#08090d] via-[#08090d]/70 to-transparent px-5 pb-12 pt-28">
           <div className="h-3 w-24 animate-pulse rounded-full bg-white/10" />
           <div className="h-10 w-3/4 max-w-[280px] animate-pulse rounded-xl bg-white/15" />
@@ -306,42 +306,42 @@ export function HomeScreen() {
 .apple-tv-home .home-feature-hero .hero-short-black-fade{background:linear-gradient(180deg,transparent 0%,rgba(8,9,13,.25) 38%,rgba(8,9,13,.72) 75%,#08090d 100%)!important}
 .apple-tv-home .home-feature-hero .hero-top-transition{background:linear-gradient(180deg,rgba(0,0,0,.42),transparent 72%)!important}
 .apple-tv-home .home-feature-hero .home-hero-side-shade{background:linear-gradient(90deg,rgba(0,0,0,.58),transparent 92%)!important}
-.apple-tv-home .home-feature-hero .hero-source-badge{border:0!important;border-radius:5px!important;background:rgba(255,255,255,.16)!important;box-shadow:none!important;letter-spacing:.12em;text-transform:uppercase;font-size:9px!important;backdrop-filter:blur(14px)}
+.apple-tv-home .home-feature-hero .hero-source-badge{border:0!important;border-radius:5px!important;background:rgba(255,255,255,.16)!important;letter-spacing:.12em;text-transform:uppercase;font-size:9px!important;backdrop-filter:blur(14px)}
 .apple-tv-home .home-feature-hero h1{font-size:clamp(34px,9vw,48px)!important;line-height:1.02!important;letter-spacing:-.055em!important;font-weight:750!important}
-.apple-tv-home .home-feature-hero .hero-slide-dot[aria-current=true]{background:#fff!important;box-shadow:0 0 0 3px rgba(255,255,255,.13)!important;width:5px!important;min-width:5px!important;height:5px!important}
-.apple-tv-home .home-feature-hero .hero-slide-dot{background:rgba(255,255,255,.48);box-shadow:none;width:5px!important;min-width:5px!important;height:5px!important}
-.apple-tv-home .home-feature-hero a[class*=bg-gradient-to-r]{background:#fff!important;color:#08090d!important;box-shadow:none!important;font-weight:750}
+.apple-tv-home .home-feature-hero .hero-slide-dot[aria-current=true]{background:#fff!important;width:5px!important;min-width:5px!important;height:5px!important}
+.apple-tv-home .home-feature-hero .hero-slide-dot{background:rgba(255,255,255,.48);width:5px!important;min-width:5px!important;height:5px!important}
+.apple-tv-home .home-feature-hero a[class*=bg-gradient-to-r]{background:#fff!important;color:#08090d!important;font-weight:750}
 .apple-tv-home .home-feature-hero .absolute.inset-x-0.top-0{padding-top:max(54px,env(safe-area-inset-top))!important}
 
 
 .apple-tv-home .container{max-width:none;padding-left:20px;padding-right:20px}
 .apple-tv-home .movie-carousel-view-more{color:rgba(255,255,255,.62);padding:4px 0;font-size:11px;letter-spacing:-.01em}.apple-tv-home .movie-carousel-view-more-icon{background:transparent!important;color:inherit!important}
 .apple-tv-home .movie-carousel-view-more-icon{width:20px;height:20px;background:rgba(255,255,255,.1)}
-.apple-tv-home section:has(> .container){padding-top:13px;padding-bottom:13px}.apple-tv-home .movie-carousel-poster .movie-poster-frame{border-radius:12px!important;border:1px solid rgba(167,139,250,.16);box-shadow:0 5px 18px rgba(0,0,0,.14)}.apple-tv-home .movie-carousel-poster .movie-card-info{margin-top:8px!important}.apple-tv-home .movie-carousel-poster .movie-card-title{font-size:12px;line-height:1.35;font-weight:650}.apple-tv-home .movie-carousel-poster .movie-card-rating{font-size:10px;margin-top:4px}.apple-tv-home .movie-carousel-poster .movie-card-original{font-size:10px}.apple-tv-home .movie-carousel-swiper .swiper-slide{height:auto}
+.apple-tv-home section:has(> .container){padding-top:13px;padding-bottom:13px}.apple-tv-home .movie-carousel-poster .movie-poster-frame{border-radius:12px!important;border:1px solid rgba(255,255,255,.12);}.apple-tv-home .movie-carousel-poster .movie-card-info{margin-top:8px!important}.apple-tv-home .movie-carousel-poster .movie-card-title{font-size:12px;line-height:1.35;font-weight:650}.apple-tv-home .movie-carousel-poster .movie-card-rating{font-size:10px;margin-top:4px}.apple-tv-home .movie-carousel-poster .movie-card-original{font-size:10px}.apple-tv-home .movie-carousel-swiper .swiper-slide{height:auto}
 .apple-tv-home section:has(> .container) h2{color:#f5f5f7!important;background:none!important;-webkit-text-fill-color:#f5f5f7!important;font-size:19px;font-weight:700;letter-spacing:-.035em}
 .apple-tv-home .topic-grid-section{padding-top:8px!important;padding-bottom:14px!important}
-.apple-tv-home .topic-grid-chip{background:rgba(255,255,255,.075)!important;border:1px solid rgba(255,255,255,.09)!important;color:rgba(255,255,255,.82)!important;border-radius:9999px!important;box-shadow:none!important}
+.apple-tv-home .topic-grid-chip{background:rgba(255,255,255,.075)!important;border:1px solid rgba(255,255,255,.09)!important;color:rgba(255,255,255,.82)!important;border-radius:9999px!important;}
 .apple-tv-home .topic-grid-icon{filter:saturate(.55)}
 .apple-tv-home .topic-grid-title{color:#f5f5f7!important;font-size:18px!important;letter-spacing:-.035em}
 .apple-tv-home .topic-grid-hint{color:rgba(255,255,255,.42)!important}
 @media(max-width:480px){.apple-tv-home .movie-carousel-poster .movie-poster-frame{border-radius:11px!important}.apple-tv-home section:has(> .container){padding-top:12px;padding-bottom:12px}.apple-tv-home .home-feature-hero{height:min(66svh,610px)!important;min-height:520px}.apple-tv-home .home-feature-hero .relative.z-20{justify-content:flex-end!important;padding-bottom:76px!important;padding-top:90px!important}.apple-tv-home .home-feature-hero .relative.z-20>div{max-width:100%!important}.apple-tv-home .home-feature-hero .relative.z-20 p{max-width:310px}.apple-tv-home section:has(> .container){padding-top:14px;padding-bottom:14px}}
-html[data-mobile-theme=light] .apple-tv-home,html[data-theme=light] .apple-tv-home{--apple-home-bg:#f5f3fb;background:#f5f3fb!important;color:#211d2d}
-html[data-mobile-theme=light] .apple-tv-home .home-feature-hero,html[data-theme=light] .apple-tv-home .home-feature-hero{background:#f5f3fb!important}
-html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .hero-bottom-fade,html[data-theme=light] .apple-tv-home .home-feature-hero .hero-bottom-fade{background:linear-gradient(180deg,transparent 0%,rgba(8,9,13,.08) 38%,rgba(8,9,13,.68) 67%,rgba(8,9,13,.78) 78%,#f5f3fb 100%)!important}
-html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .hero-short-black-fade,html[data-theme=light] .apple-tv-home .home-feature-hero .hero-short-black-fade{background:linear-gradient(180deg,transparent 0%,rgba(8,9,13,.12) 35%,rgba(8,9,13,.46) 70%,#f5f3fb 100%)!important}
+html[data-mobile-theme=light] .apple-tv-home,html[data-theme=light] .apple-tv-home{--apple-home-bg:#f5f5f7;background:#f5f5f7!important;color:#211d2d}
+html[data-mobile-theme=light] .apple-tv-home .home-feature-hero,html[data-theme=light] .apple-tv-home .home-feature-hero{background:#f5f5f7!important}
+html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .hero-bottom-fade,html[data-theme=light] .apple-tv-home .home-feature-hero .hero-bottom-fade{background:linear-gradient(180deg,transparent 0%,rgba(8,9,13,.08) 38%,rgba(8,9,13,.68) 67%,rgba(8,9,13,.78) 78%,#f5f5f7 100%)!important}
+html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .hero-short-black-fade,html[data-theme=light] .apple-tv-home .home-feature-hero .hero-short-black-fade{background:linear-gradient(180deg,transparent 0%,rgba(8,9,13,.12) 35%,rgba(8,9,13,.46) 70%,#f5f5f7 100%)!important}
 html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .hero-top-transition,html[data-theme=light] .apple-tv-home .home-feature-hero .hero-top-transition{background:linear-gradient(180deg,rgba(8,9,13,.42),transparent 78%)!important}
 html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .home-hero-side-shade,html[data-theme=light] .apple-tv-home .home-feature-hero .home-hero-side-shade{background:linear-gradient(90deg,rgba(8,9,13,.38),rgba(8,9,13,.08) 62%,transparent 100%)!important}
-html[data-mobile-theme=light] .apple-tv-home .home-feature-hero h1,html[data-theme=light] .apple-tv-home .home-feature-hero h1{color:#fff!important;text-shadow:0 2px 16px rgba(0,0,0,.5)!important}
-html[data-mobile-theme=light] .apple-tv-home .home-feature-hero p,html[data-theme=light] .apple-tv-home .home-feature-hero p{color:rgba(255,255,255,.78)!important;text-shadow:0 1px 8px rgba(0,0,0,.55)}
+html[data-mobile-theme=light] .apple-tv-home .home-feature-hero h1,html[data-theme=light] .apple-tv-home .home-feature-hero h1{color:#fff!important;}
+html[data-mobile-theme=light] .apple-tv-home .home-feature-hero p,html[data-theme=light] .apple-tv-home .home-feature-hero p{color:rgba(255,255,255,.78)!important;}
 html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .hero-source-badge,html[data-theme=light] .apple-tv-home .home-feature-hero .hero-source-badge{color:#fff!important;background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.32)!important}
 html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .absolute.inset-x-0.top-0,html[data-theme=light] .apple-tv-home .home-feature-hero .absolute.inset-x-0.top-0{color:#fff!important}
-html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .absolute.inset-x-0.top-0 button,html[data-theme=light] .apple-tv-home .home-feature-hero .absolute.inset-x-0.top-0 button{background:rgba(255,255,255,.18)!important;border-color:rgba(255,255,255,.3)!important;color:#fff!important;box-shadow:0 4px 18px rgba(0,0,0,.16)!important}
+html[data-mobile-theme=light] .apple-tv-home .home-feature-hero .absolute.inset-x-0.top-0 button,html[data-theme=light] .apple-tv-home .home-feature-hero .absolute.inset-x-0.top-0 button{background:rgba(255,255,255,.18)!important;border-color:rgba(255,255,255,.3)!important;color:#fff!important;}
 html[data-mobile-theme=light] .apple-tv-home .home-feature-hero a[class*=bg-gradient-to-r],html[data-theme=light] .apple-tv-home .home-feature-hero a[class*=bg-gradient-to-r]{background:#fff!important;color:#17131f!important}
 html[data-mobile-theme=light] .apple-tv-home section:has(> .container) h2,html[data-theme=light] .apple-tv-home section:has(> .container) h2{color:#211d2d!important;-webkit-text-fill-color:#211d2d!important}
-html[data-mobile-theme=light] .apple-tv-home .topic-grid-chip,html[data-theme=light] .apple-tv-home .topic-grid-chip{background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(239,235,251,.92))!important;border-color:rgba(128,104,183,.22)!important;color:#393052!important;box-shadow:none!important;border-radius:9999px!important}
+html[data-mobile-theme=light] .apple-tv-home .topic-grid-chip,html[data-theme=light] .apple-tv-home .topic-grid-chip{background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(239,235,251,.92))!important;border-color:rgba(128,104,183,.22)!important;color:#393052!important;border-radius:9999px!important}
 html[data-mobile-theme=light] .apple-tv-home .topic-grid-title,html[data-theme=light] .apple-tv-home .topic-grid-title{color:#211d2d!important}
-html[data-mobile-theme=light] .apple-tv-home .topic-grid-hint,html[data-theme=light] .apple-tv-home .topic-grid-hint{color:#6c5bb0!important}
-html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data-theme=light] .apple-tv-home .movie-carousel-view-more{color:#76649f!important}html[data-mobile-theme=light] .apple-tv-home .movie-carousel-poster .movie-poster-frame,html[data-theme=light] .apple-tv-home .movie-carousel-poster .movie-poster-frame{border-color:rgba(125,91,190,.2)!important;box-shadow:0 5px 16px rgba(79,63,122,.09)!important}`}</style>
+html[data-mobile-theme=light] .apple-tv-home .topic-grid-hint,html[data-theme=light] .apple-tv-home .topic-grid-hint{color:#6b7280!important}
+html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data-theme=light] .apple-tv-home .movie-carousel-view-more{color:#6b7280!important}html[data-mobile-theme=light] .apple-tv-home .movie-carousel-poster .movie-poster-frame,html[data-theme=light] .apple-tv-home .movie-carousel-poster .movie-poster-frame{border-color:rgba(125,91,190,.2)!important;}`}</style>
       {data.hero.length > 0 ? <HeroSlider movies={data.hero.slice(0, 6)} /> : <HomeSkeletonHero />}
 
       <div className="flex flex-col gap-0 pb-16 relative z-30">

@@ -98,21 +98,21 @@ export function MovieListingScreen({ type }: { type: string }) {
           --listing-muted: #a1a4b7;
           --listing-soft: rgba(255,255,255,.07);
           --listing-border: rgba(255,255,255,.10);
-          --listing-accent: #a78bfa;
-          --listing-accent-2: #d946ef;
+          --listing-accent: #d1d5db;
+          --listing-accent-2: #9ca3af;
           color: var(--listing-text);
           background: var(--listing-bg);
           min-height: 100vh;
         }
         .listing-hero {
           isolation: isolate;
-          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(13,13,29,.91) 48%, rgba(20,12,35,.56) 100%), var(--listing-hero-image);
+          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(15,17,26,.91) 48%, rgba(15,17,26,.56) 100%), var(--listing-hero-image);
           background-size: cover;
           background-position: center 35%;
           border: 1px solid var(--listing-border);
         }
         .listing-gradient-text {
-          background: linear-gradient(105deg,#c4b5fd 0%,#a78bfa 48%,#e879f9 100%);
+          background: linear-gradient(105deg,#d1d5db 0%,#d1d5db 48%,#d1d5db 100%);
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
@@ -138,18 +138,18 @@ export function MovieListingScreen({ type }: { type: string }) {
           background: var(--listing-panel) !important;
           border: 1px solid var(--listing-border) !important;
           border-radius: 18px !important;
-          box-shadow: none !important;
+          
           color: var(--listing-text) !important;
           backdrop-filter: blur(22px) saturate(150%) !important;
         }
         .listing-page .listing-filter-shell button { color: var(--listing-text); }
-        .listing-page .listing-filter-shell button:hover { border-color: rgba(167,139,250,.45); }
+        .listing-page .listing-filter-shell button:hover { border-color: rgba(255,255,255,.12); }
         .listing-page .listing-filter-shell [class*="bg-[#0b0d14]"] {
           background: var(--listing-panel-solid) !important;
           border-color: var(--listing-border) !important;
         }
         .listing-page .listing-filter-shell a:hover {
-          background: linear-gradient(110deg,#8b5cf6,#a855f7,#d946ef) !important;
+          background: linear-gradient(110deg,#d1d5db,#d1d5db,#d1d5db) !important;
           color: white !important;
         }
         .listing-page .listing-chip {
@@ -160,8 +160,8 @@ export function MovieListingScreen({ type }: { type: string }) {
         }
         .listing-page .listing-chip-active {
           color: white;
-          border-color: rgba(192,132,252,.65);
-          background: linear-gradient(110deg,#8b5cf6,#a855f7,#d946ef);
+          border-color: rgba(255,255,255,.12);
+          background: linear-gradient(110deg,#d1d5db,#d1d5db,#d1d5db);
         }
         @media (min-width: 640px) {
           .listing-page .listing-movie-grid { grid-template-columns: repeat(4,minmax(0,1fr)); column-gap: 16px; row-gap: 32px; }
@@ -185,13 +185,13 @@ export function MovieListingScreen({ type }: { type: string }) {
         /* Keep the featured movie panel visually identical in light and dark themes. */
         .listing-page .listing-hero {
           color: #f7f7fc;
-          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(13,13,29,.91) 48%, rgba(20,12,35,.56) 100%), var(--listing-hero-image);
+          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(15,17,26,.91) 48%, rgba(15,17,26,.56) 100%), var(--listing-hero-image);
           border-color: var(--listing-border);
         }
         html[data-mobile-theme="light"] .listing-page .listing-hero,
         html[data-theme="light"] .listing-page .listing-hero {
           color: #f7f7fc !important;
-          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(13,13,29,.91) 48%, rgba(20,12,35,.56) 100%), var(--listing-hero-image) !important;
+          background: linear-gradient(105deg, rgba(9,11,19,.98) 0%, rgba(15,17,26,.91) 48%, rgba(15,17,26,.56) 100%), var(--listing-hero-image) !important;
           border-color: rgba(255,255,255,.10) !important;
         }
         html[data-mobile-theme="light"] .listing-page .listing-filter-shell [class*="text-white"],
@@ -221,8 +221,6 @@ export function MovieListingScreen({ type }: { type: string }) {
             className="listing-hero relative mb-6 overflow-hidden rounded-[26px] px-4 py-5 sm:mb-8 sm:px-7 sm:py-7"
             style={{ "--listing-hero-image": heroImage ? `url("${heroImage}")` : "none" } as CSSProperties}
           >
-            <div className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-28 right-1/4 h-48 w-64 rounded-full bg-white/10 blur-3xl" />
             <div className="relative z-10 max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/70">
                 <Sparkles size={12} /> XEM PHIM · KHÔNG GIAN ĐIỆN ẢNH
