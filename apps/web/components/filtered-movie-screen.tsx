@@ -8,7 +8,7 @@ import { getFilteredMovies, type LatestMoviesResponse, type ListMovie, type Movi
 
 export function FilteredMovieScreen({ initialFilters }: { initialFilters: MovieFilters }) {
   const router = useRouter();
-  const filters = useMemo(() => initialFilters, [initialFilters.type, initialFilters.category, initialFilters.country, initialFilters.year, initialFilters.sortField, initialFilters.sortType]);
+  const filters = useMemo(() => initialFilters, [initialFilters.type, initialFilters.category, initialFilters.country, initialFilters.year, initialFilters.sortField, initialFilters.sortType, initialFilters.sortLang]);
   const [movies, setMovies] = useState<ListMovie[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);

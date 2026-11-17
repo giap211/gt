@@ -117,6 +117,15 @@ export const FilterBar = () => {
             <option value="asc">Tăng dần</option>
           </select>
         </label>
+        <label className="min-w-0">
+          <span className="mb-1.5 block text-[10px] font-bold text-white/60">Ngôn ngữ</span>
+          <select className={fieldClass} value={filters.sortLang || ""} onChange={(e) => update("sortLang", e.target.value)}>
+            <option value="">Tất cả ngôn ngữ</option>
+            <option value="vietsub">Vietsub</option>
+            <option value="thuyet-minh">Thuyết minh</option>
+            <option value="long-tieng">Lồng tiếng</option>
+          </select>
+        </label>
       </div>
       <div className="mt-3 flex flex-wrap justify-end gap-2">
         <button type="button" onClick={clear} className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 px-4 text-xs font-bold text-white/65 transition hover:bg-white/5">
