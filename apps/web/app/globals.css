@@ -660,10 +660,6 @@ svg[class*="text-yellow-400"] {
   --brand-highlight: rgba(192,132,252,.82);
 }
 
-/* Violet edge highlight is reserved for landscape movie cards. */
-.movie-poster-frame-horizontal { position:relative; isolation:isolate; }
-.movie-poster-frame-horizontal img { border:1px solid rgba(167,139,250,.32); border-radius:inherit; box-shadow:0 0 0 1px rgba(139,92,246,.07),0 3px 14px rgba(91,33,182,.10); transition:border-color .24s ease,box-shadow .24s ease,filter .24s ease; }
-.movie-poster-frame-horizontal:hover img { border-color:rgba(216,180,254,.9); box-shadow:0 0 0 1px rgba(192,132,252,.34),0 0 15px rgba(168,85,247,.22); }
 /* Reusable gradient button treatment; existing gold CTA classes are migrated here too. */
 [class~="bg-[#ffd875]"],
 [class~="bg-[#f0c24d]"],
@@ -728,37 +724,6 @@ html[data-theme="light"] .hero-bottom-fade {
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-bottom-fade { transition: none !important; }
-}
-
-
-/* Fixed violet highlight for movie posters on homepage and movie listings.
-   The light stays at one angle and never reacts to page scrolling. */
-.movie-poster-frame {
-  isolation: isolate;
-}
-.movie-poster-frame-horizontal::after {
-  content: "";
-  position: absolute;
-  z-index: 40;
-  inset: 0;
-  padding: 1.35px;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 1;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg 238deg,
-    rgba(139, 92, 246, .08) 258deg,
-    rgba(192, 132, 252, .82) 282deg,
-    rgba(255, 255, 255, .9) 296deg,
-    rgba(217, 70, 239, .72) 310deg,
-    rgba(139, 92, 246, .12) 332deg,
-    transparent 350deg 360deg
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
 }
 
 
@@ -986,19 +951,6 @@ body { min-width: 320px; background: #050509 !important; }
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
-/* Quiet, restrained interaction states instead of neon glow. */
-.movie-poster-frame-horizontal img,
-.movie-poster-frame-vertical img,
-.listing-page .listing-movie-grid img {
-  border-color: rgba(255,255,255,.12) !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,.12) !important;
-}
-.movie-poster-frame-horizontal:hover img,
-.movie-poster-frame-vertical:hover img,
-.listing-page .listing-movie-grid a:hover img {
-  border-color: rgba(255,255,255,.32) !important;
-  box-shadow: 0 4px 18px rgba(0,0,0,.18) !important;
-}
 .movie-carousel-view-more-icon,
 .movie-carousel-view-more-icon:hover {
   background: rgba(255,255,255,.08) !important;
@@ -1084,27 +1036,6 @@ html[data-theme="light"] [class*="text-fuchsia-"] {
 }
 
 
-/* Poster frames: remove every outline/rim on both landscape and portrait cards. */
-.movie-poster-frame-horizontal,
-.movie-poster-frame-vertical,
-.movie-poster-frame-horizontal img,
-.movie-poster-frame-vertical img,
-.movie-poster-frame-horizontal::before,
-.movie-poster-frame-horizontal::after,
-.movie-poster-frame-vertical::before,
-.movie-poster-frame-vertical::after {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-}
-.movie-poster-frame-horizontal:hover,
-.movie-poster-frame-vertical:hover,
-.movie-poster-frame-horizontal:hover img,
-.movie-poster-frame-vertical:hover img {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-}
 /* Poster metadata tags need a solid, high-contrast backing over busy artwork. */
 .card-badge,
 .badge-item,
@@ -1120,37 +1051,6 @@ html[data-theme="light"] [class*="text-fuchsia-"] {
 .badge-primary { background: rgba(38, 42, 48, .96) !important; }
 
 
-/* Definitive poster cleanup: no violet rim, outline, ring or hover highlight
-   on either landscape or portrait poster, including nested image wrappers. */
-a.movie-poster-frame,
-a.movie-poster-frame:hover,
-a.movie-poster-frame:focus,
-a.movie-poster-frame:focus-visible,
-a.movie-poster-frame *,
-a.movie-poster-frame *::before,
-a.movie-poster-frame *::after,
-a.movie-poster-frame::before,
-a.movie-poster-frame::after {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-  --tw-ring-shadow: 0 0 #0000 !important;
-  --tw-ring-offset-shadow: 0 0 #0000 !important;
-  --tw-ring-color: transparent !important;
-  filter: none;
-}
-a.movie-poster-frame:hover,
-a.movie-poster-frame:focus-visible {
-  transform: none;
-}
-a.movie-poster-frame img,
-a.movie-poster-frame:hover img {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-  filter: none !important;
-}
-
 /* Make the QL. HD / QL. FHD quality label readable over any artwork. */
 a.movie-poster-frame span[class*="bg-[#f0c24d]"] {
   background: #f4f4f5 !important;
@@ -1164,32 +1064,4 @@ a.movie-poster-frame span[class*="bg-[#f0c24d]"] {
   font-weight: 800 !important;
   letter-spacing: .02em;
   padding: 3px 7px !important;
-}
-
-
-/* Landscape card edge: neutralize the card wrapper as well as the image.
-   The previous rim was being painted by the horizontal card's outer wrapper. */
-.group:has(> a.movie-poster-frame-horizontal),
-.group:has(> a.movie-poster-frame-horizontal):hover,
-.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal,
-.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal img,
-.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal span,
-.group:has(> a.movie-poster-frame-horizontal)::before,
-.group:has(> a.movie-poster-frame-horizontal)::after,
-.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal::before,
-.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal::after {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-  --tw-ring-shadow: 0 0 #0000 !important;
-  --tw-ring-offset-shadow: 0 0 #0000 !important;
-  --tw-ring-color: transparent !important;
-  filter: none !important;
-  -webkit-filter: none !important;
-  background-image: none !important;
-}
-.group:has(> a.movie-poster-frame-horizontal) > a.movie-poster-frame-horizontal img {
-  transform: none !important;
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
 }
