@@ -25,7 +25,8 @@ export const FilterBar = () => {
       .catch((error) => console.error("Cannot load PhimAPI filter options", error))
       .finally(() => { if (active) setLoadingOptions(false); });
     const params = new URLSearchParams(window.location.search);
-    const pathType = window.location.pathname.match(/^\\/danh-sach\\/([^/]+)/)?.[1] || "";
+    const pathParts = window.location.pathname.split("/");
+    const pathType = pathParts[1] === "danh-sach" ? pathParts[2] || "" : "";
     setFilters({
       type: params.get("type") || pathType,
       category: params.get("category") || "",
