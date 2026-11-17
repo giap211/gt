@@ -27,10 +27,12 @@ export const FilterBar = () => {
     const params = new URLSearchParams(window.location.search);
     const pathParts = window.location.pathname.split("/");
     const pathType = pathParts[1] === "danh-sach" ? pathParts[2] || "" : "";
+    const pathCategory = pathParts[1] === "the-loai" ? pathParts[2] || "" : "";
+    const pathCountry = pathParts[1] === "quoc-gia" ? pathParts[2] || "" : "";
     setFilters({
       type: params.get("type") || pathType,
-      category: params.get("category") || "",
-      country: params.get("country") || "",
+      category: params.get("category") || pathCategory,
+      country: params.get("country") || pathCountry,
       year: params.get("year") || "",
       sortField: params.get("sort_field") || "modified.time",
       sortType: params.get("sort_type") || "desc",
