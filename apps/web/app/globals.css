@@ -556,6 +556,66 @@ div[class*="z-[200]"] input:focus {
 }
 
 
+
+/* Runtime performance: keep off-screen listing cards out of the paint pipeline. */
+@media (max-width: 767px) {
+  .listing-movie-grid > div {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 340px;
+  }
+
+  /* Avoid animating every poster simultaneously during first paint / pagination. */
+  .listing-movie-grid > div.animate-card-fade {
+    animation: none;
+  }
+}
+
+/* The dock already has a dedicated glass layer; avoid filtering the same pixels twice. */
+.gt-dock-nav {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* The episode picker is nearly opaque, so backdrop filtering it and every row is wasted work. */
+.watch-player-menu {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.watch-player-menu > header {
+  -webkit-backdrop-filter: blur(14px) saturate(125%) !important;
+  backdrop-filter: blur(14px) saturate(125%) !important;
+}
+
+.watch-player-menu .watch-player-server-list > button,
+.watch-player-menu .watch-player-episode-grid > button {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Animate only properties that can stay on the compositor instead of triggering layout. */
+.ranking-number-hollow {
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.5s ease;
+}
+
+.tag-topic {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.button-login {
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.thumbs-slider .swiper-slide {
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listing-movie-grid > div.animate-card-fade {
+    animation: none !important;
+  }
+}
+
 /* Mobile-only product frame: desktop users see the same phone-first experience. */
 html { background: #050509; }
 body { min-width: 320px; background: #050509 !important; }
