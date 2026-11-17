@@ -41,7 +41,7 @@ interface MovieCarouselProps {
 export const MovieCarousel = ({
   title,
   viewMoreLink,
-  titleGradient = "linear-gradient(235deg, #ffffff 30%, #a78bfa 130%)",
+  titleGradient = "linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)",
   items,
   layout = "standard",
 }: MovieCarouselProps) => {
@@ -88,14 +88,14 @@ export const MovieCarousel = ({
             <button
               ref={navigationPrevRef}
               aria-label="Trước"
-              className="absolute left-0 top-1/2 -translate-y-[60%] z-20 w-9 h-9 bg-[#1a1c28]/90 border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/swiper:opacity-100 transition-all hover:bg-white hover:text-black disabled:opacity-0 hidden md:flex shadow-lg"
+              className="absolute left-0 top-1/2 -translate-y-[60%] z-20 w-9 h-9 bg-[#1a1c28]/90 border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/swiper:opacity-100 transition-all hover:bg-white hover:text-black disabled:opacity-0 hidden md:flex "
             >
               <ChevronLeft size={20} />
             </button>
             <button
               ref={navigationNextRef}
               aria-label="Sau"
-              className="absolute right-0 top-1/2 -translate-y-[60%] z-20 w-9 h-9 bg-[#1a1c28]/90 border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/swiper:opacity-100 transition-all hover:bg-white hover:text-black disabled:opacity-0 hidden md:flex shadow-lg"
+              className="absolute right-0 top-1/2 -translate-y-[60%] z-20 w-9 h-9 bg-[#1a1c28]/90 border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/swiper:opacity-100 transition-all hover:bg-white hover:text-black disabled:opacity-0 hidden md:flex "
             >
               <ChevronRight size={20} />
             </button>
@@ -144,7 +144,7 @@ export const MovieCarousel = ({
                       <MovieCard {...movie} hideInfo variant="vertical" />
                     </div>
                       <div className="mt-1 flex items-start gap-2">
-                        <span className="shrink-0 text-3xl md:text-4xl font-black italic leading-none text-[#f5c451] drop-shadow-[0_2px_8px_rgba(245,196,81,0.2)]">
+                        <span className="shrink-0 text-3xl md:text-4xl font-black italic leading-none text-[#f5c451] ">
                           {index + 1}
                         </span>
                         <div className="min-w-0 pt-0.5">
@@ -169,7 +169,7 @@ export const MovieCarousel = ({
                     className="group flex h-full w-full flex-col items-center justify-center gap-3 bg-transparent text-center"
                     aria-label={`Xem thêm phim trong mục ${title}`}
                   >
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/[0.07] text-white shadow-none transition-transform duration-300 group-hover:scale-110 group-hover:bg-white/[0.12]">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/[0.07] text-white  transition-transform duration-300 group-hover:scale-110 group-hover:bg-white/[0.12]">
                       <ChevronRight size={28} strokeWidth={2.1} />
                     </span>
                     <span className="text-sm font-semibold text-white/85">Xem thêm</span>

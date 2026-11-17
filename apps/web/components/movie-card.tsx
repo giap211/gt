@@ -135,11 +135,11 @@ export const MovieCard = ({
 
         <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-wrap gap-0.5 p-1.5 pointer-events-none">
           {langChip && (
-            <span className="rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-[#1a1c28] shadow-sm">
+            <span className="rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-[#1a1c28] ">
               {langChip}
             </span>
           )}
-          <span className="rounded bg-[#f0c24d] px-1.5 py-0.5 text-[10px] font-bold text-[#1a1c28] shadow-sm">
+          <span className="rounded bg-[#f0c24d] px-1.5 py-0.5 text-[10px] font-bold text-[#1a1c28] ">
             {qChip}
           </span>
         </div>

@@ -113,7 +113,7 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
                       </defs>
                     </svg>
                     <div
-                      className="relative aspect-[2/3] w-full overflow-hidden shadow-xl transition-transform duration-300 group-hover/slide:-translate-y-1"
+                      className="relative aspect-[2/3] w-full overflow-hidden  transition-transform duration-300 group-hover/slide:-translate-y-1"
                       style={{ clipPath: `url(#trending-poster-clip-${clipIdPrefix}-${index})` }}
                     >
                       <MovieCard {...movie} hideInfo variant="vertical" />
@@ -124,7 +124,7 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
                         <Link href={`/phim/${movie.slug}`}>{movie.title}</Link>
                       </h3>
                       {movie.rating && Number(movie.rating) > 0 && (
-                        <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold tabular-nums text-violet-400">
+                        <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold tabular-nums text-white/70">
                           <Star size={10} fill="currentColor" />
                           <span>{Number(movie.rating).toFixed(1)}</span>
                         </div>

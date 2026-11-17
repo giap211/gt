@@ -153,7 +153,7 @@ function MemberLibraryModal({
 
   return (
     <div className="member-modal-backdrop fixed inset-0 z-[190] flex items-center justify-center bg-black/75 px-4 backdrop-blur-md">
-      <div className="member-modal-panel relative w-full max-w-[560px] overflow-hidden rounded-2xl border border-white/10 bg-[#11131d] shadow-[0_30px_90px_rgba(0,0,0,0.65)]">
+      <div className="member-modal-panel relative w-full max-w-[560px] overflow-hidden rounded-2xl border border-white/10 bg-[#11131d] ">
         <div className="relative p-6">
           <button
             onClick={onClose}
@@ -273,7 +273,7 @@ function MemberAuthModal({
 
   return (
     <div className="member-modal-backdrop fixed inset-0 z-[200] flex items-center justify-center bg-black/75 px-4 backdrop-blur-md">
-      <div className="member-modal-panel relative w-full max-w-[430px] overflow-hidden rounded-2xl border border-white/10 bg-[#11131d] shadow-[0_30px_90px_rgba(0,0,0,0.65)]">
+      <div className="member-modal-panel relative w-full max-w-[430px] overflow-hidden rounded-2xl border border-white/10 bg-[#11131d] ">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,216,117,0.14),transparent_38%)]" />
         <div className="relative p-6 md:p-7">
           <button

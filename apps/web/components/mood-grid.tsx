@@ -25,7 +25,7 @@ export const MoodGrid = () => {
             <Link
               key={mood.name}
               href={`/the-loai/${mood.name.toLowerCase()}`}
-              className={`${mood.color} rounded-xl p-5 group transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg relative overflow-hidden`}
+              className={`${mood.color} rounded-xl p-5 group transition-all duration-300 hover:scale-105 active:scale-95  relative overflow-hidden`}
             >
               <div className="relative z-10">
                 <h4 className="text-white font-black text-lg uppercase tracking-tighter">

@@ -28,8 +28,8 @@ export const TopicGrid = () => {
               className={
                 "topic-grid-chip shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-all " +
                 (index === 0
-                  ? "bg-violet-600 text-white"
-                  : "bg-white/90 text-[#4b4560] border border-violet-100")
+                  ? "bg-white/10 text-white"
+                  : "bg-white/90 text-[#4b4560] border border-white/15")
               }
             >
               {topic.name}
@@ -45,7 +45,7 @@ export const TopicGrid = () => {
           background: rgba(255, 255, 255, 0.08) !important;
           color: rgba(255, 255, 255, 0.75) !important;
           border-color: rgba(255, 255, 255, 0.1) !important;
-          box-shadow: none !important;
+          
           border-radius: 9999px !important;
         }
         html[data-mobile-theme="light"] .topic-grid-title {

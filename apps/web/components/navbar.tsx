@@ -63,14 +63,14 @@ const AnimatedBrand = () => (
   >
     <defs>
       <linearGradient id="xp-brand-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#c4b5fd">
-          <animate attributeName="stop-color" values="#c4b5fd;#e879f9;#818cf8;#c4b5fd" dur="5s" repeatCount="indefinite" />
+        <stop offset="0%" stopColor="#d1d5db">
+          <animate attributeName="stop-color" values="#d1d5db;#d1d5db;#818cf8;#d1d5db" dur="5s" repeatCount="indefinite" />
         </stop>
-        <stop offset="48%" stopColor="#a78bfa">
-          <animate attributeName="stop-color" values="#a78bfa;#818cf8;#e879f9;#a78bfa" dur="5s" repeatCount="indefinite" />
+        <stop offset="48%" stopColor="#d1d5db">
+          <animate attributeName="stop-color" values="#d1d5db;#818cf8;#d1d5db;#d1d5db" dur="5s" repeatCount="indefinite" />
         </stop>
-        <stop offset="100%" stopColor="#e879f9">
-          <animate attributeName="stop-color" values="#e879f9;#c4b5fd;#a78bfa;#e879f9" dur="5s" repeatCount="indefinite" />
+        <stop offset="100%" stopColor="#d1d5db">
+          <animate attributeName="stop-color" values="#d1d5db;#d1d5db;#d1d5db;#d1d5db" dur="5s" repeatCount="indefinite" />
         </stop>
       </linearGradient>
       <linearGradient id="xp-brand-sweep" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -86,7 +86,7 @@ const AnimatedBrand = () => (
       <rect x="1" y="1" width="33" height="33" rx="10" fill="none" stroke="url(#xp-brand-gradient)" strokeWidth="1.7" />
       <path d="M14 10.5 24 17.5 14 24.5Z" fill="url(#xp-brand-gradient)" />
       <path d="M5 8.5V5.5Q5 4 6.5 4H9" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth="1.2" strokeLinecap="round" />
-      <circle cx="29" cy="6" r="1.6" fill="#e879f9">
+      <circle cx="29" cy="6" r="1.6" fill="#d1d5db">
         <animate attributeName="opacity" values=".35;1;.35" dur="2s" repeatCount="indefinite" />
       </circle>
     </g>
@@ -204,7 +204,7 @@ export const Navbar = () => {
       <header
         className={`hidden lg:block fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
           isScrolled
-            ? "bg-[#0b0d14]/90 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_10px_30px_rgba(0,0,0,0.8)] py-2.5 sm:py-3"
+            ? "bg-[#0b0d14]/90 backdrop-blur-xl border-b border-white/[0.08]  py-2.5 sm:py-3"
             : "bg-gradient-to-b from-black/80 via-black/30 to-transparent py-3 sm:py-4"
         }`}
       >
@@ -261,7 +261,7 @@ export const Navbar = () => {
                   <span>Thể Loại</span>
                   <ChevronDown size={13} className="text-white/40 group-hover:rotate-180 group-hover:text-white transition-transform" />
                 </button>
-                <div className="absolute top-full left-0 mt-2 w-80 bg-[#10121a]/95 border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-[#10121a]/95 border border-white/10 rounded-2xl  backdrop-blur-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="px-2 py-1.5 mb-1.5 border-b border-white/[0.06] flex items-center justify-between">
                     <span className="text-[11px] font-semibold text-[#ffd875] flex items-center gap-1.5">
                       <Sparkles size={12} />
@@ -291,7 +291,7 @@ export const Navbar = () => {
                   <span>Quốc Gia</span>
                   <ChevronDown size={13} className="text-white/40 group-hover:rotate-180 group-hover:text-white transition-transform" />
                 </button>
-                <div className="absolute top-full left-0 mt-2 w-56 bg-[#10121a]/95 border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl p-2.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-[#10121a]/95 border border-white/10 rounded-2xl  backdrop-blur-2xl p-2.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="px-2 py-1.5 mb-1 border-b border-white/[0.06]">
                     <span className="text-[11px] font-semibold text-[#ffd875] flex items-center gap-1.5">
                       <Globe size={12} />
@@ -330,7 +330,7 @@ export const Navbar = () => {
                       setShowLiveSearch(true);
                     }}
                     onFocus={() => setShowLiveSearch(true)}
-                    className="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.1] border border-white/[0.08] focus:border-[#ffd875]/60 text-white text-base rounded-full py-2 pl-4 pr-11 outline-none shadow-sm transition-all placeholder:text-white/35"
+                    className="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.1] border border-white/[0.08] focus:border-[#ffd875]/60 text-white text-base rounded-full py-2 pl-4 pr-11 outline-none  transition-all placeholder:text-white/35"
                     placeholder="Tìm phim..."
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
@@ -356,7 +356,7 @@ export const Navbar = () => {
               </form>
 
               {showLiveSearch && searchQuery.trim().length >= 2 && (
-                <div className="absolute top-full right-0 mt-2.5 w-[min(92vw,360px)] max-h-[min(58vh,420px)] bg-[#090b12] border border-white/15 rounded-2xl shadow-[0_24px_70px_rgba(0,0,0,0.98)] overflow-hidden z-[60]">
+                <div className="absolute top-full right-0 mt-2.5 w-[min(92vw,360px)] max-h-[min(58vh,420px)] bg-[#090b12] border border-white/15 rounded-2xl  overflow-hidden z-[60]">
                   <div className="px-3 py-2 border-b border-white/10 bg-[#111521] flex items-center justify-between">
                     <span className="text-[11px] font-semibold text-[#ffd875] flex items-center gap-1.5">
                       <Film size={12} />
@@ -407,7 +407,7 @@ export const Navbar = () => {
                   <ChevronDown size={14} className="text-white/40" />
                 </button>
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-[#10121a]/95 border border-white/10 rounded-2xl shadow-xl backdrop-blur-xl p-2 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-[#10121a]/95 border border-white/10 rounded-2xl  backdrop-blur-xl p-2 z-50">
                     <button
                       onClick={() => { openLibrary("favorites"); setIsUserMenuOpen(false); }}
                       className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-white/80 hover:bg-white/10"

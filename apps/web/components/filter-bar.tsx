@@ -25,7 +25,7 @@ export const FilterBar = () => {
   return (
     <div
       ref={containerRef}
-      className="relative z-30 bg-[#11131d]/90 backdrop-blur-xl rounded-2xl p-3 sm:p-4 mb-8 flex flex-wrap gap-2.5 sm:gap-4 items-center border border-white/10 shadow-xl"
+      className="relative z-30 bg-[#11131d]/90 backdrop-blur-xl rounded-2xl p-3 sm:p-4 mb-8 flex flex-wrap gap-2.5 sm:gap-4 items-center border border-white/10 "
     >
       <div className="flex items-center gap-2 text-[#ffd875] font-black uppercase text-xs sm:text-sm tracking-wider mr-2">
         <Filter className="w-4 h-4 text-[#ffd875]" />
@@ -54,7 +54,7 @@ export const FilterBar = () => {
           />
         </button>
         {openDropdown === "type" && (
-          <div className="absolute top-full left-0 mt-2 w-48 max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-none z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute top-full left-0 mt-2 w-48 max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl  backdrop-blur-none z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
             <Link
               href="/danh-sach/phim-le"
               onClick={() => setOpenDropdown(null)}
@@ -109,7 +109,7 @@ export const FilterBar = () => {
           />
         </button>
         {openDropdown === "genre" && (
-          <div className="absolute top-full left-0 mt-2 w-[min(18rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-none z-50 p-3 grid grid-cols-2 gap-1.5 text-xs font-bold animate-in fade-in zoom-in-95 duration-150 max-h-[min(70vh,20rem)] overflow-y-auto custom-scrollbar min-w-0">
+          <div className="absolute top-full left-0 mt-2 w-[min(18rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl  backdrop-blur-none z-50 p-3 grid grid-cols-2 gap-1.5 text-xs font-bold animate-in fade-in zoom-in-95 duration-150 max-h-[min(70vh,20rem)] overflow-y-auto custom-scrollbar min-w-0">
             <Link
               href="/the-loai/hanh-dong"
               onClick={() => setOpenDropdown(null)}
@@ -206,7 +206,7 @@ export const FilterBar = () => {
           />
         </button>
         {openDropdown === "country" && (
-          <div className="absolute top-full left-0 mt-2 w-48 max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-none z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute top-full left-0 mt-2 w-48 max-w-[calc(100vw-2rem)] bg-[#0b0d14] border border-white/10 rounded-2xl  backdrop-blur-none z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
             <Link
               href="/quoc-gia/han-quoc"
               onClick={() => setOpenDropdown(null)}
