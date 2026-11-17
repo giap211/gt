@@ -13,6 +13,9 @@ import {
 } from "@/lib/ophim-client";
 
 export function MovieListingScreen({ type }: { type: string }) {
+  const pathname = usePathname();
+  const filterEnabled = pathname === `/danh-sach/${type}`;
+
   const [movies, setMovies] = useState<ListMovie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
