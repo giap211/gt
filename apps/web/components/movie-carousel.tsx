@@ -79,7 +79,14 @@ export const MovieCarousel = ({
               {title}
             </h2>
             {effectiveViewMoreLink && (
-              <span className="shrink-0 text-[10px] font-semibold text-white/45">8 phim</span>
+              <Link
+                href={effectiveViewMoreLink}
+                className="group inline-flex shrink-0 items-center gap-1.5 rounded-full py-1 pl-2 text-[11px] font-semibold text-white/65 transition-colors hover:text-white"
+                aria-label={`Xem thêm phim trong mục ${title}`}
+              >
+                Xem thêm
+                <ChevronRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
             )}
           </div>
 
@@ -162,20 +169,6 @@ export const MovieCarousel = ({
                   )}
                 </SwiperSlide>
               ))}
-              {effectiveViewMoreLink && (
-                <SwiperSlide key="view-more" className="h-auto">
-                  <Link
-                    href={effectiveViewMoreLink}
-                    className="group flex h-full w-full flex-col items-center justify-center gap-3 bg-transparent text-center"
-                    aria-label={`Xem thêm phim trong mục ${title}`}
-                  >
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/[0.07] text-white  transition-transform duration-300 group-hover:scale-110 group-hover:bg-white/[0.12]">
-                      <ChevronRight size={28} strokeWidth={2.1} />
-                    </span>
-                    <span className="text-sm font-semibold text-white/85">Xem thêm</span>
-                  </Link>
-                </SwiperSlide>
-              )}
             </Swiper>
           </div>
         </div>
