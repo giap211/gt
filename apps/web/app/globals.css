@@ -1082,3 +1082,39 @@ html[data-theme="light"] [class*="text-fuchsia-"] {
 @media (prefers-reduced-motion: reduce) {
   .movie-poster-frame-vertical img { transition: none !important; }
 }
+
+
+/* Poster frames: remove every outline/rim on both landscape and portrait cards. */
+.movie-poster-frame-horizontal,
+.movie-poster-frame-vertical,
+.movie-poster-frame-horizontal img,
+.movie-poster-frame-vertical img,
+.movie-poster-frame-horizontal::before,
+.movie-poster-frame-horizontal::after,
+.movie-poster-frame-vertical::before,
+.movie-poster-frame-vertical::after {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+.movie-poster-frame-horizontal:hover,
+.movie-poster-frame-vertical:hover,
+.movie-poster-frame-horizontal:hover img,
+.movie-poster-frame-vertical:hover img {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+/* Poster metadata tags need a solid, high-contrast backing over busy artwork. */
+.card-badge,
+.badge-item,
+.badge-primary {
+  color: #fff !important;
+  background: rgba(24, 26, 31, .92) !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.65) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.42) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.badge-primary { background: rgba(38, 42, 48, .96) !important; }
