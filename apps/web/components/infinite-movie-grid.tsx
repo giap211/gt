@@ -23,61 +23,48 @@ export const InfiniteMovieGrid = ({
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const loadingRef = useRef(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const loadMore = useCallback(
-    async (page: number) => {
-      setLoadingMore(true);
-      try {
-        const res = await fetchMore(page);
-        if (res && res.status) {
-          setMovies((prev) => {
-            const combined = [...prev, ...res.items];
-            // Defensive deduplication to prevent duplicate keys during infinite scroll
-            return Array.from(
-              new Map(combined.map((m) => [m._id, m])).values(),
-            );
-          });
-          setTotalPages(res.pagination.totalPages);
-        }
-      } catch (error) {
-        console.error("Failed to fetch more movies", error);
-      } finally {
-        setLoadingMore(false);
+  const loadMore = useCallback(async () => {
+    if (loadingRef.current || currentPage >= totalPages) return;
+    loadingRef.current = true;
+    setLoadingMore(true);
+    const nextPage = currentPage + 1;
+    try {
+      const res = await fetchMore(nextPage);
+      if (res?.status) {
+        setMovies((prev) => Array.from(
+          new Map([...prev, ...res.items].map((movie) => [movie._id || movie.slug, movie])).values(),
+        ));
+        setCurrentPage(nextPage);
+        setTotalPages(res.pagination?.totalPages || totalPages);
       }
-    },
-    [fetchMore],
-  );
+    } catch (error) {
+      console.error("Failed to fetch next movie page", error);
+    } finally {
+      loadingRef.current = false;
+      setLoadingMore(false);
+    }
+  }, [currentPage, totalPages, fetchMore]);
 
-  const lastMovieElementRef = useCallback(
-    (node: HTMLDivElement) => {
-      if (loadingMore) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        const first = entries[0];
-        if (
-          first &&
-          first.isIntersecting &&
-          currentPage < totalPages &&
-          !loadingMore
-        ) {
-          const nextPage = currentPage + 1;
-          setCurrentPage(nextPage);
-          loadMore(nextPage);
-        }
-      }, { rootMargin: "700px 0px" });
-
-      if (node) observer.current.observe(node);
-    },
-    [loadingMore, currentPage, totalPages, loadMore],
-  );
+  const lastMovieElementRef = useCallback((node: HTMLDivElement | null) => {
+    observer.current?.disconnect();
+    if (!node || loadingMore || currentPage >= totalPages) return;
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) void loadMore();
+    }, { rootMargin: "900px 0px", threshold: 0.01 });
+    observer.current.observe(node);
+  }, [loadingMore, currentPage, totalPages, loadMore]);
 
   useEffect(() => {
     setMovies(initialItems);
-    setTotalPages(initialTotalPages);
     setCurrentPage(initialPage);
-  }, [initialItems, initialTotalPages, initialPage]);
+    setTotalPages(initialTotalPages);
+    loadingRef.current = false;
+  }, [initialItems, initialPage, initialTotalPages]);
+
+  useEffect(() => () => observer.current?.disconnect(), []);
 
   const transformMovie = (m: ListMovie) => ({
     id: m._id,
@@ -99,31 +86,19 @@ export const InfiniteMovieGrid = ({
     <div className="w-full">
       <div className="listing-movie-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-10">
         {movies.map((movie, index) => (
-          <div
-            key={`${movie._id}-${index}`}
-            ref={index === movies.length - 1 ? lastMovieElementRef : null}
-            className="animate-card-fade"
-          >
+          <div key={movie._id || movie.slug} ref={index === movies.length - 1 ? lastMovieElementRef : null} className="animate-card-fade">
             <MovieCard {...transformMovie(movie)} />
           </div>
         ))}
       </div>
-
       {loadingMore && (
-        <div className="mt-20 flex flex-col items-center justify-center gap-4 py-8">
-          <div className="w-8 h-8 border-[3px] border-[#ffd875]/40 border-t-[#ffd875] rounded-full animate-spin"></div>
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffd875]/40 animate-pulse">
-            Luân hồi vũ trụ phim...
-          </span>
+        <div className="mt-12 flex items-center justify-center gap-3 py-8" role="status">
+          <div className="h-6 w-6 animate-spin rounded-full border-[3px] border-violet-400/30 border-t-violet-400" />
+          <span className="text-xs font-semibold text-white/55">Đang tải thêm phim…</span>
         </div>
       )}
-
       {!loadingMore && currentPage >= totalPages && movies.length > 0 && (
-        <div className="mt-24 text-center">
-          <span className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
-            Hư vô - Bạn đã xem hết tất cả
-          </span>
-        </div>
+        <p className="mt-16 text-center text-xs font-medium text-white/35">Bạn đã xem hết danh sách phim.</p>
       )}
     </div>
   );

@@ -941,3 +941,92 @@ export const getMoviesFromNguonC = async (
 export const getImageUrl = (pathImage: string, fileName: string): string => {
   return formatImageUrl(fileName, pathImage);
 };
+
+export interface MovieFilterOption {
+  id?: string;
+  name: string;
+  slug: string;
+}
+
+export interface MovieFilterOptions {
+  categories: MovieFilterOption[];
+  countries: MovieFilterOption[];
+  years: string[];
+}
+
+export interface MovieFilters {
+  type?: string;
+  category?: string;
+  country?: string;
+  year?: string;
+  sortField?: string;
+  sortType?: string;
+}
+
+function extractFilterItems(payload: unknown): MovieFilterOption[] {
+  if (!payload || typeof payload !== "object") return [];
+  const root = payload as {
+    data?: { items?: unknown[] };
+    items?: unknown[];
+  };
+  const rawItems = root.data?.items || root.items || [];
+  if (!Array.isArray(rawItems)) return [];
+  return rawItems.flatMap((raw) => {
+    if (!raw || typeof raw !== "object") return [];
+    const item = raw as Record<string, unknown>;
+    const name = String(item.name || item.title || item.year || "").trim();
+    const slug = String(item.slug || item.year || "").trim();
+    if (!name || !slug) return [];
+    return [{ id: item._id ? String(item._id) : undefined, name, slug }];
+  });
+}
+
+/** Lấy nguyên danh mục thể loại/quốc gia/năm từ PhimAPI, không tự thêm lựa chọn. */
+export const getMovieFilterOptions = async (): Promise<MovieFilterOptions> => {
+  const [categoryData, countryData, yearData] = await Promise.all([
+    fetchWithFallback<unknown>("/the-loai"),
+    fetchWithFallback<unknown>("/quoc-gia"),
+    fetchWithFallback<unknown>("/nam"),
+  ]);
+  const categories = extractFilterItems(categoryData).sort((a, b) => a.name.localeCompare(b.name, "vi"));
+  const countries = extractFilterItems(countryData).sort((a, b) => a.name.localeCompare(b.name, "vi"));
+  const years = extractFilterItems(yearData)
+    .map((item) => item.slug)
+    .filter((year) => /^\\d{4}$/.test(year))
+    .sort((a, b) => Number(b) - Number(a));
+  return { categories, countries, years };
+};
+
+/** Gọi endpoint danh sách PhimAPI với nhiều tiêu chí trong cùng một request. */
+export const getFilteredMovies = async (
+  filters: MovieFilters,
+  page: number = 1,
+): Promise<LatestMoviesResponse> => {
+  try {
+    const type = normalizeSlug(filters.type || "");
+    const endpoint = type
+      ? `/v1/api/danh-sach/${encodeURIComponent(type)}`
+      : "/v1/api/danh-sach";
+    const query = new URLSearchParams({ page: String(page) });
+    if (filters.category) query.set("category", normalizeSlug(filters.category));
+    if (filters.country) query.set("country", normalizeSlug(filters.country));
+    if (filters.year) query.set("year", filters.year);
+    if (filters.sortField) query.set("sort_field", filters.sortField);
+    if (filters.sortType) query.set("sort_type", filters.sortType);
+    const data = await fetchWithFallback<V1ListApiResponse>(`${endpoint}?${query.toString()}`);
+    if (!data?.data) return failedListResponse();
+    const cdn =
+      data.data.APP_DOMAIN_CDN_IMAGE ||
+      data.data.params?.cdnData ||
+      DEFAULT_CDN_IMAGE;
+    return {
+      status: true,
+      items: cleanAndFilterMovies(data.data.items || [], cdn),
+      pathImage: cdn,
+      pagination: data.data.params?.pagination || emptyPagination(),
+    };
+  } catch (error) {
+    console.error("Error fetching filtered movies:", error);
+    return failedListResponse();
+  }
+};
