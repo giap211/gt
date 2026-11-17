@@ -288,7 +288,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
               return (
                 <SwiperSlide key={movie._id} className="relative !h-auto">
                   <div className="relative min-h-[420px] sm:min-h-[480px] lg:min-h-[620px]">
-                    <div className="absolute inset-0 z-0 bg-[#1a1030]">
+                    <div className="absolute inset-0 z-0 bg-[#191b24]">
                       <ResilientMovieImage
                         sources={heroImageSources}
                         fallbackSrc="/images/fallback-horizontal.svg"
