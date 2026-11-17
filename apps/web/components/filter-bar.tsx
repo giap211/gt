@@ -36,7 +36,7 @@ function filtersToUrl(filters: MovieFilters) {
   return query ? `/bo-loc?${query}` : "/bo-loc";
 }
 
-export const FilterBar = () => {
+export const FilterBar = ({ enabled = true }: { enabled?: boolean }) => {
   const router = useRouter();
   const initialized = useRef(false);
   const [ready, setReady] = useState(false);
@@ -45,6 +45,7 @@ export const FilterBar = () => {
   const [filters, setFilters] = useState<MovieFilters>(DEFAULT_FILTERS);
 
   useEffect(() => {
+    if (!enabled) return;
     let active = true;
     getMovieFilterOptions()
       .then((result) => { if (active) setOptions(result); })
@@ -54,12 +55,12 @@ export const FilterBar = () => {
     initialized.current = true;
     setReady(true);
     return () => { active = false; };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
-    if (!initialized.current || !ready) return;
+    if (!enabled || !initialized.current || !ready) return;
     router.replace(filtersToUrl(filters), { scroll: false });
-  }, [filters, ready, router]);
+  }, [enabled, filters, ready, router]);
 
   const update = (key: keyof MovieFilters, value: string) => {
     setFilters((current) => ({ ...current, [key]: value }));

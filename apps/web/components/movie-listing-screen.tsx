@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Clapperboard, Tv, Sparkles, Play, ArrowUpRight, Film } from "lucide-react";
 import { InfiniteMovieGrid } from "@/components/infinite-movie-grid";
 import { FilterBar } from "@/components/filter-bar";
@@ -260,7 +261,7 @@ export function MovieListingScreen({ type }: { type: string }) {
           </div>
         )}
 
-        <div className="listing-filter-shell"><FilterBar /></div>
+        <div className="listing-filter-shell"><FilterBar enabled={filterEnabled} /></div>
 
         <div className="mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
