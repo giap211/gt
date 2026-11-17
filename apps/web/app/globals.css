@@ -695,8 +695,6 @@ html[data-mobile-theme="light"] .collection-page [class*="bg-[#0f111a]"],
 html[data-mobile-theme="light"] .search-page [class*="bg-[#0b0d14]"] { background: #f5f4f8 !important; }
 html[data-mobile-theme="light"] .collection-page [class*="border-white/"],
 html[data-mobile-theme="light"] .search-page [class*="border-white/"] { border-color: rgba(65,55,90,.13) !important; }
-html[data-mobile-theme="light"] .collection-page [class*="bg-white/"],
-html[data-mobile-theme="light"] .search-page [class*="bg-white/"] { background-color: rgba(75,62,105,.045) !important; }
 
 /* Filters and dropdowns must not retain dark surfaces. */
 html[data-mobile-theme="light"] .filter-bar {
@@ -779,3 +777,14 @@ html[data-mobile-theme="light"] .movie-detail-page .movie-detail-content [class*
 
 /* The player remains intentionally black in both themes. */
 html[data-mobile-theme="light"] .watch-player-page { background: #000 !important; color: #fff !important; }
+
+/* Final light-mode pass: text-led shelves and notification UI must remain legible. */
+html[data-mobile-theme="light"] .apple-tv-home .trending-carousel h3 { color: #292638 !important; }
+html[data-mobile-theme="light"] .apple-tv-home .trending-carousel p,
+html[data-mobile-theme="light"] .apple-tv-home .trending-carousel [class*="text-white/"] { color: #777386 !important; }
+html[data-mobile-theme="light"] .home-notification-overlay {
+  background: rgba(248,247,251,.98) !important; color: #292638 !important;
+  backdrop-filter: blur(22px) saturate(130%);
+}
+html[data-mobile-theme="light"] .home-notification-overlay [class*="text-white"] { color: #514b63 !important; }
+html[data-mobile-theme="light"] .home-notification-overlay [class*="border-white/"] { border-color: rgba(65,55,90,.13) !important; }

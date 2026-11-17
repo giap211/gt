@@ -387,7 +387,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           <div
             role="dialog"
             aria-labelledby="notification-title"
-            className="fixed inset-0 z-[200] flex flex-col bg-[#0c0c12]/96 backdrop-blur-md"
+            className="home-notification-overlay fixed inset-0 z-[200] flex flex-col bg-[#0c0c12]/96 backdrop-blur-md"
           >
             <header className="flex items-center justify-between border-b border-white/10 px-4 pb-3 pt-[max(16px,env(safe-area-inset-top))]">
               <h2 id="notification-title" className="text-base font-bold text-white">

@@ -37,7 +37,7 @@ export const TrendingCarousel = ({ title, items }: TrendingCarouselProps) => {
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="py-4 md:py-6 w-full relative overflow-hidden">
+    <section className="trending-carousel py-4 md:py-6 w-full relative overflow-hidden">
       <div className="container mx-auto px-3 md:px-6">
         <div className="flex min-w-0 items-center justify-between gap-3 mb-3 md:mb-5">
           <h2 className="min-w-0 text-lg md:text-xl font-bold text-white leading-tight">
