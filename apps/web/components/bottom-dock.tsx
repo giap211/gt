@@ -54,11 +54,6 @@ export function BottomDock() {
 
   // Keep the last main dock section selected while visiting a movie detail page.
   useEffect(() => {
-    const saved = window.sessionStorage.getItem("gt:last-dock-section");
-    if (saved === "home" || saved === "list" || saved === "search") {
-      setActiveSection(saved);
-    }
-
     const routeSection = pathname === "/"
       ? "home"
       : pathname.startsWith("/bo-loc") || pathname.startsWith("/danh-sach") || pathname.startsWith("/the-loai") || pathname.startsWith("/quoc-gia")
@@ -67,9 +62,22 @@ export function BottomDock() {
           ? "search"
           : null;
 
+    // A real route always wins over the remembered dock tab. In particular,
+    // opening the site root must never briefly restore a stale "list" tab.
     if (routeSection) {
       setActiveSection(routeSection);
       window.sessionStorage.setItem("gt:last-dock-section", routeSection);
+      return;
+    }
+
+    // Only preserve the previous section while viewing a movie detail page.
+    if (pathname.startsWith("/phim/")) {
+      const saved = window.sessionStorage.getItem("gt:last-dock-section");
+      if (saved === "home" || saved === "list" || saved === "search") {
+        setActiveSection(saved);
+      } else {
+        setActiveSection("home");
+      }
     }
   }, [pathname]);
 
