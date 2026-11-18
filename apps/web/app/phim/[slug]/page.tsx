@@ -410,8 +410,8 @@ export default function MovieDetailPage({
           <p className="text-[12px] text-white/40 mb-2.5">Diễn viên</p>
           <div className="grid grid-cols-2 gap-x-2 gap-y-3">
             {movie.actor.slice(0, 6).map((name) => (
-              <div key={name} className="flex flex-col items-center gap-1">
-                <div className="w-14 h-14 rounded-full overflow-hidden bg-[#1c1e2a] border border-white/10">
+              <Link key={name} href={`/dien-vien/${encodeURIComponent(name)}`} className="group flex flex-col items-center gap-1 rounded-xl p-1 transition-colors hover:bg-white/[0.04]" aria-label={`Xem phim có diễn viên ${name}`}>
+                <div className="w-14 h-14 rounded-full overflow-hidden bg-[#1c1e2a] border border-white/10 group-hover:border-violet-400/60">
                   {actorImages[name] ? (
                     <img
                       src={actorImages[name]}
@@ -429,7 +429,7 @@ export default function MovieDetailPage({
                 <span className="text-[11px] text-white/55 text-center line-clamp-2 leading-tight">
                   {name}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -1043,8 +1043,8 @@ function TabContent({
     return (
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
         {(movie.actor || []).map((name) => (
-          <div key={name} className="text-center">
-            <div className="mx-auto w-16 h-16 rounded-full overflow-hidden bg-white/5 border border-white/10">
+          <Link key={name} href={`/dien-vien/${encodeURIComponent(name)}`} className="group block rounded-xl p-2 text-center transition-colors hover:bg-white/[0.04]" aria-label={`Xem phim có diễn viên ${name}`}>
+            <div className="mx-auto w-16 h-16 rounded-full overflow-hidden bg-white/5 border border-white/10 group-hover:border-violet-400/60">
               {actorImages[name] ? (
                 <img
                   src={actorImages[name]}
@@ -1059,8 +1059,8 @@ function TabContent({
                 </div>
               )}
             </div>
-            <p className="mt-1.5 text-xs text-white/70 line-clamp-2">{name}</p>
-          </div>
+            <p className="mt-1.5 text-xs text-white/70 line-clamp-2 group-hover:text-violet-300">{name}</p>
+          </Link>
         ))}
       </div>
     );
