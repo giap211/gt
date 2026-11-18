@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { InfiniteMovieGrid } from "@/components/infinite-movie-grid";
-import { FilterBar } from "@/components/filter-bar";
 import { searchMovies, type ListMovie } from "@/lib/ophim-client";
 
 function SearchContent() {
@@ -41,8 +40,6 @@ function SearchContent() {
           Tìm thấy {results.length} kết quả
         </p>
       </div>
-
-      <FilterBar />
 
       {results.length > 0 ? (
         <InfiniteMovieGrid
