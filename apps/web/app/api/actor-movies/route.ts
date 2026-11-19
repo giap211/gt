@@ -63,6 +63,7 @@ export async function GET(request: Request) {
       .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
       .slice(0, 40)
       .map(item => ({
+        tmdbId: item.id || 0,
         title: item.title || item.name || "",
         originalTitle: item.original_title || item.original_name || "",
         year: (item.release_date || item.first_air_date || "").slice(0, 4),

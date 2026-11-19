@@ -36,19 +36,43 @@ export default function ActorPage({ params }: { params: Promise<{ name: string }
           setNotFound(true);
           return;
         }
-        const titles = Array.from(new Set(data.credits.flatMap(item =>
-          [item.title, item.originalTitle].map(value => value.trim()).filter(Boolean)
-        ))).slice(0, 24);
-        const results = await Promise.all(titles.map(title => searchMovies(title, 1, 8)));
-        if (cancelled) return;
+        // Chỉ ghép phim khi TMDB ID và loại nội dung khớp chính xác.
+        // Không dùng kết quả tìm theo tên đơn thuần vì dễ kéo nhầm phim trùng/na ná tiêu đề.
+        const credits = data.credits.filter(item => item.tmdbId > 0);
+        const matched: ListMovie[] = [];
         const seen = new Set<string>();
-        const matched = results.flatMap(result => result.status ? result.items : [])
-          .filter(item => {
-            if (!item.slug || seen.has(item.slug)) return false;
-            seen.add(item.slug);
-            return true;
-          }).slice(0, 48);
-        setMovies(matched);
+        for (let index = 0; index < credits.length; index += 6) {
+          const batch = credits.slice(index, index + 6);
+          const batchResults = await Promise.all(batch.map(async credit => {
+            const primaryTitle = credit.originalTitle || credit.title;
+            const primary = primaryTitle
+              ? await searchMovies(primaryTitle, 1, 20)
+              : null;
+            const exactPrimary = primary?.status ? primary.items.filter(movie =>
+              String(movie.tmdb?.id || "") === String(credit.tmdbId) &&
+              movie.tmdb?.type === credit.mediaType
+            ) : [];
+            if (exactPrimary.length) return exactPrimary;
+
+            const fallbackTitle = credit.title && credit.title !== primaryTitle
+              ? credit.title
+              : "";
+            if (!fallbackTitle) return [];
+            const fallback = await searchMovies(fallbackTitle, 1, 20);
+            return fallback.status ? fallback.items.filter(movie =>
+              String(movie.tmdb?.id || "") === String(credit.tmdbId) &&
+              movie.tmdb?.type === credit.mediaType
+            ) : [];
+          }));
+          for (const movie of batchResults.flat()) {
+            const key = movie.slug || movie._id;
+            if (!key || seen.has(key)) continue;
+            seen.add(key);
+            matched.push(movie);
+          }
+        }
+        if (cancelled) return;
+        setMovies(matched.slice(0, 48));
       } catch (error) {
         console.error("Actor movies failed:", error);
         if (!cancelled) setNotFound(true);
