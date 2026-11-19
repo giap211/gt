@@ -587,12 +587,17 @@ export default function MovieDetailPage({
               </div>
               <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 no-scrollbar snap-x">
                 {movie.actor.slice(0, 12).map((name) => (
-                  <div key={name} className="w-[104px] shrink-0 snap-start">
-                    <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 bg-white/10">
+                  <Link
+                    key={name}
+                    href={`/dien-vien/${encodeURIComponent(name)}`}
+                    aria-label={`Xem phim có diễn viên ${name}`}
+                    className="group w-[104px] shrink-0 snap-start rounded-xl text-left transition-transform active:scale-[0.98]"
+                  >
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 bg-white/10 transition-colors group-hover:border-violet-400/60">
                       {actorImages[name] ? <img src={actorImages[name]} alt={name} className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" /> : <div className="flex h-full items-center justify-center text-2xl font-semibold text-white/30">{name.trim().charAt(0).toUpperCase()}</div>}
                     </div>
-                    <p className="mt-2 line-clamp-2 text-[12px] font-medium leading-snug text-white/85">{name}</p>
-                  </div>
+                    <p className="mt-2 line-clamp-2 text-[12px] font-medium leading-snug text-white/85 transition-colors group-hover:text-violet-300">{name}</p>
+                  </Link>
                 ))}
               </div>
             </section>
