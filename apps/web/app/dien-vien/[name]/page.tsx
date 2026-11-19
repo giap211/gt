@@ -8,7 +8,7 @@ import { searchMovies, type ListMovie } from "@/lib/ophim-client";
 
 type ActorData = {
   person: { id: number; name: string; profileUrl: string | null } | null;
-  credits: Array<{ title: string; originalTitle: string; year: string; mediaType: string }>;
+  credits: Array<{ tmdbId: number; title: string; originalTitle: string; year: string; mediaType: string }>;
 };
 
 export default function ActorPage({ params }: { params: Promise<{ name: string }> }) {
