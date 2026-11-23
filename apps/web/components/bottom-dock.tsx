@@ -394,17 +394,18 @@ export function BottomDock() {
         .gt-dock-nav {
           position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between;
           gap: 4px; width: 100%; height: 72px; padding: 7px 9px; overflow: hidden; border-radius: 9999px;
-          background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.2);
-          
-          -webkit-backdrop-filter: blur(14px) saturate(150%);
-          backdrop-filter: blur(14px) saturate(150%);
+          /* Give the dock a dependable, readable surface instead of relying on blur alone. */
+          background: rgba(19,21,32,.94); border: 1px solid rgba(255,255,255,.24);
+          box-shadow: 0 10px 34px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.12);
+          -webkit-backdrop-filter: blur(18px) saturate(155%);
+          backdrop-filter: blur(18px) saturate(155%);
           -webkit-tap-highlight-color: transparent;
         }
-        .gt-liquid-glass-blur { position:absolute; inset:0; z-index:0; border-radius:inherit; pointer-events:none; background:rgba(255,255,255,.045); -webkit-backdrop-filter:blur(16px) saturate(145%); backdrop-filter:blur(16px) saturate(145%); }
+        .gt-liquid-glass-blur { position:absolute; inset:0; z-index:0; border-radius:inherit; pointer-events:none; background:rgba(255,255,255,.055); -webkit-backdrop-filter:blur(16px) saturate(145%); backdrop-filter:blur(16px) saturate(145%); }
         .gt-liquid-glass-rim { display:none !important; }
         .gt-liquid-glass-bubble {
           position:absolute; top:7px; bottom:7px; left:0; width:0; z-index:2; pointer-events:none; border-radius:9999px;
-          background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18);
+          background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.24);
           
           transition:left .48s cubic-bezier(.34,1.2,.64,1), width .48s cubic-bezier(.34,1.2,.64,1);
         }
@@ -419,11 +420,12 @@ export function BottomDock() {
         .gt-dock-item.is-active { color:#fff; transform:translateY(-1px); }
         .gt-dock-item:active { transform:scale(1.09); }
         html[data-mobile-theme="light"] .gt-dock-nav {
-          background:rgba(255,255,255,.58); border-color:rgba(255,255,255,.72);
-          
-          -webkit-backdrop-filter:blur(14px) saturate(150%); backdrop-filter:blur(14px) saturate(150%);
+          background:rgba(250,248,255,.96); border-color:rgba(105,84,145,.24);
+          box-shadow:0 10px 32px rgba(47,35,75,.16), inset 0 1px 0 rgba(255,255,255,.96);
+          -webkit-backdrop-filter:blur(18px) saturate(150%); backdrop-filter:blur(18px) saturate(150%);
         }
-        html[data-mobile-theme="light"] .gt-liquid-glass-bubble { background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.18); }
+        html[data-mobile-theme="light"] .gt-liquid-glass-blur { background:rgba(255,255,255,.12); }
+        html[data-mobile-theme="light"] .gt-liquid-glass-bubble { background:rgba(104,78,150,.12); border-color:rgba(104,78,150,.2); }
         html[data-mobile-theme="light"] .gt-dock-item { color:rgba(48,39,67,.72); }
         html[data-mobile-theme="light"] .gt-dock-item.is-active { color:#4b3b70; }
         @media (prefers-reduced-motion:reduce) { .gt-dock-item,.gt-liquid-glass-bubble { transition:none; } }
