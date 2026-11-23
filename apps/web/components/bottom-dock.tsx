@@ -386,11 +386,11 @@ export function BottomDock() {
       </div>
 
       <style jsx global>{`
-        .gt-dock { padding-bottom: env(safe-area-inset-bottom); will-change: transform, opacity; transition: transform .38s cubic-bezier(.22,.75,.25,1), opacity .28s ease; }
+        .gt-dock { left: 0 !important; right: 0 !important; width: 100% !important; box-sizing: border-box; padding-bottom: env(safe-area-inset-bottom); will-change: transform, opacity; transition: transform .38s cubic-bezier(.22,.75,.25,1), opacity .28s ease; }
         .gt-dock.is-scroll-hidden { transform: translate3d(0, calc(100% + 28px), 0); opacity: 0; pointer-events: none !important; }
         .gt-dock.is-scroll-visible { transform: translate3d(0, 0, 0); opacity: 1; }
         @media (prefers-reduced-motion: reduce) { .gt-dock { transition: none !important; } }
-        .gt-dock > div { width: min(92vw, 380px); max-width: 380px; margin-inline: auto; padding: 0; }
+        .gt-dock > div { position: relative; left: auto; right: auto; width: min(calc(100% - 32px), 380px) !important; max-width: 380px; margin-left: auto !important; margin-right: auto !important; padding: 0; box-sizing: border-box; }
         .gt-dock-nav {
           position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between;
           gap: 4px; width: 100%; height: 72px; padding: 7px 9px; overflow: hidden; border-radius: 9999px;

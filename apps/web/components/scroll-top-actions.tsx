@@ -44,7 +44,7 @@ export function ScrollTopActions() {
             <ArrowLeft size={20} strokeWidth={2.1} />
           </button>
         )}
-        <button type="button" onClick={() => setNotificationsOpen(true)} tabIndex={visible ? 0 : -1} aria-label="Thông báo" className="scroll-top-action-button scroll-top-notification pointer-events-auto">
+        <button type="button" onClick={() => setNotificationsOpen(true)} tabIndex={visible ? 0 : -1} aria-label="Thông báo" className={`scroll-top-action-button scroll-top-notification pointer-events-auto ${isHome ? "is-home-notification" : ""}`}>
           <Bell size={19} strokeWidth={2} />
           <i aria-hidden="true" />
         </button>
@@ -57,7 +57,7 @@ export function ScrollTopActions() {
         .scroll-top-actions.is-hidden { opacity: 0; transform: translateY(-18px); pointer-events: none; }
         .scroll-top-action-button { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: #fff; background: rgba(24,20,38,.58); border: 1px solid rgba(205,185,255,.28); box-shadow: 0 8px 28px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.2); -webkit-backdrop-filter: blur(18px) saturate(155%); backdrop-filter: blur(18px) saturate(155%); transition: transform .28s cubic-bezier(.2,.8,.2,1), background .25s ease; }
         .scroll-top-action-button:active { transform: scale(.9); }
-        .scroll-top-notification i { position:absolute; right:8px; top:8px; width:7px; height:7px; border-radius:50%; background:#f43f5e; box-shadow:0 0 0 2px rgba(24,20,38,.9); }
+        .scroll-top-notification.is-home-notification { margin-left: auto; }\n        .scroll-top-notification i { position:absolute; right:8px; top:8px; width:7px; height:7px; border-radius:50%; background:#f43f5e; box-shadow:0 0 0 2px rgba(24,20,38,.9); }
         html[data-mobile-theme="light"] .scroll-top-action-button { color:#4b347d; background:rgba(255,255,255,.72); border-color:rgba(126,91,190,.24); box-shadow:0 8px 28px rgba(62,42,100,.12),inset 0 1px 0 rgba(255,255,255,.9); }
         @media (prefers-reduced-motion: reduce) { .scroll-top-actions,.scroll-top-action-button { transition:none !important; } }
       `}</style>
