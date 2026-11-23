@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ResilientMovieImage } from "./resilient-movie-image";
 import Link from "next/link";
-import { Bell, Play, Plus, X, Bookmark } from "lucide-react";
+import { Bell, Play, Plus, X, Bookmark, ShieldCheck, Sparkles, Check } from "lucide-react";
 import { useMember } from "./member-provider";
 import { memberClient } from "@/lib/member-client";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -117,6 +117,21 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
   return (
     <>
       <style jsx global>{`
+        .home-notification-overlay { background: radial-gradient(ellipse at 50% 38%, rgba(103,76,174,.22), transparent 48%), radial-gradient(ellipse at 12% 88%, rgba(68,47,122,.16), transparent 42%), rgba(9,8,17,.97) !important; animation: home-notice-overlay-in .38s ease-out both; }
+        .home-notice-content { position:relative; isolation:isolate; overflow:hidden; }
+        .home-notice-glow { position:absolute; width:260px; height:260px; border-radius:50%; background:rgba(132,91,220,.18); filter:blur(75px); top:20%; animation:home-notice-breathe 5s ease-in-out infinite alternate; }
+        .home-notice-card { isolation:isolate; border:1px solid rgba(210,190,255,.2); background:linear-gradient(150deg,rgba(42,34,65,.88),rgba(18,17,29,.94) 58%,rgba(30,24,48,.9)); box-shadow:0 24px 90px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.13); animation:home-notice-card-in .65s cubic-bezier(.2,.8,.2,1) both; }
+        .home-notice-card::before { content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; padding:1px; background:linear-gradient(135deg,rgba(222,205,255,.55),transparent 38%,rgba(154,117,239,.28) 72%,transparent); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+        .home-notice-orbit { position:absolute; width:260px; height:260px; top:-185px; left:50%; transform:translateX(-50%); border:1px solid rgba(206,185,255,.12); border-radius:50%; box-shadow:0 0 0 22px rgba(206,185,255,.025),0 0 0 48px rgba(206,185,255,.02); pointer-events:none; }
+        .home-notice-icon-wrap { color:#eee6ff; background:linear-gradient(145deg,rgba(171,137,255,.28),rgba(104,76,171,.13)); border:1px solid rgba(220,203,255,.28); box-shadow:0 10px 38px rgba(127,91,205,.22),inset 0 1px 0 rgba(255,255,255,.18); animation:home-notice-float 4s ease-in-out infinite; }
+        .home-notice-shield { filter:drop-shadow(0 0 12px rgba(190,160,255,.5)); }
+        .home-notice-sparkle { position:absolute; right:-5px; top:-5px; display:grid; place-items:center; width:27px; height:27px; border-radius:50%; color:#fff; background:linear-gradient(135deg,#b79aff,#7550c8); box-shadow:0 4px 16px rgba(137,99,220,.45); }
+        .home-notice-gradient-text { background:linear-gradient(100deg,#e5d8ff 5%,#b99aff 48%,#f0d7ff 95%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+        @keyframes home-notice-overlay-in { from { opacity:0 } to { opacity:1 } }
+        @keyframes home-notice-card-in { from { opacity:0; transform:translateY(22px) scale(.96) } to { opacity:1; transform:translateY(0) scale(1) } }
+        @keyframes home-notice-float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-5px) } }
+        @keyframes home-notice-breathe { from { opacity:.55; transform:scale(.9) } to { opacity:1; transform:scale(1.12) } }
+        @media (prefers-reduced-motion:reduce) { .home-notification-overlay,.home-notice-card,.home-notice-icon-wrap,.home-notice-glow { animation:none!important } }
         .hero-card-wrap {
           padding: max(12px, env(safe-area-inset-top)) 16px 8px;
         }
@@ -402,9 +417,35 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                 <X size={20} />
               </button>
             </header>
-            <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
-              <Bell size={28} className="text-white/70" />
-              <p className="text-sm text-white/50">Chưa có thông báo mới</p>
+            <div className="home-notice-content flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+              <div className="home-notice-glow" aria-hidden="true" />
+              <div className="home-notice-card relative w-full max-w-[390px] overflow-hidden rounded-[30px] px-6 pb-8 pt-9 sm:px-8">
+                <div className="home-notice-orbit" aria-hidden="true" />
+                <div className="home-notice-icon-wrap relative mx-auto mb-6 flex h-[76px] w-[76px] items-center justify-center rounded-[26px]">
+                  <ShieldCheck size={38} strokeWidth={1.65} className="home-notice-shield" />
+                  <span className="home-notice-sparkle"><Sparkles size={16} /></span>
+                </div>
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-[.28em] text-violet-200/75">Cam kết trải nghiệm</p>
+                <h3 className="text-[29px] font-extrabold leading-[1.12] tracking-[-.045em] text-white sm:text-[34px]">
+                  Xem phim trọn vẹn.
+                  <span className="block home-notice-gradient-text">Không quảng cáo.</span>
+                </h3>
+                <p className="mx-auto mt-4 max-w-[290px] text-[13px] leading-6 text-white/65">
+                  Website sẽ không bao giờ có quảng cáo. Tận hưởng phim yêu thích liền mạch, không bị làm phiền.
+                </p>
+                <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                <div className="flex flex-col gap-3 text-left">
+                  {["Không banner quảng cáo", "Không pop-up làm phiền", "Không quảng cáo chen giữa phim"].map((item) => (
+                    <div key={item} className="flex items-center gap-3 text-[12px] font-medium text-white/80">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-400/15 text-violet-200"><Check size={13} strokeWidth={2.5} /></span>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-7 flex items-center justify-center gap-2 text-[10px] font-semibold uppercase tracking-[.18em] text-violet-200/65">
+                  <Sparkles size={13} /> Trải nghiệm giải trí thuần túy
+                </div>
+              </div>
             </div>
           </div>,
           document.body,
