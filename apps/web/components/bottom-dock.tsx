@@ -386,19 +386,20 @@ export function BottomDock() {
       </div>
 
       <style jsx global>{`
-        .gt-dock { left: 0 !important; right: 0 !important; width: 100% !important; box-sizing: border-box; padding-bottom: env(safe-area-inset-bottom); will-change: transform, opacity; transition: transform .38s cubic-bezier(.22,.75,.25,1), opacity .28s ease; }
-        .gt-dock.is-scroll-hidden { transform: translate3d(0, calc(100% + 28px), 0); opacity: 0; pointer-events: none !important; }
-        .gt-dock.is-scroll-visible { transform: translate3d(0, 0, 0); opacity: 1; }
+        .gt-dock { left: 0 !important; right: 0 !important; width: 100% !important; box-sizing: border-box; padding-bottom: env(safe-area-inset-bottom); will-change: transform; transition: transform .38s cubic-bezier(.22,.75,.25,1); }
+        /* Keep opacity off the ancestor: iOS otherwise composites away the backdrop blur. */
+        .gt-dock.is-scroll-hidden { transform: translate3d(0, calc(100% + 28px), 0); pointer-events: none !important; }
+        .gt-dock.is-scroll-visible { transform: translate3d(0, 0, 0); pointer-events: auto; }
         @media (prefers-reduced-motion: reduce) { .gt-dock { transition: none !important; } }
         .gt-dock > div { position: relative; left: auto; right: auto; width: min(calc(100% - 32px), 380px) !important; max-width: 380px; margin-left: auto !important; margin-right: auto !important; padding: 0; box-sizing: border-box; }
         .gt-dock-nav {
           position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between;
           gap: 4px; width: 100%; height: 72px; padding: 7px 9px; overflow: hidden; border-radius: 9999px;
           /* Give the dock a dependable, readable surface instead of relying on blur alone. */
-          background: rgba(19,21,32,.94); border: 1px solid rgba(255,255,255,.24);
-          box-shadow: 0 10px 34px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.12);
-          -webkit-backdrop-filter: blur(18px) saturate(155%);
-          backdrop-filter: blur(18px) saturate(155%);
+          background: rgba(19,21,32,.78); border: 1px solid rgba(255,255,255,.26);
+          box-shadow: 0 10px 34px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.14);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          backdrop-filter: blur(28px) saturate(180%);
           -webkit-tap-highlight-color: transparent;
         }
         .gt-liquid-glass-blur { position:absolute; inset:0; z-index:0; border-radius:inherit; pointer-events:none; background:rgba(255,255,255,.055); -webkit-backdrop-filter:blur(16px) saturate(145%); backdrop-filter:blur(16px) saturate(145%); }
@@ -420,11 +421,11 @@ export function BottomDock() {
         .gt-dock-item.is-active { color:#fff; transform:translateY(-1px); }
         .gt-dock-item:active { transform:scale(1.09); }
         html[data-mobile-theme="light"] .gt-dock-nav {
-          background:rgba(250,248,255,.96); border-color:rgba(105,84,145,.24);
-          box-shadow:0 10px 32px rgba(47,35,75,.16), inset 0 1px 0 rgba(255,255,255,.96);
-          -webkit-backdrop-filter:blur(18px) saturate(150%); backdrop-filter:blur(18px) saturate(150%);
+          background:rgba(250,248,255,.80); border-color:rgba(105,84,145,.28);
+          box-shadow:0 10px 32px rgba(47,35,75,.16), inset 0 1px 0 rgba(255,255,255,.92);
+          -webkit-backdrop-filter:blur(28px) saturate(175%); backdrop-filter:blur(28px) saturate(175%);
         }
-        html[data-mobile-theme="light"] .gt-liquid-glass-blur { background:rgba(255,255,255,.12); }
+        html[data-mobile-theme="light"] .gt-liquid-glass-blur { background:rgba(255,255,255,.10); }
         html[data-mobile-theme="light"] .gt-liquid-glass-bubble { background:rgba(104,78,150,.12); border-color:rgba(104,78,150,.2); }
         html[data-mobile-theme="light"] .gt-dock-item { color:rgba(48,39,67,.72); }
         html[data-mobile-theme="light"] .gt-dock-item.is-active { color:#4b3b70; }

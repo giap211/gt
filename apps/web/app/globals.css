@@ -570,11 +570,7 @@ div[class*="z-[200]"] input:focus {
   }
 }
 
-/* The dock already has a dedicated glass layer; avoid filtering the same pixels twice. */
-.gt-dock-nav {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
+/* Keep backdrop filtering enabled for the dock's live glass surface. */
 
 /* The episode picker is nearly opaque, so backdrop filtering it and every row is wasted work. */
 .watch-player-menu {
