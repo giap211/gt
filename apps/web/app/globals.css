@@ -935,3 +935,28 @@ html[data-mobile-theme="light"] .collection-page > div > div:first-child > butto
 html[data-theme="light"] .collection-page > div > div:first-child > button:active {
   background: rgba(112,86,174,.10) !important;
 }
+
+
+/* Home "Xem thêm" links stay text-only in light mode (no inherited white pill). */
+html[data-mobile-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="Xem thêm phim"],
+html[data-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="Xem thêm phim"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #7056a8 !important;
+  -webkit-text-fill-color: #7056a8 !important;
+}
+html[data-mobile-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="Xem thêm phim"] svg,
+html[data-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="Xem thêm phim"] svg {
+  color: #7056a8 !important;
+  fill: none !important;
+}
+html[data-mobile-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="Xem thêm phim"]::before,
+html[data-mobile-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="Xem thêm phim"]::after,
+html[data-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="Xem thêm phim"]::before,
+html[data-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="Xem thêm phim"]::after {
+  content: none !important;
+  display: none !important;
+}
