@@ -149,6 +149,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           padding: max(12px, env(safe-area-inset-top)) 16px 8px;
         }
         .hero-card {
+          container-type: size;
           position: relative;
           border-radius: 28px;
           overflow: hidden;
@@ -296,7 +297,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
             modules={[Autoplay, EffectFade]}
             effect="fade"
             speed={700}
-            autoplay={{ delay: 8000, disableOnInteraction: false }}
+            autoplay={{ delay: 10000, disableOnInteraction: false }}
             className="h-full w-full"
           >
             {movies.map((movie, index) => {
@@ -333,7 +334,13 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                           key={`${movie.slug}-${activeTrailer}`}
                           title={`Trailer ${movie.name} (tắt tiếng)`}
                           src={`https://www.youtube-nocookie.com/embed/${activeTrailer}?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=${activeTrailer}&modestbranding=1&rel=0&iv_load_policy=3`}
-                          className="absolute inset-0 h-full w-full scale-[1.18] pointer-events-none"
+                          className="absolute left-1/2 top-1/2 pointer-events-none"
+                          style={{
+                            width: "max(100cqw, 177.78cqh)",
+                            height: "max(100cqh, 56.25cqw)",
+                            transform: "translate(-50%, -50%)",
+                            maxWidth: "none",
+                          }}
                           allow="autoplay; encrypted-media; picture-in-picture"
                           referrerPolicy="strict-origin-when-cross-origin"
                           tabIndex={-1}
