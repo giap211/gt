@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, Bell, Check, ShieldCheck, Sparkles, X } from "lucide-react";
 
 export function ScrollTopActions() {
   const router = useRouter();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [visible, setVisible] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
@@ -36,17 +38,29 @@ export function ScrollTopActions() {
         className={`scroll-top-actions fixed inset-x-0 z-[180] flex items-center justify-between px-4 sm:px-6 pointer-events-none transition-all duration-300 ${visible ? "is-visible" : "is-hidden"}`}
         aria-hidden={!visible}
       >
-        <button type="button" onClick={goBack} tabIndex={visible ? 0 : -1} aria-label="Trở về" className="scroll-top-action-button pointer-events-auto">
-          <ArrowLeft size={19} strokeWidth={2.1} />
-          <span>Trở về</span>
-        </button>
+        <>
+        {!isHome && (
+          <button type="button" onClick={goBack} tabIndex={visible ? 0 : -1} aria-label="Trở về" className="scroll-top-action-button pointer-events-auto">
+            <ArrowLeft size={20} strokeWidth={2.1} />
+          </button>
+        )}
         <button type="button" onClick={() => setNotificationsOpen(true)} tabIndex={visible ? 0 : -1} aria-label="Thông báo" className="scroll-top-action-button scroll-top-notification pointer-events-auto">
-          <Bell size={18} strokeWidth={2} />
-          <span>Thông báo</span>
+          <Bell size={19} strokeWidth={2} />
           <i aria-hidden="true" />
         </button>
+        </>
       </div>
 
+      <style jsx global>{`
+        .scroll-top-actions { top: max(10px, env(safe-area-inset-top)); min-height: 46px; }
+        .scroll-top-actions.is-visible { opacity: 1; transform: translateY(0); }
+        .scroll-top-actions.is-hidden { opacity: 0; transform: translateY(-18px); pointer-events: none; }
+        .scroll-top-action-button { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: #fff; background: rgba(24,20,38,.58); border: 1px solid rgba(205,185,255,.28); box-shadow: 0 8px 28px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.2); -webkit-backdrop-filter: blur(18px) saturate(155%); backdrop-filter: blur(18px) saturate(155%); transition: transform .28s cubic-bezier(.2,.8,.2,1), background .25s ease; }
+        .scroll-top-action-button:active { transform: scale(.9); }
+        .scroll-top-notification i { position:absolute; right:8px; top:8px; width:7px; height:7px; border-radius:50%; background:#f43f5e; box-shadow:0 0 0 2px rgba(24,20,38,.9); }
+        html[data-mobile-theme="light"] .scroll-top-action-button { color:#4b347d; background:rgba(255,255,255,.72); border-color:rgba(126,91,190,.24); box-shadow:0 8px 28px rgba(62,42,100,.12),inset 0 1px 0 rgba(255,255,255,.9); }
+        @media (prefers-reduced-motion: reduce) { .scroll-top-actions,.scroll-top-action-button { transition:none !important; } }
+      `}</style>
       {notificationsOpen && typeof document !== "undefined" && createPortal(
         <div role="dialog" aria-modal="true" aria-labelledby="scroll-notification-title" className="scroll-notification-overlay fixed inset-0 z-[220] flex flex-col">
           <header className="flex items-center justify-between border-b border-white/10 px-4 pb-3 pt-[max(16px,env(safe-area-inset-top))]">

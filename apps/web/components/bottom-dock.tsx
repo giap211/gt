@@ -33,6 +33,7 @@ export function BottomDock() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ListMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [dockHidden, setDockHidden] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isHome = pathname === "/";
@@ -50,7 +51,28 @@ export function BottomDock() {
   useEffect(() => {
     setSearchOpen(false);
     setAccountOpen(false);
+    setDockHidden(false);
   }, [pathname]);
+
+  useEffect(() => {
+    let lastY = window.scrollY || 0;
+    let ticking = false;
+    const updateDockVisibility = () => {
+      const currentY = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+      const delta = currentY - lastY;
+      if (currentY < 40) setDockHidden(false);
+      else if (Math.abs(delta) >= 8) setDockHidden(delta > 0);
+      lastY = currentY;
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateDockVisibility);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Keep the last main dock section selected while visiting a movie detail page.
   useEffect(() => {
@@ -317,7 +339,7 @@ export function BottomDock() {
         </div>
       )}
 
-      <div className="gt-dock lg:hidden fixed bottom-4 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)]">
+      <div className={`gt-dock lg:hidden fixed bottom-4 left-0 right-0 z-[80] pointer-events-none pb-[env(safe-area-inset-bottom)] ${dockHidden && !searchOpen && !accountOpen ? "is-scroll-hidden" : "is-scroll-visible"}`}>
         <div className="mx-auto max-w-md px-4 pb-3 pt-1">
           <nav className="gt-dock-nav pointer-events-auto" aria-label="Điều hướng chính">
             <LiquidGlassDockSurface />
@@ -364,7 +386,10 @@ export function BottomDock() {
       </div>
 
       <style jsx global>{`
-        .gt-dock { padding-bottom: env(safe-area-inset-bottom); }
+        .gt-dock { padding-bottom: env(safe-area-inset-bottom); will-change: transform, opacity; transition: transform .38s cubic-bezier(.22,.75,.25,1), opacity .28s ease; }
+        .gt-dock.is-scroll-hidden { transform: translate3d(0, calc(100% + 28px), 0); opacity: 0; pointer-events: none !important; }
+        .gt-dock.is-scroll-visible { transform: translate3d(0, 0, 0); opacity: 1; }
+        @media (prefers-reduced-motion: reduce) { .gt-dock { transition: none !important; } }
         .gt-dock > div { width: min(92vw, 380px); max-width: 380px; margin-inline: auto; padding: 0; }
         .gt-dock-nav {
           position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between;
