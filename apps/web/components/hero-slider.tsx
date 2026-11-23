@@ -64,10 +64,23 @@ function wrapHeroTitle(title: string, maxChars = 20) {
 export const HeroSlider = ({ movies }: HeroSliderProps) => {
   const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [activeTrailer, setActiveTrailer] = useState<string | null>(null);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [savedSlugs, setSavedSlugs] = useState<Set<string>>(() => new Set());
   const [savingSlug, setSavingSlug] = useState<string | null>(null);
   const { user, openAuth } = useMember();
+
+  useEffect(() => {
+    const movie = movies[activeSlide];
+    if (!movie?.slug) { setActiveTrailer(null); return; }
+    let cancelled = false;
+    setActiveTrailer(null);
+    fetch(`/api/hero-trailer/${encodeURIComponent(movie.slug)}`)
+      .then(async (response) => response.ok ? await response.json() as { trailerKey?: string | null } : null)
+      .then((result) => { if (!cancelled) setActiveTrailer(result?.trailerKey || null); })
+      .catch(() => { if (!cancelled) setActiveTrailer(null); });
+    return () => { cancelled = true; };
+  }, [activeSlide, movies]);
 
   useEffect(() => {
     let cancelled = false;
@@ -315,6 +328,18 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                         quality={80}
                         className="object-cover object-center"
                       />
+                      {index === activeSlide && activeTrailer && (
+                        <iframe
+                          key={`${movie.slug}-${activeTrailer}`}
+                          title={`Trailer ${movie.name} (tắt tiếng)`}
+                          src={`https://www.youtube-nocookie.com/embed/${activeTrailer}?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=${activeTrailer}&modestbranding=1&rel=0&iv_load_policy=3`}
+                          className="absolute inset-0 h-full w-full scale-[1.18] pointer-events-none"
+                          allow="autoplay; encrypted-media; picture-in-picture"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          tabIndex={-1}
+                          aria-hidden="true"
+                        />
+                      )}
                       <div className="hero-card-overlay absolute inset-0" />
                     </div>
 
