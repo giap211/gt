@@ -28,6 +28,7 @@ import { MemberProvider } from "@/components/member-provider";
 import { RouteScrollReset } from "@/components/route-scroll-reset";
 import { PersistentTabShell } from "@/components/persistent-tab-shell";
 import { PosterScrollMotion } from "@/components/poster-scroll-motion";
+import { ScrollTopActions } from "@/components/scroll-top-actions";
 
 export const metadata: Metadata = {
   title: "XemPhim",
@@ -64,6 +65,7 @@ export default function RootLayout({
         <MemberProvider>
           <div className="mobile-app-shell">
             <Navbar />
+            <ScrollTopActions />
             <div className="pb-0"><PersistentTabShell>{children}</PersistentTabShell></div>
             <BottomDock />
           </div>

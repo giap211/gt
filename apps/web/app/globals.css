@@ -960,3 +960,96 @@ html[data-theme="light"] .apple-tv-home .movie-carousel-section a[aria-label^="X
   content: none !important;
   display: none !important;
 }
+
+
+/* Scroll-triggered floating back and notification controls. */
+.scroll-top-actions {
+  top: max(12px, env(safe-area-inset-top));
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.scroll-top-actions.is-hidden {
+  opacity: 0;
+  transform: translateY(-18px);
+  visibility: hidden;
+}
+.scroll-top-actions.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+.scroll-top-action-button {
+  position: relative;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 16px;
+  border: 1px solid rgba(255,255,255,.34);
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg,rgba(255,255,255,.24),rgba(255,255,255,.10));
+  -webkit-backdrop-filter: blur(24px) saturate(1.55);
+  backdrop-filter: blur(24px) saturate(1.55);
+  box-shadow: 0 8px 28px rgba(15,10,35,.14), inset 0 1px 0 rgba(255,255,255,.28);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .01em;
+  transition: transform .2s ease, background .2s ease, border-color .2s ease;
+}
+.scroll-top-action-button:active { transform: scale(.96); }
+.scroll-top-notification i {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a78bfa;
+  box-shadow: 0 0 10px rgba(167,139,250,.9);
+}
+html[data-mobile-theme="light"] .scroll-top-action-button,
+html[data-theme="light"] .scroll-top-action-button {
+  color: #51436f;
+  border-color: rgba(105,83,150,.22);
+  background: linear-gradient(135deg,rgba(255,255,255,.84),rgba(246,242,255,.66));
+  box-shadow: 0 8px 26px rgba(48,35,80,.10), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.scroll-notification-overlay {
+  background:
+    radial-gradient(ellipse at 50% 38%,rgba(103,76,174,.22),transparent 48%),
+    rgba(9,8,17,.97);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  animation: scroll-notice-fade .28s ease-out both;
+}
+.scroll-notification-card {
+  border: 1px solid rgba(210,190,255,.2);
+  background: linear-gradient(150deg,rgba(42,34,65,.92),rgba(18,17,29,.97) 58%,rgba(30,24,48,.94));
+  box-shadow: 0 24px 90px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.13);
+  animation: scroll-notice-card .5s cubic-bezier(.2,.8,.2,1) both;
+}
+.scroll-notification-orbit {
+  position:absolute; width:260px; height:260px; top:-185px; left:50%; transform:translateX(-50%);
+  border:1px solid rgba(206,185,255,.12); border-radius:50%;
+  box-shadow:0 0 0 22px rgba(206,185,255,.025),0 0 0 48px rgba(206,185,255,.02);
+  pointer-events:none;
+}
+.scroll-notification-icon {
+  color:#eee6ff;
+  background:linear-gradient(145deg,rgba(171,137,255,.28),rgba(104,76,171,.13));
+  border:1px solid rgba(220,203,255,.28);
+  box-shadow:0 10px 38px rgba(127,91,205,.22),inset 0 1px 0 rgba(255,255,255,.18);
+  animation:scroll-notice-float 4s ease-in-out infinite;
+}
+.scroll-notification-gradient-text {
+  background:linear-gradient(100deg,#e5d8ff 5%,#b99aff 48%,#f0d7ff 95%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+@keyframes scroll-notice-fade { from { opacity:0 } to { opacity:1 } }
+@keyframes scroll-notice-card { from { opacity:0; transform:translateY(18px) scale(.97) } to { opacity:1; transform:translateY(0) scale(1) } }
+@keyframes scroll-notice-float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-5px) } }
+@media (prefers-reduced-motion:reduce) {
+  .scroll-top-actions,.scroll-notification-overlay,.scroll-notification-card,.scroll-notification-icon { animation:none!important; transition:none!important }
+}
