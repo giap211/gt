@@ -636,13 +636,16 @@ body { min-width: 320px; background: #050509 !important; }
   body { background: #050509 !important; }
   .mobile-app-shell { min-height: 100dvh; }
 }
+/* Keep the fixed dock anchored to the viewport. Do not center the outer
+   wrapper with translateX: its transform is also used for scroll hide/show. */
 .mobile-app-shell .gt-dock {
   display: block !important;
   position: fixed !important;
-  left: 50% !important;
-  right: auto !important;
-  width: min(100vw, 480px) !important;
-  transform: translateX(-50%);
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
 }
 .mobile-app-shell .mobile-search-overlay,
 .mobile-app-shell .mobile-account-sheet {
