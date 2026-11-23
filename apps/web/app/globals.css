@@ -904,3 +904,34 @@ html[data-mobile-theme="light"] .comments-panel button svg,
 html[data-theme="light"] .comments-panel button svg {
   color: #fff !important;
 }
+
+
+/* Fix the native filter controls and header action on light-mode collection pages. */
+html[data-mobile-theme="light"] .filter-bar select,
+html[data-theme="light"] .filter-bar select {
+  color-scheme: light !important;
+  color: #292638 !important;
+  -webkit-text-fill-color: #292638 !important;
+  background-color: #f7f6fa !important;
+  border-color: rgba(65,55,90,.16) !important;
+}
+html[data-mobile-theme="light"] .filter-bar select option,
+html[data-theme="light"] .filter-bar select option {
+  color: #292638 !important;
+  background: #fff !important;
+}
+html[data-mobile-theme="light"] .filter-bar select:focus,
+html[data-theme="light"] .filter-bar select:focus {
+  border-color: rgba(112,86,174,.55) !important;
+  box-shadow: 0 0 0 3px rgba(112,86,174,.10);
+}
+html[data-mobile-theme="light"] .collection-page > div > div:first-child > button,
+html[data-theme="light"] .collection-page > div > div:first-child > button {
+  color: #55466f !important;
+  background: rgba(255,255,255,.88) !important;
+  border-color: rgba(85,70,111,.20) !important;
+}
+html[data-mobile-theme="light"] .collection-page > div > div:first-child > button:active,
+html[data-theme="light"] .collection-page > div > div:first-child > button:active {
+  background: rgba(112,86,174,.10) !important;
+}
