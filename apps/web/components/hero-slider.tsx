@@ -333,11 +333,11 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                         <iframe
                           key={`${movie.slug}-${activeTrailer}`}
                           title={`Trailer ${movie.name} (tắt tiếng)`}
-                          src={`https://www.youtube-nocookie.com/embed/${activeTrailer}?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=${activeTrailer}&modestbranding=1&rel=0&iv_load_policy=3`}
+                          src={`https://www.youtube-nocookie.com/embed/${activeTrailer}?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&playsinline=1&loop=1&playlist=${activeTrailer}&modestbranding=1&rel=0&iv_load_policy=3&cc_load_policy=0`}
                           className="absolute left-1/2 top-1/2 pointer-events-none"
                           style={{
-                            width: "max(100cqw, 177.78cqh)",
-                            height: "max(100cqh, 56.25cqw)",
+                            width: "max(120cqw, 213.34cqh)",
+                            height: "max(120cqh, 67.5cqw)",
                             transform: "translate(-50%, -50%)",
                             maxWidth: "none",
                           }}
@@ -347,6 +347,14 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                           aria-hidden="true"
                         />
                       )}
+                      <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 z-[1]"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, rgba(10,8,18,.94) 0%, rgba(10,8,18,.72) 9%, rgba(10,8,18,.22) 19%, transparent 29%, transparent 72%, rgba(10,8,18,.38) 83%, rgba(10,8,18,.9) 100%)",
+                        }}
+                      />
                       <div className="hero-card-overlay absolute inset-0" />
                     </div>
 
