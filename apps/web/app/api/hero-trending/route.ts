@@ -285,7 +285,7 @@ async function addHeroDescriptions(items: HeroItem[]): Promise<Array<HeroItem & 
     // Lấy logo phim (không phải poster) từ TMDB Images API.
     // Ưu tiên logo tiếng Anh, sau đó logo không gắn ngôn ngữ và cuối cùng là logo bất kỳ.
     let title_logo: string | undefined;
-    if (tmdbId && /^\\d+$/.test(tmdbId) && (accessToken || apiKey)) {
+    if (tmdbId && /^\d+$/.test(tmdbId) && (accessToken || apiKey)) {
       try {
         const imagesUrl = new URL(`${TMDB_BASE_URL}/${tmdbType}/${tmdbId}/images`);
         imagesUrl.searchParams.set("include_image_language", "en,null");
