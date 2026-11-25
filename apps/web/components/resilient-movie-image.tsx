@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 type ResilientMovieImageProps = {
@@ -16,9 +17,10 @@ type ResilientMovieImageProps = {
 };
 
 /**
- * Movie artwork is loaded as a normal browser image through our same-origin
- * image endpoint. The browser and Vercel CDN cache the returned bytes; no
- * Next.js image optimizer or remote image loader is involved.
+ * Follow the image-loading strategy used by giap211/rophim:
+ * Next Image with unoptimized enabled, remotePatterns allowlisting and
+ * browser-native lazy loading. This deliberately bypasses the Next image
+ * optimizer because movie CDN URLs often reject optimizer requests.
  */
 export function ResilientMovieImage({
   sources,
@@ -29,6 +31,8 @@ export function ResilientMovieImage({
   style,
   priority = false,
   loading,
+  sizes = "100vw",
+  quality = 75,
 }: ResilientMovieImageProps) {
   const sourceKey = sources.filter(Boolean).join("\n");
   const candidates = useMemo(
@@ -45,7 +49,7 @@ export function ResilientMovieImage({
                   ? `https://${source.slice(7)}`
                   : source,
             )
-            .filter((source) => /^https:\/\//i.test(source)),
+            .filter((source) => /^(https:\/\/|\/)/i.test(source)),
         ),
       ),
     // sourceKey represents the ordered source list.
@@ -59,24 +63,20 @@ export function ResilientMovieImage({
   }, [sourceKey]);
 
   const usingFallback = attempt >= candidates.length;
-  const remoteSrc = candidates[attempt];
-  const src = usingFallback || !remoteSrc
-    ? fallbackSrc
-    : `/api/refraction-image?url=${encodeURIComponent(remoteSrc)}`;
-
-  const fillStyle: CSSProperties = fill
-    ? { position: "absolute", inset: 0, width: "100%", height: "100%" }
-    : {};
+  const src = usingFallback ? fallbackSrc : candidates[attempt] || fallbackSrc;
 
   return (
-    <img
+    <Image
       src={src}
       alt={alt}
-      className={className}
-      style={{ ...fillStyle, ...style }}
+      fill={fill}
+      sizes={sizes}
+      quality={quality}
+      unoptimized
+      priority={priority}
       loading={priority ? "eager" : loading ?? "lazy"}
-      fetchPriority={priority ? "high" : "auto"}
-      decoding="async"
+      className={className}
+      style={style}
       onError={() => {
         if (!usingFallback) setAttempt((current) => current + 1);
       }}
