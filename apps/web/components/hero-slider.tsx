@@ -175,7 +175,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
           display: block;
           width: auto;
           max-width: 100%;
-          max-height: 108px;
+          max-height: 54px;
           object-fit: contain;
           object-position: left bottom;
         }
@@ -388,7 +388,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                           aria-label={`Xem phim ${movie.name}`}
                         >
                           {movie.title_logo ? (
-                            <span className="flex h-[112px] max-w-[340px] items-end">
+                            <span className="flex h-[56px] max-w-[170px] items-end">
                               <Image
                                 key={movie.slug}
                                 src={movie.title_logo}
