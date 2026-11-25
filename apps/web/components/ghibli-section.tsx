@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { ResilientMovieImage } from "./resilient-movie-image";
 import { Play, Info } from "lucide-react";
 
 export const GhibliSection = () => {
@@ -16,12 +16,12 @@ export const GhibliSection = () => {
         </div>
 
         <div className="relative w-full min-h-[430px] sm:min-h-0 sm:aspect-[16/9] md:aspect-[21/9] rounded-3xl overflow-hidden group">
-          <Image
-            src="https://phimimg.com/upload/vod/20250716-1/3be680dcb8b627540ea2703730db511f.jpg"
+          <ResilientMovieImage
+            sources={["https://phimimg.com/upload/vod/20250716-1/3be680dcb8b627540ea2703730db511f.jpg"]}
+            fallbackSrc="/images/fallback-horizontal.svg"
             alt="Studio Ghibli"
             fill
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
-            unoptimized
           />
           <div className="ghibli-feature-art absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
 
