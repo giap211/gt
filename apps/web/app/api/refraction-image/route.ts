@@ -71,7 +71,7 @@ export async function GET(request: Request) {
 
       if (![301, 302, 303, 307, 308].includes(upstream.status)) break;
 
-      const location = upstream.headers.get("location");
+      const location = imageResponse.headers.get("location");
       if (!location || redirectCount === 4) {
         return errorResponse(502, "Image redirect failed");
       }
@@ -83,12 +83,20 @@ export async function GET(request: Request) {
       currentUrl = redirectedUrl;
     }
 
-    if (!upstream || !upstream.ok || !upstream.body) {
-      return errorResponse(upstream?.status || 502, "Image unavailable");
+    const imageResponse = upstream;
+    if (imageResponse === null) {
+      return errorResponse(502, "Image unavailable");
+    }
+    if (!imageResponse.ok) {
+      return errorResponse(imageResponse.status || 502, "Image unavailable");
+    }
+    const imageBody = imageResponse.body;
+    if (imageBody === null) {
+      return errorResponse(502, "Image unavailable");
     }
 
     const contentType = (
-      upstream.headers.get("content-type") || ""
+      imageResponse.headers.get("content-type") || ""
     ).split(";")[0].trim().toLowerCase();
 
     const allowedTypes = new Set([
@@ -104,7 +112,7 @@ export async function GET(request: Request) {
       return errorResponse(415, "Upstream response is not a supported image");
     }
 
-    const contentLength = Number(upstream.headers.get("content-length") || 0);
+    const contentLength = Number(imageResponse.headers.get("content-length") || 0);
     if (contentLength > 20 * 1024 * 1024) {
       return errorResponse(413, "Image is too large");
     }
@@ -120,12 +128,12 @@ export async function GET(request: Request) {
       headers.set("Content-Length", String(contentLength));
     }
 
-    const etag = upstream.headers.get("etag");
-    const lastModified = upstream.headers.get("last-modified");
+    const etag = imageResponse.headers.get("etag");
+    const lastModified = imageResponse.headers.get("last-modified");
     if (etag) headers.set("ETag", etag);
     if (lastModified) headers.set("Last-Modified", lastModified);
 
-    return new Response(upstream.body, { status: 200, headers });
+    return new Response(imageBody, { status: 200, headers });
   } catch {
     return errorResponse(502, "Unable to fetch image");
   }
