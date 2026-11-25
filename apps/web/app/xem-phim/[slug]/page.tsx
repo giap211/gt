@@ -20,7 +20,7 @@ import {
   RotateCw,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { ResilientMovieImage } from "@/components/resilient-movie-image";
 import { VideoPlayer } from "@/components/video-player";
 import { MovieCarousel } from "@/components/movie-carousel";
 import { CommentsPanel } from "@/components/comments-panel";
@@ -601,7 +601,7 @@ function WatchPageContent({ params }: { params: Promise<{ slug: string }> }) {
         {currentEpisode?.url && (
           <VideoPlayer
             url={currentEpisode.url}
-            poster={movie.thumb_url}
+            poster={movie.thumb_url ? `/api/refraction-image?url=${encodeURIComponent(movie.thumb_url)}` : undefined}
             title={`${movie.name} - ${formatEpisodeName(currentEpisode.name)}`}
             startAtSeconds={resumeAt}
             introStartSeconds={introSegment?.startSeconds}
@@ -761,7 +761,7 @@ function EpisodeList({
             >
               <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-white/15 to-white/[0.025]">
                 {stillUrl ? (
-                  <Image src={stillUrl} alt={formatEpisodeName(ep.name)} fill sizes="(max-width: 1280px) 142px, 180px" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <ResilientMovieImage sources={[stillUrl]} fallbackSrc="/images/fallback-horizontal.svg" alt={formatEpisodeName(ep.name)} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="text-3xl font-light text-white/20">{String(index + 1).padStart(2, "0")}</span>
