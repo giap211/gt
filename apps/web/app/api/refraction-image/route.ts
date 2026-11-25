@@ -71,7 +71,7 @@ export async function GET(request: Request) {
 
       if (![301, 302, 303, 307, 308].includes(upstream.status)) break;
 
-      const location = imageResponse.headers.get("location");
+      const location = upstream.headers.get("location");
       if (!location || redirectCount === 4) {
         return errorResponse(502, "Image redirect failed");
       }
