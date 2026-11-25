@@ -11,8 +11,8 @@ type ResilientMovieImageProps = Omit<ImageProps, "src" | "alt" | "onError"> & {
 
 /**
  * Tries every distinct movie-art URL in order, then displays the local fallback.
- * Remote sources use the same-origin proxy for reliable CDN access, then Next.js
- * image optimization to resize and encode the result for the requesting device.
+ * Remote sources use the same-origin proxy and Next.js image optimization to
+ * resize and encode the result for the requesting device.
  */
 export function ResilientMovieImage({
   sources,
@@ -41,8 +41,7 @@ export function ResilientMovieImage({
   const usingFallback = attempt >= candidates.length;
   const remoteSrc = candidates[attempt] ?? fallbackSrc;
   // Serve remote poster artwork through our same-origin image proxy. This
-  // avoids browser hotlink/CORS failures on movie CDNs while retaining the
-  // ordered retry behavior when a source itself is unavailable.
+  // avoids browser hotlink/CORS failures while retaining ordered source retries.
   const src = usingFallback
     ? fallbackSrc
     : `/api/refraction-image?url=${encodeURIComponent(remoteSrc)}`;
@@ -52,7 +51,6 @@ export function ResilientMovieImage({
       {...imageProps}
       src={src}
       alt={alt}
-      unoptimized={!usingFallback}
       onError={() => {
         if (!usingFallback) setAttempt((current) => current + 1);
       }}
