@@ -84,7 +84,7 @@ export async function GET(request: Request) {
     }
 
     const imageResponse = upstream;
-    if (imageResponse === null) {
+    if (!imageResponse) {
       return errorResponse(502, "Image unavailable");
     }
     if (!imageResponse.ok) {
