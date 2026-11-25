@@ -235,7 +235,7 @@ async function buildHeroItems(tmdbTitles: string[], netflixTvTitles: string[]) {
 }
 
 
-async function addHeroDescriptions(items: HeroItem[]): Promise<Array<HeroItem & { content?: string }>> {
+async function addHeroDescriptions(items: HeroItem[]): Promise<Array<HeroItem & { content?: string; title_logo?: string }>> {
   const accessToken = process.env.TMDB_API_READ_ACCESS_TOKEN;
   const apiKey = process.env.TMDB_API_KEY;
 
@@ -282,7 +282,41 @@ async function addHeroDescriptions(items: HeroItem[]): Promise<Array<HeroItem & 
       }
     }
 
-    return { ...item, content };
+    // Lấy logo phim (không phải poster) từ TMDB Images API.
+    // Ưu tiên logo tiếng Anh, sau đó logo không gắn ngôn ngữ và cuối cùng là logo bất kỳ.
+    let title_logo: string | undefined;
+    if (tmdbId && /^\\d+$/.test(tmdbId) && (accessToken || apiKey)) {
+      try {
+        const imagesUrl = new URL(`${TMDB_BASE_URL}/${tmdbType}/${tmdbId}/images`);
+        imagesUrl.searchParams.set("include_image_language", "en,null");
+        if (!accessToken && apiKey) imagesUrl.searchParams.set("api_key", apiKey);
+        const imagesResponse = await fetch(imagesUrl, {
+          headers: {
+            Accept: "application/json",
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          next: { revalidate: 86400 },
+        });
+        if (imagesResponse.ok) {
+          const images = await imagesResponse.json() as {
+            logos?: Array<{ file_path?: string; iso_639_1?: string | null; vote_average?: number }>;
+          };
+          const logos = (images.logos || []).filter((logo) => logo.file_path);
+          logos.sort((left, right) => {
+            const languageRank = (language?: string | null) => language === "en" ? 0 : language === null ? 1 : 2;
+            return languageRank(left.iso_639_1) - languageRank(right.iso_639_1)
+              || (right.vote_average || 0) - (left.vote_average || 0);
+          });
+          if (logos[0]?.file_path) {
+            title_logo = `https://image.tmdb.org/t/p/w500${logos[0].file_path}`;
+          }
+        }
+      } catch {
+        // Logo không bắt buộc; giao diện sẽ dùng tên phim dạng chữ.
+      }
+    }
+
+    return { ...item, content, ...(title_logo ? { title_logo } : {}) };
   }));
 }
 

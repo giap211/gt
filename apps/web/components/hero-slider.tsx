@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ResilientMovieImage } from "./resilient-movie-image";
 import Link from "next/link";
+import Image from "next/image";
 import { Bell, Play, Plus, X, Bookmark, ShieldCheck, Sparkles, Check } from "lucide-react";
 import { useMember } from "./member-provider";
 import { memberClient } from "@/lib/member-client";
@@ -32,7 +33,8 @@ interface Movie {
   content?: string;
   description?: string;
   category?: { name: string }[];
-  tmdb?: { type?: "movie" | "tv" | string };
+  tmdb?: { id?: number | string; type?: "movie" | "tv" | string };
+  title_logo?: string;
 }
 
 interface HeroSliderProps {
@@ -168,6 +170,14 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
             rgba(15, 10, 30, 0.78) 72%,
             rgba(12, 8, 24, 0.95) 100%
           );
+        }
+        .hero-card-title-logo {
+          display: block;
+          width: auto;
+          max-width: 100%;
+          max-height: 108px;
+          object-fit: contain;
+          object-position: left bottom;
         }
         .hero-card-title-svg {
           display: block;
@@ -377,28 +387,43 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
                           className="block"
                           aria-label={`Xem phim ${movie.name}`}
                         >
-                          <svg
-                            key={movie.slug}
-                            className="hero-card-title-svg"
-                            viewBox="0 0 680 120"
-                            role="img"
-                            aria-label={movie.name}
-                          >
-                            <text x="0" y="48">
-                              {wrapHeroTitle(movie.name).map((line, lineIndex) => (
-                                <tspan key={`line-${lineIndex}`} x="0" dy={lineIndex === 0 ? 0 : 54}>
-                                  {Array.from(line).map((character, characterIndex) => (
-                                    <tspan
-                                      key={`char-${lineIndex}-${characterIndex}`}
-                                      style={{ animationDelay: `${(lineIndex * 20 + characterIndex) * 18}ms` }}
-                                    >
-                                      {character === " " ? "\u00a0" : character}
-                                    </tspan>
-                                  ))}
-                                </tspan>
-                              ))}
-                            </text>
-                          </svg>
+                          {movie.title_logo ? (
+                            <span className="flex h-[112px] max-w-[340px] items-end">
+                              <Image
+                                key={movie.slug}
+                                src={movie.title_logo}
+                                alt={movie.name}
+                                width={500}
+                                height={220}
+                                unoptimized
+                                priority={index === 0}
+                                className="hero-card-title-logo"
+                              />
+                            </span>
+                          ) : (
+                            <svg
+                              key={movie.slug}
+                              className="hero-card-title-svg"
+                              viewBox="0 0 680 120"
+                              role="img"
+                              aria-label={movie.name}
+                            >
+                              <text x="0" y="48">
+                                {wrapHeroTitle(movie.name).map((line, lineIndex) => (
+                                  <tspan key={`line-${lineIndex}`} x="0" dy={lineIndex === 0 ? 0 : 54}>
+                                    {Array.from(line).map((character, characterIndex) => (
+                                      <tspan
+                                        key={`char-${lineIndex}-${characterIndex}`}
+                                        style={{ animationDelay: `${(lineIndex * 20 + characterIndex) * 18}ms` }}
+                                      >
+                                        {character === " " ? "\u00a0" : character}
+                                      </tspan>
+                                    ))}
+                                  </tspan>
+                                ))}
+                              </text>
+                            </svg>
+                          )}
                         </Link>
 
                         {metaParts.length > 0 && (
