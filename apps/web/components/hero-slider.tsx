@@ -307,7 +307,7 @@ export const HeroSlider = ({ movies }: HeroSliderProps) => {
             modules={[Autoplay, EffectFade]}
             effect="fade"
             speed={700}
-            autoplay={{ delay: 10000, disableOnInteraction: false }}
+            autoplay={{ delay: 60000, disableOnInteraction: false }}
             className="h-full w-full"
           >
             {movies.map((movie, index) => {
