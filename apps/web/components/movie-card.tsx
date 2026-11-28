@@ -23,7 +23,7 @@ interface MovieCardProps {
   view?: number;
   rating?: number | string;
   /** horizontal landscape cards vs vertical posters */
-  variant?: "horizontal" | "vertical" | "square" | "tall";
+  variant?: "horizontal" | "vertical" | "portrait" | "tall";
 }
 
 const formatPlaybackTime = (value: number) => {
@@ -90,7 +90,7 @@ export const MovieCard = ({
   variant = "horizontal",
 }: MovieCardProps) => {
   const isHorizontal = variant === "horizontal";
-  const frameAspect = isHorizontal ? "aspect-[16/9]" : variant === "square" ? "aspect-square" : variant === "tall" ? "aspect-[4/5]" : "aspect-[2/3]";
+  const frameAspect = isHorizontal ? "aspect-[16/9]" : variant === "portrait" ? "aspect-[3/4]" : variant === "tall" ? "aspect-[4/5]" : "aspect-[2/3]";
   const imageSources = isHorizontal ? [thumbUrl, posterUrl] : [posterUrl, thumbUrl];
   const fallbackSrc = isHorizontal
     ? "/images/fallback-horizontal.svg"

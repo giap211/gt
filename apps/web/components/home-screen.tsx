@@ -317,7 +317,7 @@ export function HomeScreen() {
 .apple-tv-home .container{max-width:none;padding-left:20px;padding-right:20px}
 .apple-tv-home .movie-carousel-view-more{color:rgba(255,255,255,.62);padding:4px 0;font-size:11px;letter-spacing:-.01em}.apple-tv-home .movie-carousel-view-more-icon{background:transparent!important;color:inherit!important}
 .apple-tv-home .movie-carousel-view-more-icon{width:20px;height:20px;background:rgba(255,255,255,.1)}
-.apple-tv-home section:has(> .container){padding-top:13px;padding-bottom:13px}.apple-tv-home .movie-carousel-poster .movie-poster-frame{border-radius:12px!important;border:0;}.apple-tv-home .movie-carousel-square .movie-poster-frame{border-radius:18px!important}.apple-tv-home .movie-carousel-tall .movie-poster-frame{border-radius:14px!important}.apple-tv-home .movie-carousel-poster .movie-card-info{margin-top:8px!important}.apple-tv-home .movie-carousel-poster .movie-card-title{font-size:12px;line-height:1.35;font-weight:650}.apple-tv-home .movie-carousel-poster .movie-card-rating{font-size:10px;margin-top:4px}.apple-tv-home .movie-carousel-poster .movie-card-original{font-size:10px}.apple-tv-home .movie-carousel-swiper .swiper-slide{height:auto}
+.apple-tv-home section:has(> .container){padding-top:13px;padding-bottom:13px}.apple-tv-home .movie-carousel-poster .movie-poster-frame{border-radius:12px!important;border:0;}.apple-tv-home .movie-carousel-portrait .movie-poster-frame{border-radius:16px!important}.apple-tv-home .movie-carousel-tall .movie-poster-frame{border-radius:18px!important}.movie-carousel-tall .swiper-slide{width:100%!important}.movie-carousel-tall .movie-poster-frame{width:100%;aspect-ratio:4/5!important}.movie-carousel-tall .movie-card-info{padding:0 2px}.apple-tv-home .movie-carousel-poster .movie-card-info{margin-top:8px!important}.apple-tv-home .movie-carousel-poster .movie-card-title{font-size:12px;line-height:1.35;font-weight:650}.apple-tv-home .movie-carousel-poster .movie-card-rating{font-size:10px;margin-top:4px}.apple-tv-home .movie-carousel-poster .movie-card-original{font-size:10px}.apple-tv-home .movie-carousel-swiper .swiper-slide{height:auto}.apple-tv-home .movie-carousel-tall .swiper-slide{flex-shrink:0}
 .apple-tv-home section:has(> .container) h2{color:#f5f5f7!important;background:none!important;-webkit-text-fill-color:#f5f5f7!important;font-size:19px;font-weight:700;letter-spacing:-.035em}
 .apple-tv-home .topic-grid-section{padding-top:8px!important;padding-bottom:14px!important}
 .apple-tv-home .topic-grid-chip{background:rgba(255,255,255,.075)!important;border:1px solid rgba(255,255,255,.09)!important;color:rgba(255,255,255,.82)!important;border-radius:9999px!important;}
@@ -364,7 +364,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
                 title="Điện ảnh Hàn Quốc"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/han-quoc"
-                layout="square"
+                layout="portrait"
                 items={transformMovies(data.korean)}
               />
 
@@ -412,7 +412,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
                 title="Dấu ấn điện ảnh Việt"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/viet-nam"
-                layout="square"
+                layout="portrait"
                 items={transformMovies(data.viet)}
               />
 
@@ -464,7 +464,7 @@ html[data-mobile-theme=light] .apple-tv-home .movie-carousel-view-more,html[data
                 title="Tinh Hoa Điện Ảnh Hồng Kông"
                 titleGradient="linear-gradient(235deg, #ffffff 30%, #d1d5db 130%)"
                 viewMoreLink="/quoc-gia/hong-kong"
-                layout="square"
+                layout="portrait"
                 items={transformMovies(data.hongkong)}
               />
 

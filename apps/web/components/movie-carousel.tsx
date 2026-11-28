@@ -16,7 +16,7 @@ interface MovieCarouselProps {
   viewMoreLink?: string;
   /** gradient text color for section title */
   titleGradient?: string;
-  layout?: "standard" | "ranked" | "poster" | "compact" | "square" | "tall";
+  layout?: "standard" | "ranked" | "poster" | "compact" | "portrait" | "tall";
   items: {
     id: string;
     title: string;
@@ -110,7 +110,7 @@ export const MovieCarousel = ({
             <Swiper
               modules={[Navigation]}
               spaceBetween={10}
-              slidesPerView={layout === "ranked" ? 2.65 : layout === "poster" ? 2.35 : layout === "square" ? 2.35 : layout === "tall" ? 2.7 : layout === "compact" ? 1.85 : 1.6}
+              slidesPerView={layout === "ranked" ? 2.65 : layout === "poster" ? 2.35 : layout === "portrait" ? 2.35 : layout === "tall" ? 2.7 : layout === "compact" ? 1.85 : 1.6}
               navigation={{
                 prevEl: navigationPrevRef.current,
                 nextEl: navigationNextRef.current,
@@ -123,13 +123,13 @@ export const MovieCarousel = ({
                 }
               }}
               breakpoints={{
-                480: { slidesPerView: layout === "ranked" ? 3.1 : layout === "poster" ? 2.8 : layout === "square" ? 2.8 : layout === "tall" ? 3.1 : layout === "compact" ? 2.5 : 2.1, spaceBetween: 10 },
-                768: { slidesPerView: layout === "ranked" ? 4.2 : layout === "poster" ? 3.8 : layout === "square" ? 3.8 : layout === "tall" ? 4.2 : layout === "compact" ? 3.2 : 2.6, spaceBetween: 12 },
-                1024: { slidesPerView: layout === "ranked" ? 5.2 : layout === "poster" ? 4.8 : layout === "square" ? 4.8 : layout === "tall" ? 5.2 : layout === "compact" ? 4 : 3.4, spaceBetween: 12 },
-                1280: { slidesPerView: layout === "ranked" ? 6.2 : layout === "poster" ? 5.8 : layout === "square" ? 5.8 : layout === "tall" ? 6.2 : layout === "compact" ? 4.8 : 4.1, spaceBetween: 12 },
-                1536: { slidesPerView: layout === "ranked" ? 6.5 : layout === "poster" ? 6.2 : layout === "square" ? 6.2 : layout === "tall" ? 6.6 : layout === "compact" ? 5.2 : 4.4, spaceBetween: 14 },
+                480: { slidesPerView: layout === "ranked" ? 3.1 : layout === "poster" ? 2.8 : layout === "portrait" ? 2.8 : layout === "tall" ? 1 : layout === "compact" ? 2.5 : 2.1, spaceBetween: 10 },
+                768: { slidesPerView: layout === "ranked" ? 4.2 : layout === "poster" ? 3.8 : layout === "portrait" ? 3.8 : layout === "tall" ? 1 : layout === "compact" ? 3.2 : 2.6, spaceBetween: 12 },
+                1024: { slidesPerView: layout === "ranked" ? 5.2 : layout === "poster" ? 4.8 : layout === "portrait" ? 4.8 : layout === "tall" ? 1 : layout === "compact" ? 4 : 3.4, spaceBetween: 12 },
+                1280: { slidesPerView: layout === "ranked" ? 6.2 : layout === "poster" ? 5.8 : layout === "portrait" ? 5.8 : layout === "tall" ? 1 : layout === "compact" ? 4.8 : 4.1, spaceBetween: 12 },
+                1536: { slidesPerView: layout === "ranked" ? 6.5 : layout === "poster" ? 6.2 : layout === "portrait" ? 6.2 : layout === "tall" ? 1 : layout === "compact" ? 5.2 : 4.4, spaceBetween: 14 },
               }}
-              className={`movie-carousel-swiper w-full !overflow-hidden ${layout === "poster" ? "movie-carousel-poster" : ""} ${layout === "square" ? "movie-carousel-square" : ""} ${layout === "tall" ? "movie-carousel-tall" : ""}`}
+              className={`movie-carousel-swiper w-full !overflow-hidden ${layout === "poster" ? "movie-carousel-poster" : ""} ${layout === "portrait" ? "movie-carousel-portrait" : ""} ${layout === "tall" ? "movie-carousel-tall" : ""}`}
             >
               {visibleItems.map((movie, index) => (
                 <SwiperSlide key={movie.id} className="h-auto">
@@ -165,7 +165,7 @@ export const MovieCarousel = ({
                       </div>
                     </div>
                   ) : (
-                    <MovieCard {...movie} variant={layout === "poster" ? "vertical" : layout === "square" ? "square" : layout === "tall" ? "tall" : "horizontal"} />
+                    <MovieCard {...movie} variant={layout === "poster" ? "vertical" : layout === "portrait" ? "portrait" : layout === "tall" ? "tall" : "horizontal"} />
                   )}
                 </SwiperSlide>
               ))}
