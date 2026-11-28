@@ -115,9 +115,7 @@ export const MovieCard = ({
     <div className="group relative w-full">
       <Link
         href={href || `/phim/${slug}`}
-        className={`movie-poster-frame ${isHorizontal ? "movie-poster-frame-horizontal" : "movie-poster-frame-vertical"} block relative overflow-hidden rounded-lg ${
-          ${frameAspect}
-        }`}
+        className={`movie-poster-frame ${isHorizontal ? "movie-poster-frame-horizontal" : "movie-poster-frame-vertical"} block relative overflow-hidden rounded-lg ${frameAspect}`}
       >
         <ResilientMovieImage
           sources={imageSources}
