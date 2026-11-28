@@ -110,7 +110,7 @@ export const MovieCarousel = ({
             <Swiper
               modules={[Navigation]}
               spaceBetween={10}
-              slidesPerView={layout === "ranked" ? 2.65 : layout === "poster" ? 2.35 : layout === "portrait" ? 2.35 : layout === "tall" ? 2.7 : layout === "compact" ? 1.85 : 1.6}
+              slidesPerView={layout === "ranked" ? 2.65 : layout === "poster" ? 2.35 : layout === "portrait" ? 2.35 : layout === "tall" ? 1 : layout === "compact" ? 1.85 : 1.6}
               navigation={{
                 prevEl: navigationPrevRef.current,
                 nextEl: navigationNextRef.current,
